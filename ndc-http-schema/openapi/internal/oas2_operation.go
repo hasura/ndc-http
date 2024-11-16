@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 	"slices"
 	"strconv"
@@ -34,9 +33,6 @@ func (oc *oas2OperationBuilder) BuildFunction(pathKey string, operation *v2.Oper
 	funcName := formatOperationName(operation.OperationId)
 	if funcName == "" {
 		funcName = buildPathMethodName(pathKey, "get", oc.builder.ConvertOptions)
-	}
-	if oc.builder.Prefix != "" {
-		funcName = utils.StringSliceToCamelCase([]string{oc.builder.Prefix, funcName})
 	}
 	oc.builder.Logger.Info("function",
 		slog.String("name", funcName),
@@ -97,9 +93,6 @@ func (oc *oas2OperationBuilder) BuildProcedure(pathKey string, method string, op
 		procName = buildPathMethodName(pathKey, method, oc.builder.ConvertOptions)
 	}
 
-	if oc.builder.Prefix != "" {
-		procName = utils.StringSliceToCamelCase([]string{oc.builder.Prefix, procName})
-	}
 	oc.builder.Logger.Info("procedure",
 		slog.String("name", procName),
 		slog.String("path", pathKey),
@@ -230,7 +223,6 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, apiPa
 			return nil, err
 		}
 
-		log.Println("type != ''", apiPath, fieldPaths, typeEncoder)
 		schemaType := typeEncoder.Encode()
 		argument := rest.ArgumentInfo{
 			ArgumentInfo: schema.ArgumentInfo{
@@ -238,7 +230,10 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, apiPa
 			},
 		}
 		if param.Description != "" {
-			argument.Description = &param.Description
+			description := utils.StripHTMLTags(param.Description)
+			if description != "" {
+				argument.Description = &description
+			}
 		}
 
 		switch paramLocation {
@@ -253,13 +248,20 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, apiPa
 			}
 		case rest.InFormData:
 			if typeSchema != nil {
-				formDataObject.Fields[paramName] = rest.ObjectField{
+				param := rest.ObjectField{
 					ObjectField: schema.ObjectField{
-						Type:        argument.Type,
-						Description: argument.Description,
+						Type: argument.Type,
 					},
 					HTTP: typeSchema,
 				}
+
+				if argument.Description != nil {
+					desc := utils.StripHTMLTags(*argument.Description)
+					if desc != "" {
+						param.ObjectField.Description = &desc
+					}
+				}
+				formDataObject.Fields[paramName] = param
 			}
 		default:
 			argument.HTTP = &rest.RequestParameter{

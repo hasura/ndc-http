@@ -39,9 +39,6 @@ func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.Oper
 	if funcName == "" {
 		funcName = buildPathMethodName(oc.pathKey, "get", oc.builder.ConvertOptions)
 	}
-	if oc.builder.Prefix != "" {
-		funcName = utils.StringSliceToCamelCase([]string{oc.builder.Prefix, funcName})
-	}
 
 	defer func() {
 		oc.builder.Logger.Info("function",
@@ -90,10 +87,6 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) (*rest.O
 	procName := formatOperationName(operation.OperationId)
 	if procName == "" {
 		procName = buildPathMethodName(oc.pathKey, oc.method, oc.builder.ConvertOptions)
-	}
-
-	if oc.builder.Prefix != "" {
-		procName = utils.StringSliceToCamelCase([]string{oc.builder.Prefix, procName})
 	}
 
 	defer func() {
@@ -210,8 +203,9 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 				EncodingObject: encoding,
 			},
 		}
-		if param.Description != "" {
-			argument.Description = &param.Description
+		paramDescription := utils.StripHTMLTags(param.Description)
+		if paramDescription != "" {
+			argument.Description = &paramDescription
 		}
 
 		oc.Arguments[paramName] = argument
@@ -318,8 +312,9 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 				argument := schema.ArgumentInfo{
 					Type: ndcType.Encode(),
 				}
-				if header.Description != "" {
-					argument.Description = &header.Description
+				headerDesc := utils.StripHTMLTags(header.Description)
+				if headerDesc != "" {
+					argument.Description = &headerDesc
 				}
 				item.Headers[key] = headerParam
 				oc.Arguments[argumentName] = rest.ArgumentInfo{

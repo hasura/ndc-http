@@ -28,9 +28,9 @@ type OAS2Builder struct {
 }
 
 // NewOAS2Builder creates an OAS3Builder instance
-func NewOAS2Builder(schema *rest.NDCHttpSchema, options ConvertOptions) *OAS2Builder {
+func NewOAS2Builder(options ConvertOptions) *OAS2Builder {
 	builder := &OAS2Builder{
-		schema:         schema,
+		schema:         rest.NewNDCHttpSchema(),
 		schemaCache:    make(map[string]SchemaInfoCache),
 		ConvertOptions: applyConvertOptions(options),
 	}
@@ -38,12 +38,7 @@ func NewOAS2Builder(schema *rest.NDCHttpSchema, options ConvertOptions) *OAS2Bui
 	return builder
 }
 
-// Schema returns the inner NDC HTTP schema
-func (oc *OAS2Builder) Schema() *rest.NDCHttpSchema {
-	return oc.schema
-}
-
-func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.Swagger]) error {
+func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.Swagger]) (*rest.NDCHttpSchema, error) {
 	if docModel.Model.Info != nil {
 		oc.schema.Settings.Version = docModel.Model.Info.Version
 	}
@@ -65,14 +60,14 @@ func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.
 
 	for iterPath := docModel.Model.Paths.PathItems.First(); iterPath != nil; iterPath = iterPath.Next() {
 		if err := oc.pathToNDCOperations(iterPath); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	if docModel.Model.Definitions != nil {
 		for cSchema := docModel.Model.Definitions.Definitions.First(); cSchema != nil; cSchema = cSchema.Next() {
 			if err := oc.convertComponentSchemas(cSchema); err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
@@ -82,17 +77,14 @@ func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.
 		for scheme := docModel.Model.SecurityDefinitions.Definitions.First(); scheme != nil; scheme = scheme.Next() {
 			err := oc.convertSecuritySchemes(scheme)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
 
 	oc.schema.Settings.Security = convertSecurities(docModel.Model.Security)
-	if err := cleanUnusedSchemaTypes(oc.schema); err != nil {
-		return err
-	}
 
-	return nil
+	return NewNDCBuilder(oc.schema, *oc.ConvertOptions).Build()
 }
 
 func (oc *OAS2Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v2.SecurityScheme]) error {
@@ -101,30 +93,20 @@ func (oc *OAS2Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v2
 	if security == nil {
 		return nil
 	}
+
 	result := rest.SecurityScheme{}
 	switch security.Type {
-	case "apiKey":
-		result.Type = rest.APIKeyScheme
+	case string(rest.APIKeyScheme):
 		inLocation, err := rest.ParseAPIKeyLocation(security.In)
 		if err != nil {
 			return err
 		}
-		apiConfig := rest.APIKeyAuthConfig{
-			In:   inLocation,
-			Name: security.Name,
-		}
 		valueEnv := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key}))
-		result.Value = &valueEnv
-		result.APIKeyAuthConfig = &apiConfig
-	case "basic":
-		result.Type = rest.HTTPAuthScheme
-		httpConfig := rest.HTTPAuthConfig{
-			Scheme: "Basic",
-			Header: "Authorization",
-		}
-		valueEnv := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN"}))
-		result.Value = &valueEnv
-		result.HTTPAuthConfig = &httpConfig
+		result.SecuritySchemer = rest.NewAPIKeyAuthConfig(security.Name, inLocation, valueEnv)
+	case string(rest.BasicAuthScheme):
+		user := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "USERNAME"}))
+		password := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "PASSWORD"}))
+		result.SecuritySchemer = rest.NewBasicAuthConfig(user, password)
 	case "oauth2":
 		var flowType rest.OAuthFlowType
 		switch security.Flow {
@@ -149,12 +131,10 @@ func (oc *OAS2Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v2
 			}
 			flow.Scopes = scopes
 		}
-		result.Type = rest.OAuth2Scheme
-		result.OAuth2Config = &rest.OAuth2Config{
-			Flows: map[rest.OAuthFlowType]rest.OAuthFlow{
-				flowType: flow,
-			},
-		}
+
+		result.SecuritySchemer = rest.NewOAuth2Config(map[rest.OAuthFlowType]rest.OAuthFlow{
+			flowType: flow,
+		})
 	default:
 		return fmt.Errorf("invalid security scheme: %s", security.Type)
 	}
