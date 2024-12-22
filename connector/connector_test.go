@@ -1384,6 +1384,22 @@ func TestConnectorArgumentPresets(t *testing.T) {
 			assert.DeepEqual(t, map[string]any{
 				"id":   float64(1),
 				"name": "Dog",
+				"categories": []any{
+					map[string]any{
+						"id":   float64(1),
+						"name": "mammal",
+						"addresses": []any{
+							map[string]any{
+								"id":   float64(1),
+								"name": string("Street 0"),
+							},
+							map[string]any{
+								"id":   float64(2),
+								"name": "Street 1",
+							},
+						},
+					},
+				},
 			}, body)
 
 			writeResponse(w, []byte(`[{"id": 1, "name": "Dog"}]`))
@@ -1469,7 +1485,21 @@ func TestConnectorArgumentPresets(t *testing.T) {
 				{
 					"type": "procedure",
 					"name": "addPet",
-					"arguments": {}
+					"arguments": {
+						"body": {
+							"categories": [{
+								"name": "mammal",
+								"addresses": [
+									{
+										"id": 1
+									},
+									{
+										"id": 2
+									}
+								]
+							}]
+						}
+					}
 				}
 			],
 			"collection_relationships": {}

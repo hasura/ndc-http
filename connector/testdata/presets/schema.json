@@ -42,6 +42,53 @@
             "type": "nullable",
             "underlying_type": { "name": "String", "type": "named" }
           }
+        },
+        "categories": {
+          "type": {
+            "element_type": { "name": "Category", "type": "named" },
+            "type": "array"
+          }
+        }
+      }
+    },
+    "Category": {
+      "fields": {
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "name": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          }
+        },
+        "addresses": {
+          "type": {
+            "element_type": { "name": "Address", "type": "named" },
+            "type": "array"
+          }
+        }
+      }
+    },
+    "Address": {
+      "fields": {
+        "id": {
+          "type": {
+            "name": "Int64",
+            "type": "named"
+          }
+        },
+        "name": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": { "name": "String", "type": "named" }
+          }
         }
       }
     },
@@ -187,6 +234,13 @@
       },
       "aggregate_functions": {},
       "comparison_operators": {}
+    },
+    "Int64": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "int64"
+      }
     },
     "JSON": {
       "representation": {

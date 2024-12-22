@@ -2,6 +2,10 @@ package argument
 
 import (
 	"errors"
+	"fmt"
+	"log"
+	"strconv"
+	"strings"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
@@ -54,23 +58,24 @@ func (ap ArgumentPreset) Evaluate(operationName string, arguments map[string]any
 		return nil, err
 	}
 
+	selectorStr := string(rootSelector)
 	if len(segments) == 1 {
-		arguments[string(rootSelector)] = value
+		arguments[selectorStr] = value
 
 		return arguments, nil
 	}
 
-	nestedValue, err := ap.evalNestedField(segments[1:], arguments[string(rootSelector)], value)
+	nestedValue, err := ap.evalNestedField(segments[1:], arguments[string(rootSelector)], value, []string{selectorStr})
 	if err != nil {
 		return nil, err
 	}
 
-	arguments[string(rootSelector)] = nestedValue
+	arguments[selectorStr] = nestedValue
 
 	return arguments, nil
 }
 
-func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any, value any) (any, error) {
+func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any, value any, fieldPaths []string) (any, error) {
 	segmentsLen := len(segments)
 	if segmentsLen == 0 || len(segments[0].Selectors()) == 0 {
 		return value, nil
@@ -83,22 +88,79 @@ func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any,
 			argumentMap = make(map[string]any)
 		}
 
+		selectorStr := string(selector)
 		if segmentsLen == 1 {
-			argumentMap[string(selector)] = value
+			argumentMap[selectorStr] = value
 
 			return argumentMap, nil
 		}
 
-		nestedValue, err := ap.evalNestedField(segments[1:], argumentMap[string(selector)], value)
+		nestedValue, err := ap.evalNestedField(segments[1:], argumentMap[selectorStr], value, append(fieldPaths, selectorStr))
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
+		}
+
+		argumentMap[selectorStr] = nestedValue
+
+		return argumentMap, nil
+	case spec.WildcardSelector:
+		argumentSlice, sok := argument.([]any)
+		if !sok {
+			return argument, nil
+		}
+
+		for i, arg := range argumentSlice {
+			var err error
+			argumentSlice[i], err = ap.evalNestedField(segments[1:], arg, value, append(fieldPaths, strconv.Itoa(i)))
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return argumentSlice, nil
+	case spec.SliceSelector:
+		argumentSlice, sok := argument.([]any)
+		if !sok {
+			return argument, nil
+		}
+
+		log.Println(selector, argumentSlice)
+		step := selector.Step()
+		if step < 1 {
+			step = 1
+		}
+
+		end := selector.End()
+		if end >= len(argumentSlice) {
+			end = len(argumentSlice) - 1
+		}
+
+		for i := selector.Start(); i <= end; i += step {
+			var err error
+			argumentSlice[i], err = ap.evalNestedField(segments[1:], argumentSlice[i], value, append(fieldPaths, strconv.Itoa(i)))
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return argumentSlice, nil
+	case spec.Index:
+		index := int(selector)
+		argumentSlice, sok := argument.([]any)
+		if !sok || len(argumentSlice) <= index {
+			return argument, nil
+		}
+
+		newValue, err := ap.evalNestedField(segments[1:], argumentSlice[index], value, append(fieldPaths, strconv.Itoa(index)))
 		if err != nil {
 			return nil, err
 		}
 
-		argumentMap[string(selector)] = nestedValue
+		argumentSlice[index] = newValue
 
-		return argumentMap, nil
+		return argumentSlice, nil
 	default:
-		return nil, errors.New("unsupported jsonpath spec: " + selector.String())
+		return argument, nil
 	}
 }
 

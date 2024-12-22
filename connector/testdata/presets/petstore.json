@@ -42,6 +42,38 @@
           "value": 1
         },
         "targets": ["addPet"]
+      },
+      {
+        "path": "body.id",
+        "value": {
+          "type": "literal",
+          "value": 1
+        },
+        "targets": ["addPet"]
+      },
+      {
+        "path": "body.categories[*].id",
+        "value": {
+          "type": "literal",
+          "value": 1
+        },
+        "targets": []
+      },
+      {
+        "path": "body.categories[*].addresses[0].name",
+        "value": {
+          "type": "literal",
+          "value": "Street 0"
+        },
+        "targets": []
+      },
+      {
+        "path": "body.categories[*].addresses[1:3].name",
+        "value": {
+          "type": "literal",
+          "value": "Street 1"
+        },
+        "targets": []
       }
     ]
   },
@@ -147,6 +179,70 @@
             "name": "String",
             "type": "named"
           }
+        },
+        "categories": {
+          "type": {
+            "type": "array",
+            "element_type": {
+              "name": "Category",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "Category": {
+      "fields": {
+        "id": {
+          "type": {
+            "name": "Int64",
+            "type": "named"
+          },
+          "http": {
+            "type": ["integer"],
+            "format": "int64"
+          }
+        },
+        "name": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": ["string"]
+          }
+        },
+        "addresses": {
+          "type": {
+            "type": "array",
+            "element_type": {
+              "name": "Address",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "Address": {
+      "fields": {
+        "id": {
+          "type": {
+            "name": "Int64",
+            "type": "named"
+          },
+          "http": {
+            "type": ["integer"],
+            "format": "int64"
+          }
+        },
+        "name": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": ["string"]
+          }
         }
       }
     }
@@ -157,6 +253,13 @@
       "comparison_operators": {},
       "representation": {
         "type": "int32"
+      }
+    },
+    "Int64": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "int64"
       }
     },
     "String": {

@@ -67,6 +67,11 @@ settings:
         name: X-Pet-Status
       targets:
         - findPetsByStatus
+    - path: body.categories[*].id
+      value:
+        type: literal
+        value: 1
+      targets: []
   tls:
     # Path to the TLS cert to use for TLS required connections.
     certFile:
@@ -313,6 +318,12 @@ object_types:
         type:
           name: String
           type: named
+      categories:
+        type:
+          type: array
+          element_type:
+            name: Category
+            type: named
   PetXml:
     fields:
       category:

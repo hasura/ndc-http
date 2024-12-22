@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"slices"
+	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/schema"
@@ -30,7 +31,7 @@ func ValidateArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.Argument
 
 		typeRep, err := evalTypeRepresentationFromJSONPath(httpSchema, jsonPath, &op, isGlobal)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("%s: %w", key, err)
 		}
 
 		if typeRep == nil {
@@ -50,7 +51,7 @@ func ValidateArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.Argument
 
 		typeRep, err := evalTypeRepresentationFromJSONPath(httpSchema, jsonPath, &op, isGlobal)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("%s: %w", key, err)
 		}
 
 		if typeRep == nil {
@@ -61,7 +62,7 @@ func ValidateArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.Argument
 		targets[BuildArgumentPresetJSONPathKey(key, jsonPath)] = typeRep
 	}
 
-	return jsonPath, targets, err
+	return jsonPath, targets, nil
 }
 
 // BuildArgumentPresetKey builds the argument preset key.
@@ -109,14 +110,14 @@ func evalTypeRepresentationFromJSONPath(httpSchema *rest.NDCHttpSchema, jsonPath
 func evalArgumentFromJSONPath(httpSchema *rest.NDCHttpSchema, typeSchema schema.Type, segments []*spec.Segment, fieldPaths []string) (schema.TypeEncoder, schema.TypeRepresentation, error) {
 	rawType, err := typeSchema.InterfaceT()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 	}
 
 	switch t := rawType.(type) {
 	case *schema.NullableType:
 		underlyingType, typeRep, err := evalArgumentFromJSONPath(httpSchema, t.UnderlyingType, segments, fieldPaths)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 		}
 
 		if underlyingType == nil {
@@ -133,7 +134,17 @@ func evalArgumentFromJSONPath(httpSchema *rest.NDCHttpSchema, typeSchema schema.
 			return schema.NewNullableType(t), schema.NewTypeRepresentationJSON().Encode(), nil
 		}
 
-		return nil, nil, nil
+		switch s := segments[0].Selectors()[0].(type) {
+		case spec.WildcardSelector, spec.Index, spec.SliceSelector:
+			newType, typeRep, err := evalArgumentFromJSONPath(httpSchema, t.ElementType, segments[1:], append(fieldPaths, s.String()))
+			if err != nil {
+				return nil, nil, fmt.Errorf("%s%s: %w", strings.Join(fieldPaths, "."), s.String(), err)
+			}
+
+			return schema.NewArrayType(newType), typeRep, nil
+		default:
+			return nil, nil, nil
+		}
 	case *schema.NamedType:
 		if scalarType, ok := httpSchema.ScalarTypes[t.Name]; ok {
 			return schema.NewNullableType(t), scalarType.Representation, nil
@@ -149,12 +160,12 @@ func evalArgumentFromJSONPath(httpSchema *rest.NDCHttpSchema, typeSchema schema.
 		}
 
 		selectorName, ok := segments[0].Selectors()[0].(spec.Name)
-		if !ok || selectorName == "" {
-			return nil, nil, errors.New("unsupported json path selector: " + segments[0].String())
+		if !ok {
+			return nil, nil, nil
 		}
 
 		if selectorName == "" {
-			return nil, nil, errors.New("invalid json path, empty selector name: " + segments[0].String())
+			return nil, nil, fmt.Errorf("invalid json path %s, empty selector name: %s", strings.Join(fieldPaths, "."), segments[0].String())
 		}
 
 		selector := string(selectorName)
@@ -166,6 +177,10 @@ func evalArgumentFromJSONPath(httpSchema *rest.NDCHttpSchema, typeSchema schema.
 		newFieldType, typeRep, err := evalArgumentFromJSONPath(httpSchema, field.Type, segments[1:], append(fieldPaths, selector))
 		if err != nil {
 			return nil, nil, err
+		}
+
+		if newFieldType == nil {
+			return nil, nil, nil
 		}
 
 		field.Type = newFieldType.Encode()
