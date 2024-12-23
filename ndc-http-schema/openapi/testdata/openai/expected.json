@@ -178,13 +178,13 @@
         }
       }
     },
-    "ChatCompletionRequestMessageInput": {
+    "ChatCompletionRequestMessage": {
       "fields": {
         "content": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "String",
+              "name": "JSON",
               "type": "named"
             }
           }
@@ -205,7 +205,7 @@
           }
         },
         "name": {
-          "description": "An optional name for the participant. Provides the model information to differentiate between participants of the same role.",
+          "description": "The name of the function to call.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -220,7 +220,7 @@
           }
         },
         "role": {
-          "description": "The role of the messages author, in this case `system`.",
+          "description": "The role of the messages author, in this case `function`.",
           "type": {
             "name": "ChatCompletionRequestMessageRoleEnum",
             "type": "named"
@@ -628,7 +628,7 @@
           "description": "A list of messages comprising the conversation so far. [Example Python code](https://cookbook.openai.com/examples/how_to_format_inputs_to_chatgpt_models).",
           "type": {
             "element_type": {
-              "name": "ChatCompletionRequestMessageInput",
+              "name": "ChatCompletionRequestMessage",
               "type": "named"
             },
             "type": "array"
@@ -1090,7 +1090,7 @@
         }
       }
     },
-    "CreateModelRequest": {
+    "CreateModelRequestInput": {
       "fields": {
         "model": {
           "description": "The name of the model to create",
@@ -1127,7 +1127,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CreateThreadRequestInput",
+              "name": "CreateThreadRequest",
               "type": "named"
             }
           },
@@ -1139,14 +1139,47 @@
         }
       }
     },
-    "CreateThreadRequestInput": {
+    "CreateThreadRequest": {
       "fields": {
         "tool_resources": {
           "description": "A set of resources that are made available to the assistant's tools in this thread. The resources are specific to the type of tool. For example, the `code_interpreter` tool requires a list of file IDs, while the `file_search` tool requires a list of vector store IDs.",
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CreateThreadRequestToolResourcesInput",
+              "name": "CreateThreadRequestToolResources",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ]
+          }
+        }
+      }
+    },
+    "CreateThreadRequestToolResources": {
+      "description": "A set of resources that are made available to the assistant's tools in this thread. The resources are specific to the type of tool. For example, the `code_interpreter` tool requires a list of file IDs, while the `file_search` tool requires a list of vector store IDs.",
+      "fields": {
+        "code_interpreter": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "CreateThreadRequestToolResourcesCodeInterpreter",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ]
+          }
+        },
+        "file_search": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "CreateThreadRequestToolResourcesFileSearch",
               "type": "named"
             }
           },
@@ -1185,7 +1218,7 @@
         }
       }
     },
-    "CreateThreadRequestToolResourcesFileSearchInput": {
+    "CreateThreadRequestToolResourcesFileSearch": {
       "fields": {
         "vector_store_ids": {
           "description": "The [vector store](/docs/api-reference/vector-stores/object) attached to this thread. There can be a maximum of 1 vector store attached to the thread.",
@@ -1216,7 +1249,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "CreateThreadRequestToolResourcesFileSearchVectorStoresInput",
+                "name": "CreateThreadRequestToolResourcesFileSearchVectorStores",
                 "type": "named"
               },
               "type": "array"
@@ -1235,75 +1268,14 @@
         }
       }
     },
-    "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategy1Static": {
-      "fields": {
-        "chunk_overlap_tokens": {
-          "description": "The number of tokens that overlap between chunks. The default value is `400`.  Note that the overlap must not exceed half of `max_chunk_size_tokens`.",
-          "type": {
-            "name": "Int32",
-            "type": "named"
-          },
-          "http": {
-            "type": [
-              "integer"
-            ]
-          }
-        },
-        "max_chunk_size_tokens": {
-          "description": "The maximum number of tokens in each chunk. The default value is `800`. The minimum value is `100` and the maximum value is `4096`.",
-          "type": {
-            "name": "Int32",
-            "type": "named"
-          },
-          "http": {
-            "type": [
-              "integer"
-            ],
-            "maximum": 4096,
-            "minimum": 100
-          }
-        }
-      }
-    },
-    "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategyInput": {
-      "description": "The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy.",
-      "fields": {
-        "static": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategy1Static",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "object"
-            ]
-          }
-        },
-        "type": {
-          "description": "Always `auto`.",
-          "type": {
-            "name": "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategyTypeEnum",
-            "type": "named"
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        }
-      }
-    },
-    "CreateThreadRequestToolResourcesFileSearchVectorStoresInput": {
+    "CreateThreadRequestToolResourcesFileSearchVectorStores": {
       "fields": {
         "chunking_strategy": {
           "description": "The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy.",
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategyInput",
+              "name": "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategy",
               "type": "named"
             }
           },
@@ -1353,14 +1325,14 @@
         }
       }
     },
-    "CreateThreadRequestToolResourcesInput": {
-      "description": "A set of resources that are made available to the assistant's tools in this thread. The resources are specific to the type of tool. For example, the `code_interpreter` tool requires a list of file IDs, while the `file_search` tool requires a list of vector store IDs.",
+    "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategy": {
+      "description": "The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy.",
       "fields": {
-        "code_interpreter": {
+        "static": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CreateThreadRequestToolResourcesCodeInterpreter",
+              "name": "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategy1Static",
               "type": "named"
             }
           },
@@ -1370,18 +1342,49 @@
             ]
           }
         },
-        "file_search": {
+        "type": {
+          "description": "Always `static`.",
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CreateThreadRequestToolResourcesFileSearchInput",
+              "name": "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategyTypeEnum",
               "type": "named"
             }
           },
           "http": {
             "type": [
-              "object"
+              "string"
             ]
+          }
+        }
+      }
+    },
+    "CreateThreadRequestToolResourcesFileSearchVectorStoresChunkingStrategy1Static": {
+      "fields": {
+        "chunk_overlap_tokens": {
+          "description": "The number of tokens that overlap between chunks. The default value is `400`.  Note that the overlap must not exceed half of `max_chunk_size_tokens`.",
+          "type": {
+            "name": "Int32",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "integer"
+            ]
+          }
+        },
+        "max_chunk_size_tokens": {
+          "description": "The maximum number of tokens in each chunk. The default value is `800`. The minimum value is `100` and the maximum value is `4096`.",
+          "type": {
+            "name": "Int32",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "maximum": 4096,
+            "minimum": 100
           }
         }
       }
@@ -1593,7 +1596,7 @@
         "body": {
           "description": "Request body of POST /api/create",
           "type": {
-            "name": "CreateModelRequest",
+            "name": "CreateModelRequestInput",
             "type": "named"
           },
           "http": {

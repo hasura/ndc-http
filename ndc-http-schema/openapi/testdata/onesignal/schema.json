@@ -230,7 +230,7 @@
         }
       }
     },
-    "GetNotificationHistoryBody": {
+    "GetNotificationHistoryBodyInput": {
       "fields": {
         "app_id": {
           "type": {
@@ -831,7 +831,7 @@
         "body": {
           "description": "Request body of POST /notifications/{notification_id}/history",
           "type": {
-            "name": "GetNotificationHistoryBody",
+            "name": "GetNotificationHistoryBodyInput",
             "type": "named"
           }
         },

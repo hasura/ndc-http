@@ -216,10 +216,6 @@ func (oc *oas3SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 	}
 
 	var result schema.TypeEncoder
-	object := rest.ObjectType{
-		Fields: make(map[string]rest.ObjectField),
-		XML:    typeResult.XML,
-	}
 	readObject := rest.ObjectType{
 		Fields: make(map[string]rest.ObjectField),
 		XML:    typeResult.XML,
@@ -230,7 +226,6 @@ func (oc *oas3SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 	}
 
 	if typeResult.Description != "" {
-		object.Description = &typeResult.Description
 		readObject.Description = &typeResult.Description
 		writeObject.Description = &typeResult.Description
 	}
@@ -270,7 +265,8 @@ func (oc *oas3SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 
 		switch {
 		case !propApiSchema.ReadOnly && !propApiSchema.WriteOnly:
-			object.Fields[propName] = objField
+			readObject.Fields[propName] = objField
+			writeObject.Fields[propName] = objField
 		case !oc.writeMode && propApiSchema.ReadOnly:
 			readObject.Fields[propName] = objField
 		default:
@@ -279,34 +275,20 @@ func (oc *oas3SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 	}
 
 	writeRefName := formatWriteObjectName(refName)
-	if len(readObject.Fields) == 0 && len(writeObject.Fields) == 0 {
-		if len(object.Fields) > 0 && isXMLLeafObject(object) {
-			object.Fields[xmlValueFieldName] = xmlValueField
-		}
+	if isXMLLeafObject(readObject) {
+		readObject.Fields[xmlValueFieldName] = xmlValueField
+	}
 
-		oc.builder.schema.ObjectTypes[refName] = object
-		result = schema.NewNamedType(refName)
+	if isXMLLeafObject(writeObject) {
+		writeObject.Fields[xmlValueFieldName] = xmlValueField
+	}
+
+	oc.builder.schema.ObjectTypes[refName] = readObject
+	oc.builder.schema.ObjectTypes[writeRefName] = writeObject
+	if oc.writeMode {
+		result = schema.NewNamedType(writeRefName)
 	} else {
-		for key, field := range object.Fields {
-			readObject.Fields[key] = field
-			writeObject.Fields[key] = field
-		}
-
-		if len(readObject.Fields) > 0 && isXMLLeafObject(readObject) {
-			readObject.Fields[xmlValueFieldName] = xmlValueField
-		}
-
-		if len(writeObject.Fields) > 0 && isXMLLeafObject(writeObject) {
-			writeObject.Fields[xmlValueFieldName] = xmlValueField
-		}
-
-		oc.builder.schema.ObjectTypes[refName] = readObject
-		oc.builder.schema.ObjectTypes[writeRefName] = writeObject
-		if oc.writeMode {
-			result = schema.NewNamedType(writeRefName)
-		} else {
-			result = schema.NewNamedType(refName)
-		}
+		result = schema.NewNamedType(refName)
 	}
 
 	if baseSchema.Nullable != nil && *baseSchema.Nullable {
@@ -443,119 +425,113 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 	return schema.NewNamedType(refName), typeSchema, nil
 }
 
-type unionSiblingField struct {
-	Type        schema.TypeEncoder
-	EnumOneOf   []string
-	Description *string
-	HTTP        *rest.TypeSchema
-}
-
 // Find common fields in all objects to merge the type.
 // If they have the same type, we don't need to wrap it with the nullable type.
 func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, srcObjects []rest.ObjectType, unionType oasUnionType, fieldPaths []string) error {
-	objectItemLength := len(srcObjects)
-	siblingFields := make(map[string]unionSiblingField)
-	for i, object := range srcObjects {
-		if i >= objectItemLength-1 {
-			break
-		}
-
+	mergedObjectFields := make(map[string][]rest.ObjectField)
+	for _, object := range srcObjects {
 		for key, field := range object.Fields {
-			siblingField, siblingFieldExist := siblingFields[key]
-			nextField, ok := srcObjects[i+1].Fields[key]
+			mergedObjectFields[key] = append(mergedObjectFields[key], field)
+		}
+	}
 
+	for key, fields := range mergedObjectFields {
+		if len(fields) == 1 {
+			newField := rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Description: fields[0].Description,
+					Arguments:   fields[0].Arguments,
+					Type:        fields[0].Type,
+				},
+				HTTP: fields[0].HTTP,
+			}
+
+			if unionType != oasAllOf && !isNullableType(newField.Type.Interface()) {
+				newField.Type = (schema.NullableType{
+					Type:           schema.TypeNullable,
+					UnderlyingType: newField.Type,
+				}).Encode()
+			}
+
+			dest.Fields[key] = newField
+
+			continue
+		}
+
+		var unionField rest.ObjectField
+		for i, field := range fields {
+			if i == 0 {
+				unionField = field
+
+				continue
+			}
+
+			var ok bool
+			unionField, ok = mergeUnionTypes(httpSchema, field.Type, unionField.Type, append(fieldPaths, key))
 			if !ok {
-				if siblingFieldExist && unionType != oasAllOf && !isNullableType(siblingField.Type) {
-					siblingField.Type = schema.NewNullableType(siblingField.Type)
-					siblingFields[key] = siblingField
-				}
-
-				continue
+				break
 			}
 
-			newField, ok := mergeUnionTypes(httpSchema, field.Type, nextField.Type, append(fieldPaths, key))
-			switch {
-			case ok:
-				usField := unionSiblingField{
-					Type:      newField.Type,
-					EnumOneOf: append(siblingField.EnumOneOf, newField.EnumOneOf...),
-				}
+			if unionField.Description == nil && field.Description != nil {
+				unionField.Description = field.Description
+			}
 
-				switch {
-				case siblingFieldExist && siblingField.Description != nil:
-					usField.Description = siblingField.Description
-				case field.Description != nil:
-					usField.Description = field.Description
-				case nextField.Description != nil:
-					usField.Description = nextField.Description
-				}
-
-				switch {
-				case len(newField.EnumOneOf) > 0:
-					usField.HTTP = &rest.TypeSchema{
-						Type: []string{"string"},
-					}
-				case siblingFieldExist && siblingField.HTTP != nil:
-					usField.HTTP = siblingField.HTTP
-				case field.HTTP != nil:
-					usField.HTTP = field.HTTP
-				case nextField.HTTP != nil:
-					usField.HTTP = nextField.HTTP
-				}
-
-				siblingFields[key] = usField
-			case siblingFieldExist:
-				newField, _ = mergeUnionTypes(httpSchema, siblingField.Type.Encode(), nextField.Type, append(fieldPaths, key))
-				siblingFields[key] = unionSiblingField{
-					Type: newField.Type,
-				}
-			default:
-				siblingFields[key] = *newField
+			if unionField.HTTP == nil && field.HTTP != nil {
+				unionField.HTTP = field.HTTP
 			}
 		}
+
+		if len(fields) < len(srcObjects) && unionType != oasAllOf && !isNullableType(unionField.Type.Interface()) {
+			unionField.Type = (schema.NullableType{
+				Type:           schema.TypeNullable,
+				UnderlyingType: unionField.Type,
+			}).Encode()
+		}
+
+		dest.Fields[key] = unionField
 	}
 
-	for key, field := range siblingFields {
-		fieldType := field.Type
-		if len(field.EnumOneOf) > 0 {
-			newScalar := schema.NewScalarType()
-			newScalar.Representation = schema.NewTypeRepresentationEnum(utils.SliceUnique(field.EnumOneOf)).Encode()
+	// for key, field := range siblingFields {
+	// 	fieldType := field.Type
+	// 	if len(field.EnumOneOf) > 0 {
+	// 		newScalar := schema.NewScalarType()
+	// 		newScalar.Representation = schema.NewTypeRepresentationEnum(utils.SliceUnique(field.EnumOneOf)).Encode()
 
-			newName := utils.StringSliceToPascalCase(append(fieldPaths, key, "Enum"))
-			httpSchema.ScalarTypes[newName] = *newScalar
+	// 		newName := utils.StringSliceToPascalCase(append(fieldPaths, key, "Enum"))
+	// 		httpSchema.ScalarTypes[newName] = *newScalar
 
-			var err error
-			fieldType, err = replaceNamedType(field.Type.Encode(), newName)
-			if err != nil {
-				return fmt.Errorf("%s: failed to replace named type, %w", strings.Join(append(fieldPaths, key), "."), err)
-			}
-		}
+	// 		var err error
+	// 		fieldType, err = replaceNamedType(field.Type.Encode(), newName)
+	// 		if err != nil {
+	// 			return fmt.Errorf("%s: failed to replace named type, %w", strings.Join(append(fieldPaths, key), "."), err)
+	// 		}
+	// 	}
 
-		dest.Fields[key] = rest.ObjectField{
-			ObjectField: schema.ObjectField{
-				Description: field.Description,
-				Type:        fieldType.Encode(),
-			},
-			HTTP: field.HTTP,
-		}
-	}
+	// 	dest.Fields[key] = rest.ObjectField{
+	// 		ObjectField: schema.ObjectField{
+	// 			Description: field.Description,
+	// 			Type:        fieldType.Encode(),
+	// 		},
+	// 		HTTP: field.HTTP,
+	// 	}
+	// }
 
-	for _, objectItem := range srcObjects {
-		for key, field := range objectItem.Fields {
-			if _, ok := siblingFields[key]; ok {
-				continue
-			}
+	// for _, objectItem := range srcObjects {
+	// 	for key, field := range objectItem.Fields {
+	// 		if _, ok := siblingFields[key]; ok {
+	// 			continue
+	// 		}
 
-			// In anyOf and oneOf union objects, the API only requires one of union objects, other types are optional.
-			// Because the NDC spec hasn't supported union types yet we make all properties optional to enable autocompletion.
-			iType := field.Type.Interface()
-			if unionType != oasAllOf && !isNullableType(iType) {
-				field.ObjectField.Type = schema.NewNullableType(iType).Encode()
-			}
+	// 		// In anyOf and oneOf union objects, the API only requires one of union objects, other types are optional.
+	// 		// Because the NDC spec hasn't supported union types yet we make all properties optional to enable autocompletion.
+	// 		iType := field.Type.Interface()
+	// 		if unionType != oasAllOf && !isNullableType(iType) {
+	// 			field.ObjectField.Type = schema.NewNullableType(iType).Encode()
+	// 		}
 
-			dest.Fields[key] = field
-		}
-	}
+	// 		dest.Fields[key] = field
+	// 	}
+	// }
 
 	return nil
 }

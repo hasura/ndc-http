@@ -117,6 +117,47 @@ var defaultScalarTypes = map[rest.ScalarName]*schema.ScalarType{
 	},
 }
 
+var typeRepresentationToScalarNameRelationship = map[schema.TypeRepresentationType]rest.ScalarName{
+	schema.TypeRepresentationTypeBoolean:     rest.ScalarBoolean,
+	schema.TypeRepresentationTypeString:      rest.ScalarString,
+	schema.TypeRepresentationTypeInt8:        rest.ScalarInt32,
+	schema.TypeRepresentationTypeInt16:       rest.ScalarInt32,
+	schema.TypeRepresentationTypeInt32:       rest.ScalarInt32,
+	schema.TypeRepresentationTypeInt64:       rest.ScalarInt64,
+	schema.TypeRepresentationTypeBigInteger:  rest.ScalarBigDecimal,
+	schema.TypeRepresentationTypeBigDecimal:  rest.ScalarBigDecimal,
+	schema.TypeRepresentationTypeBytes:       rest.ScalarBytes,
+	schema.TypeRepresentationTypeDate:        rest.ScalarDate,
+	schema.TypeRepresentationTypeEnum:        rest.ScalarString,
+	schema.TypeRepresentationTypeFloat32:     rest.ScalarFloat32,
+	schema.TypeRepresentationTypeFloat64:     rest.ScalarFloat64,
+	schema.TypeRepresentationTypeGeography:   rest.ScalarJSON,
+	schema.TypeRepresentationTypeGeometry:    rest.ScalarJSON,
+	schema.TypeRepresentationTypeTimestamp:   rest.ScalarTimestampTZ,
+	schema.TypeRepresentationTypeTimestampTZ: rest.ScalarTimestampTZ,
+	schema.TypeRepresentationTypeJSON:        rest.ScalarJSON,
+}
+
+var integerTypeRepresentations = []schema.TypeRepresentationType{
+	schema.TypeRepresentationTypeInt32,
+	schema.TypeRepresentationTypeInt64,
+	schema.TypeRepresentationTypeInt8,
+	schema.TypeRepresentationTypeInt16,
+}
+
+var floatTypeRepresentations = []schema.TypeRepresentationType{
+	schema.TypeRepresentationTypeFloat32,
+	schema.TypeRepresentationTypeFloat64,
+}
+
+var stringTypeRepresentations = []schema.TypeRepresentationType{
+	schema.TypeRepresentationTypeString,
+	schema.TypeRepresentationTypeEnum,
+	schema.TypeRepresentationTypeDate,
+	schema.TypeRepresentationTypeTimestamp,
+	schema.TypeRepresentationTypeTimestampTZ,
+}
+
 const xmlValueFieldName string = "xmlValue"
 
 var xmlValueField = rest.ObjectField{
