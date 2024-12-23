@@ -180,12 +180,20 @@ func (oc *oas2SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 	if xmlSchema.Name == "" {
 		xmlSchema.Name = fieldPaths[0]
 	}
-	object := rest.ObjectType{
+
+	var result schema.TypeEncoder
+	readObject := rest.ObjectType{
 		Fields: make(map[string]rest.ObjectField),
 		XML:    xmlSchema,
 	}
+	writeObject := rest.ObjectType{
+		Fields: make(map[string]rest.ObjectField),
+		XML:    xmlSchema,
+	}
+
 	if typeResult.Description != "" {
-		object.Description = &typeResult.Description
+		readObject.Description = &typeResult.Description
+		writeObject.Description = &typeResult.Description
 	}
 
 	for prop := baseSchema.Properties.First(); prop != nil; prop = prop.Next() {
@@ -222,14 +230,29 @@ func (oc *oas2SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 			objField.Description = &propApiSchema.Description
 		}
 
-		object.Fields[propName] = objField
+		readObject.Fields[propName] = objField
+		if !propApiSchema.ReadOnly {
+			writeObject.Fields[propName] = objField
+		}
 	}
 
-	if isXMLLeafObject(object) {
-		object.Fields[xmlValueFieldName] = xmlValueField
+	writeRefName := formatWriteObjectName(refName)
+	if isXMLLeafObject(readObject) {
+		readObject.Fields[xmlValueFieldName] = xmlValueField
 	}
-	oc.builder.schema.ObjectTypes[refName] = object
-	var result schema.TypeEncoder = schema.NewNamedType(refName)
+
+	if isXMLLeafObject(writeObject) {
+		writeObject.Fields[xmlValueFieldName] = xmlValueField
+	}
+
+	oc.builder.schema.ObjectTypes[refName] = readObject
+	oc.builder.schema.ObjectTypes[writeRefName] = writeObject
+	if oc.writeMode {
+		result = schema.NewNamedType(writeRefName)
+	} else {
+		result = schema.NewNamedType(refName)
+	}
+
 	if baseSchema.Nullable != nil && *baseSchema.Nullable {
 		result = schema.NewNullableType(result)
 	}

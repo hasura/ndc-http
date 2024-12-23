@@ -335,6 +335,75 @@ func isNullableType(input schema.TypeEncoder) bool {
 	return ok
 }
 
+// Find common fields in all objects to merge the type.
+// If they have the same type, we don't need to wrap it with the nullable type.
+func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, srcObjects []rest.ObjectType, unionType oasUnionType, fieldPaths []string) error {
+	mergedObjectFields := make(map[string][]rest.ObjectField)
+	for _, object := range srcObjects {
+		for key, field := range object.Fields {
+			mergedObjectFields[key] = append(mergedObjectFields[key], field)
+		}
+	}
+
+	for key, fields := range mergedObjectFields {
+		if len(fields) == 1 {
+			newField := rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Description: fields[0].Description,
+					Arguments:   fields[0].Arguments,
+					Type:        fields[0].Type,
+				},
+				HTTP: fields[0].HTTP,
+			}
+
+			if unionType != oasAllOf && !isNullableType(newField.Type.Interface()) {
+				newField.Type = (schema.NullableType{
+					Type:           schema.TypeNullable,
+					UnderlyingType: newField.Type,
+				}).Encode()
+			}
+
+			dest.Fields[key] = newField
+
+			continue
+		}
+
+		var unionField rest.ObjectField
+		for i, field := range fields {
+			if i == 0 {
+				unionField = field
+
+				continue
+			}
+
+			var ok bool
+			unionField, ok = mergeUnionTypes(httpSchema, field.Type, unionField.Type, append(fieldPaths, key))
+			if !ok {
+				break
+			}
+
+			if unionField.Description == nil && field.Description != nil {
+				unionField.Description = field.Description
+			}
+
+			if unionField.HTTP == nil && field.HTTP != nil {
+				unionField.HTTP = field.HTTP
+			}
+		}
+
+		if len(fields) < len(srcObjects) && unionType != oasAllOf && !isNullableType(unionField.Type.Interface()) {
+			unionField.Type = (schema.NullableType{
+				Type:           schema.TypeNullable,
+				UnderlyingType: unionField.Type,
+			}).Encode()
+		}
+
+		dest.Fields[key] = unionField
+	}
+
+	return nil
+}
+
 func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Type, fieldPaths []string) (rest.ObjectField, bool) {
 	bn, bNullErr := b.AsNullable()
 	bType := b
@@ -523,29 +592,6 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 	}
 
 	return results, nil, nullable
-}
-
-func getMaybeTypeRepresentationEnum(httpSchema *rest.NDCHttpSchema, input schema.Type) (*schema.TypeRepresentationEnum, bool) {
-	switch t := input.Interface().(type) {
-	case *schema.NullableType:
-		return getMaybeTypeRepresentationEnum(httpSchema, t.UnderlyingType)
-	case *schema.ArrayType:
-		return nil, false
-	case *schema.NamedType:
-		scl, ok := httpSchema.ScalarTypes[t.Name]
-		if !ok {
-			return nil, false
-		}
-
-		typeRep, err := scl.Representation.AsEnum()
-		if err != nil {
-			return nil, false
-		}
-
-		return typeRep, true
-	default:
-		return nil, false
-	}
 }
 
 func formatWriteObjectName(name string) string {
