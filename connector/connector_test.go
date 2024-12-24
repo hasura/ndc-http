@@ -1160,7 +1160,7 @@ func (mtls *mockTLSServer) Count() int {
 	return mtls.counter
 }
 
-func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string) *httptest.Server {
+func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string, insecure bool) *httptest.Server {
 	t.Helper()
 	mux := http.NewServeMux()
 
@@ -1195,7 +1195,11 @@ func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string) *httptes
 	tlsConfig := &tls.Config{
 		ClientCAs:    caCertPool,
 		Certificates: []tls.Certificate{cert},
-		ClientAuth:   tls.RequestClientCert,
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+	}
+
+	if insecure {
+		tlsConfig.ClientAuth = tls.NoClientCert
 	}
 
 	server := httptest.NewUnstartedServer(mux)
@@ -1207,11 +1211,11 @@ func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string) *httptes
 
 func TestConnectorTLS(t *testing.T) {
 	mockServer := &mockTLSServer{}
-	server := mockServer.createMockTLSServer(t, "testdata/tls/certs")
+	server := mockServer.createMockTLSServer(t, "testdata/tls/certs", false)
 	defer server.Close()
 
 	mockServer1 := &mockTLSServer{}
-	server1 := mockServer1.createMockTLSServer(t, "testdata/tls/certs_s1")
+	server1 := mockServer1.createMockTLSServer(t, "testdata/tls/certs_s1", false)
 	defer server1.Close()
 
 	t.Setenv("PET_STORE_URL", server.URL)
@@ -1312,7 +1316,7 @@ func TestConnectorTLS(t *testing.T) {
 
 func TestConnectorTLSInsecure(t *testing.T) {
 	mockServer := &mockTLSServer{}
-	server := mockServer.createMockTLSServer(t, "testdata/tls/certs")
+	server := mockServer.createMockTLSServer(t, "testdata/tls/certs", true)
 	defer server.Close()
 
 	t.Setenv("PET_STORE_URL", server.URL)
