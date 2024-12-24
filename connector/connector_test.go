@@ -1309,7 +1309,7 @@ func TestConnectorTLS(t *testing.T) {
 		})
 	}()
 
-	time.Sleep(1)
+	time.Sleep(time.Second)
 	assert.Equal(t, 1, mockServer.Count())
 	assert.Equal(t, 1, mockServer1.Count())
 }
