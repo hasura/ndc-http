@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"log"
 	"log/slog"
 	"strings"
 
@@ -23,14 +24,14 @@ type OAS3Builder struct {
 	// stores prebuilt and evaluating information of component schema types.
 	// some undefined schema types aren't stored in either object nor scalar,
 	// or self-reference types that haven't added into the object_types map yet.
-	// This cache temporarily stores them to avoid infinite recursive reference.
+	// This cache temporarily stores them to avoid infinite recursive references.
 	schemaCache map[string]SchemaInfoCache
 }
 
 // SchemaInfoCache stores prebuilt information of component schema types.
 type SchemaInfoCache struct {
-	Name       string
-	Schema     schema.TypeEncoder
+	TypeRead   schema.TypeEncoder
+	TypeWrite  schema.TypeEncoder
 	TypeSchema *rest.TypeSchema
 }
 
@@ -266,23 +267,29 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		return nil
 	}
 
-	typeEncoder, schemaResult, err := newOAS3SchemaBuilder(oc, "", rest.InBody, false).
+	schemaResult, err := newOAS3SchemaBuilder(oc, "", rest.InBody, false).
 		getSchemaType(typeSchema, []string{typeKey})
 	if err != nil {
 		return err
 	}
 
-	var typeName string
-	if typeEncoder != nil {
-		typeName = getNamedType(typeEncoder, true, "")
+	if schemaResult == nil {
+		log.Println("can not build schema for", typeKey)
+
+		return nil
 	}
 
-	if schemaResult != nil {
-		if schemaResult.XML == nil {
-			schemaResult.XML = &rest.XMLSchema{}
+	var typeName string
+	if schemaResult.TypeRead != nil {
+		typeName = getNamedType(schemaResult.TypeRead, true, "")
+	}
+
+	if schemaResult.TypeSchema != nil {
+		if schemaResult.TypeSchema.XML == nil {
+			schemaResult.TypeSchema.XML = &rest.XMLSchema{}
 		}
-		if schemaResult.XML.Name == "" {
-			schemaResult.XML.Name = typeKey
+		if schemaResult.TypeSchema.XML.Name == "" {
+			schemaResult.TypeSchema.XML.Name = typeKey
 		}
 	}
 
@@ -295,22 +302,18 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 
 	cacheKey := "#/components/schemas/" + typeKey
 	// treat no-property objects as a Arbitrary JSON scalar
-	if typeEncoder == nil || typeName == string(rest.ScalarJSON) {
+	if schemaResult.TypeRead == nil || typeName == string(rest.ScalarJSON) {
 		refName := utils.ToPascalCase(typeKey)
 		scalar := schema.NewScalarType()
 		scalar.Representation = schema.NewTypeRepresentationJSON().Encode()
 		oc.schema.ScalarTypes[refName] = *scalar
 		oc.schemaCache[cacheKey] = SchemaInfoCache{
-			Name:       refName,
-			Schema:     schema.NewNamedType(refName),
-			TypeSchema: schemaResult,
+			TypeRead:   schema.NewNamedType(refName),
+			TypeWrite:  schema.NewNamedType(refName),
+			TypeSchema: schemaResult.TypeSchema,
 		}
 	} else {
-		oc.schemaCache[cacheKey] = SchemaInfoCache{
-			Name:       typeName,
-			Schema:     typeEncoder,
-			TypeSchema: schemaResult,
-		}
+		oc.schemaCache[cacheKey] = *schemaResult
 	}
 
 	return err
@@ -369,8 +372,8 @@ func (oc *OAS3Builder) populateWriteSchemaType(schemaType schema.Type) (schema.T
 		_, evaluated := oc.schemaCache[ty.Name]
 		if !evaluated {
 			oc.schemaCache[ty.Name] = SchemaInfoCache{
-				Name:   ty.Name,
-				Schema: schema.NewNamedType(ty.Name),
+				TypeRead:  schema.NewNamedType(ty.Name),
+				TypeWrite: schema.NewNamedType(ty.Name),
 				TypeSchema: &rest.TypeSchema{
 					Type: []string{"object"},
 				},

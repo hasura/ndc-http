@@ -230,6 +230,44 @@
         }
       }
     },
+    "FilterInput": {
+      "fields": {
+        "field": {
+          "description": "Name of the field to use as the first operand in the filter expression.",
+          "type": {
+            "name": "String",
+            "type": "named"
+          }
+        },
+        "key": {
+          "description": "If `field` is `tag`, this field is *required* to specify `key` inside the tags.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "relation": {
+          "description": "Operator of a filter expression.",
+          "type": {
+            "name": "FilterRelation",
+            "type": "named"
+          }
+        },
+        "value": {
+          "description": "Constant value to use as the second operand in the filter expression. This value is *required* when the relation operator is a binary operator.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
     "GetNotificationHistoryBodyInput": {
       "fields": {
         "app_id": {
@@ -291,7 +329,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "StringMap",
+              "name": "StringMapInput",
               "type": "named"
             }
           }
@@ -332,7 +370,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "Filter",
+                "name": "FilterInput",
                 "type": "named"
               },
               "type": "array"
@@ -343,7 +381,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "StringMap",
+              "name": "StringMapInput",
               "type": "named"
             }
           }
@@ -382,7 +420,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "StringMap",
+              "name": "StringMapInput",
               "type": "named"
             }
           }
@@ -748,6 +786,20 @@
       }
     },
     "StringMap": {
+      "fields": {
+        "en": {
+          "description": "Text in English.  Will be used as a fallback",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "StringMapInput": {
       "fields": {
         "en": {
           "description": "Text in English.  Will be used as a fallback",

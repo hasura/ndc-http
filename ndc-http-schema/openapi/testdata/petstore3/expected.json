@@ -1139,6 +1139,42 @@
         "name": "category"
       }
     },
+    "CategoryInput": {
+      "fields": {
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "name": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "xml": {
+        "name": "category"
+      }
+    },
     "CreateFineTuningJobRequest": {
       "fields": {
         "model": {
@@ -1970,6 +2006,14 @@
             "type": [
               "array"
             ],
+            "items": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "tag"
+              }
+            },
             "xml": {
               "wrapped": true
             }
@@ -1986,7 +2030,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "Category",
+              "name": "CategoryInput",
               "type": "named"
             }
           },
@@ -2083,7 +2127,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "Tag",
+                "name": "TagInput",
                 "type": "named"
               },
               "type": "array"
@@ -2093,6 +2137,14 @@
             "type": [
               "array"
             ],
+            "items": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "tag"
+              }
+            },
             "xml": {
               "wrapped": true
             }
@@ -4398,7 +4450,10 @@
           "http": {
             "type": [
               "object"
-            ]
+            ],
+            "xml": {
+              "name": "payment_method_affirm"
+            }
           }
         },
         "currency": {
@@ -7399,6 +7454,42 @@
         "name": "tag"
       }
     },
+    "TagInput": {
+      "fields": {
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "name": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "xml": {
+        "name": "tag"
+      }
+    },
     "TreasuryInboundTransfer": {
       "description": "Use [InboundTransfers](https://stripe.com/docs/treasury/moving-money/financial-accounts/into/inbound-transfers) to add funds to your [FinancialAccount](https://stripe.com/docs/api#financial_accounts) via a PaymentMethod that is owned by you. The funds will be transferred via an ACH debit.",
       "fields": {
@@ -7719,7 +7810,7 @@
         }
       }
     },
-    "UploadPetMultipartBodyInputInput": {
+    "UploadPetMultipartBodyInput": {
       "fields": {
         "address": {
           "type": {
@@ -7749,7 +7840,15 @@
           "http": {
             "type": [
               "array"
-            ]
+            ],
+            "items": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "address"
+              }
+            }
           }
         },
         "children": {
@@ -8056,6 +8155,9 @@
       "request": {
         "url": "/v1/accounts/{account}",
         "method": "delete",
+        "requestBody": {
+          "contentType": "application/x-www-form-urlencoded"
+        },
         "response": {
           "contentType": "application/json"
         }
@@ -8076,6 +8178,19 @@
               ],
               "maxLength": 5000
             }
+          }
+        },
+        "body": {
+          "description": "Request body of DELETE /v1/accounts/{account}",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "JSON",
+              "type": "named"
+            }
+          },
+          "http": {
+            "in": "body"
           }
         }
       },
@@ -8990,7 +9105,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "UploadPetMultipartBodyInputInput",
+              "name": "UploadPetMultipartBodyInput",
               "type": "named"
             }
           },

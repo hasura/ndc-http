@@ -251,14 +251,14 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		scalar.Representation = schema.NewTypeRepresentationJSON().Encode()
 		oc.schema.ScalarTypes[refName] = *scalar
 		oc.schemaCache[cacheKey] = SchemaInfoCache{
-			Name:       refName,
-			Schema:     schema.NewNamedType(refName),
+			TypeRead:   schema.NewNamedType(refName),
+			TypeWrite:  schema.NewNamedType(refName),
 			TypeSchema: schemaResult,
 		}
 	} else {
 		oc.schemaCache[cacheKey] = SchemaInfoCache{
-			Name:       typeName,
-			Schema:     typeEncoder,
+			TypeRead:   typeEncoder,
+			TypeWrite:  typeEncoder,
 			TypeSchema: schemaResult,
 		}
 	}

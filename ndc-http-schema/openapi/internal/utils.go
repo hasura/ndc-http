@@ -785,26 +785,3 @@ func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 		return rest.ScalarBinary
 	}
 }
-
-func replaceNamedType(schemaType schema.Type, name string) (schema.TypeEncoder, error) {
-	switch t := schemaType.Interface().(type) {
-	case *schema.NullableType:
-		newType, err := replaceNamedType(t.UnderlyingType, name)
-		if err != nil {
-			return nil, err
-		}
-
-		return schema.NewNullableType(newType), nil
-	case *schema.ArrayType:
-		newType, err := replaceNamedType(t.ElementType, name)
-		if err != nil {
-			return nil, err
-		}
-
-		return schema.NewArrayType(newType), nil
-	case *schema.NamedType:
-		return schema.NewNamedType(name), nil
-	default:
-		return nil, fmt.Errorf("invalid type: %v", schemaType)
-	}
-}

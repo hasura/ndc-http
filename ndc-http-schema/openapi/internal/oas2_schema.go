@@ -282,7 +282,10 @@ func (oc *oas2SchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProx
 			return nil, nil, err
 		}
 	} else if typeCache, ok := oc.builder.schemaCache[rawRefName]; ok {
-		ndcType = typeCache.Schema
+		ndcType = typeCache.TypeRead
+		if oc.writeMode {
+			ndcType = typeCache.TypeWrite
+		}
 		typeSchema = createSchemaFromOpenAPISchema(innerSchema)
 		if typeCache.TypeSchema != nil {
 			typeSchema.Type = typeCache.TypeSchema.Type
@@ -292,8 +295,8 @@ func (oc *oas2SchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProx
 		refName := getSchemaRefTypeNameV2(rawRefName)
 		schemaName := utils.ToPascalCase(refName)
 		oc.builder.schemaCache[rawRefName] = SchemaInfoCache{
-			Name:   schemaName,
-			Schema: schema.NewNamedType(schemaName),
+			TypeRead:  schema.NewNamedType(schemaName),
+			TypeWrite: schema.NewNamedType(schemaName),
 		}
 
 		_, ok := oc.builder.schema.ObjectTypes[schemaName]
@@ -303,8 +306,8 @@ func (oc *oas2SchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProx
 				return nil, nil, err
 			}
 			oc.builder.schemaCache[rawRefName] = SchemaInfoCache{
-				Name:       schemaName,
-				Schema:     ndcType,
+				TypeRead:   ndcType,
+				TypeWrite:  ndcType,
 				TypeSchema: typeSchema,
 			}
 		} else {
