@@ -131,7 +131,7 @@
         }
       }
     },
-    "PetBody": {
+    "PetBodyInput": {
       "fields": {
         "age": {
           "type": {
@@ -160,8 +160,11 @@
         },
         "id": {
           "type": {
-            "name": "String",
-            "type": "named"
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
           },
           "http": {
             "type": [
@@ -202,8 +205,11 @@
         },
         "type": {
           "type": {
-            "name": "PetBodyTypeEnum",
-            "type": "named"
+            "type": "nullable",
+            "underlying_type": {
+              "name": "PetBodyTypeEnum",
+              "type": "named"
+            }
           },
           "http": {
             "type": [
@@ -230,7 +236,7 @@
         "body": {
           "description": "Pet object that needs to be added to the store",
           "type": {
-            "name": "PetBody",
+            "name": "PetBodyInput",
             "type": "named"
           },
           "http": {
@@ -238,7 +244,10 @@
             "schema": {
               "type": [
                 "object"
-              ]
+              ],
+              "xml": {
+                "name": "PetBody"
+              }
             }
           }
         }

@@ -1160,7 +1160,7 @@ func (mtls *mockTLSServer) Count() int {
 	return mtls.counter
 }
 
-func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string) *httptest.Server {
+func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string, insecure bool) *httptest.Server {
 	t.Helper()
 	mux := http.NewServeMux()
 
@@ -1195,7 +1195,11 @@ func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string) *httptes
 	tlsConfig := &tls.Config{
 		ClientCAs:    caCertPool,
 		Certificates: []tls.Certificate{cert},
-		ClientAuth:   tls.RequestClientCert,
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+	}
+
+	if insecure {
+		tlsConfig.ClientAuth = tls.NoClientCert
 	}
 
 	server := httptest.NewUnstartedServer(mux)
@@ -1207,11 +1211,11 @@ func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string) *httptes
 
 func TestConnectorTLS(t *testing.T) {
 	mockServer := &mockTLSServer{}
-	server := mockServer.createMockTLSServer(t, "testdata/tls/certs")
+	server := mockServer.createMockTLSServer(t, "testdata/tls/certs", false)
 	defer server.Close()
 
 	mockServer1 := &mockTLSServer{}
-	server1 := mockServer1.createMockTLSServer(t, "testdata/tls/certs_s1")
+	server1 := mockServer1.createMockTLSServer(t, "testdata/tls/certs_s1", false)
 	defer server1.Close()
 
 	t.Setenv("PET_STORE_URL", server.URL)
@@ -1305,14 +1309,14 @@ func TestConnectorTLS(t *testing.T) {
 		})
 	}()
 
-	time.Sleep(1)
+	time.Sleep(time.Second)
 	assert.Equal(t, 1, mockServer.Count())
 	assert.Equal(t, 1, mockServer1.Count())
 }
 
 func TestConnectorTLSInsecure(t *testing.T) {
 	mockServer := &mockTLSServer{}
-	server := mockServer.createMockTLSServer(t, "testdata/tls/certs")
+	server := mockServer.createMockTLSServer(t, "testdata/tls/certs", true)
 	defer server.Close()
 
 	t.Setenv("PET_STORE_URL", server.URL)
@@ -1384,6 +1388,22 @@ func TestConnectorArgumentPresets(t *testing.T) {
 			assert.DeepEqual(t, map[string]any{
 				"id":   float64(1),
 				"name": "Dog",
+				"categories": []any{
+					map[string]any{
+						"id":   float64(1),
+						"name": "mammal",
+						"addresses": []any{
+							map[string]any{
+								"id":   float64(1),
+								"name": string("Street 0"),
+							},
+							map[string]any{
+								"id":   float64(2),
+								"name": "Street 1",
+							},
+						},
+					},
+				},
 			}, body)
 
 			writeResponse(w, []byte(`[{"id": 1, "name": "Dog"}]`))
@@ -1469,7 +1489,21 @@ func TestConnectorArgumentPresets(t *testing.T) {
 				{
 					"type": "procedure",
 					"name": "addPet",
-					"arguments": {}
+					"arguments": {
+						"body": {
+							"categories": [{
+								"name": "mammal",
+								"addresses": [
+									{
+										"id": 1
+									},
+									{
+										"id": 2
+									}
+								]
+							}]
+						}
+					}
 				}
 			],
 			"collection_relationships": {}

@@ -135,6 +135,71 @@
       "xml": {
         "name": "Post"
       }
+    },
+    "HasuraPostInput": {
+      "fields": {
+        "body": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "title": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "userId": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "xml": {
+        "name": "Post"
+      }
     }
   },
   "procedures": {
@@ -153,7 +218,7 @@
         "body": {
           "description": "Post object that needs to be added",
           "type": {
-            "name": "HasuraPost",
+            "name": "HasuraPostInput",
             "type": "named"
           },
           "http": {
@@ -161,7 +226,10 @@
             "schema": {
               "type": [
                 "object"
-              ]
+              ],
+              "xml": {
+                "name": "Post"
+              }
             }
           }
         }

@@ -521,6 +521,46 @@
         }
       }
     },
+    "PostInput": {
+      "fields": {
+        "body": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "title": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "userId": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
     "Todo": {
       "fields": {
         "completed": {
@@ -746,7 +786,7 @@
         "body": {
           "description": "Post object that needs to be added",
           "type": {
-            "name": "Post",
+            "name": "PostInput",
             "type": "named"
           }
         }
@@ -783,7 +823,7 @@
         "body": {
           "description": "Post object that needs to be updated",
           "type": {
-            "name": "Post",
+            "name": "PostInput",
             "type": "named"
           }
         },
@@ -807,7 +847,7 @@
         "body": {
           "description": "Post object that needs to be updated",
           "type": {
-            "name": "Post",
+            "name": "PostInput",
             "type": "named"
           }
         },

@@ -89,6 +89,315 @@
           }
         },
         "required": ["id", "type", "age"]
+      },
+      "payment_source": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/account"
+          },
+          {
+            "$ref": "#/components/schemas/bank_account"
+          },
+          {
+            "$ref": "#/components/schemas/card"
+          },
+          {
+            "$ref": "#/components/schemas/source"
+          }
+        ]
+      },
+      "account": {
+        "properties": {
+          "country": {
+            "description": "The account's country.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "created": {
+            "description": "Time at which the account was connected. Measured in seconds since the Unix epoch.",
+            "format": "unix-time",
+            "type": "integer"
+          },
+          "default_currency": {
+            "description": "Three-letter ISO currency code representing the default currency for the account. This must be a currency that [Stripe supports in the account's country](https://stripe.com/docs/payouts).",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "details_submitted": {
+            "description": "Whether account details have been submitted. Accounts with Stripe Dashboard access, which includes Standard accounts, cannot receive payouts before this is true. Accounts where this is false should be directed to [an onboarding flow](/connect/onboarding) to finish submitting account details.",
+            "type": "boolean"
+          },
+          "email": {
+            "description": "An email address associated with the account. It's not used for authentication and Stripe doesn't market to this field without explicit approval from the platform.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique identifier for the object.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "type": {
+            "description": "The Stripe account type. Can be `standard`, `express`, `custom`, or `none`.",
+            "enum": ["custom", "express", "none", "standard"],
+            "type": "string"
+          }
+        },
+        "required": ["id", "object"],
+        "title": "Account",
+        "type": "object"
+      },
+      "bank_account": {
+        "properties": {
+          "default_for_currency": {
+            "description": "Whether this bank account is the default external account for its currency.",
+            "nullable": true,
+            "type": "boolean"
+          },
+          "fingerprint": {
+            "description": "Uniquely identifies this particular bank account. You can use this attribute to check whether two bank accounts are the same.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique identifier for the object.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "last4": {
+            "description": "The last four digits of the bank account number.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "object": {
+            "description": "String representing the object's type. Objects of the same type share the same value.",
+            "enum": ["bank_account"],
+            "type": "string"
+          },
+          "routing_number": {
+            "description": "The routing transit number for the bank account.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "For bank accounts, possible values are `new`, `validated`, `verified`, `verification_failed`, or `errored`. A bank account that hasn't had any activity or validation performed is `new`. If Stripe can determine that the bank account exists, its status will be `validated`. Note that there often isn’t enough information to know (e.g., for smaller credit unions), and the validation is not always run. If customer bank account verification has succeeded, the bank account status will be `verified`. If the verification failed for any reason, such as microdeposit failure, the status will be `verification_failed`. If a payout sent to this bank account fails, we'll set the status to `errored` and will not continue to send [scheduled payouts](https://stripe.com/docs/payouts#payout-schedule) until the bank details are updated.\n\nFor external accounts, possible values are `new`, `errored` and `verification_failed`. If a payout fails, the status is set to `errored` and scheduled payouts are stopped until account details are updated. In the US and India, if we can't [verify the owner of the bank account](https://support.stripe.com/questions/bank-account-ownership-verification), we'll set the status to `verification_failed`. Other validations aren't run against external accounts because they're only used for payouts. This means the other statuses don't apply.",
+            "maxLength": 5000,
+            "type": "string"
+          }
+        },
+        "required": ["country", "currency", "id", "last4", "object", "status"],
+        "title": "BankAccount",
+        "type": "object"
+      },
+      "card": {
+        "description": "You can store multiple cards on a customer in order to charge the customer\nlater. You can also store multiple debit cards on a recipient in order to\ntransfer to those cards later.\n\nRelated guide: [Card payments with Sources](https://stripe.com/docs/sources/cards)",
+        "properties": {
+          "allow_redisplay": {
+            "description": "This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to “unspecified”.",
+            "enum": ["always", "limited", "unspecified"],
+            "nullable": true,
+            "type": "string"
+          },
+          "available_payout_methods": {
+            "description": "A set of available payout methods for this card. Only values from this set should be passed as the `method` when creating a payout.",
+            "items": {
+              "enum": ["instant", "standard"],
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "brand": {
+            "description": "Card brand. Can be `American Express`, `Diners Club`, `Discover`, `Eftpos Australia`, `Girocard`, `JCB`, `MasterCard`, `UnionPay`, `Visa`, or `Unknown`.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "country": {
+            "description": "Two-letter ISO code representing the country of the card. You could use this attribute to get a sense of the international breakdown of cards you've collected.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "currency": {
+            "description": "Three-letter [ISO code for currency](https://www.iso.org/iso-4217-currency-codes.html) in lowercase. Must be a [supported currency](https://docs.stripe.com/currencies). Only applicable on accounts (not customers or recipients). The card can be used as a transfer destination for funds in this currency. This property is only available for accounts where [controller.requirement_collection](/api/accounts/object#account_object-controller-requirement_collection) is `application`, which includes Custom accounts.",
+            "format": "currency",
+            "nullable": true,
+            "type": "string"
+          },
+          "cvc_check": {
+            "description": "If a CVC was provided, results of the check: `pass`, `fail`, `unavailable`, or `unchecked`. A result of unchecked indicates that CVC was provided but hasn't been checked yet. Checks are typically performed when attaching a card to a Customer object, or when creating a charge. For more details, see [Check if a card is valid without a charge](https://support.stripe.com/questions/check-if-a-card-is-valid-without-a-charge).",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "default_for_currency": {
+            "description": "Whether this card is the default external account for its currency. This property is only available for accounts where [controller.requirement_collection](/api/accounts/object#account_object-controller-requirement_collection) is `application`, which includes Custom accounts.",
+            "nullable": true,
+            "type": "boolean"
+          },
+          "dynamic_last4": {
+            "description": "(For tokenized numbers only.) The last four digits of the device account number.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "exp_month": {
+            "description": "Two-digit number representing the card's expiration month.",
+            "type": "integer"
+          },
+          "exp_year": {
+            "description": "Four-digit number representing the card's expiration year.",
+            "type": "integer"
+          },
+          "fingerprint": {
+            "description": "Uniquely identifies this particular card number. You can use this attribute to check whether two customers who’ve signed up with you are using the same card number, for example. For payment methods that tokenize card information (Apple Pay, Google Pay), the tokenized number might be provided instead of the underlying card number.\n\n*As of May 1, 2021, card fingerprint in India for Connect changed to allow two fingerprints for the same card---one for India and one for the rest of the world.*",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "funding": {
+            "description": "Card funding type. Can be `credit`, `debit`, `prepaid`, or `unknown`.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique identifier for the object.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "iin": {
+            "description": "Issuer identification number of the card.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "last4": {
+            "description": "The last four digits of the card.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "name": {
+            "description": "Cardholder name.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "object": {
+            "description": "String representing the object's type. Objects of the same type share the same value.",
+            "enum": ["card"],
+            "type": "string"
+          },
+          "regulated_status": {
+            "description": "Status of a card based on the card issuer.",
+            "enum": ["regulated", "unregulated"],
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "For external accounts that are cards, possible values are `new` and `errored`. If a payout fails, the status is set to `errored` and [scheduled payouts](https://stripe.com/docs/payouts#payout-schedule) are stopped until account details are updated.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "tokenization_method": {
+            "description": "If the card number is tokenized, this is the method that was used. Can be `android_pay` (includes Google Pay), `apple_pay`, `masterpass`, `visa_checkout`, or null.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "brand",
+          "exp_month",
+          "exp_year",
+          "funding",
+          "id",
+          "last4",
+          "object"
+        ],
+        "title": "Card",
+        "type": "object"
+      },
+      "source": {
+        "properties": {
+          "created": {
+            "description": "Time at which the object was created. Measured in seconds since the Unix epoch.",
+            "format": "unix-time",
+            "type": "integer"
+          },
+          "currency": {
+            "description": "Three-letter [ISO code for the currency](https://stripe.com/docs/currencies) associated with the source. This is the currency for which the source will be chargeable once ready. Required for `single_use` sources.",
+            "format": "currency",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "Unique identifier for the object.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "object": {
+            "description": "String representing the object's type. Objects of the same type share the same value.",
+            "enum": ["source"],
+            "type": "string"
+          },
+          "statement_descriptor": {
+            "description": "Extra information about a source. This will appear on your customer's statement every time you charge the source.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "The status of the source, one of `canceled`, `chargeable`, `consumed`, `failed`, or `pending`. Only `chargeable` sources can be used to create a charge.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "type": {
+            "description": "The `type` of the source. The `type` is a payment method, one of `ach_credit_transfer`, `ach_debit`, `alipay`, `bancontact`, `card`, `card_present`, `eps`, `giropay`, `ideal`, `multibanco`, `klarna`, `p24`, `sepa_debit`, `sofort`, `three_d_secure`, or `wechat`. An additional hash is included on the source with a name matching this value. It contains additional information specific to the [payment method](https://stripe.com/docs/sources) used.",
+            "enum": [
+              "ach_credit_transfer",
+              "ach_debit",
+              "acss_debit",
+              "alipay",
+              "au_becs_debit",
+              "bancontact",
+              "card",
+              "card_present",
+              "eps",
+              "giropay",
+              "ideal",
+              "klarna",
+              "multibanco",
+              "p24",
+              "sepa_debit",
+              "sofort",
+              "three_d_secure",
+              "wechat"
+            ],
+            "type": "string",
+            "x-stripeBypassValidation": true
+          },
+          "usage": {
+            "description": "Either `reusable` or `single_use`. Whether this source should be reusable or not. Some source types may or may not be reusable by construction, while others may leave the option at creation. If an incompatible value is passed, an error will be returned.",
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_secret",
+          "created",
+          "flow",
+          "id",
+          "livemode",
+          "object",
+          "status",
+          "type"
+        ],
+        "title": "Source",
+        "type": "object"
       }
     }
   },
@@ -114,6 +423,74 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1/customers/{customer}/sources/{id}": {
+      "get": {
+        "description": "<p>Retrieve a specified source for a given customer.</p>",
+        "operationId": "GetCustomersCustomerSourcesId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "customer",
+            "required": true,
+            "schema": {
+              "maxLength": 5000,
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Specifies which fields in the response should be expanded.",
+            "explode": true,
+            "in": "query",
+            "name": "expand",
+            "required": false,
+            "schema": {
+              "items": {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "deepObject"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "maxLength": 500,
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "encoding": {},
+              "schema": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/payment_source"
+                }
+              }
+            },
+            "description": "Successful response."
           }
         }
       }

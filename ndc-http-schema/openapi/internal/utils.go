@@ -335,96 +335,217 @@ func isNullableType(input schema.TypeEncoder) bool {
 	return ok
 }
 
-func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Type, fieldPaths []string) (*unionSiblingField, bool) {
+// Find common fields in all objects to merge the type.
+// If they have the same type, we don't need to wrap it with the nullable type.
+func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, srcObjects []rest.ObjectType, unionType oasUnionType, fieldPaths []string) error {
+	mergedObjectFields := make(map[string][]rest.ObjectField)
+	for _, object := range srcObjects {
+		for key, field := range object.Fields {
+			mergedObjectFields[key] = append(mergedObjectFields[key], field)
+		}
+	}
+
+	for key, fields := range mergedObjectFields {
+		if len(fields) == 1 {
+			newField := rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Description: fields[0].Description,
+					Arguments:   fields[0].Arguments,
+					Type:        fields[0].Type,
+				},
+				HTTP: fields[0].HTTP,
+			}
+
+			if unionType != oasAllOf && !isNullableType(newField.Type.Interface()) {
+				newField.Type = (schema.NullableType{
+					Type:           schema.TypeNullable,
+					UnderlyingType: newField.Type,
+				}).Encode()
+			}
+
+			dest.Fields[key] = newField
+
+			continue
+		}
+
+		var unionField rest.ObjectField
+		for i, field := range fields {
+			if i == 0 {
+				unionField = field
+
+				continue
+			}
+
+			var ok bool
+			unionField, ok = mergeUnionTypes(httpSchema, field.Type, unionField.Type, append(fieldPaths, key))
+			if !ok {
+				break
+			}
+
+			if unionField.Description == nil && field.Description != nil {
+				unionField.Description = field.Description
+			}
+
+			if unionField.HTTP == nil && field.HTTP != nil {
+				unionField.HTTP = field.HTTP
+			}
+		}
+
+		if len(fields) < len(srcObjects) && unionType != oasAllOf && !isNullableType(unionField.Type.Interface()) {
+			unionField.Type = (schema.NullableType{
+				Type:           schema.TypeNullable,
+				UnderlyingType: unionField.Type,
+			}).Encode()
+		}
+
+		dest.Fields[key] = unionField
+	}
+
+	return nil
+}
+
+func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Type, fieldPaths []string) (rest.ObjectField, bool) {
+	bn, bNullErr := b.AsNullable()
+	bType := b
+	if bNullErr == nil {
+		bType = bn.UnderlyingType
+	}
+
+	var result rest.ObjectField
+	var isEqual bool
+
 	switch at := a.Interface().(type) {
 	case *schema.NullableType:
-		bt, err := b.AsNullable()
-		buType := b
-		if err == nil {
-			buType = bt.UnderlyingType
-		}
-
-		ut, ok := mergeUnionTypes(httpSchema, at.UnderlyingType, buType, fieldPaths)
+		result, ok := mergeUnionTypes(httpSchema, at.UnderlyingType, bType, fieldPaths)
 		if !ok {
-			return &unionSiblingField{
-				Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))),
+			return rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).Encode(),
+				},
 			}, false
 		}
 
-		ut.Type = schema.NewNullableType(ut.Type)
+		if !isNullableType(result.Type.Interface()) {
+			result.Type = (schema.NullableType{
+				Type:           schema.TypeNullable,
+				UnderlyingType: result.Type,
+			}).Encode()
+		}
 
-		return ut, true
+		return result, true
 	case *schema.ArrayType:
-		bt, err := b.AsArray()
+		bt, err := bType.AsArray()
 		if err != nil {
-			return &unionSiblingField{
-				Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))),
-			}, false
+			break
 		}
 
-		ut, ok := mergeUnionTypes(httpSchema, at.ElementType, bt.ElementType, fieldPaths)
-		if !ok {
-			return &unionSiblingField{
-				Type: schema.NewArrayType(schema.NewNamedType(string(rest.ScalarJSON))),
-			}, false
+		result, isEqual = mergeUnionTypes(httpSchema, at.ElementType, bt.ElementType, fieldPaths)
+		if !isEqual {
+			result = rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Type: schema.NewArrayType(schema.NewNamedType(string(rest.ScalarJSON))).Encode(),
+				},
+			}
+		} else {
+			result.Type = schema.ArrayType{
+				Type:        schema.TypeArray,
+				ElementType: result.Type,
+			}.Encode()
 		}
-
-		ut.Type = schema.NewArrayType(ut.Type)
-
-		return ut, true
 	case *schema.NamedType:
-		bt, err := b.AsNamed()
+		bt, err := bType.AsNamed()
 		if err != nil {
-			return &unionSiblingField{
-				Type: schema.NewNamedType(string(rest.ScalarJSON)),
-			}, false
+			break
+		}
+
+		if at.Name == bt.Name {
+			result = rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Type: a,
+				},
+			}
+
+			isEqual = true
+
+			break
 		}
 
 		// if both types are enum scalars, a new enum scalar is created with the merged value set of both enums.
+		var typeRepA, typeRepB schema.TypeRepresentationType
 		var enumA, enumB *schema.TypeRepresentationEnum
 		scalarA, ok := httpSchema.ScalarTypes[at.Name]
 		if ok {
+			typeRepA, _ = scalarA.Representation.Type()
 			enumA, _ = scalarA.Representation.AsEnum()
 		}
 
 		scalarB, ok := httpSchema.ScalarTypes[bt.Name]
 		if ok {
+			typeRepB, _ = scalarB.Representation.Type()
 			enumB, _ = scalarB.Representation.AsEnum()
 		}
 
-		if at.Name == bt.Name {
-			result := &unionSiblingField{
-				Type: at,
-			}
-			if enumA != nil {
-				result.EnumOneOf = enumA.OneOf
-			}
+		if enumA != nil && enumB != nil {
+			enumValues := utils.SliceUnique(append(enumA.OneOf, enumB.OneOf...))
+			newScalar := schema.NewScalarType()
+			newScalar.Representation = schema.NewTypeRepresentationEnum(enumValues).Encode()
 
-			return result, true
+			newName := utils.StringSliceToPascalCase(append(fieldPaths, "Enum"))
+			httpSchema.ScalarTypes[newName] = *newScalar
+
+			result = rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Type: schema.NewNamedType(newName).Encode(),
+				},
+			}
+			isEqual = true
+
+			break
 		}
 
-		if enumA == nil || enumB == nil {
-			return &unionSiblingField{
-				Type: schema.NewNamedType(string(rest.ScalarJSON)),
-			}, false
+		scalarName := rest.ScalarJSON
+		switch {
+		case typeRepA == "" || typeRepB == "" || typeRepA == schema.TypeRepresentationTypeJSON || typeRepB == schema.TypeRepresentationTypeJSON:
+		case typeRepA == typeRepB:
+			sn, ok := typeRepresentationToScalarNameRelationship[typeRepA]
+			if ok {
+				scalarName = sn
+			}
+		case slices.Contains(integerTypeRepresentations, typeRepA) && slices.Contains(integerTypeRepresentations, typeRepB):
+			if typeRepA == schema.TypeRepresentationTypeInt64 || typeRepB == schema.TypeRepresentationTypeInt64 {
+				scalarName = rest.ScalarInt64
+			} else {
+				scalarName = rest.ScalarInt32
+			}
+		case slices.Contains(floatTypeRepresentations, typeRepA) && slices.Contains(floatTypeRepresentations, typeRepB):
+			scalarName = rest.ScalarFloat64
+		case slices.Contains(stringTypeRepresentations, typeRepA) && slices.Contains(stringTypeRepresentations, typeRepB):
+			scalarName = rest.ScalarString
 		}
 
-		enumValues := append(enumA.OneOf, enumB.OneOf...)
-		newScalar := schema.NewScalarType()
-		newScalar.Representation = schema.NewTypeRepresentationEnum(enumValues).Encode()
-
-		newName := utils.StringSliceToPascalCase(append(fieldPaths, "Enum")) + "_" + strings.Join(enumValues, "_")
-		httpSchema.ScalarTypes[newName] = *newScalar
-
-		return &unionSiblingField{
-			Type:      schema.NewNamedType(newName),
-			EnumOneOf: enumValues,
-		}, true
+		result = rest.ObjectField{
+			ObjectField: schema.ObjectField{
+				Type: schema.NewNamedType(string(scalarName)).Encode(),
+			},
+		}
 	}
 
-	return &unionSiblingField{
-		Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))),
-	}, false
+	if len(result.ObjectField.Type) == 0 {
+		result = rest.ObjectField{
+			ObjectField: schema.ObjectField{
+				Type: schema.NewNamedType(string(rest.ScalarJSON)).Encode(),
+			},
+		}
+	}
+
+	if bNullErr != nil && !isNullableType(result.Type.Interface()) {
+		result.Type = (schema.NullableType{
+			Type:           schema.TypeNullable,
+			UnderlyingType: result.Type,
+		}).Encode()
+	}
+
+	return result, isEqual
 }
 
 // encodeHeaderArgumentName encodes header key to NDC schema field name
@@ -662,28 +783,5 @@ func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 		return rest.ScalarString
 	default:
 		return rest.ScalarBinary
-	}
-}
-
-func replaceNamedType(schemaType schema.Type, name string) (schema.TypeEncoder, error) {
-	switch t := schemaType.Interface().(type) {
-	case *schema.NullableType:
-		newType, err := replaceNamedType(t.UnderlyingType, name)
-		if err != nil {
-			return nil, err
-		}
-
-		return schema.NewNullableType(newType), nil
-	case *schema.ArrayType:
-		newType, err := replaceNamedType(t.ElementType, name)
-		if err != nil {
-			return nil, err
-		}
-
-		return schema.NewArrayType(newType), nil
-	case *schema.NamedType:
-		return schema.NewNamedType(name), nil
-	default:
-		return nil, fmt.Errorf("invalid type: %v", schemaType)
 	}
 }

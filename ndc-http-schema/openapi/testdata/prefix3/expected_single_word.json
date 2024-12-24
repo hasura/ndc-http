@@ -137,7 +137,10 @@
             }
           },
           "http": {
-            "type": []
+            "type": [],
+            "xml": {
+              "name": "Notification200Errors"
+            }
           }
         },
         "external_id": {
@@ -321,13 +324,71 @@
         }
       }
     },
+    "HasuraFilterInput": {
+      "fields": {
+        "field": {
+          "description": "Name of the field to use as the first operand in the filter expression.",
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "key": {
+          "description": "If `field` is `tag`, this field is *required* to specify `key` inside the tags.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "relation": {
+          "description": "Operator of a filter expression.",
+          "type": {
+            "name": "HasuraFilterRelation",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "value": {
+          "description": "Constant value to use as the second operand in the filter expression. This value is *required* when the relation operator is a binary operator.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
     "HasuraNotificationInput": {
       "fields": {
         "contents": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraStringMap",
+              "name": "HasuraStringMapInput",
               "type": "named"
             }
           },
@@ -393,7 +454,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "HasuraFilter",
+                "name": "HasuraFilterInput",
                 "type": "named"
               },
               "type": "array"
@@ -402,14 +463,19 @@
           "http": {
             "type": [
               "array"
-            ]
+            ],
+            "items": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "headings": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraStringMap",
+              "name": "HasuraStringMapInput",
               "type": "named"
             }
           },
@@ -496,7 +562,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraStringMap",
+              "name": "HasuraStringMapInput",
               "type": "named"
             }
           },
@@ -552,7 +618,15 @@
           "http": {
             "type": [
               "array"
-            ]
+            ],
+            "items": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "NotificationWithMeta"
+              }
+            }
           }
         },
         "offset": {
@@ -698,7 +772,12 @@
           "http": {
             "type": [
               "array"
-            ]
+            ],
+            "items": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "headings": {
@@ -787,7 +866,12 @@
           "http": {
             "type": [
               "array"
-            ]
+            ],
+            "items": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "platform_delivery_stats": {
@@ -1082,6 +1166,25 @@
       }
     },
     "HasuraStringMap": {
+      "fields": {
+        "en": {
+          "description": "Text in English.  Will be used as a fallback",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "HasuraStringMapInput": {
       "fields": {
         "en": {
           "description": "Text in English.  Will be used as a fallback",

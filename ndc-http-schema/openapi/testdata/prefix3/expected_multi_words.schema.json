@@ -182,13 +182,51 @@
         }
       }
     },
+    "HasuraOneSignalFilterInput": {
+      "fields": {
+        "field": {
+          "description": "Name of the field to use as the first operand in the filter expression.",
+          "type": {
+            "name": "String",
+            "type": "named"
+          }
+        },
+        "key": {
+          "description": "If `field` is `tag`, this field is *required* to specify `key` inside the tags.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "relation": {
+          "description": "Operator of a filter expression.",
+          "type": {
+            "name": "HasuraOneSignalFilterRelation",
+            "type": "named"
+          }
+        },
+        "value": {
+          "description": "Constant value to use as the second operand in the filter expression. This value is *required* when the relation operator is a binary operator.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
     "HasuraOneSignalNotificationInput": {
       "fields": {
         "contents": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraOneSignalStringMap",
+              "name": "HasuraOneSignalStringMapInput",
               "type": "named"
             }
           }
@@ -229,7 +267,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "HasuraOneSignalFilter",
+                "name": "HasuraOneSignalFilterInput",
                 "type": "named"
               },
               "type": "array"
@@ -240,7 +278,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraOneSignalStringMap",
+              "name": "HasuraOneSignalStringMapInput",
               "type": "named"
             }
           }
@@ -291,7 +329,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraOneSignalStringMap",
+              "name": "HasuraOneSignalStringMapInput",
               "type": "named"
             }
           }
@@ -669,6 +707,20 @@
       }
     },
     "HasuraOneSignalStringMap": {
+      "fields": {
+        "en": {
+          "description": "Text in English.  Will be used as a fallback",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "HasuraOneSignalStringMapInput": {
       "fields": {
         "en": {
           "description": "Text in English.  Will be used as a fallback",

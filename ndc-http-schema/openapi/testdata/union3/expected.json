@@ -20,8 +20,540 @@
       }
     }
   },
-  "functions": {},
+  "functions": {
+    "GetCustomersCustomerSourcesId": {
+      "request": {
+        "url": "/v1/customers/{customer}/sources/{id}",
+        "method": "get",
+        "response": {
+          "contentType": "application/json"
+        }
+      },
+      "arguments": {
+        "customer": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "style": "simple",
+            "name": "customer",
+            "in": "path",
+            "schema": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 5000
+            }
+          }
+        },
+        "expand": {
+          "description": "Specifies which fields in the response should be expanded.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "String",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "style": "deepObject",
+            "explode": true,
+            "name": "expand",
+            "in": "query",
+            "schema": {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "type": [
+                  "string"
+                ],
+                "maxLength": 5000
+              }
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "style": "simple",
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": [
+                "string"
+              ],
+              "maxLength": 500
+            }
+          }
+        }
+      },
+      "description": "Retrieve a specified source for a given customer.",
+      "result_type": {
+        "name": "PaymentSource",
+        "type": "named"
+      }
+    }
+  },
   "object_types": {
+    "PaymentSource": {
+      "fields": {
+        "allow_redisplay": {
+          "description": "This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to unspecified.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "CardAllowRedisplay",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "available_payout_methods": {
+          "description": "A set of available payout methods for this card. Only values from this set should be passed as the `method` when creating a payout.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "CardAvailablePayoutMethods",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {
+              "type": [
+                "string"
+              ]
+            }
+          }
+        },
+        "brand": {
+          "description": "Card brand. Can be `American Express`, `Diners Club`, `Discover`, `Eftpos Australia`, `Girocard`, `JCB`, `MasterCard`, `UnionPay`, `Visa`, or `Unknown`.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "country": {
+          "description": "Two-letter ISO code representing the country of the card. You could use this attribute to get a sense of the international breakdown of cards you've collected.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "created": {
+          "description": "Time at which the object was created. Measured in seconds since the Unix epoch.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "UnixTime",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "format": "unix-time"
+          }
+        },
+        "currency": {
+          "description": "Three-letter [ISO code for the currency](https://stripe.com/docs/currencies) associated with the source. This is the currency for which the source will be chargeable once ready. Required for `single_use` sources.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "format": "currency"
+          }
+        },
+        "cvc_check": {
+          "description": "If a CVC was provided, results of the check: `pass`, `fail`, `unavailable`, or `unchecked`. A result of unchecked indicates that CVC was provided but hasn't been checked yet. Checks are typically performed when attaching a card to a Customer object, or when creating a charge. For more details, see [Check if a card is valid without a charge](https://support.stripe.com/questions/check-if-a-card-is-valid-without-a-charge).",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "default_currency": {
+          "description": "Three-letter ISO currency code representing the default currency for the account. This must be a currency that [Stripe supports in the account's country](https://stripe.com/docs/payouts).",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "default_for_currency": {
+          "description": "Whether this card is the default external account for its currency. This property is only available for accounts where [controller.requirement_collection](/api/accounts/object#account_object-controller-requirement_collection) is `application`, which includes Custom accounts.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Boolean",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "boolean"
+            ]
+          }
+        },
+        "details_submitted": {
+          "description": "Whether account details have been submitted. Accounts with Stripe Dashboard access, which includes Standard accounts, cannot receive payouts before this is true. Accounts where this is false should be directed to [an onboarding flow](/connect/onboarding) to finish submitting account details.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Boolean",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "boolean"
+            ]
+          }
+        },
+        "dynamic_last4": {
+          "description": "(For tokenized numbers only.) The last four digits of the device account number.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "email": {
+          "description": "An email address associated with the account. It's not used for authentication and Stripe doesn't market to this field without explicit approval from the platform.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "exp_month": {
+          "description": "Two-digit number representing the card's expiration month.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ]
+          }
+        },
+        "exp_year": {
+          "description": "Four-digit number representing the card's expiration year.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ]
+          }
+        },
+        "fingerprint": {
+          "description": "Uniquely identifies this particular card number. You can use this attribute to check whether two customers whove signed up with you are using the same card number, for example. For payment methods that tokenize card information (Apple Pay, Google Pay), the tokenized number might be provided instead of the underlying card number.  *As of May 1, 2021, card fingerprint in India for Connect changed to allow two fingerprints for the same card---one for India and one for the rest of the world.*",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "funding": {
+          "description": "Card funding type. Can be `credit`, `debit`, `prepaid`, or `unknown`.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "id": {
+          "description": "Unique identifier for the object.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "iin": {
+          "description": "Issuer identification number of the card.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "last4": {
+          "description": "The last four digits of the card.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "name": {
+          "description": "Cardholder name.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "object": {
+          "description": "String representing the object's type. Objects of the same type share the same value.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "PaymentSourceObjectEnum",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "regulated_status": {
+          "description": "Status of a card based on the card issuer.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "CardRegulatedStatus",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "routing_number": {
+          "description": "The routing transit number for the bank account.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "statement_descriptor": {
+          "description": "Extra information about a source. This will appear on your customer's statement every time you charge the source.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "status": {
+          "description": "The status of the source, one of `canceled`, `chargeable`, `consumed`, `failed`, or `pending`. Only `chargeable` sources can be used to create a charge.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "tokenization_method": {
+          "description": "If the card number is tokenized, this is the method that was used. Can be `android_pay` (includes Google Pay), `apple_pay`, `masterpass`, `visa_checkout`, or null.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        },
+        "type": {
+          "description": "The `type` of the source. The `type` is a payment method, one of `ach_credit_transfer`, `ach_debit`, `alipay`, `bancontact`, `card`, `card_present`, `eps`, `giropay`, `ideal`, `multibanco`, `klarna`, `p24`, `sepa_debit`, `sofort`, `three_d_secure`, or `wechat`. An additional hash is included on the source with a name matching this value. It contains additional information specific to the [payment method](https://stripe.com/docs/sources) used.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "PaymentSourceTypeEnum",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "usage": {
+          "description": "Either `reusable` or `single_use`. Whether this source should be reusable or not. Some source types may or may not be reusable by construction, while others may leave the option at creation. If an incompatible value is passed, an error will be returned.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "maxLength": 5000
+          }
+        }
+      }
+    },
     "Pet": {
       "fields": {
         "age": {
@@ -160,8 +692,11 @@
         },
         "id": {
           "type": {
-            "name": "String",
-            "type": "named"
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
           },
           "http": {
             "type": [
@@ -202,8 +737,11 @@
         },
         "type": {
           "type": {
-            "name": "PetBodyTypeEnum",
-            "type": "named"
+            "type": "nullable",
+            "underlying_type": {
+              "name": "PetBodyTypeEnum",
+              "type": "named"
+            }
           },
           "http": {
             "type": [
@@ -246,6 +784,47 @@
     }
   },
   "scalar_types": {
+    "Boolean": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "boolean"
+      }
+    },
+    "CardAllowRedisplay": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "always",
+          "limited",
+          "unspecified"
+        ],
+        "type": "enum"
+      }
+    },
+    "CardAvailablePayoutMethods": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "instant",
+          "standard"
+        ],
+        "type": "enum"
+      }
+    },
+    "CardRegulatedStatus": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "regulated",
+          "unregulated"
+        ],
+        "type": "enum"
+      }
+    },
     "Int32": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -258,6 +837,49 @@
       "comparison_operators": {},
       "representation": {
         "type": "json"
+      }
+    },
+    "PaymentSourceObjectEnum": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "bank_account",
+          "card",
+          "source"
+        ],
+        "type": "enum"
+      }
+    },
+    "PaymentSourceTypeEnum": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "ach_credit_transfer",
+          "ach_debit",
+          "acss_debit",
+          "alipay",
+          "au_becs_debit",
+          "bancontact",
+          "card",
+          "card_present",
+          "custom",
+          "eps",
+          "express",
+          "giropay",
+          "ideal",
+          "klarna",
+          "multibanco",
+          "none",
+          "p24",
+          "sepa_debit",
+          "sofort",
+          "standard",
+          "three_d_secure",
+          "wechat"
+        ],
+        "type": "enum"
       }
     },
     "PetBodyTypeEnum": {
@@ -287,6 +909,13 @@
       "comparison_operators": {},
       "representation": {
         "type": "string"
+      }
+    },
+    "UnixTime": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "int32"
       }
     }
   }

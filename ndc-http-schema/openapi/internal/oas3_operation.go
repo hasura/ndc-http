@@ -182,7 +182,7 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 		if param.Required != nil && *param.Required {
 			paramRequired = true
 		}
-		schemaType, apiSchema, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.ParameterLocation(param.In), true).
+		schemaResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.ParameterLocation(param.In)).
 			getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 		if err != nil {
 			return err
@@ -207,12 +207,12 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 
 		argument := rest.ArgumentInfo{
 			ArgumentInfo: schema.ArgumentInfo{
-				Type: schemaType.Encode(),
+				Type: schemaResult.TypeWrite.Encode(),
 			},
 			HTTP: &rest.RequestParameter{
 				Name:           paramName,
 				In:             paramLocation,
-				Schema:         apiSchema,
+				Schema:         schemaResult.TypeSchema,
 				EncodingObject: encoding,
 			},
 		}
@@ -263,13 +263,13 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 	if contentType == rest.ContentTypeFormURLEncoded {
 		location = rest.InQuery
 	}
-	schemaType, typeSchema, err := newOAS3SchemaBuilder(oc.builder, apiPath, location, true).
+	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, location).
 		getSchemaTypeFromProxy(content.Schema, !bodyRequired, fieldPaths)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if typeSchema == nil {
+	if typeResult == nil || typeResult.TypeRead == nil {
 		return nil, nil, nil
 	}
 
@@ -278,7 +278,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 	}
 
 	if content.Encoding == nil || content.Encoding.Len() == 0 {
-		return bodyResult, schemaType, nil
+		return bodyResult, typeResult.TypeWrite, nil
 	}
 
 	bodyResult.Encoding = make(map[string]rest.EncodingObject)
@@ -311,7 +311,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 					continue
 				}
 
-				ndcType, typeSchema, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InHeader, true).
+				typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InHeader).
 					getSchemaTypeFromProxy(header.Schema, header.AllowEmptyValue, append(fieldPaths, key))
 				if err != nil {
 					return nil, nil, err
@@ -333,12 +333,12 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 				argumentName := encodeHeaderArgumentName(key)
 				headerParam := rest.RequestParameter{
 					ArgumentName:   argumentName,
-					Schema:         typeSchema,
+					Schema:         typeResult.TypeSchema,
 					EncodingObject: headerEncoding,
 				}
 
 				argument := schema.ArgumentInfo{
-					Type: ndcType.Encode(),
+					Type: typeResult.TypeWrite.Encode(),
 				}
 				headerDesc := utils.StripHTMLTags(header.Description)
 				if headerDesc != "" {
@@ -354,7 +354,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 		bodyResult.Encoding[iter.Key()] = item
 	}
 
-	return bodyResult, schemaType, nil
+	return bodyResult, typeResult.TypeWrite, nil
 }
 
 func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath string, fieldPaths []string) (schema.TypeEncoder, *rest.Response, error) {
@@ -428,7 +428,7 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 		return getResultTypeFromContentType(oc.builder.schema, contentType), schemaResponse, nil
 	}
 
-	schemaType, _, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InBody, false).
+	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InBody).
 		getSchemaTypeFromProxy(bodyContent.Schema, false, fieldPaths)
 	if err != nil {
 		return nil, nil, err
@@ -438,9 +438,9 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 	case rest.ContentTypeNdJSON:
 		// Newline Delimited JSON (ndjson) format represents a stream of structured objects
 		// so the response would be wrapped with an array
-		return schema.NewArrayType(schemaType), schemaResponse, nil
+		return schema.NewArrayType(typeResult.TypeRead), schemaResponse, nil
 	default:
-		return schemaType, schemaResponse, nil
+		return typeResult.TypeRead, schemaResponse, nil
 	}
 }
 
