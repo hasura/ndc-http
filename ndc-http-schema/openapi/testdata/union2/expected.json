@@ -131,7 +131,7 @@
         }
       }
     },
-    "PetBody": {
+    "PetBodyInput": {
       "fields": {
         "age": {
           "type": {
@@ -236,7 +236,7 @@
         "body": {
           "description": "Pet object that needs to be added to the store",
           "type": {
-            "name": "PetBody",
+            "name": "PetBodyInput",
             "type": "named"
           },
           "http": {
@@ -244,7 +244,10 @@
             "schema": {
               "type": [
                 "object"
-              ]
+              ],
+              "xml": {
+                "name": "PetBody"
+              }
             }
           }
         }

@@ -14,18 +14,16 @@ import (
 )
 
 type oas3SchemaBuilder struct {
-	builder   *OAS3Builder
-	apiPath   string
-	location  rest.ParameterLocation
-	writeMode bool
+	builder  *OAS3Builder
+	apiPath  string
+	location rest.ParameterLocation
 }
 
-func newOAS3SchemaBuilder(builder *OAS3Builder, apiPath string, location rest.ParameterLocation, writeMode bool) *oas3SchemaBuilder {
+func newOAS3SchemaBuilder(builder *OAS3Builder, apiPath string, location rest.ParameterLocation) *oas3SchemaBuilder {
 	return &oas3SchemaBuilder{
-		builder:   builder,
-		apiPath:   apiPath,
-		writeMode: writeMode,
-		location:  location,
+		builder:  builder,
+		apiPath:  apiPath,
+		location: location,
 	}
 }
 
@@ -148,7 +146,6 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		}, nil
 	}
 
-	var typeResult *SchemaInfoCache
 	typeName := typeSchema.Type[0]
 	switch typeName {
 	case "object":
@@ -175,7 +172,7 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 			}
 		}
 
-		typeResult = &SchemaInfoCache{
+		typeResult := &SchemaInfoCache{
 			TypeSchema: createSchemaFromOpenAPISchema(typeSchema),
 			TypeRead:   schema.NewArrayType(itemSchema.TypeRead),
 			TypeWrite:  schema.NewArrayType(itemSchema.TypeWrite),
@@ -272,7 +269,7 @@ func (oc *oas3SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 		case !propResult.TypeSchema.ReadOnly && !propResult.TypeSchema.WriteOnly:
 			readObject.Fields[propName] = readField
 			writeObject.Fields[propName] = writeField
-		case !oc.writeMode && propResult.TypeSchema.ReadOnly:
+		case propResult.TypeSchema.ReadOnly:
 			readObject.Fields[propName] = readField
 		default:
 			writeObject.Fields[propName] = writeField
@@ -380,7 +377,7 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 	var writeObjectItems []rest.ObjectType
 
 	for i, item := range proxies {
-		schemaResult, err := newOAS3SchemaBuilder(oc.builder, oc.apiPath, oc.location, false).
+		schemaResult, err := newOAS3SchemaBuilder(oc.builder, oc.apiPath, oc.location).
 			getSchemaTypeFromProxy(item, nullable, append(fieldPaths, strconv.Itoa(i)))
 		if err != nil {
 			return nil, err
@@ -447,10 +444,6 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 	}
 	if len(writeObject.Fields) > 0 {
 		oc.builder.schema.ObjectTypes[writeRefName] = writeObject
-	}
-
-	if oc.writeMode && len(writeObject.Fields) > 0 {
-		refName = writeRefName
 	}
 
 	return &SchemaInfoCache{

@@ -182,7 +182,7 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 		if param.Required != nil && *param.Required {
 			paramRequired = true
 		}
-		schemaResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.ParameterLocation(param.In), true).
+		schemaResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.ParameterLocation(param.In)).
 			getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 		if err != nil {
 			return err
@@ -263,7 +263,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 	if contentType == rest.ContentTypeFormURLEncoded {
 		location = rest.InQuery
 	}
-	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, location, true).
+	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, location).
 		getSchemaTypeFromProxy(content.Schema, !bodyRequired, fieldPaths)
 	if err != nil {
 		return nil, nil, err
@@ -311,7 +311,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 					continue
 				}
 
-				typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InHeader, true).
+				typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InHeader).
 					getSchemaTypeFromProxy(header.Schema, header.AllowEmptyValue, append(fieldPaths, key))
 				if err != nil {
 					return nil, nil, err
@@ -428,7 +428,7 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 		return getResultTypeFromContentType(oc.builder.schema, contentType), schemaResponse, nil
 	}
 
-	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InBody, false).
+	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InBody).
 		getSchemaTypeFromProxy(bodyContent.Schema, false, fieldPaths)
 	if err != nil {
 		return nil, nil, err

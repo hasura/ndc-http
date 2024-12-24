@@ -150,8 +150,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 			return nil, errParameterNameRequired
 		}
 
-		var typeEncoder schema.TypeEncoder
-		var typeSchema *rest.TypeSchema
+		var schemaResult *SchemaInfoCache
 		var err error
 
 		paramRequired := false
@@ -161,40 +160,50 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 
 		switch {
 		case param.Type != "":
-			typeEncoder, err = newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).getSchemaTypeFromParameter(param, fieldPaths)
+			typeEncoder, err := newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).
+				getSchemaTypeFromParameter(param, fieldPaths)
 			if err != nil {
 				return nil, err
 			}
-			typeSchema = &rest.TypeSchema{
-				Type:    evaluateOpenAPITypes([]string{param.Type}),
-				Pattern: param.Pattern,
+
+			schemaResult = &SchemaInfoCache{
+				TypeRead:  typeEncoder,
+				TypeWrite: typeEncoder,
+				TypeSchema: &rest.TypeSchema{
+					Type:    evaluateOpenAPITypes([]string{param.Type}),
+					Pattern: param.Pattern,
+				},
 			}
 			if param.Maximum != nil {
 				maximum := float64(*param.Maximum)
-				typeSchema.Maximum = &maximum
+				schemaResult.TypeSchema.Maximum = &maximum
 			}
 			if param.Minimum != nil {
 				minimum := float64(*param.Minimum)
-				typeSchema.Minimum = &minimum
+				schemaResult.TypeSchema.Minimum = &minimum
 			}
 			if param.MaxLength != nil {
 				maxLength := int64(*param.MaxLength)
-				typeSchema.MaxLength = &maxLength
+				schemaResult.TypeSchema.MaxLength = &maxLength
 			}
 			if param.MinLength != nil {
 				minLength := int64(*param.MinLength)
-				typeSchema.MinLength = &minLength
+				schemaResult.TypeSchema.MinLength = &minLength
 			}
 		case param.Schema != nil:
-			typeEncoder, typeSchema, err = newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).
+			schemaResult, err = newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).
 				getSchemaTypeFromProxy(param.Schema, !paramRequired, fieldPaths)
 			if err != nil {
 				return nil, err
 			}
 		default:
-			typeEncoder = oc.builder.buildScalarJSON()
-			typeSchema = &rest.TypeSchema{
-				Type: []string{},
+			typeEncoder := oc.builder.buildScalarJSON()
+			schemaResult = &SchemaInfoCache{
+				TypeRead:  typeEncoder,
+				TypeWrite: typeEncoder,
+				TypeSchema: &rest.TypeSchema{
+					Type: []string{},
+				},
 			}
 		}
 
@@ -203,7 +212,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 			return nil, err
 		}
 
-		schemaType := typeEncoder.Encode()
+		schemaType := schemaResult.TypeWrite.Encode()
 		argument := rest.ArgumentInfo{
 			ArgumentInfo: schema.ArgumentInfo{
 				Type: schemaType,
@@ -220,19 +229,19 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 		case rest.InBody:
 			argument.HTTP = &rest.RequestParameter{
 				In:     rest.InBody,
-				Schema: typeSchema,
+				Schema: schemaResult.TypeSchema,
 			}
 			oc.Arguments[rest.BodyKey] = argument
 			requestBody = &rest.RequestBody{
 				ContentType: contentType,
 			}
 		case rest.InFormData:
-			if typeSchema != nil {
+			if schemaResult.TypeSchema != nil {
 				param := rest.ObjectField{
 					ObjectField: schema.ObjectField{
 						Type: argument.Type,
 					},
-					HTTP: typeSchema,
+					HTTP: schemaResult.TypeSchema,
 				}
 
 				if argument.Description != nil {
@@ -247,7 +256,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 			argument.HTTP = &rest.RequestParameter{
 				Name:   paramName,
 				In:     paramLocation,
-				Schema: typeSchema,
+				Schema: schemaResult.TypeSchema,
 			}
 			oc.Arguments[paramName] = argument
 		}
@@ -345,13 +354,13 @@ func (oc *oas2OperationBuilder) convertResponse(operation *v2.Operation, fieldPa
 		return getResultTypeFromContentType(oc.builder.schema, contentType), response, nil
 	}
 
-	schemaType, _, err := newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.InBody).
+	schemaResult, err := newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.InBody).
 		getSchemaTypeFromProxy(resp.Schema, false, fieldPaths)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return schemaType, response, nil
+	return schemaResult.TypeRead, response, nil
 }
 
 func (oc *oas2OperationBuilder) getContentTypeV2(contentTypes []string) string {

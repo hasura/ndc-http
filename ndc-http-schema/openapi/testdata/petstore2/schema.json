@@ -489,6 +489,28 @@
         }
       }
     },
+    "CategoryInput": {
+      "fields": {
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "name": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
     "ContactdbCustomFieldWithIdValue": {
       "fields": {
         "id": {
@@ -1027,7 +1049,120 @@
         }
       }
     },
+    "OAuth2ClientInput": {
+      "fields": {
+        "client_id": {
+          "description": "ID  is the id for this client.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "client_name": {
+          "description": "Name is the human-readable string name of the client to be presented to the end-user during authorization.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "client_secret": {
+          "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then never again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users that they need to write the secret down as it will not be made available again.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "client_secret_expires_at": {
+          "description": "SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it's value will always be set to 0.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "client_uri": {
+          "description": "ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
     "Order": {
+      "fields": {
+        "complete": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Boolean",
+              "type": "named"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "petId": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "quantity": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "shipDate": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "TimestampTZ",
+              "type": "named"
+            }
+          }
+        },
+        "status": {
+          "description": "Order Status",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "OrderStatus",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "OrderInput": {
       "fields": {
         "complete": {
           "type": {
@@ -1155,6 +1290,75 @@
         }
       }
     },
+    "PetInput": {
+      "fields": {
+        "category": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "CategoryInput",
+              "type": "named"
+            }
+          }
+        },
+        "field": {
+          "description": "This empty field is returned instead of the list of scopes if the user making the call doesn't have the authorization required.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "JSON",
+              "type": "named"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "name": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          }
+        },
+        "photoUrls": {
+          "type": {
+            "element_type": {
+              "name": "String",
+              "type": "named"
+            },
+            "type": "array"
+          }
+        },
+        "status": {
+          "description": "pet status in the store",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "PetStatus",
+              "type": "named"
+            }
+          }
+        },
+        "tags": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "TagInput",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
     "SnakeObject": {
       "fields": {
         "context": {
@@ -1187,6 +1391,28 @@
       }
     },
     "Tag": {
+      "fields": {
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "name": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "TagInput": {
       "fields": {
         "id": {
           "type": {
@@ -1332,6 +1558,83 @@
           }
         }
       }
+    },
+    "UserInput": {
+      "fields": {
+        "email": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "firstName": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "lastName": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "password": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "phone": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "userStatus": {
+          "description": "User Status",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "username": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
     }
   },
   "procedures": [
@@ -1340,7 +1643,7 @@
         "body": {
           "description": "Pet object that needs to be added to the store",
           "type": {
-            "name": "Pet",
+            "name": "PetInput",
             "type": "named"
           }
         }
@@ -1425,7 +1728,7 @@
       "arguments": {
         "body": {
           "type": {
-            "name": "OAuth2Client",
+            "name": "OAuth2ClientInput",
             "type": "named"
           }
         }
@@ -1442,7 +1745,7 @@
         "body": {
           "description": "order placed for purchasing the pet",
           "type": {
-            "name": "Order",
+            "name": "OrderInput",
             "type": "named"
           }
         }
@@ -1459,7 +1762,7 @@
         "body": {
           "description": "Pet object that needs to be added to the store",
           "type": {
-            "name": "Pet",
+            "name": "PetInput",
             "type": "named"
           }
         }
@@ -1476,7 +1779,7 @@
         "body": {
           "description": "Pet object that needs to be added to the store",
           "type": {
-            "name": "Pet",
+            "name": "PetInput",
             "type": "named"
           }
         }
@@ -1517,7 +1820,7 @@
         "body": {
           "description": "Updated user object",
           "type": {
-            "name": "User",
+            "name": "UserInput",
             "type": "named"
           }
         },

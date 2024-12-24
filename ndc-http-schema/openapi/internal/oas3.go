@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"log"
 	"log/slog"
 	"strings"
 
@@ -267,15 +266,13 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		return nil
 	}
 
-	schemaResult, err := newOAS3SchemaBuilder(oc, "", rest.InBody, false).
+	schemaResult, err := newOAS3SchemaBuilder(oc, "", rest.InBody).
 		getSchemaType(typeSchema, []string{typeKey})
 	if err != nil {
 		return err
 	}
 
 	if schemaResult == nil {
-		log.Println("can not build schema for", typeKey)
-
 		return nil
 	}
 

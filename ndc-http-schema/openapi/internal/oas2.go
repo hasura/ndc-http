@@ -220,19 +220,26 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		return nil
 	}
 
-	typeEncoder, schemaResult, err := newOAS2SchemaBuilder(oc, "", rest.InBody).getSchemaType(typeSchema, []string{typeKey})
-
-	var typeName string
-	if typeEncoder != nil {
-		typeName = getNamedType(typeEncoder, true, "")
+	schemaResult, err := newOAS2SchemaBuilder(oc, "", rest.InBody).getSchemaType(typeSchema, []string{typeKey})
+	if err != nil {
+		return err
 	}
 
-	if schemaResult != nil {
-		if schemaResult.XML == nil {
-			schemaResult.XML = &rest.XMLSchema{}
+	if schemaResult == nil {
+		return nil
+	}
+
+	var typeName string
+	if schemaResult.TypeRead != nil {
+		typeName = getNamedType(schemaResult.TypeRead, true, "")
+	}
+
+	if schemaResult.TypeSchema != nil {
+		if schemaResult.TypeSchema.XML == nil {
+			schemaResult.TypeSchema.XML = &rest.XMLSchema{}
 		}
-		if schemaResult.XML.Name == "" {
-			schemaResult.XML.Name = typeKey
+		if schemaResult.TypeSchema.XML.Name == "" {
+			schemaResult.TypeSchema.XML.Name = typeKey
 		}
 	}
 
@@ -245,7 +252,7 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 
 	cacheKey := "#/definitions/" + typeKey
 	// treat no-property objects as a Arbitrary JSON scalar
-	if typeEncoder == nil || typeName == string(rest.ScalarJSON) {
+	if schemaResult.TypeRead == nil || typeName == string(rest.ScalarJSON) {
 		refName := utils.ToPascalCase(typeKey)
 		scalar := schema.NewScalarType()
 		scalar.Representation = schema.NewTypeRepresentationJSON().Encode()
@@ -253,14 +260,10 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		oc.schemaCache[cacheKey] = SchemaInfoCache{
 			TypeRead:   schema.NewNamedType(refName),
 			TypeWrite:  schema.NewNamedType(refName),
-			TypeSchema: schemaResult,
+			TypeSchema: schemaResult.TypeSchema,
 		}
 	} else {
-		oc.schemaCache[cacheKey] = SchemaInfoCache{
-			TypeRead:   typeEncoder,
-			TypeWrite:  typeEncoder,
-			TypeSchema: schemaResult,
-		}
+		oc.schemaCache[cacheKey] = *schemaResult
 	}
 
 	return err
