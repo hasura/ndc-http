@@ -574,7 +574,8 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 
 		// empty string enum is considered as nullable, e.g. key1=&key2=
 		// however, it's redundant and prevents the tool converting correct types
-		if location == rest.InQuery && (sc.Type[0] == "string" && len(sc.Enum) == 1 && (sc.Enum[0] == nil || sc.Enum[0].Value == "")) {
+		if (len(sc.Type) == 1 && sc.Type[0] == "null") ||
+			(location == rest.InQuery && (sc.Type[0] == "string" && len(sc.Enum) == 1 && (sc.Enum[0] == nil || sc.Enum[0].Value == ""))) {
 			nullable = true
 
 			continue

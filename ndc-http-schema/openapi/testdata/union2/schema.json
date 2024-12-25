@@ -2,33 +2,18 @@
   "collections": [],
   "functions": [],
   "object_types": {
-    "Pet": {
+    "CatInput": {
       "fields": {
         "age": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "Int32",
-              "type": "named"
-            }
-          }
-        },
-        "icon": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
+            "name": "Int32",
+            "type": "named"
           }
         },
         "id": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
+            "name": "String",
+            "type": "named"
           }
         },
         "metadata": {
@@ -43,37 +28,46 @@
             }
           }
         },
-        "text": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          }
-        },
         "type": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "PetTypeEnum",
-              "type": "named"
-            }
-          }
-        },
-        "value": {
-          "description": "The value of this recipient's custom field",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
+            "name": "CatType",
+            "type": "named"
           }
         }
       }
     },
-    "PetBodyInput": {
+    "DogInput": {
+      "fields": {
+        "icon": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          }
+        },
+        "text": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          }
+        },
+        "type": {
+          "type": {
+            "name": "DogType",
+            "type": "named"
+          }
+        }
+      }
+    },
+    "Pet": {
       "fields": {
         "age": {
           "type": {
@@ -121,7 +115,17 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetBodyTypeEnum",
+              "name": "PetTypeEnum",
+              "type": "named"
+            }
+          }
+        },
+        "value": {
+          "description": "The value of this recipient's custom field",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
               "type": "named"
             }
           }
@@ -133,15 +137,32 @@
     {
       "arguments": {
         "body": {
-          "description": "Pet object that needs to be added to the store",
+          "description": "Request body of POST /pet",
           "type": {
-            "name": "PetBodyInput",
+            "name": "CatInput",
             "type": "named"
           }
         }
       },
       "description": "Add a new pet to the store",
-      "name": "addPet",
+      "name": "addPet_Cat",
+      "result_type": {
+        "name": "Pet",
+        "type": "named"
+      }
+    },
+    {
+      "arguments": {
+        "body": {
+          "description": "Request body of POST /pet",
+          "type": {
+            "name": "DogInput",
+            "type": "named"
+          }
+        }
+      },
+      "description": "Add a new pet to the store",
+      "name": "addPet_Dog",
       "result_type": {
         "name": "Pet",
         "type": "named"
@@ -149,6 +170,26 @@
     }
   ],
   "scalar_types": {
+    "CatType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cat"
+        ],
+        "type": "enum"
+      }
+    },
+    "DogType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "dog"
+        ],
+        "type": "enum"
+      }
+    },
     "Int32": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -161,17 +202,6 @@
       "comparison_operators": {},
       "representation": {
         "type": "json"
-      }
-    },
-    "PetBodyTypeEnum": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "cat",
-          "dog"
-        ],
-        "type": "enum"
       }
     },
     "PetTypeEnum": {

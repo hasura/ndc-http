@@ -159,7 +159,7 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 
 			if len(bodyTypes) > 1 {
 				bodyTypeName := getNamedType(bodyType.TypeRead, true, "")
-				newProcName = formatOperationName(procName + bodyTypeName)
+				newProcName = procName + "_" + strings.TrimPrefix(bodyTypeName, utils.ToPascalCase(procName))
 			}
 		}
 

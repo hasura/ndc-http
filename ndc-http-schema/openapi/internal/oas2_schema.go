@@ -123,7 +123,7 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 	typeName := oasTypes[0]
 	switch typeName {
 	case "object":
-		typeResult, err = oc.evalObjectType(typeSchema, false, fieldPaths)
+		typeResult, err = oc.evalObjectType(typeSchema, fieldPaths)
 		if err != nil {
 			return nil, err
 		}
@@ -169,7 +169,7 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 	return typeResult, nil
 }
 
-func (oc *oas2SchemaBuilder) evalObjectType(baseSchema *base.Schema, forcePropertiesNullable bool, fieldPaths []string) (*SchemaInfoCache, error) {
+func (oc *oas2SchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths []string) (*SchemaInfoCache, error) {
 	typeResult := createSchemaFromOpenAPISchema(baseSchema)
 	refName := utils.StringSliceToPascalCase(fieldPaths)
 
@@ -217,7 +217,7 @@ func (oc *oas2SchemaBuilder) evalObjectType(baseSchema *base.Schema, forceProper
 			slog.String("name", propName),
 			slog.Any("field", fieldPaths))
 
-		nullable := forcePropertiesNullable || !slices.Contains(baseSchema.Required, propName)
+		nullable := !slices.Contains(baseSchema.Required, propName)
 		propResult, err := oc.getSchemaTypeFromProxy(prop.Value(), nullable, append(fieldPaths, propName))
 		if err != nil {
 			return nil, err
@@ -376,7 +376,7 @@ func (oc *oas2SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 		}
 
 		if len(oasTypes) == 1 && baseSchema.Type[0] == "object" {
-			schemaResult, err := oc.evalObjectType(baseSchema, true, fieldPaths)
+			schemaResult, err := oc.evalObjectType(baseSchema, fieldPaths)
 			if err != nil {
 				return nil, err
 			}

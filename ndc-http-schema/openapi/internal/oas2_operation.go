@@ -137,7 +137,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 
 			if len(bodyTypes) > 1 {
 				bodyTypeName := getNamedType(bodyType.TypeRead, true, "")
-				newProcName = formatOperationName(procName + bodyTypeName)
+				newProcName = procName + "_" + strings.TrimPrefix(bodyTypeName, utils.ToPascalCase(procName))
 			}
 		}
 

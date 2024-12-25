@@ -22,15 +22,12 @@
   },
   "functions": {},
   "object_types": {
-    "Pet": {
+    "CatInput": {
       "fields": {
         "age": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "Int32",
-              "type": "named"
-            }
+            "name": "Int32",
+            "type": "named"
           },
           "http": {
             "type": [
@@ -38,27 +35,10 @@
             ]
           }
         },
-        "icon": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
         "id": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
+            "name": "String",
+            "type": "named"
           },
           "http": {
             "type": [
@@ -86,13 +66,53 @@
             }
           }
         },
-        "text": {
+        "type": {
+          "type": {
+            "name": "CatType",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "xml": {
+        "name": "Cat"
+      }
+    },
+    "DogInput": {
+      "fields": {
+        "icon": {
           "type": {
             "type": "nullable",
             "underlying_type": {
               "name": "String",
               "type": "named"
             }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "text": {
+          "type": {
+            "name": "String",
+            "type": "named"
           },
           "http": {
             "type": [
@@ -102,26 +122,8 @@
         },
         "type": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "PetTypeEnum",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "value": {
-          "description": "The value of this recipient's custom field",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
+            "name": "DogType",
+            "type": "named"
           },
           "http": {
             "type": [
@@ -129,9 +131,12 @@
             ]
           }
         }
+      },
+      "xml": {
+        "name": "Dog"
       }
     },
-    "PetBodyInput": {
+    "Pet": {
       "fields": {
         "age": {
           "type": {
@@ -207,7 +212,22 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetBodyTypeEnum",
+              "name": "PetTypeEnum",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "value": {
+          "description": "The value of this recipient's custom field",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
               "type": "named"
             }
           },
@@ -221,7 +241,7 @@
     }
   },
   "procedures": {
-    "addPet": {
+    "addPet_Cat": {
       "request": {
         "url": "/pet",
         "method": "post",
@@ -234,9 +254,9 @@
       },
       "arguments": {
         "body": {
-          "description": "Pet object that needs to be added to the store",
+          "description": "Request body of POST /pet",
           "type": {
-            "name": "PetBodyInput",
+            "name": "CatInput",
             "type": "named"
           },
           "http": {
@@ -244,10 +264,41 @@
             "schema": {
               "type": [
                 "object"
-              ],
-              "xml": {
-                "name": "PetBody"
-              }
+              ]
+            }
+          }
+        }
+      },
+      "description": "Add a new pet to the store",
+      "result_type": {
+        "name": "Pet",
+        "type": "named"
+      }
+    },
+    "addPet_Dog": {
+      "request": {
+        "url": "/pet",
+        "method": "post",
+        "requestBody": {
+          "contentType": "application/json"
+        },
+        "response": {
+          "contentType": "application/json"
+        }
+      },
+      "arguments": {
+        "body": {
+          "description": "Request body of POST /pet",
+          "type": {
+            "name": "DogInput",
+            "type": "named"
+          },
+          "http": {
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
             }
           }
         }
@@ -260,6 +311,26 @@
     }
   },
   "scalar_types": {
+    "CatType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cat"
+        ],
+        "type": "enum"
+      }
+    },
+    "DogType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "dog"
+        ],
+        "type": "enum"
+      }
+    },
     "Int32": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -272,17 +343,6 @@
       "comparison_operators": {},
       "representation": {
         "type": "json"
-      }
-    },
-    "PetBodyTypeEnum": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "cat",
-          "dog"
-        ],
-        "type": "enum"
       }
     },
     "PetTypeEnum": {

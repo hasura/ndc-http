@@ -3794,6 +3794,16 @@
           },
           "complete": {
             "type": "boolean"
+          },
+          "customer": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Customer"
+              }
+            ]
           }
         },
         "xml": {

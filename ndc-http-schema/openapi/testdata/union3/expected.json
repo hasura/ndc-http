@@ -767,7 +767,7 @@
     }
   },
   "procedures": {
-    "postPetsCat": {
+    "postPets_Cat": {
       "request": {
         "url": "/pets",
         "method": "post",
@@ -801,7 +801,7 @@
         "type": "named"
       }
     },
-    "postPetsDog": {
+    "postPets_Dog": {
       "request": {
         "url": "/pets",
         "method": "post",

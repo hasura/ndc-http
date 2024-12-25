@@ -468,7 +468,7 @@
         }
       },
       "description": "POST /pets",
-      "name": "postPetsCat",
+      "name": "postPets_Cat",
       "result_type": {
         "name": "Pet",
         "type": "named"
@@ -485,7 +485,7 @@
         }
       },
       "description": "POST /pets",
-      "name": "postPetsDog",
+      "name": "postPets_Dog",
       "result_type": {
         "name": "Pet",
         "type": "named"

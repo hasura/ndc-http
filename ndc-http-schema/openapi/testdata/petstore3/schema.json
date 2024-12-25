@@ -350,6 +350,46 @@
     }
   ],
   "object_types": {
+    "Address": {
+      "fields": {
+        "city": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "state": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "street": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "zip": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
     "AddressInput": {
       "fields": {
         "city": {
@@ -615,6 +655,74 @@
     "CreateFineTuningJobRequestInput": {
       "fields": {
         "model": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "Customer": {
+      "fields": {
+        "address": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "Address",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "username": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "CustomerInput": {
+      "fields": {
+        "address": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "AddressInput",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          }
+        },
+        "username": {
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -915,6 +1023,15 @@
             }
           }
         },
+        "customer": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Customer",
+              "type": "named"
+            }
+          }
+        },
         "id": {
           "type": {
             "type": "nullable",
@@ -970,6 +1087,15 @@
             "type": "nullable",
             "underlying_type": {
               "name": "Boolean",
+              "type": "named"
+            }
+          }
+        },
+        "customer": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "CustomerInput",
               "type": "named"
             }
           }
