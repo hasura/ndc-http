@@ -14,7 +14,7 @@
     },
     "schemas": {
       "PetBody": {
-        "allOf": [
+        "oneOf": [
           {
             "$ref": "#/components/schemas/Dog"
           },
@@ -24,7 +24,7 @@
         ]
       },
       "Pet": {
-        "oneOf": [
+        "allOf": [
           {
             "$ref": "#/components/schemas/Dog"
           },

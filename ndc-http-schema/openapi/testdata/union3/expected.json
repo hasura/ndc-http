@@ -103,6 +103,114 @@
     }
   },
   "object_types": {
+    "CatInput": {
+      "fields": {
+        "age": {
+          "type": {
+            "name": "Int32",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "integer"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "metadata": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "JSON",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {
+              "type": []
+            }
+          }
+        },
+        "type": {
+          "type": {
+            "name": "CatType",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "DogInput": {
+      "fields": {
+        "icon": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "text": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "type": {
+          "type": {
+            "name": "DogType",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
     "PaymentSource": {
       "fields": {
         "allow_redisplay": {
@@ -558,115 +666,6 @@
       "fields": {
         "age": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "Int32",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "integer"
-            ]
-          }
-        },
-        "icon": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "id": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "metadata": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "element_type": {
-                "name": "JSON",
-                "type": "named"
-              },
-              "type": "array"
-            }
-          },
-          "http": {
-            "type": [
-              "array"
-            ],
-            "items": {
-              "type": []
-            }
-          }
-        },
-        "text": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "type": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "PetTypeEnum",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "value": {
-          "description": "The value of this recipient's custom field",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        }
-      }
-    },
-    "PetBodyInput": {
-      "fields": {
-        "age": {
-          "type": {
             "name": "Int32",
             "type": "named"
           },
@@ -739,7 +738,22 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetBodyTypeEnum",
+              "name": "PetTypeEnum",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "value": {
+          "description": "The value of this recipient's custom field",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
               "type": "named"
             }
           },
@@ -753,7 +767,7 @@
     }
   },
   "procedures": {
-    "postPets": {
+    "postPetsCat": {
       "request": {
         "url": "/pets",
         "method": "post",
@@ -768,7 +782,56 @@
         "body": {
           "description": "Request body of POST /pets",
           "type": {
-            "name": "PetBodyInput",
+            "name": "CatInput",
+            "type": "named"
+          },
+          "http": {
+            "in": "body"
+          }
+        },
+        "paramBody": {
+          "description": "Request body of POST /pets",
+          "type": {
+            "name": "DogInput",
+            "type": "named"
+          },
+          "http": {
+            "in": "body"
+          }
+        }
+      },
+      "description": "POST /pets",
+      "result_type": {
+        "name": "Pet",
+        "type": "named"
+      }
+    },
+    "postPetsDog": {
+      "request": {
+        "url": "/pets",
+        "method": "post",
+        "requestBody": {
+          "contentType": "application/json"
+        },
+        "response": {
+          "contentType": "application/json"
+        }
+      },
+      "arguments": {
+        "body": {
+          "description": "Request body of POST /pets",
+          "type": {
+            "name": "CatInput",
+            "type": "named"
+          },
+          "http": {
+            "in": "body"
+          }
+        },
+        "paramBody": {
+          "description": "Request body of POST /pets",
+          "type": {
+            "name": "DogInput",
             "type": "named"
           },
           "http": {
@@ -821,6 +884,26 @@
         "one_of": [
           "regulated",
           "unregulated"
+        ],
+        "type": "enum"
+      }
+    },
+    "CatType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cat"
+        ],
+        "type": "enum"
+      }
+    },
+    "DogType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "dog"
         ],
         "type": "enum"
       }
@@ -878,17 +961,6 @@
           "standard",
           "three_d_secure",
           "wechat"
-        ],
-        "type": "enum"
-      }
-    },
-    "PetBodyTypeEnum": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "cat",
-          "dog"
         ],
         "type": "enum"
       }

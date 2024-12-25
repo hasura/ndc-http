@@ -383,6 +383,8 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 
 	var readObjectItems []rest.ObjectType
 	var writeObjectItems []rest.ObjectType
+	var oneOfInfos []SchemaInfoCache
+	var isJSON bool
 
 	for i, item := range proxies {
 		schemaResult, err := newOAS3SchemaBuilder(oc.builder, oc.apiPath, oc.location).
@@ -401,19 +403,18 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 			}
 		}
 
+		if unionType == oasOneOf && schemaResult != nil {
+			oneOfInfos = append(oneOfInfos, *schemaResult)
+		}
+
 		if !isObject {
-			schemaResult.TypeSchema = &rest.TypeSchema{
-				Description: typeSchema.Description,
-				Type:        []string{},
+			isJSON = true
+
+			if unionType == oasOneOf {
+				continue
 			}
 
-			jsonScalar := oc.builder.buildScalarJSON()
-
-			return &SchemaInfoCache{
-				TypeRead:   jsonScalar,
-				TypeWrite:  jsonScalar,
-				TypeSchema: schemaResult.TypeSchema,
-			}, nil
+			break
 		}
 
 		writeName := formatWriteObjectName(name)
@@ -423,6 +424,20 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 		}
 
 		writeObjectItems = append(writeObjectItems, writeObj)
+	}
+
+	if isJSON {
+		jsonScalar := oc.builder.buildScalarJSON()
+
+		return &SchemaInfoCache{
+			TypeRead:  jsonScalar,
+			TypeWrite: jsonScalar,
+			OneOf:     oneOfInfos,
+			TypeSchema: &rest.TypeSchema{
+				Description: typeSchema.Description,
+				Type:        []string{},
+			},
+		}, nil
 	}
 
 	readObject := rest.ObjectType{
@@ -458,5 +473,6 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 		TypeRead:   schema.NewNamedType(refName),
 		TypeWrite:  schema.NewNamedType(writeRefName),
 		TypeSchema: typeSchema,
+		OneOf:      oneOfInfos,
 	}, nil
 }

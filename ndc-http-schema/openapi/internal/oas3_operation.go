@@ -89,9 +89,9 @@ func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.Oper
 	return &function, funcName, nil
 }
 
-func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) (*rest.OperationInfo, string, error) {
+func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 	if operation == nil || (oc.builder.ConvertOptions.NoDeprecation && operation.Deprecated != nil && *operation.Deprecated) {
-		return nil, "", nil
+		return nil
 	}
 
 	start := time.Now()
@@ -108,61 +108,76 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) (*rest.O
 
 	resultType, schemaResponse, err := oc.convertResponse(operation.Responses, oc.pathKey, []string{procName, "Result"})
 	if err != nil {
-		return nil, "", fmt.Errorf("%s: %w", oc.pathKey, err)
+		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
 
 	if resultType == nil {
-		return nil, "", nil
+		return nil
 	}
 
 	err = oc.convertParameters(operation.Parameters, oc.pathKey, []string{procName})
 	if err != nil {
-		return nil, "", fmt.Errorf("%s: %w", oc.pathKey, err)
+		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
 
-	reqBody, schemaType, err := oc.convertRequestBody(operation.RequestBody, oc.pathKey, []string{procName, "Body"})
+	reqBody, bodyTypes, err := oc.convertRequestBody(operation.RequestBody, oc.pathKey, []string{procName, "Body"})
 	if err != nil {
-		return nil, "", fmt.Errorf("%s: %w", oc.pathKey, err)
+		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
-	if reqBody != nil {
-		description := fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
-		// renaming query parameter name `body` if exist to avoid conflicts
-		if paramData, ok := oc.Arguments[rest.BodyKey]; ok {
-			oc.Arguments["paramBody"] = paramData
+
+	if len(bodyTypes) == 0 {
+		bodyTypes = []SchemaInfoCache{{}}
+	}
+
+	for _, bodyType := range bodyTypes {
+		newProcName := procName
+		if reqBody != nil && bodyType.TypeWrite != nil {
+			description := fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
+			// renaming query parameter name `body` if exist to avoid conflicts
+			if paramData, ok := oc.Arguments[rest.BodyKey]; ok {
+				oc.Arguments["paramBody"] = paramData
+			}
+
+			oc.Arguments[rest.BodyKey] = rest.ArgumentInfo{
+				ArgumentInfo: schema.ArgumentInfo{
+					Description: &description,
+					Type:        bodyType.TypeWrite.Encode(),
+				},
+				HTTP: &rest.RequestParameter{
+					In: rest.InBody,
+				},
+			}
+
+			if len(bodyTypes) > 1 {
+				bodyTypeName := getNamedType(bodyType.TypeRead, true, "")
+				newProcName = formatOperationName(procName + bodyTypeName)
+			}
 		}
 
-		oc.Arguments[rest.BodyKey] = rest.ArgumentInfo{
-			ArgumentInfo: schema.ArgumentInfo{
-				Description: &description,
-				Type:        schemaType.Encode(),
-			},
-			HTTP: &rest.RequestParameter{
-				In: rest.InBody,
-			},
+		description := oc.getOperationDescription(operation)
+		requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, oc.Arguments)
+		if err != nil {
+			return fmt.Errorf("%s: %w", procName, err)
 		}
+
+		procedure := rest.OperationInfo{
+			Request: &rest.Request{
+				URL:         requestURL,
+				Method:      oc.method,
+				Security:    convertSecurities(operation.Security),
+				Servers:     oc.builder.convertServers(operation.Servers),
+				RequestBody: reqBody,
+				Response:    *schemaResponse,
+			},
+			Description: &description,
+			Arguments:   arguments,
+			ResultType:  resultType.Encode(),
+		}
+
+		oc.builder.schema.Procedures[newProcName] = procedure
 	}
 
-	description := oc.getOperationDescription(operation)
-	requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, oc.Arguments)
-	if err != nil {
-		return nil, "", fmt.Errorf("%s: %w", procName, err)
-	}
-
-	procedure := rest.OperationInfo{
-		Request: &rest.Request{
-			URL:         requestURL,
-			Method:      oc.method,
-			Security:    convertSecurities(operation.Security),
-			Servers:     oc.builder.convertServers(operation.Servers),
-			RequestBody: reqBody,
-			Response:    *schemaResponse,
-		},
-		Description: &description,
-		Arguments:   arguments,
-		ResultType:  resultType.Encode(),
-	}
-
-	return &procedure, procName, nil
+	return nil
 }
 
 func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPath string, fieldPaths []string) error {
@@ -248,7 +263,7 @@ func (oc *oas3OperationBuilder) getContentType(contents *orderedmap.Map[string, 
 	return contentType, media
 }
 
-func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiPath string, fieldPaths []string) (*rest.RequestBody, schema.TypeEncoder, error) {
+func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiPath string, fieldPaths []string) (*rest.RequestBody, []SchemaInfoCache, error) {
 	if reqBody == nil || reqBody.Content == nil {
 		return nil, nil, nil
 	}
@@ -269,7 +284,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 		return nil, nil, err
 	}
 
-	if typeResult == nil || typeResult.TypeRead == nil {
+	if typeResult == nil || typeResult.TypeWrite == nil {
 		return nil, nil, nil
 	}
 
@@ -277,8 +292,13 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 		ContentType: contentType,
 	}
 
+	bodyTypes := []SchemaInfoCache{*typeResult}
+	if len(typeResult.OneOf) > 1 {
+		bodyTypes = typeResult.OneOf
+	}
+
 	if content.Encoding == nil || content.Encoding.Len() == 0 {
-		return bodyResult, typeResult.TypeWrite, nil
+		return bodyResult, bodyTypes, nil
 	}
 
 	bodyResult.Encoding = make(map[string]rest.EncodingObject)
@@ -311,7 +331,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 					continue
 				}
 
-				typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InHeader).
+				headerResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InHeader).
 					getSchemaTypeFromProxy(header.Schema, header.AllowEmptyValue, append(fieldPaths, key))
 				if err != nil {
 					return nil, nil, err
@@ -333,12 +353,12 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 				argumentName := encodeHeaderArgumentName(key)
 				headerParam := rest.RequestParameter{
 					ArgumentName:   argumentName,
-					Schema:         typeResult.TypeSchema,
+					Schema:         headerResult.TypeSchema,
 					EncodingObject: headerEncoding,
 				}
 
 				argument := schema.ArgumentInfo{
-					Type: typeResult.TypeWrite.Encode(),
+					Type: headerResult.TypeWrite.Encode(),
 				}
 				headerDesc := utils.StripHTMLTags(header.Description)
 				if headerDesc != "" {
@@ -354,7 +374,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 		bodyResult.Encoding[iter.Key()] = item
 	}
 
-	return bodyResult, typeResult.TypeWrite, nil
+	return bodyResult, bodyTypes, nil
 }
 
 func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath string, fieldPaths []string) (schema.TypeEncoder, *rest.Response, error) {
