@@ -505,7 +505,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "NotificationsEvents",
+              "name": "GetNotificationHistoryBodyEvents",
               "type": "named"
             }
           },
@@ -1556,6 +1556,17 @@
         "type": "enum"
       }
     },
+    "GetNotificationHistoryBodyEvents": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "sent",
+          "clicked"
+        ],
+        "type": "enum"
+      }
+    },
     "Int32": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -1582,17 +1593,6 @@
       "comparison_operators": {},
       "representation": {
         "type": "json"
-      }
-    },
-    "NotificationsEvents": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "sent",
-          "clicked"
-        ],
-        "type": "enum"
       }
     },
     "OutcomeDataAggregation": {

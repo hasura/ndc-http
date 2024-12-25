@@ -31,7 +31,6 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 		TrimPrefix:          config.TrimPrefix,
 		EnvPrefix:           config.EnvPrefix,
 		AllowedContentTypes: config.AllowedContentTypes,
-		Strict:              config.Strict,
 		NoDeprecation:       config.NoDeprecation,
 		Logger:              logger,
 	}
@@ -79,9 +78,7 @@ func ResolveConvertConfigArguments(config *ConvertConfig, configDir string, args
 		if args.Pure {
 			config.Pure = args.Pure
 		}
-		if args.Strict {
-			config.Strict = args.Strict
-		}
+
 		if args.NoDeprecation {
 			config.NoDeprecation = args.NoDeprecation
 		}

@@ -38,13 +38,9 @@ func (oc *oas2SchemaBuilder) getSchemaTypeFromParameter(param *v2.Parameter, fie
 		return nil, fmt.Errorf("%s: unsupported object parameter", strings.Join(fieldPaths, "."))
 	case "array":
 		if param.Items == nil || param.Items.Type == "" {
-			if oc.builder.Strict {
-				return nil, fmt.Errorf("%s: array item is empty", strings.Join(fieldPaths, "."))
-			}
-
 			typeEncoder = schema.NewArrayType(oc.builder.buildScalarJSON())
 		} else {
-			itemName := getScalarFromType(oc.builder.schema, []string{param.Items.Type}, param.Format, param.Enum, oc.trimPathPrefix(oc.apiPath), fieldPaths)
+			itemName := getScalarFromType(oc.builder.schema, []string{param.Items.Type}, param.Format, param.Enum, fieldPaths)
 			typeEncoder = schema.NewArrayType(schema.NewNamedType(itemName))
 		}
 	default:
@@ -52,7 +48,7 @@ func (oc *oas2SchemaBuilder) getSchemaTypeFromParameter(param *v2.Parameter, fie
 			return nil, fmt.Errorf("%s: unsupported schema type %s", strings.Join(fieldPaths, "."), param.Type)
 		}
 
-		scalarName := getScalarFromType(oc.builder.schema, []string{param.Type}, param.Format, param.Enum, oc.trimPathPrefix(oc.apiPath), fieldPaths)
+		scalarName := getScalarFromType(oc.builder.schema, []string{param.Type}, param.Format, param.Enum, fieldPaths)
 		typeEncoder = schema.NewNamedType(scalarName)
 	}
 
@@ -87,11 +83,7 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 
 	oasTypes, nullable := extractNullableFromOASTypes(typeSchema.Type)
 	nullable = nullable || (typeSchema.Nullable != nil && *typeSchema.Nullable)
-	if len(oasTypes) == 0 || (typeSchema.AdditionalProperties != nil && (typeSchema.AdditionalProperties.B || typeSchema.AdditionalProperties.A != nil)) {
-		if len(typeSchema.Type) == 0 && oc.builder.Strict {
-			return nil, errParameterSchemaEmpty(fieldPaths)
-		}
-
+	if typeSchema.AdditionalProperties != nil && (typeSchema.AdditionalProperties.B || typeSchema.AdditionalProperties.A != nil) {
 		var result schema.TypeEncoder = oc.builder.buildScalarJSON()
 		if nullable {
 			result = schema.NewNullableType(result)
@@ -104,8 +96,8 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		}, nil
 	}
 
-	if len(oasTypes) > 1 || isPrimitiveScalar(oasTypes) {
-		scalarName := getScalarFromType(oc.builder.schema, oasTypes, typeSchema.Format, typeSchema.Enum, oc.trimPathPrefix(oc.apiPath), fieldPaths)
+	if len(oasTypes) != 1 || isPrimitiveScalar(oasTypes) {
+		scalarName := getScalarFromType(oc.builder.schema, oasTypes, typeSchema.Format, typeSchema.Enum, fieldPaths)
 		var resultType schema.TypeEncoder = schema.NewNamedType(scalarName)
 		if nullable {
 			resultType = schema.NewNullableType(resultType)
@@ -129,11 +121,7 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		}
 	case "array":
 		var itemSchema *SchemaInfoCache
-		if typeSchema.Items == nil || typeSchema.Items.A == nil {
-			if oc.builder.Strict {
-				return nil, fmt.Errorf("%s: array item is empty", strings.Join(fieldPaths, "."))
-			}
-		} else {
+		if typeSchema.Items != nil || typeSchema.Items.A != nil {
 			itemSchema, err = oc.getSchemaTypeFromProxy(typeSchema.Items.A, false, fieldPaths)
 			if err != nil {
 				return nil, err
@@ -362,7 +350,7 @@ func (oc *oas2SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 	case 0:
 		oasTypes, isNullable := extractNullableFromOASTypes(baseSchema.Type)
 		if len(baseSchema.Type) > 1 || isPrimitiveScalar(baseSchema.Type) {
-			scalarName := getScalarFromType(oc.builder.schema, oasTypes, baseSchema.Format, baseSchema.Enum, oc.trimPathPrefix(oc.apiPath), fieldPaths)
+			scalarName := getScalarFromType(oc.builder.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
 			var result schema.TypeEncoder = schema.NewNamedType(scalarName)
 			if nullable || isNullable {
 				result = schema.NewNullableType(result)

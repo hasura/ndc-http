@@ -180,7 +180,6 @@ type ConvertOptions struct {
 	Prefix              string
 	TrimPrefix          string
 	EnvPrefix           string
-	Strict              bool
 	NoDeprecation       bool
 	Logger              *slog.Logger
 }

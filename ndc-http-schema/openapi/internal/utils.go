@@ -70,25 +70,47 @@ func extractNullableFromOASTypes(names []string) ([]string, bool) {
 	return typeNames, nullable
 }
 
-func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, apiPath string, fieldPaths []string) string {
+func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, fieldPaths []string) string {
 	var scalarName string
 	var scalarType *schema.ScalarType
 
-	if len(names) != 1 {
-		scalarName = "JSON"
+	namesLen := len(names)
+	switch {
+	case namesLen == 0 && len(enumNodes) > 0:
+		scalarName, scalarType = buildEnumScalar(sm, enumNodes, fieldPaths)
+	case namesLen == 1:
+		scalarName, scalarType = getScalarFromOASType(sm, names, format, enumNodes, fieldPaths)
+	default:
+		scalarName = string(rest.ScalarJSON)
 		scalarType = defaultScalarTypes[rest.ScalarJSON]
-	} else {
-		scalarName, scalarType = getScalarFromNamedType(sm, names, format, enumNodes, apiPath, fieldPaths)
 	}
 
-	if _, ok := sm.ScalarTypes[scalarName]; !ok {
-		sm.ScalarTypes[scalarName] = *scalarType
-	}
+	sm.AddScalar(scalarName, *scalarType)
 
 	return scalarName
 }
 
-func getScalarFromNamedType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, apiPath string, fieldPaths []string) (string, *schema.ScalarType) {
+func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths []string) (string, *schema.ScalarType) {
+	enums := make([]string, len(enumNodes))
+	for i, enum := range enumNodes {
+		enums[i] = enum.Value
+	}
+
+	scalarType := schema.NewScalarType()
+	scalarType.Representation = schema.NewTypeRepresentationEnum(enums).Encode()
+
+	scalarName := utils.StringSliceToPascalCase(fieldPaths)
+	if canSetEnumToSchema(sm, scalarName, enums) {
+		return scalarName, scalarType
+	}
+
+	// if the name exists, add enum above name with Enum suffix
+	scalarName += "Enum"
+
+	return scalarName, scalarType
+}
+
+func getScalarFromOASType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, fieldPaths []string) (string, *schema.ScalarType) {
 	var scalarName string
 	var scalarType *schema.ScalarType
 
@@ -124,45 +146,8 @@ func getScalarFromNamedType(sm *rest.NDCHttpSchema, names []string, format strin
 		scalarName = string(rest.ScalarBinary)
 		scalarType = defaultScalarTypes[rest.ScalarBinary]
 	case "string":
-		schemaEnumLength := len(enumNodes)
-		if schemaEnumLength > 0 {
-			enums := make([]string, schemaEnumLength)
-			for i, enum := range enumNodes {
-				enums[i] = enum.Value
-			}
-			scalarType = schema.NewScalarType()
-			scalarType.Representation = schema.NewTypeRepresentationEnum(enums).Encode()
-
-			// build scalar name strategies
-			// 1. combine resource name and field name
-			apiPath = strings.TrimPrefix(apiPath, "/")
-			if apiPath != "" {
-				apiPaths := strings.Split(apiPath, "/")
-				resourceName := fieldPaths[0]
-				if len(apiPaths) > 0 {
-					resourceName = apiPaths[0]
-				}
-				enumName := "Enum"
-				if len(fieldPaths) > 1 {
-					enumName = fieldPaths[len(fieldPaths)-1]
-				}
-
-				scalarName = utils.StringSliceToPascalCase([]string{resourceName, enumName})
-				if canSetEnumToSchema(sm, scalarName, enums) {
-					return scalarName, scalarType
-				}
-			}
-
-			// 2. if the scalar type exists, fallback to field paths
-			scalarName = utils.StringSliceToPascalCase(fieldPaths)
-			if canSetEnumToSchema(sm, scalarName, enums) {
-				return scalarName, scalarType
-			}
-
-			// 3. Reuse above name with Enum suffix
-			scalarName += "Enum"
-
-			return scalarName, scalarType
+		if len(enumNodes) > 0 {
+			return buildEnumScalar(sm, enumNodes, fieldPaths)
 		}
 
 		switch format {

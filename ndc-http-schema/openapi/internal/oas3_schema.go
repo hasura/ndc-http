@@ -109,11 +109,7 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 
 	oasTypes, nullable := extractNullableFromOASTypes(typeSchema.Type)
 	nullable = nullable || (typeSchema.Nullable != nil && *typeSchema.Nullable)
-	if len(oasTypes) == 0 || (typeSchema.AdditionalProperties != nil && (typeSchema.AdditionalProperties.B || typeSchema.AdditionalProperties.A != nil)) {
-		if len(typeSchema.Type) == 0 && oc.builder.Strict {
-			return nil, errParameterSchemaEmpty(fieldPaths)
-		}
-
+	if typeSchema.AdditionalProperties != nil && (typeSchema.AdditionalProperties.B || typeSchema.AdditionalProperties.A != nil) {
 		var result schema.TypeEncoder = oc.builder.buildScalarJSON()
 		if nullable {
 			result = schema.NewNullableType(result)
@@ -126,8 +122,8 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		}, nil
 	}
 
-	if len(oasTypes) > 1 || isPrimitiveScalar(oasTypes) {
-		scalarName := getScalarFromType(oc.builder.schema, oasTypes, typeSchema.Format, typeSchema.Enum, oc.builder.trimPathPrefix(oc.apiPath), fieldPaths)
+	if len(oasTypes) != 1 || isPrimitiveScalar(oasTypes) {
+		scalarName := getScalarFromType(oc.builder.schema, oasTypes, typeSchema.Format, typeSchema.Enum, fieldPaths)
 		var resultType schema.TypeEncoder = schema.NewNamedType(scalarName)
 		if nullable {
 			resultType = schema.NewNullableType(resultType)
@@ -151,11 +147,7 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		}
 	case "array":
 		var itemSchema *SchemaInfoCache
-		if typeSchema.Items == nil || typeSchema.Items.A == nil {
-			if oc.builder.Strict {
-				return nil, fmt.Errorf("%s: array item is empty", strings.Join(fieldPaths, "."))
-			}
-		} else {
+		if typeSchema.Items != nil && typeSchema.Items.A != nil {
 			itemSchema, err = oc.getSchemaTypeFromProxy(typeSchema.Items.A, false, fieldPaths)
 			if err != nil {
 				return nil, err
@@ -319,7 +311,7 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 	case 0:
 		oasTypes, isNullable := extractNullableFromOASTypes(baseSchema.Type)
 		if len(baseSchema.Type) > 1 || isPrimitiveScalar(baseSchema.Type) {
-			scalarName := getScalarFromType(oc.builder.schema, oasTypes, baseSchema.Format, baseSchema.Enum, oc.builder.trimPathPrefix(oc.apiPath), fieldPaths)
+			scalarName := getScalarFromType(oc.builder.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
 			var result schema.TypeEncoder = schema.NewNamedType(scalarName)
 			if nullable || isNullable {
 				result = schema.NewNullableType(result)

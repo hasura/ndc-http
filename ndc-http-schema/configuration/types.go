@@ -212,8 +212,6 @@ type ConvertConfig struct {
 	EnvPrefix string `json:"envPrefix,omitempty" yaml:"envPrefix"`
 	// Return the pure NDC schema only
 	Pure bool `json:"pure,omitempty" yaml:"pure"`
-	// Require strict validation
-	Strict bool `json:"strict,omitempty" yaml:"strict"`
 	// Ignore deprecated fields.
 	NoDeprecation bool `json:"noDeprecation,omitempty" yaml:"noDeprecation"`
 	// Patch files to be applied into the input file before converting

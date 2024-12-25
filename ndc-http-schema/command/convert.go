@@ -61,7 +61,6 @@ func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logg
 		slog.Any("patch_before", config.PatchBefore),
 		slog.Any("patch_after", config.PatchAfter),
 		slog.Any("allowed_content_types", config.AllowedContentTypes),
-		slog.Bool("strict", config.Strict),
 		slog.Bool("pure", config.Pure),
 		slog.Bool("no_deprecation", config.NoDeprecation),
 	)
