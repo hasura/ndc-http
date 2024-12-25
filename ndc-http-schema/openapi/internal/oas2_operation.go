@@ -49,7 +49,7 @@ func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonPar
 	if resultType == nil {
 		return nil, "", nil
 	}
-	reqBody, err := oc.convertParameters(operation, commonParams, []string{funcName})
+	reqBody, _, err := oc.convertParameters(operation, commonParams, []string{funcName})
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
 	}
@@ -76,9 +76,9 @@ func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonPar
 }
 
 // BuildProcedure build a HTTP NDC function information from OpenAPI v2 operation
-func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonParams []*v2.Parameter) (*rest.OperationInfo, string, error) {
+func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonParams []*v2.Parameter) error {
 	if operation == nil {
-		return nil, "", nil
+		return nil
 	}
 
 	procName := buildUniqueOperationName(oc.builder.schema, operation.OperationId, oc.pathKey, oc.method, oc.builder.ConvertOptions)
@@ -91,42 +91,84 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 
 	resultType, response, err := oc.convertResponse(operation, []string{procName, "Result"})
 	if err != nil {
-		return nil, "", fmt.Errorf("%s: %w", oc.pathKey, err)
+		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
 
 	if resultType == nil {
-		return nil, "", nil
+		return nil
 	}
 
-	reqBody, err := oc.convertParameters(operation, commonParams, []string{procName})
+	reqBody, bodyTypes, err := oc.convertParameters(operation, commonParams, []string{procName})
 	if err != nil {
-		return nil, "", fmt.Errorf("%s: %w", oc.pathKey, err)
+		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
 
-	description := oc.getOperationDescription(operation)
-	requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, oc.Arguments)
-	if err != nil {
-		return nil, "", fmt.Errorf("%s: %w", procName, err)
-	}
-	procedure := rest.OperationInfo{
-		Request: &rest.Request{
-			URL:         requestURL,
-			Method:      oc.method,
-			RequestBody: reqBody,
-			Security:    convertSecurities(operation.Security),
-			Response:    *response,
-		},
-		Description: &description,
-		Arguments:   arguments,
-		ResultType:  resultType.Encode(),
+	if len(bodyTypes) == 0 {
+		bodyTypes = []SchemaInfoCache{{}}
 	}
 
-	return &procedure, procName, nil
+	for _, bodyType := range bodyTypes {
+		newProcName := procName
+		arguments := make(map[string]rest.ArgumentInfo)
+		for key, arg := range oc.Arguments {
+			arguments[key] = arg
+		}
+
+		if reqBody != nil && bodyType.TypeWrite != nil {
+			description := bodyType.TypeSchema.Description
+			if description == "" {
+				description = fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
+			}
+			// renaming query parameter name `body` if exist to avoid conflicts
+			if paramData, ok := arguments[rest.BodyKey]; ok {
+				arguments["paramBody"] = paramData
+			}
+
+			arguments[rest.BodyKey] = rest.ArgumentInfo{
+				ArgumentInfo: schema.ArgumentInfo{
+					Description: &description,
+					Type:        bodyType.TypeWrite.Encode(),
+				},
+				HTTP: &rest.RequestParameter{
+					In:     rest.InBody,
+					Schema: bodyType.TypeSchema,
+				},
+			}
+
+			if len(bodyTypes) > 1 {
+				bodyTypeName := getNamedType(bodyType.TypeRead, true, "")
+				newProcName = formatOperationName(procName + bodyTypeName)
+			}
+		}
+
+		description := oc.getOperationDescription(operation)
+		requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, arguments)
+		if err != nil {
+			return fmt.Errorf("%s: %w", procName, err)
+		}
+
+		procedure := rest.OperationInfo{
+			Request: &rest.Request{
+				URL:         requestURL,
+				Method:      oc.method,
+				Security:    convertSecurities(operation.Security),
+				RequestBody: reqBody,
+				Response:    *response,
+			},
+			Description: &description,
+			Arguments:   arguments,
+			ResultType:  resultType.Encode(),
+		}
+
+		oc.builder.schema.Procedures[newProcName] = procedure
+	}
+
+	return nil
 }
 
-func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commonParams []*v2.Parameter, fieldPaths []string) (*rest.RequestBody, error) {
+func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commonParams []*v2.Parameter, fieldPaths []string) (*rest.RequestBody, []SchemaInfoCache, error) {
 	if operation == nil || (len(operation.Parameters) == 0 && len(commonParams) == 0) {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	contentType := oc.getContentTypeV2(operation.Consumes)
@@ -135,19 +177,21 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 	}
 
 	var requestBody *rest.RequestBody
+	var bodyTypes []SchemaInfoCache
 	formData := rest.TypeSchema{
 		Type: []string{"object"},
 	}
 	formDataObject := rest.ObjectType{
 		Fields: map[string]rest.ObjectField{},
 	}
+
 	for _, param := range append(operation.Parameters, commonParams...) {
 		if param == nil {
 			continue
 		}
 		paramName := param.Name
 		if paramName == "" {
-			return nil, errParameterNameRequired
+			return nil, nil, errParameterNameRequired
 		}
 
 		var schemaResult *SchemaInfoCache
@@ -163,7 +207,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 			typeEncoder, err := newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).
 				getSchemaTypeFromParameter(param, fieldPaths)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 
 			schemaResult = &SchemaInfoCache{
@@ -194,7 +238,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 			schemaResult, err = newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).
 				getSchemaTypeFromProxy(param.Schema, !paramRequired, fieldPaths)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		default:
 			typeEncoder := oc.builder.buildScalarJSON()
@@ -209,7 +253,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 
 		paramLocation, err := rest.ParseParameterLocation(param.In)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		schemaType := schemaResult.TypeWrite.Encode()
@@ -222,16 +266,17 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 			description := utils.StripHTMLTags(param.Description)
 			if description != "" {
 				argument.Description = &description
+				schemaResult.TypeSchema.Description = description
 			}
 		}
 
 		switch paramLocation {
 		case rest.InBody:
-			argument.HTTP = &rest.RequestParameter{
-				In:     rest.InBody,
-				Schema: schemaResult.TypeSchema,
+			bodyTypes = []SchemaInfoCache{*schemaResult}
+			if len(schemaResult.OneOf) > 1 {
+				bodyTypes = schemaResult.OneOf
 			}
-			oc.Arguments[rest.BodyKey] = argument
+
 			requestBody = &rest.RequestBody{
 				ContentType: contentType,
 			}
@@ -267,7 +312,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 		oc.builder.schema.ObjectTypes[bodyName] = formDataObject
 
 		desc := "Form data of " + oc.pathKey
-		oc.Arguments["body"] = rest.ArgumentInfo{
+		oc.Arguments[rest.BodyKey] = rest.ArgumentInfo{
 			ArgumentInfo: schema.ArgumentInfo{
 				Type:        schema.NewNamedType(bodyName).Encode(),
 				Description: &desc,
@@ -282,7 +327,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 		}
 	}
 
-	return requestBody, nil
+	return requestBody, bodyTypes, nil
 }
 
 func (oc *oas2OperationBuilder) convertResponse(operation *v2.Operation, fieldPaths []string) (schema.TypeEncoder, *rest.Response, error) {

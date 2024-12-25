@@ -1744,7 +1744,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "CreateModelRequest"
+              }
+            }
           }
         }
       },
@@ -1776,7 +1784,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "CreateChatCompletionRequest"
+              }
+            }
           }
         }
       },
@@ -1805,7 +1821,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "CreateThreadAndRunRequest"
+              }
+            }
           }
         }
       },

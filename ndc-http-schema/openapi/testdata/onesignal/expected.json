@@ -1409,7 +1409,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "Notification"
+              }
+            }
           }
         }
       },
@@ -1491,7 +1499,12 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "notification_id": {

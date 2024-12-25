@@ -131,20 +131,29 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 
 	for _, bodyType := range bodyTypes {
 		newProcName := procName
+		arguments := make(map[string]rest.ArgumentInfo)
+		for key, arg := range oc.Arguments {
+			arguments[key] = arg
+		}
+
 		if reqBody != nil && bodyType.TypeWrite != nil {
-			description := fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
+			description := bodyType.TypeSchema.Description
+			if description == "" {
+				description = fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
+			}
 			// renaming query parameter name `body` if exist to avoid conflicts
-			if paramData, ok := oc.Arguments[rest.BodyKey]; ok {
-				oc.Arguments["paramBody"] = paramData
+			if paramData, ok := arguments[rest.BodyKey]; ok {
+				arguments["paramBody"] = paramData
 			}
 
-			oc.Arguments[rest.BodyKey] = rest.ArgumentInfo{
+			arguments[rest.BodyKey] = rest.ArgumentInfo{
 				ArgumentInfo: schema.ArgumentInfo{
 					Description: &description,
 					Type:        bodyType.TypeWrite.Encode(),
 				},
 				HTTP: &rest.RequestParameter{
-					In: rest.InBody,
+					In:     rest.InBody,
+					Schema: bodyType.TypeSchema,
 				},
 			}
 
@@ -155,7 +164,7 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 		}
 
 		description := oc.getOperationDescription(operation)
-		requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, oc.Arguments)
+		requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, arguments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", procName, err)
 		}

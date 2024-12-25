@@ -786,17 +786,12 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
-          }
-        },
-        "paramBody": {
-          "description": "Request body of POST /pets",
-          "type": {
-            "name": "DogInput",
-            "type": "named"
-          },
-          "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -821,21 +816,16 @@
         "body": {
           "description": "Request body of POST /pets",
           "type": {
-            "name": "CatInput",
-            "type": "named"
-          },
-          "http": {
-            "in": "body"
-          }
-        },
-        "paramBody": {
-          "description": "Request body of POST /pets",
-          "type": {
             "name": "DogInput",
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },

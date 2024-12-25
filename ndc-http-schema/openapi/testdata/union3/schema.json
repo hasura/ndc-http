@@ -465,13 +465,6 @@
             "name": "CatInput",
             "type": "named"
           }
-        },
-        "paramBody": {
-          "description": "Request body of POST /pets",
-          "type": {
-            "name": "DogInput",
-            "type": "named"
-          }
         }
       },
       "description": "POST /pets",
@@ -484,13 +477,6 @@
     {
       "arguments": {
         "body": {
-          "description": "Request body of POST /pets",
-          "type": {
-            "name": "CatInput",
-            "type": "named"
-          }
-        },
-        "paramBody": {
           "description": "Request body of POST /pets",
           "type": {
             "name": "DogInput",

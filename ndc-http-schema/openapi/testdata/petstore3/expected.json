@@ -8190,7 +8190,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -8229,7 +8234,12 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -8343,7 +8353,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -8408,7 +8423,12 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "headerXRateLimitLimit": {
@@ -8465,7 +8485,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "id": {
@@ -8519,7 +8544,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "pet"
+              }
+            }
           }
         }
       },
@@ -8563,7 +8596,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "CreateFineTuningJobRequest"
+              }
+            }
           }
         }
       },
@@ -8598,7 +8639,20 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "type": [
+                  "object"
+                ],
+                "xml": {
+                  "name": "user"
+                }
+              }
+            }
           }
         }
       },
@@ -8763,7 +8817,15 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "order"
+              }
+            }
           }
         }
       },
@@ -8795,7 +8857,17 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "book",
+                "prefix": "smp",
+                "namespace": "http://example.com/schema"
+              }
+            }
           }
         }
       },
@@ -8827,7 +8899,15 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "comments"
+              }
+            }
           }
         }
       },
@@ -8864,7 +8944,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "pet"
+              }
+            }
           }
         }
       },
@@ -8901,7 +8989,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "pet"
+              }
+            }
           }
         }
       },
@@ -9042,7 +9138,13 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "string"
+              ],
+              "format": "binary"
+            }
           }
         },
         "petId": {
@@ -9110,7 +9212,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "headerXRateLimitLimit": {
