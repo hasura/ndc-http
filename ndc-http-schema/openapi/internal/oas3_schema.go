@@ -140,13 +140,17 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		}, nil
 	}
 
+	var typeResult *SchemaInfoCache
+	var err error
 	typeName := oasTypes[0]
 	switch typeName {
 	case "object":
-		return oc.evalObjectType(typeSchema, false, fieldPaths)
+		typeResult, err = oc.evalObjectType(typeSchema, false, fieldPaths)
+		if err != nil {
+			return nil, err
+		}
 	case "array":
 		var itemSchema *SchemaInfoCache
-		var err error
 		if typeSchema.Items == nil || typeSchema.Items.A == nil {
 			if oc.builder.Strict {
 				return nil, fmt.Errorf("%s: array item is empty", strings.Join(fieldPaths, "."))
@@ -165,7 +169,7 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 			}
 		}
 
-		typeResult := &SchemaInfoCache{
+		typeResult = &SchemaInfoCache{
 			TypeSchema: createSchemaFromOpenAPISchema(typeSchema),
 			TypeRead:   schema.NewArrayType(itemSchema.TypeRead),
 			TypeWrite:  schema.NewArrayType(itemSchema.TypeWrite),
@@ -174,16 +178,16 @@ func (oc *oas3SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		if itemSchema.TypeSchema != nil {
 			typeResult.TypeSchema.Items = itemSchema.TypeSchema
 		}
-
-		if nullable {
-			typeResult.TypeRead = schema.NewNullableType(typeResult.TypeRead)
-			typeResult.TypeWrite = schema.NewNullableType(typeResult.TypeWrite)
-		}
-
-		return typeResult, nil
 	default:
 		return nil, fmt.Errorf("unsupported schema type %s", typeName)
 	}
+
+	if nullable {
+		typeResult.TypeRead = schema.NewNullableType(typeResult.TypeRead)
+		typeResult.TypeWrite = schema.NewNullableType(typeResult.TypeWrite)
+	}
+
+	return typeResult, nil
 }
 
 func (oc *oas3SchemaBuilder) evalObjectType(baseSchema *base.Schema, forcePropertiesNullable bool, fieldPaths []string) (*SchemaInfoCache, error) {

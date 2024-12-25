@@ -156,8 +156,11 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "ChatCompletionRequestAssistantMessageFunctionCallInput",
-              "type": "named"
+              "type": "nullable",
+              "underlying_type": {
+                "name": "ChatCompletionRequestAssistantMessageFunctionCallInput",
+                "type": "named"
+              }
             }
           }
         },
@@ -538,8 +541,11 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "ChatCompletionStreamOptionsInput",
-              "type": "named"
+              "type": "nullable",
+              "underlying_type": {
+                "name": "ChatCompletionStreamOptionsInput",
+                "type": "named"
+              }
             }
           }
         },
@@ -707,8 +713,11 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CreateChatCompletionResponseChoicesLogprobs",
-              "type": "named"
+              "type": "nullable",
+              "underlying_type": {
+                "name": "CreateChatCompletionResponseChoicesLogprobs",
+                "type": "named"
+              }
             }
           }
         },
@@ -780,8 +789,11 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CreateThreadRequestToolResourcesInput",
-              "type": "named"
+              "type": "nullable",
+              "underlying_type": {
+                "name": "CreateThreadRequestToolResourcesInput",
+                "type": "named"
+              }
             }
           }
         }
