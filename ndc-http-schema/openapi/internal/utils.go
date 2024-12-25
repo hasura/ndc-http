@@ -55,9 +55,7 @@ func getSchemaRefTypeNameV3(name string) string {
 	return result[1]
 }
 
-func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, apiPath string, fieldPaths []string) (string, bool) {
-	var scalarName string
-	var scalarType *schema.ScalarType
+func extractNullableFromOASTypes(names []string) ([]string, bool) {
 	var typeNames []string
 	var nullable bool
 
@@ -69,7 +67,14 @@ func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, en
 		}
 	}
 
-	if len(typeNames) != 1 {
+	return typeNames, nullable
+}
+
+func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, apiPath string, fieldPaths []string) string {
+	var scalarName string
+	var scalarType *schema.ScalarType
+
+	if len(names) != 1 {
 		scalarName = "JSON"
 		scalarType = defaultScalarTypes[rest.ScalarJSON]
 	} else {
@@ -80,7 +85,7 @@ func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, en
 		sm.ScalarTypes[scalarName] = *scalarType
 	}
 
-	return scalarName, nullable
+	return scalarName
 }
 
 func getScalarFromNamedType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, apiPath string, fieldPaths []string) (string, *schema.ScalarType) {

@@ -18,6 +18,7 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // UpstreamManager represents a manager for an upstream.
@@ -133,7 +134,7 @@ func (um *UpstreamManager) CreateHTTPClient(requests *RequestBuilderResults) *HT
 }
 
 // ExecuteRequest executes a request to the upstream server.
-func (um *UpstreamManager) ExecuteRequest(ctx context.Context, request *RetryableRequest, namespace string) (*http.Response, context.CancelFunc, error) {
+func (um *UpstreamManager) ExecuteRequest(ctx context.Context, span trace.Span, request *RetryableRequest, namespace string) (*http.Response, context.CancelFunc, error) {
 	req, cancel, err := request.CreateRequest(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -146,8 +147,12 @@ func (um *UpstreamManager) ExecuteRequest(ctx context.Context, request *Retryabl
 		return nil, nil, err
 	}
 
+	setHeaderAttributes(span, "http.request.header.", req.Header)
+
 	req.Header.Set(acceptEncodingHeader, um.compressors.AcceptEncoding())
 	req.Header.Set("User-Agent", "ndc-http/"+version.BuildVersion)
+	um.propagator.Inject(ctx, propagation.HeaderCarrier(req.Header))
+
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		cancel()
