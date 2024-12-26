@@ -293,7 +293,7 @@ func (oc *oas3SchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths 
 
 // Support converting oneOf, allOf or anyOf to object types with merge strategy
 func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schemaProxies []*base.SchemaProxy, unionType oasUnionType, fieldPaths []string) (*SchemaInfoCache, error) {
-	proxies, mergedType, isNullable := evalSchemaProxiesSlice(schemaProxies, oc.location)
+	proxies, mergedType, isNullable, isEmptyObject := evalSchemaProxiesSlice(schemaProxies, oc.location)
 	nullable := isNullable || (baseSchema.Nullable != nil && *baseSchema.Nullable)
 	if mergedType != nil {
 		result, err := oc.getSchemaType(mergedType, fieldPaths)
@@ -309,6 +309,10 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 
 	switch len(proxies) {
 	case 0:
+		if isEmptyObject {
+			return createSchemaInfoJSONScalar(oc.builder.schema, nullable), nil
+		}
+
 		oasTypes, isNullable := extractNullableFromOASTypes(baseSchema.Type)
 		if len(baseSchema.Type) > 1 || isPrimitiveScalar(baseSchema.Type) {
 			scalarName := getScalarFromType(oc.builder.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
@@ -362,6 +366,10 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 			result.TypeSchema.Description = utils.StripHTMLTags(baseSchema.Description)
 		}
 
+		if isEmptyObject {
+			result = transformNullableObjectPropertiesSchema(oc.builder.schema, result, nullable, fieldPaths)
+		}
+
 		return result, nil
 	}
 
@@ -382,6 +390,10 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 	}
 
 	result := mergeUnionTypeSchemas(oc.builder.schema, baseSchema, unionSchemas, unionType, fieldPaths)
+	if isEmptyObject {
+		result = transformNullableObjectPropertiesSchema(oc.builder.schema, result, nullable, fieldPaths)
+	}
+
 	result.OneOf = oneOfInfos
 
 	return result, nil
