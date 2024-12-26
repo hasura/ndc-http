@@ -160,7 +160,7 @@ func mergeUnionTypeSchemasRecursive(httpSchema *rest.NDCHttpSchema, baseSchema *
 		result, ok = mergeUnionTypeSchemasRecursive(httpSchema, baseSchema, newInputs, unionType, fieldPaths)
 	case *schema.ArrayType:
 		elemInputs := make([]SchemaInfoCache, len(inputs))
-		for i, item := range inputs {
+		for i, item := range newInputs {
 			arrRead, isArray := item.TypeRead.(*schema.ArrayType)
 			if !isArray {
 				return nil, false
@@ -195,13 +195,13 @@ func mergeUnionTypeSchemasRecursive(httpSchema *rest.NDCHttpSchema, baseSchema *
 					continue
 				}
 
-				rt, isEqual := mergeUnionTypes(httpSchema, result.TypeRead.Encode(), item.TypeRead.Encode(), fieldPaths)
-				if !isEqual {
+				rt, isMatched := mergeUnionTypes(httpSchema, result.TypeRead.Encode(), item.TypeRead.Encode(), fieldPaths)
+				if !isMatched {
 					return nil, false
 				}
 
-				wt, isEqual := mergeUnionTypes(httpSchema, result.TypeWrite.Encode(), item.TypeWrite.Encode(), fieldPaths)
-				if !isEqual {
+				wt, isMatched := mergeUnionTypes(httpSchema, result.TypeWrite.Encode(), item.TypeWrite.Encode(), fieldPaths)
+				if !isMatched {
 					return nil, false
 				}
 
@@ -301,32 +301,24 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 	}
 
 	var result schema.TypeEncoder
-	var isEqual bool
+	var isMatched bool
 
 	switch at := a.Interface().(type) {
 	case *schema.NullableType:
 		result, ok := mergeUnionTypes(httpSchema, at.UnderlyingType, bType, fieldPaths)
-		if !ok {
-			return schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))), false
-		}
-
 		if !isNullableType(result) {
 			result = schema.NewNullableType(result)
 		}
 
-		return result, true
+		return result, ok
 	case *schema.ArrayType:
 		bt, err := bType.AsArray()
 		if err != nil {
 			break
 		}
 
-		result, isEqual = mergeUnionTypes(httpSchema, at.ElementType, bt.ElementType, fieldPaths)
-		if !isEqual {
-			result = schema.NewArrayType(schema.NewNamedType(string(rest.ScalarJSON)))
-		} else {
-			result = schema.NewArrayType(result)
-		}
+		result, isMatched = mergeUnionTypes(httpSchema, at.ElementType, bt.ElementType, fieldPaths)
+		result = schema.NewArrayType(result)
 	case *schema.NamedType:
 		bt, err := bType.AsNamed()
 		if err != nil {
@@ -335,7 +327,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 
 		if at.Name == bt.Name {
 			result = at
-			isEqual = true
+			isMatched = true
 
 			break
 		}
@@ -364,7 +356,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 			httpSchema.ScalarTypes[newName] = *newScalar
 
 			result = schema.NewNamedType(newName)
-			isEqual = true
+			isMatched = true
 
 			break
 		}
@@ -376,6 +368,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 			sn, ok := typeRepresentationToScalarNameRelationship[typeRepA]
 			if ok {
 				scalarName = sn
+				isMatched = true
 			}
 		case slices.Contains(integerTypeRepresentations, typeRepA) && slices.Contains(integerTypeRepresentations, typeRepB):
 			if typeRepA == schema.TypeRepresentationTypeInt64 || typeRepB == schema.TypeRepresentationTypeInt64 {
@@ -383,10 +376,17 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 			} else {
 				scalarName = rest.ScalarInt32
 			}
+			isMatched = true
 		case slices.Contains(floatTypeRepresentations, typeRepA) && slices.Contains(floatTypeRepresentations, typeRepB):
 			scalarName = rest.ScalarFloat64
+			isMatched = true
+		case (enumA != nil && len(enumA.OneOf) == 2 && slices.Contains(enumA.OneOf, "true") && slices.Contains(enumA.OneOf, "false") && typeRepB == schema.TypeRepresentationTypeBoolean) ||
+			(enumB != nil && len(enumB.OneOf) == 2 && slices.Contains(enumB.OneOf, "true") && slices.Contains(enumB.OneOf, "false") && typeRepA == schema.TypeRepresentationTypeBoolean):
+			scalarName = rest.ScalarBoolean
+			isMatched = true
 		case slices.Contains(stringTypeRepresentations, typeRepA) && slices.Contains(stringTypeRepresentations, typeRepB):
 			scalarName = rest.ScalarString
+			isMatched = true
 		}
 
 		result = schema.NewNamedType(string(scalarName))
@@ -400,7 +400,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 		result = schema.NewNullableType(result)
 	}
 
-	return result, isEqual
+	return result, isMatched
 }
 
 // encodeHeaderArgumentName encodes header key to NDC schema field name

@@ -67,6 +67,10 @@ func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, en
 func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths []string) (string, *schema.ScalarType) {
 	enums := make([]string, len(enumNodes))
 	for i, enum := range enumNodes {
+		if enum.Value == "null" {
+			continue
+		}
+
 		enums[i] = enum.Value
 	}
 

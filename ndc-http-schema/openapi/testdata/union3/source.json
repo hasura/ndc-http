@@ -57,6 +57,10 @@
           },
           "icon": {
             "type": "string"
+          },
+          "starred_at": {
+            "type": "string",
+            "format": "data-time"
           }
         },
         "required": ["id", "type", "text"]
@@ -73,6 +77,10 @@
           },
           "age": {
             "type": "integer"
+          },
+          "starred_at": {
+            "type": "string",
+            "examples": ["\"2020-07-09T00:17:42Z\""]
           },
           "metadata": {
             "type": "array",

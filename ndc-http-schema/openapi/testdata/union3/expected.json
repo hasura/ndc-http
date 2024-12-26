@@ -163,6 +163,20 @@
             "items": {}
           }
         },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
         "type": {
           "type": {
             "name": "CatType",
@@ -201,6 +215,21 @@
             "type": [
               "string"
             ]
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "format": "data-time"
           }
         },
         "text": {
@@ -287,6 +316,20 @@
               "array"
             ],
             "items": {}
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
           }
         },
         "text": {
@@ -827,6 +870,21 @@
               "array"
             ],
             "items": {}
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "format": "data-time"
           }
         },
         "text": {

@@ -76,6 +76,15 @@
             }
           }
         },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
         "type": {
           "type": {
             "name": "CatType",
@@ -99,6 +108,15 @@
           "type": {
             "name": "String",
             "type": "named"
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
           }
         },
         "text": {
@@ -153,6 +171,15 @@
                 "type": "named"
               },
               "type": "array"
+            }
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
             }
           }
         },
@@ -498,6 +525,15 @@
                 "type": "named"
               },
               "type": "array"
+            }
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
             }
           }
         },
