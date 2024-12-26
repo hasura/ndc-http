@@ -693,9 +693,7 @@
           "http": {
             "name": "start_date",
             "in": "query",
-            "schema": {
-              "type": null
-            }
+            "schema": {}
           }
         }
       },
@@ -1208,9 +1206,7 @@
             "type": [
               "array"
             ],
-            "items": {
-              "type": null
-            }
+            "items": {}
           }
         },
         "legacy": {
@@ -1741,7 +1737,6 @@
     "GETGeoStatsResultStats": {
       "fields": {
         "metrics": {
-          "description": "The individual events and their stats.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -2179,9 +2174,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "id": {
           "type": {
@@ -2310,9 +2303,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "id": {
           "type": {
@@ -2423,9 +2414,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "id": {
           "type": {

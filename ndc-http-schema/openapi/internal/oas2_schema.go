@@ -404,18 +404,8 @@ func (oc *oas2SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 		return result, nil
 	}
 
-	typeSchema := &rest.TypeSchema{
-		Type: []string{"object"},
-	}
-
-	if baseSchema.Description != "" {
-		typeSchema.Description = utils.StripHTMLTags(baseSchema.Description)
-	}
-
-	var readObjectItems []rest.ObjectType
-	var writeObjectItems []rest.ObjectType
+	var unionSchemas []SchemaInfoCache
 	var oneOfInfos []SchemaInfoCache
-	var isJSON bool
 
 	for i, item := range proxies {
 		schemaResult, err := newOAS2SchemaBuilder(oc.builder, oc.apiPath, oc.location).
@@ -424,91 +414,14 @@ func (oc *oas2SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 			return nil, err
 		}
 
-		var readObj rest.ObjectType
-		name := getNamedType(schemaResult.TypeRead, false, "")
-		isObject := name != "" && !isPrimitiveScalar(schemaResult.TypeSchema.Type) && !slices.Contains(schemaResult.TypeSchema.Type, "array")
-		if isObject {
-			readObj, isObject = oc.builder.schema.ObjectTypes[name]
-			if isObject {
-				readObjectItems = append(readObjectItems, readObj)
-			}
-		}
+		unionSchemas = append(unionSchemas, *schemaResult)
 		if unionType == oasOneOf && schemaResult != nil {
 			oneOfInfos = append(oneOfInfos, *schemaResult)
 		}
-
-		if !isObject {
-			isJSON = true
-			if unionType == oasOneOf {
-				continue
-			}
-
-			break
-		}
-
-		writeName := formatWriteObjectName(name)
-		writeObj, ok := oc.builder.schema.ObjectTypes[writeName]
-		if !ok {
-			writeObj = readObj
-		}
-
-		writeObjectItems = append(writeObjectItems, writeObj)
-	}
-	if isJSON {
-		jsonScalar := oc.builder.buildScalarJSON()
-
-		return &SchemaInfoCache{
-			TypeRead:  jsonScalar,
-			TypeWrite: jsonScalar,
-			OneOf:     oneOfInfos,
-			TypeSchema: &rest.TypeSchema{
-				Description: typeSchema.Description,
-				Type:        []string{},
-			},
-		}, nil
 	}
 
-	readObject := rest.ObjectType{
-		Fields: map[string]rest.ObjectField{},
-	}
-	writeObject := rest.ObjectType{
-		Fields: map[string]rest.ObjectField{},
-	}
+	result := mergeUnionTypeSchemas(oc.builder.schema, baseSchema, unionSchemas, unionType, fieldPaths)
+	result.OneOf = oneOfInfos
 
-	if baseSchema.Description != "" {
-		readObject.Description = &baseSchema.Description
-		writeObject.Description = &baseSchema.Description
-	}
-
-	if err := mergeUnionObjects(oc.builder.schema, &readObject, readObjectItems, unionType, fieldPaths); err != nil {
-		return nil, err
-	}
-
-	if err := mergeUnionObjects(oc.builder.schema, &writeObject, writeObjectItems, unionType, fieldPaths); err != nil {
-		return nil, err
-	}
-
-	refName := utils.ToPascalCase(strings.Join(fieldPaths, " "))
-	writeRefName := formatWriteObjectName(refName)
-	if len(readObject.Fields) > 0 {
-		oc.builder.schema.ObjectTypes[refName] = readObject
-	}
-	if len(writeObject.Fields) > 0 {
-		oc.builder.schema.ObjectTypes[writeRefName] = writeObject
-	}
-
-	return &SchemaInfoCache{
-		TypeRead:   schema.NewNamedType(refName),
-		TypeWrite:  schema.NewNamedType(writeRefName),
-		TypeSchema: typeSchema,
-		OneOf:      oneOfInfos,
-	}, nil
-}
-
-func (oc *oas2SchemaBuilder) trimPathPrefix(input string) string {
-	if oc.builder.ConvertOptions.TrimPrefix == "" {
-		return input
-	}
-
-	return strings.TrimPrefix(input, oc.builder.ConvertOptions.TrimPrefix)
+	return result, nil
 }

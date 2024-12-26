@@ -149,7 +149,7 @@ type RequestParameter struct {
 // TypeSchema represents a serializable object of OpenAPI schema
 // that is used for validation
 type TypeSchema struct {
-	Type        []string    `json:"type"                mapstructure:"type"      yaml:"type"`
+	Type        []string    `json:"type,omitempty"      mapstructure:"type"      yaml:"type,omitempty"`
 	Format      string      `json:"format,omitempty"    mapstructure:"format"    yaml:"format,omitempty"`
 	Pattern     string      `json:"pattern,omitempty"   mapstructure:"pattern"   yaml:"pattern,omitempty"`
 	Maximum     *float64    `json:"maximum,omitempty"   mapstructure:"maximum"   yaml:"maximum,omitempty"`

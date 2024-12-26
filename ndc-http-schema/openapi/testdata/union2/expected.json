@@ -20,7 +20,26 @@
       }
     }
   },
-  "functions": {},
+  "functions": {
+    "getPet": {
+      "request": {
+        "url": "/pet",
+        "method": "get",
+        "response": {
+          "contentType": "application/json"
+        }
+      },
+      "arguments": {},
+      "description": "GET /pet",
+      "result_type": {
+        "element_type": {
+          "name": "GetPetResult",
+          "type": "named"
+        },
+        "type": "array"
+      }
+    }
+  },
   "object_types": {
     "CatInput": {
       "fields": {
@@ -61,9 +80,7 @@
             "type": [
               "array"
             ],
-            "items": {
-              "type": []
-            }
+            "items": {}
           }
         },
         "type": {
@@ -136,6 +153,98 @@
         "name": "Dog"
       }
     },
+    "GetPetResult": {
+      "fields": {
+        "age": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ]
+          }
+        },
+        "icon": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "metadata": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "JSON",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {}
+          }
+        },
+        "text": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "type": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "GetPetResultTypeEnum",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
     "Pet": {
       "fields": {
         "age": {
@@ -192,9 +301,7 @@
             "type": [
               "array"
             ],
-            "items": {
-              "type": []
-            }
+            "items": {}
           }
         },
         "text": {
@@ -326,6 +433,17 @@
       "comparison_operators": {},
       "representation": {
         "one_of": [
+          "dog"
+        ],
+        "type": "enum"
+      }
+    },
+    "GetPetResultTypeEnum": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cat",
           "dog"
         ],
         "type": "enum"

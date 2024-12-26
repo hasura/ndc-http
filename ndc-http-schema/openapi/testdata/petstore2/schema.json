@@ -964,7 +964,6 @@
     "GETGeoStatsResultStats": {
       "fields": {
         "metrics": {
-          "description": "The individual events and their stats.",
           "type": {
             "type": "nullable",
             "underlying_type": {

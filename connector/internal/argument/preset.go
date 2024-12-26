@@ -3,7 +3,6 @@ package argument
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -124,7 +123,6 @@ func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any,
 			return argument, nil
 		}
 
-		log.Println(selector, argumentSlice)
 		step := selector.Step()
 		if step < 1 {
 			step = 1

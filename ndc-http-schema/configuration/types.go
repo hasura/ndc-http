@@ -23,10 +23,10 @@ var fieldNameRegex = regexp.MustCompile(`^[a-zA-Z_]\w+$`)
 type Configuration struct {
 	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 	// Require strict validation
-	Strict         bool                   `json:"strict"         yaml:"strict"`
-	ForwardHeaders ForwardHeadersSettings `json:"forwardHeaders" yaml:"forwardHeaders"`
-	Concurrency    ConcurrencySettings    `json:"concurrency"    yaml:"concurrency"`
-	Files          []ConfigItem           `json:"files"          yaml:"files"`
+	Strict         bool                   `json:"strict"                   yaml:"strict"`
+	ForwardHeaders ForwardHeadersSettings `json:"forwardHeaders,omitempty" yaml:"forwardHeaders,omitempty"`
+	Concurrency    ConcurrencySettings    `json:"concurrency,omitempty"    yaml:"concurrency,omitempty"`
+	Files          []ConfigItem           `json:"files"                    yaml:"files"`
 }
 
 // ConcurrencySettings represent settings for concurrent webhook executions to remote servers.

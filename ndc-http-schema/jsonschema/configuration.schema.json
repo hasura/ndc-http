@@ -60,10 +60,6 @@
           "type": "boolean",
           "description": "Return the pure NDC schema only"
         },
-        "strict": {
-          "type": "boolean",
-          "description": "Require strict validation"
-        },
         "noDeprecation": {
           "type": "boolean",
           "description": "Ignore deprecated fields."
@@ -138,8 +134,6 @@
       "type": "object",
       "required": [
         "strict",
-        "forwardHeaders",
-        "concurrency",
         "files"
       ],
       "description": "Configuration contains required settings for the connector."

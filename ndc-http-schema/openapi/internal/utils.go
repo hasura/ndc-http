@@ -327,7 +327,7 @@ func isNullableType(input schema.TypeEncoder) bool {
 
 // Find common fields in all objects to merge the type.
 // If they have the same type, we don't need to wrap it with the nullable type.
-func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, srcObjects []rest.ObjectType, unionType oasUnionType, fieldPaths []string) error {
+func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, srcObjects []rest.ObjectType, unionType oasUnionType, fieldPaths []string) {
 	mergedObjectFields := make(map[string][]rest.ObjectField)
 	for _, object := range srcObjects {
 		for key, field := range object.Fields {
@@ -366,8 +366,8 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 				continue
 			}
 
-			var ok bool
-			unionField, ok = mergeUnionTypes(httpSchema, field.Type, unionField.Type, append(fieldPaths, key))
+			unionType, ok := mergeUnionTypes(httpSchema, field.Type, unionField.Type, append(fieldPaths, key))
+			unionField.Type = unionType.Encode()
 			if !ok {
 				break
 			}
@@ -390,36 +390,214 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 
 		dest.Fields[key] = unionField
 	}
-
-	return nil
 }
 
-func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Type, fieldPaths []string) (rest.ObjectField, bool) {
+func unwrapNullableUnionTypeSchemas(inputs []SchemaInfoCache) ([]SchemaInfoCache, bool, bool) {
+	var readNullable bool
+	var writeNullable bool
+	results := make([]SchemaInfoCache, len(inputs))
+	for i, item := range inputs {
+		typeRead, rn, _ := utils.UnwrapNullableTypeEncoder(item.TypeRead)
+		readNullable = readNullable || rn
+		item.TypeRead = typeRead
+
+		typeWrite, wn, _ := utils.UnwrapNullableTypeEncoder(item.TypeWrite)
+		writeNullable = writeNullable || wn
+		item.TypeWrite = typeWrite
+
+		results[i] = item
+	}
+
+	return results, readNullable, writeNullable
+}
+
+func mergeUnionTypeSchemas(httpSchema *rest.NDCHttpSchema, baseSchema *base.Schema, inputs []SchemaInfoCache, unionType oasUnionType, fieldPaths []string) *SchemaInfoCache {
+	result, ok := mergeUnionTypeSchemasRecursive(httpSchema, baseSchema, inputs, unionType, fieldPaths)
+	if ok {
+		return result
+	}
+
+	scalarName := rest.ScalarJSON
+	if _, ok := httpSchema.ScalarTypes[string(scalarName)]; !ok {
+		httpSchema.ScalarTypes[string(scalarName)] = *defaultScalarTypes[scalarName]
+	}
+
+	scalarType := schema.NewNamedType(string(scalarName))
+	typeSchema := createSchemaFromOpenAPISchema(baseSchema)
+
+	if baseSchema.Description != "" {
+		typeSchema.Description = utils.StripHTMLTags(baseSchema.Description)
+	}
+
+	return &SchemaInfoCache{
+		TypeRead:   scalarType,
+		TypeWrite:  scalarType,
+		TypeSchema: typeSchema,
+	}
+}
+
+func mergeUnionTypeSchemasRecursive(httpSchema *rest.NDCHttpSchema, baseSchema *base.Schema, inputs []SchemaInfoCache, unionType oasUnionType, fieldPaths []string) (*SchemaInfoCache, bool) {
+	newInputs, readNullable, writeNullable := unwrapNullableUnionTypeSchemas(inputs)
+	var result *SchemaInfoCache
+	var ok bool
+
+	switch tr := inputs[0].TypeRead.(type) {
+	case *schema.NullableType:
+		result, ok = mergeUnionTypeSchemasRecursive(httpSchema, baseSchema, newInputs, unionType, fieldPaths)
+	case *schema.ArrayType:
+		elemInputs := make([]SchemaInfoCache, len(inputs))
+		for i, item := range inputs {
+			arrRead, isArray := item.TypeRead.(*schema.ArrayType)
+			if !isArray {
+				return nil, false
+			}
+			arrWrite, isArray := item.TypeWrite.(*schema.ArrayType)
+			if !isArray {
+				return nil, false
+			}
+
+			item.TypeRead = arrRead.ElementType.Interface()
+			item.TypeWrite = arrWrite.ElementType.Interface()
+			elemInputs[i] = item
+		}
+
+		result, ok = mergeUnionTypeSchemasRecursive(httpSchema, baseSchema, elemInputs, unionType, fieldPaths)
+		if !ok {
+			return nil, false
+		}
+
+		result.TypeRead = schema.NewArrayType(result.TypeRead)
+		result.TypeWrite = schema.NewArrayType(result.TypeWrite)
+	case *schema.NamedType:
+		result = &SchemaInfoCache{
+			TypeSchema: &rest.TypeSchema{},
+		}
+		if _, isScalar := httpSchema.ScalarTypes[tr.Name]; isScalar {
+			for i, item := range newInputs {
+				if i == 0 {
+					result.TypeRead = item.TypeRead
+					result.TypeWrite = item.TypeWrite
+
+					continue
+				}
+
+				rt, isEqual := mergeUnionTypes(httpSchema, result.TypeRead.Encode(), item.TypeRead.Encode(), fieldPaths)
+				if !isEqual {
+					return nil, false
+				}
+
+				wt, isEqual := mergeUnionTypes(httpSchema, result.TypeWrite.Encode(), item.TypeWrite.Encode(), fieldPaths)
+				if !isEqual {
+					return nil, false
+				}
+
+				result.TypeRead = rt
+				result.TypeWrite = wt
+			}
+			ok = true
+
+			break
+		}
+
+		_, isObject := httpSchema.ObjectTypes[tr.Name]
+		if !isObject {
+			return nil, false
+		}
+
+		readObjects := make([]rest.ObjectType, len(newInputs))
+		writeObjects := make([]rest.ObjectType, len(newInputs))
+		for i, item := range newInputs {
+			rNamed, isNamedType := item.TypeRead.(*schema.NamedType)
+			if !isNamedType {
+				return nil, false
+			}
+			ro, isObject := httpSchema.ObjectTypes[rNamed.Name]
+			if !isObject {
+				return nil, false
+			}
+			readObjects[i] = ro
+
+			wNamed, isNamedType := item.TypeWrite.(*schema.NamedType)
+			if !isNamedType {
+				return nil, false
+			}
+			wo, isObject := httpSchema.ObjectTypes[wNamed.Name]
+			if !isObject {
+				return nil, false
+			}
+			writeObjects[i] = wo
+		}
+
+		readObject := rest.ObjectType{
+			Fields: map[string]rest.ObjectField{},
+		}
+		writeObject := rest.ObjectType{
+			Fields: map[string]rest.ObjectField{},
+		}
+
+		if baseSchema.Description != "" {
+			description := utils.StripHTMLTags(baseSchema.Description)
+			readObject.Description = &description
+			writeObject.Description = &description
+		}
+
+		mergeUnionObjects(httpSchema, &readObject, readObjects, unionType, fieldPaths)
+		mergeUnionObjects(httpSchema, &writeObject, writeObjects, unionType, fieldPaths)
+
+		refName := utils.ToPascalCase(strings.Join(fieldPaths, " "))
+		writeRefName := formatWriteObjectName(refName)
+		if len(readObject.Fields) > 0 {
+			httpSchema.ObjectTypes[refName] = readObject
+		}
+		if len(writeObject.Fields) > 0 {
+			httpSchema.ObjectTypes[writeRefName] = writeObject
+		}
+
+		typeSchema := &rest.TypeSchema{
+			Type: []string{"object"},
+		}
+
+		result.TypeRead = schema.NewNamedType(refName)
+		result.TypeWrite = schema.NewNamedType(writeRefName)
+		result.TypeSchema = typeSchema
+		ok = true
+	default:
+		return nil, false
+	}
+
+	if !ok {
+		return nil, false
+	}
+
+	if readNullable && !isNullableType(result.TypeRead) {
+		result.TypeRead = schema.NewNullableType(result.TypeRead)
+	}
+	if writeNullable && !isNullableType(result.TypeWrite) {
+		result.TypeWrite = schema.NewNullableType(result.TypeWrite)
+	}
+
+	return result, ok
+}
+
+func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Type, fieldPaths []string) (schema.TypeEncoder, bool) {
 	bn, bNullErr := b.AsNullable()
 	bType := b
 	if bNullErr == nil {
 		bType = bn.UnderlyingType
 	}
 
-	var result rest.ObjectField
+	var result schema.TypeEncoder
 	var isEqual bool
 
 	switch at := a.Interface().(type) {
 	case *schema.NullableType:
 		result, ok := mergeUnionTypes(httpSchema, at.UnderlyingType, bType, fieldPaths)
 		if !ok {
-			return rest.ObjectField{
-				ObjectField: schema.ObjectField{
-					Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).Encode(),
-				},
-			}, false
+			return schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))), false
 		}
 
-		if !isNullableType(result.Type.Interface()) {
-			result.Type = (schema.NullableType{
-				Type:           schema.TypeNullable,
-				UnderlyingType: result.Type,
-			}).Encode()
+		if !isNullableType(result) {
+			result = schema.NewNullableType(result)
 		}
 
 		return result, true
@@ -431,16 +609,9 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 
 		result, isEqual = mergeUnionTypes(httpSchema, at.ElementType, bt.ElementType, fieldPaths)
 		if !isEqual {
-			result = rest.ObjectField{
-				ObjectField: schema.ObjectField{
-					Type: schema.NewArrayType(schema.NewNamedType(string(rest.ScalarJSON))).Encode(),
-				},
-			}
+			result = schema.NewArrayType(schema.NewNamedType(string(rest.ScalarJSON)))
 		} else {
-			result.Type = schema.ArrayType{
-				Type:        schema.TypeArray,
-				ElementType: result.Type,
-			}.Encode()
+			result = schema.NewArrayType(result)
 		}
 	case *schema.NamedType:
 		bt, err := bType.AsNamed()
@@ -449,12 +620,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 		}
 
 		if at.Name == bt.Name {
-			result = rest.ObjectField{
-				ObjectField: schema.ObjectField{
-					Type: a,
-				},
-			}
-
+			result = at
 			isEqual = true
 
 			break
@@ -483,11 +649,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 			newName := utils.StringSliceToPascalCase(append(fieldPaths, "Enum"))
 			httpSchema.ScalarTypes[newName] = *newScalar
 
-			result = rest.ObjectField{
-				ObjectField: schema.ObjectField{
-					Type: schema.NewNamedType(newName).Encode(),
-				},
-			}
+			result = schema.NewNamedType(newName)
 			isEqual = true
 
 			break
@@ -513,26 +675,15 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 			scalarName = rest.ScalarString
 		}
 
-		result = rest.ObjectField{
-			ObjectField: schema.ObjectField{
-				Type: schema.NewNamedType(string(scalarName)).Encode(),
-			},
-		}
+		result = schema.NewNamedType(string(scalarName))
 	}
 
-	if len(result.ObjectField.Type) == 0 {
-		result = rest.ObjectField{
-			ObjectField: schema.ObjectField{
-				Type: schema.NewNamedType(string(rest.ScalarJSON)).Encode(),
-			},
-		}
+	if result == nil {
+		result = schema.NewNamedType(string(rest.ScalarJSON))
 	}
 
-	if bNullErr != nil && !isNullableType(result.Type.Interface()) {
-		result.Type = (schema.NullableType{
-			Type:           schema.TypeNullable,
-			UnderlyingType: result.Type,
-		}).Encode()
+	if bNullErr != nil && !isNullableType(result) {
+		result = schema.NewNullableType(result)
 	}
 
 	return result, isEqual

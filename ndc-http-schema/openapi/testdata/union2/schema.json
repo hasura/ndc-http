@@ -1,6 +1,19 @@
 {
   "collections": [],
-  "functions": [],
+  "functions": [
+    {
+      "arguments": {},
+      "description": "GET /pet",
+      "name": "getPet",
+      "result_type": {
+        "element_type": {
+          "name": "GetPetResult",
+          "type": "named"
+        },
+        "type": "array"
+      }
+    }
+  ],
   "object_types": {
     "CatInput": {
       "fields": {
@@ -63,6 +76,67 @@
           "type": {
             "name": "DogType",
             "type": "named"
+          }
+        }
+      }
+    },
+    "GetPetResult": {
+      "fields": {
+        "age": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "icon": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "metadata": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "JSON",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "text": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "type": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "GetPetResultTypeEnum",
+              "type": "named"
+            }
           }
         }
       }
@@ -185,6 +259,17 @@
       "comparison_operators": {},
       "representation": {
         "one_of": [
+          "dog"
+        ],
+        "type": "enum"
+      }
+    },
+    "GetPetResultTypeEnum": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cat",
           "dog"
         ],
         "type": "enum"

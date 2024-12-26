@@ -403,6 +403,32 @@
   },
   "paths": {
     "/pets": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Cat"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Dog"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "requestBody": {
           "required": true,

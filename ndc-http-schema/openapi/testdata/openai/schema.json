@@ -143,6 +143,7 @@
     "ChatCompletionRequestMessageInput": {
       "fields": {
         "content": {
+          "description": "The contents of the system message.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -165,7 +166,7 @@
           }
         },
         "name": {
-          "description": "The name of the function to call.",
+          "description": "An optional name for the participant. Provides the model information to differentiate between participants of the same role.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -175,7 +176,7 @@
           }
         },
         "role": {
-          "description": "The role of the messages author, in this case `function`.",
+          "description": "The role of the messages author, in this case `system`.",
           "type": {
             "name": "ChatCompletionRequestMessageRoleEnum",
             "type": "named"
@@ -877,7 +878,7 @@
           }
         },
         "type": {
-          "description": "Always `static`.",
+          "description": "Always `auto`.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -891,7 +892,6 @@
     "CreateThreadRequestToolResourcesFileSearchVectorStoresInput": {
       "fields": {
         "chunking_strategy": {
-          "description": "The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy.",
           "type": {
             "type": "nullable",
             "underlying_type": {

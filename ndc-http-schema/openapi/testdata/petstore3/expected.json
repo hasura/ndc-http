@@ -105,9 +105,7 @@
             "explode": true,
             "name": "created",
             "in": "query",
-            "schema": {
-              "type": []
-            }
+            "schema": {}
           }
         },
         "customer": {
@@ -144,9 +142,7 @@
             "explode": true,
             "name": "due_date",
             "in": "query",
-            "schema": {
-              "type": []
-            }
+            "schema": {}
           }
         },
         "ending_before": {
@@ -2148,9 +2144,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "id": {
           "type": {
@@ -2279,9 +2273,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "id": {
           "type": {
@@ -6849,9 +6841,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": []
-          }
+          "http": {}
         }
       }
     },
@@ -7752,9 +7742,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "created": {
           "description": "Time at which the object was created. Measured in seconds since the Unix epoch.",
@@ -7963,9 +7951,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": []
-          }
+          "http": {}
         }
       }
     },

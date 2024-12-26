@@ -253,12 +253,18 @@
     "ChatCompletionRequestMessageInput": {
       "fields": {
         "content": {
+          "description": "The contents of the system message.",
           "type": {
             "type": "nullable",
             "underlying_type": {
               "name": "JSON",
               "type": "named"
             }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
           }
         },
         "function_call": {
@@ -280,7 +286,7 @@
           }
         },
         "name": {
-          "description": "The name of the function to call.",
+          "description": "An optional name for the participant. Provides the model information to differentiate between participants of the same role.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -295,7 +301,7 @@
           }
         },
         "role": {
-          "description": "The role of the messages author, in this case `function`.",
+          "description": "The role of the messages author, in this case `system`.",
           "type": {
             "name": "ChatCompletionRequestMessageRoleEnum",
             "type": "named"
@@ -645,9 +651,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": []
-          }
+          "http": {}
         },
         "functions": {
           "description": "Deprecated in favor of `tools`.  A list of functions the model may generate JSON inputs for.",
@@ -863,9 +867,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": []
-          }
+          "http": {}
         },
         "stream": {
           "description": "If set, partial message deltas will be sent, like in ChatGPT. Tokens will be sent as data-only [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format) as they become available, with the stream terminated by a `data: [DONE]` message. [Example Python code](https://cookbook.openai.com/examples/how_to_stream_completions).",
@@ -930,7 +932,6 @@
             }
           },
           "http": {
-            "type": [],
             "xml": {
               "name": "ChatCompletionToolChoiceOption"
             }
@@ -1424,7 +1425,7 @@
           }
         },
         "type": {
-          "description": "Always `static`.",
+          "description": "Always `auto`.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -1443,7 +1444,6 @@
     "CreateThreadRequestToolResourcesFileSearchVectorStoresInput": {
       "fields": {
         "chunking_strategy": {
-          "description": "The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy.",
           "type": {
             "type": "nullable",
             "underlying_type": {

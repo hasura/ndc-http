@@ -305,14 +305,6 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 	return err
 }
 
-func (oc *OAS3Builder) trimPathPrefix(input string) string {
-	if oc.ConvertOptions.TrimPrefix == "" {
-		return input
-	}
-
-	return strings.TrimPrefix(input, oc.ConvertOptions.TrimPrefix)
-}
-
 // build a named type for JSON scalar
 func (oc *OAS3Builder) buildScalarJSON() *schema.NamedType {
 	scalarName := string(rest.ScalarJSON)
