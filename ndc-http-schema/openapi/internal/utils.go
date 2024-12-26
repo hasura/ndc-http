@@ -380,6 +380,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 		case slices.Contains(floatTypeRepresentations, typeRepA) && slices.Contains(floatTypeRepresentations, typeRepB):
 			scalarName = rest.ScalarFloat64
 			isMatched = true
+		// use boolean if the union type if oneOf boolean or enum (true, false)
 		case (enumA != nil && len(enumA.OneOf) == 2 && slices.Contains(enumA.OneOf, "true") && slices.Contains(enumA.OneOf, "false") && typeRepB == schema.TypeRepresentationTypeBoolean) ||
 			(enumB != nil && len(enumB.OneOf) == 2 && slices.Contains(enumB.OneOf, "true") && slices.Contains(enumB.OneOf, "false") && typeRepA == schema.TypeRepresentationTypeBoolean):
 			scalarName = rest.ScalarBoolean
