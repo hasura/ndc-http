@@ -200,6 +200,17 @@ func buildSchemaFile(config *Configuration, configDir string, configItem *Config
 		return nil, fmt.Errorf("the servers setting of schema %s is empty", configItem.ConvertConfig.File)
 	}
 
+	// cache original result type to be used if header forwarding or distributed execution is enabled
+	for key, op := range ndcSchema.Functions {
+		op.OriginalResultType = op.ResultType
+		ndcSchema.Functions[key] = op
+	}
+
+	for key, op := range ndcSchema.Procedures {
+		op.OriginalResultType = op.ResultType
+		ndcSchema.Procedures[key] = op
+	}
+
 	buildHTTPArguments(config, ndcSchema, configItem)
 	buildHeadersForwardingResponse(config, ndcSchema)
 
@@ -278,10 +289,11 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 		fn := restSchema.Functions[key]
 		funcName := buildDistributedName(key)
 		distributedFn := rest.OperationInfo{
-			Request:     fn.Request,
-			Arguments:   cloneDistributedArguments(fn.Arguments),
-			Description: fn.Description,
-			ResultType:  schema.NewNamedType(buildDistributedResultObjectType(restSchema, funcName, fn.ResultType)).Encode(),
+			Request:            fn.Request,
+			Arguments:          cloneDistributedArguments(fn.Arguments),
+			Description:        fn.Description,
+			ResultType:         schema.NewNamedType(buildDistributedResultObjectType(restSchema, funcName, fn.ResultType)).Encode(),
+			OriginalResultType: fn.OriginalResultType,
 		}
 		restSchema.Functions[funcName] = distributedFn
 	}
@@ -292,10 +304,11 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 		procName := buildDistributedName(key)
 
 		distributedProc := rest.OperationInfo{
-			Request:     proc.Request,
-			Arguments:   cloneDistributedArguments(proc.Arguments),
-			Description: proc.Description,
-			ResultType:  schema.NewNamedType(buildDistributedResultObjectType(restSchema, procName, proc.ResultType)).Encode(),
+			Request:            proc.Request,
+			Arguments:          cloneDistributedArguments(proc.Arguments),
+			Description:        proc.Description,
+			ResultType:         schema.NewNamedType(buildDistributedResultObjectType(restSchema, procName, proc.ResultType)).Encode(),
+			OriginalResultType: proc.OriginalResultType,
 		}
 		restSchema.Procedures[procName] = distributedProc
 	}
@@ -364,7 +377,7 @@ func buildDistributedResultObjectType(restSchema *rest.NDCHttpSchema, operationN
 					Type:        schema.NewNamedType(rest.HTTPServerIDScalarName).Encode(),
 				},
 			},
-			"data": {
+			DistributedObjectResultsDataKey: {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("A result of " + operationName),
 					Type:        underlyingType,
@@ -376,13 +389,13 @@ func buildDistributedResultObjectType(restSchema *rest.NDCHttpSchema, operationN
 	restSchema.ObjectTypes[distResultType] = rest.ObjectType{
 		Description: utils.ToPtr("Distributed responses of " + operationName),
 		Fields: map[string]rest.ObjectField{
-			"results": {
+			DistributedObjectResultsKey: {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("Results of " + operationName),
 					Type:        schema.NewArrayType(schema.NewNamedType(distResultDataType)).Encode(),
 				},
 			},
-			"errors": {
+			DistributedObjectErrorsKey: {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("Error responses of " + operationName),
 					Type:        schema.NewArrayType(schema.NewNamedType(rest.DistributedErrorObjectName)).Encode(),
@@ -424,11 +437,17 @@ func cloneOperationInfo(operation rest.OperationInfo, req *rest.Request) rest.Op
 		args[key] = arg
 	}
 
+	originalResultType := operation.OriginalResultType
+	if len(operation.OriginalResultType) == 0 {
+		originalResultType = operation.ResultType
+	}
+
 	return rest.OperationInfo{
-		Request:     req,
-		Arguments:   args,
-		Description: operation.Description,
-		ResultType:  operation.ResultType,
+		Request:            req,
+		Arguments:          args,
+		Description:        operation.Description,
+		ResultType:         operation.ResultType,
+		OriginalResultType: originalResultType,
 	}
 }
 

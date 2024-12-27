@@ -94,6 +94,30 @@ type DistributedResponse[T any] struct {
 	Errors  []DistributedError     `json:"errors"  yaml:"errors"`
 }
 
+func (dr DistributedResponse[T]) ToMap() map[string]any {
+	results := make([]map[string]any, len(dr.Results))
+	for i, result := range dr.Results {
+		results[i] = map[string]any{
+			"server": result.Server,
+			"data":   result.Data,
+		}
+	}
+
+	errs := make([]map[string]any, len(dr.Errors))
+	for i, err := range dr.Errors {
+		errs[i] = map[string]any{
+			"server":  err.Server,
+			"message": err.Message,
+			"details": err.Details,
+		}
+	}
+
+	return map[string]any{
+		"results": results,
+		"errors":  errs,
+	}
+}
+
 // NewDistributedResponse creates an empty DistributedResponse instance
 func NewDistributedResponse[T any]() *DistributedResponse[T] {
 	return &DistributedResponse[T]{

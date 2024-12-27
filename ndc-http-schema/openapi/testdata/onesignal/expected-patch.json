@@ -41,10 +41,7 @@
           }
         ],
         "requestBody": {
-          "contentType": "application/json",
-          "schema": {
-            "type": "NotificationInput"
-          }
+          "contentType": "application/json"
         },
         "response": {
           "contentType": "application/json"
@@ -58,7 +55,13 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": ["object"],
+              "xml": {
+                "name": "Notification"
+              }
+            }
           }
         }
       },

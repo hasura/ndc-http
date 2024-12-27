@@ -256,6 +256,8 @@ type OperationInfo struct {
 	Description *string `json:"description,omitempty" mapstructure:"description,omitempty" yaml:"description,omitempty"`
 	// The name of the result type
 	ResultType schema.Type `json:"result_type" mapstructure:"result_type" yaml:"result_type"`
+	// The original result type is used when header forwarding or distributed execution is enabled
+	OriginalResultType schema.Type `json:"original_result_type,omitempty" mapstructure:"original_result_type,omitempty" yaml:"original_result_type,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

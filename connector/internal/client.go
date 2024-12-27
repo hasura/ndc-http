@@ -40,32 +40,45 @@ type HTTPClient struct {
 // Send creates and executes the request and evaluate response selection
 func (client *HTTPClient) Send(ctx context.Context, selection schema.NestedField) (any, http.Header, error) {
 	httpOptions := client.requests.HTTPOptions
-	if !httpOptions.Distributed {
-		result, headers, err := client.sendSingle(ctx, client.requests.Requests[0], selection, "single")
+	var result any
+	var headers http.Header
+
+	switch {
+	case !httpOptions.Distributed:
+		var err *schema.ConnectorError
+		result, headers, err = client.sendSingle(ctx, client.requests.Requests[0], "single")
 		if err != nil {
 			return nil, nil, err
 		}
-
-		return result, headers, nil
+	case !httpOptions.Parallel || httpOptions.Concurrency <= 1 || len(client.requests.Requests) == 1:
+		rs, hs := client.sendSequence(ctx, client.requests.Requests)
+		headers = hs
+		result = rs.ToMap()
+	default:
+		rs, hs := client.sendParallel(ctx, client.requests.Requests)
+		headers = hs
+		result = rs.ToMap()
 	}
 
-	if !httpOptions.Parallel || httpOptions.Concurrency <= 1 || len(client.requests.Requests) == 1 {
-		results, headers := client.sendSequence(ctx, client.requests.Requests, selection)
+	result = client.createHeaderForwardingResponse(result, headers)
 
-		return results, headers, nil
+	if len(selection) > 0 {
+		var err error
+		result, err = utils.EvalNestedColumnFields(selection, result)
+		if err != nil {
+			return nil, nil, schema.InternalServerError(err.Error(), nil)
+		}
 	}
 
-	results, headers := client.sendParallel(ctx, client.requests.Requests, selection)
-
-	return results, headers, nil
+	return result, headers, nil
 }
 
 // execute a request to a list of remote servers in sequence
-func (client *HTTPClient) sendSequence(ctx context.Context, requests []*RetryableRequest, selection schema.NestedField) (*DistributedResponse[any], http.Header) {
+func (client *HTTPClient) sendSequence(ctx context.Context, requests []*RetryableRequest) (*DistributedResponse[any], http.Header) {
 	results := NewDistributedResponse[any]()
 	var firstHeaders http.Header
 	for _, req := range requests {
-		result, headers, err := client.sendSingle(ctx, req, selection, "sequence")
+		result, headers, err := client.sendSingle(ctx, req, "sequence")
 		if err != nil {
 			results.Errors = append(results.Errors, DistributedError{
 				Server:         req.ServerID,
@@ -87,7 +100,7 @@ func (client *HTTPClient) sendSequence(ctx context.Context, requests []*Retryabl
 }
 
 // execute a request to a list of remote servers in parallel
-func (client *HTTPClient) sendParallel(ctx context.Context, requests []*RetryableRequest, selection schema.NestedField) (*DistributedResponse[any], http.Header) {
+func (client *HTTPClient) sendParallel(ctx context.Context, requests []*RetryableRequest) (*DistributedResponse[any], http.Header) {
 	var firstHeaders http.Header
 	httpOptions := client.requests.HTTPOptions
 	results := make([]*DistributedResult[any], len(requests))
@@ -100,7 +113,7 @@ func (client *HTTPClient) sendParallel(ctx context.Context, requests []*Retryabl
 
 	sendFunc := func(req RetryableRequest, index int) {
 		eg.Go(func() error {
-			result, headers, err := client.sendSingle(ctx, &req, selection, "parallel")
+			result, headers, err := client.sendSingle(ctx, &req, "parallel")
 			if err != nil {
 				errs[index] = &DistributedError{
 					Server:         req.ServerID,
@@ -143,7 +156,7 @@ func (client *HTTPClient) sendParallel(ctx context.Context, requests []*Retryabl
 }
 
 // execute a request to the remote server with retries
-func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequest, selection schema.NestedField, mode string) (any, http.Header, *schema.ConnectorError) {
+func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequest, mode string) (any, http.Header, *schema.ConnectorError) {
 	ctx, span := tracer.Start(ctx, "Send Request to Server "+request.ServerID)
 	defer span.End()
 
@@ -254,7 +267,7 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 		return nil, nil, schema.NewConnectorError(statusCode, resp.Status, details)
 	}
 
-	result, headers, evalErr := client.evalHTTPResponse(ctx, span, resp, contentType, selection, logger)
+	result, headers, evalErr := client.evalHTTPResponse(ctx, span, resp, contentType, logger)
 	if evalErr != nil {
 		span.SetStatus(codes.Error, "failed to decode the http response")
 		span.RecordError(evalErr)
@@ -343,8 +356,7 @@ func (client *HTTPClient) doRequest(ctx context.Context, request *RetryableReque
 	return resp, body, cancel, nil
 }
 
-func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span, resp *http.Response, contentType string, selection schema.NestedField, logger *slog.Logger) (any, http.Header, *schema.ConnectorError) {
-	resultType := client.requests.Operation.ResultType
+func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span, resp *http.Response, contentType string, logger *slog.Logger) (any, http.Header, *schema.ConnectorError) {
 	if logger.Enabled(ctx, slog.LevelDebug) {
 		logAttrs := []any{
 			slog.Int("http_status", resp.StatusCode),
@@ -383,7 +395,8 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 		return nil, resp.Header, nil
 	}
 
-	var result any
+	resultType := client.requests.Operation.OriginalResultType
+
 	switch {
 	case restUtils.IsContentTypeText(contentType):
 		respBody, err := io.ReadAll(resp.Body)
@@ -391,18 +404,15 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
 
-		result = string(respBody)
+		return string(respBody), resp.Header, nil
 	case restUtils.IsContentTypeXML(contentType):
-		field, extractErr := client.extractResultType(resultType)
-		if extractErr != nil {
-			return nil, nil, extractErr
-		}
-
 		var err error
-		result, err = contenttype.NewXMLDecoder(client.requests.Schema.NDCHttpSchema).Decode(resp.Body, field)
+		result, err := contenttype.NewXMLDecoder(client.requests.Schema.NDCHttpSchema).Decode(resp.Body, resultType)
 		if err != nil {
 			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
+
+		return result, resp.Header, nil
 	case restUtils.IsContentTypeJSON(contentType):
 		if len(resultType) > 0 {
 			namedType, err := resultType.AsNamed()
@@ -420,27 +430,23 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 					return string(respBytes), resp.Header, nil
 				}
 
-				result = strResult
-
-				break
+				return strResult, resp.Header, nil
 			}
 		}
 
+		var result any
 		var err error
 		if client.requests.Schema == nil || client.requests.Schema.NDCHttpSchema == nil {
 			err = json.NewDecoder(resp.Body).Decode(&result)
 		} else {
-			responseType, extractErr := client.extractResultType(resultType)
-			if extractErr != nil {
-				return nil, nil, extractErr
-			}
-
-			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema).Decode(resp.Body, responseType)
+			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema).Decode(resp.Body, resultType)
 		}
 
 		if err != nil {
 			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
+
+		return result, resp.Header, nil
 	case contentType == rest.ContentTypeNdJSON:
 		var results []any
 		decoder := json.NewDecoder(resp.Body)
@@ -453,72 +459,18 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 			results = append(results, r)
 		}
 
-		result = results
+		return results, resp.Header, nil
 	case restUtils.IsContentTypeBinary(contentType):
 		rawBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
-		result = base64.StdEncoding.EncodeToString(rawBytes)
+
+		return base64.StdEncoding.EncodeToString(rawBytes), resp.Header, nil
 	default:
 		return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, "failed to evaluate response", map[string]any{
 			"cause": "unsupported content type " + contentType,
 		})
-	}
-
-	result = client.createHeaderForwardingResponse(result, resp.Header)
-	if len(selection) == 0 {
-		return result, resp.Header, nil
-	}
-
-	result, err := utils.EvalNestedColumnFields(selection, result)
-	if err != nil {
-		return nil, nil, schema.InternalServerError(err.Error(), nil)
-	}
-
-	return result, resp.Header, nil
-}
-
-func (client *HTTPClient) extractResultType(resultType schema.Type) (schema.Type, *schema.ConnectorError) {
-	if !client.manager.config.ForwardHeaders.Enabled || client.manager.config.ForwardHeaders.ResponseHeaders == nil || client.manager.config.ForwardHeaders.ResponseHeaders.ResultField == "" {
-		return resultType, nil
-	}
-
-	result, err := client.extractForwardedHeadersResultType(resultType)
-	if err != nil {
-		return nil, schema.NewConnectorError(http.StatusInternalServerError, "failed to extract forwarded headers response: "+err.Error(), nil)
-	}
-
-	return result, nil
-}
-
-func (client *HTTPClient) extractForwardedHeadersResultType(resultType schema.Type) (schema.Type, error) {
-	rawType, err := resultType.InterfaceT()
-	switch t := rawType.(type) {
-	case *schema.NullableType:
-		return client.extractForwardedHeadersResultType(t.UnderlyingType)
-	case *schema.ArrayType:
-		return nil, errors.New("expected object type, got array")
-	case *schema.NamedType:
-		objectType, ok := client.requests.Schema.NDCHttpSchema.ObjectTypes[t.Name]
-		if !ok {
-			return nil, fmt.Errorf("%s: expected object type", t.Name)
-		}
-
-		if len(objectType.Fields) == 0 {
-			return nil, fmt.Errorf("%s: empty object field", t.Name)
-		}
-
-		resultField, ok := objectType.Fields[client.manager.config.ForwardHeaders.ResponseHeaders.ResultField]
-		if !ok {
-			return nil, fmt.Errorf("%s: result field %s does not exist", t.Name, client.manager.config.ForwardHeaders.ResponseHeaders.ResultField)
-		}
-
-		return resultField.Type, nil
-	case *schema.PredicateType:
-		return nil, errors.New("expected object type, got predicate type")
-	default:
-		return nil, err
 	}
 }
 
