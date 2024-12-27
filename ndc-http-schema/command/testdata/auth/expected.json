@@ -73,6 +73,13 @@
             "type": "named"
           },
           "type": "array"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "findPetsByStatus": {
@@ -113,6 +120,13 @@
             "type": "named"
           },
           "type": "array"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "petRetry": {
@@ -125,6 +139,13 @@
         },
         "arguments": {},
         "result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
+        },
+        "original_result_type": {
           "element_type": {
             "name": "Pet",
             "type": "named"
@@ -225,9 +246,7 @@
                 "type": "named"
               }
             },
-            "http": {
-              "type": null
-            }
+            "http": {}
           },
           "id": {
             "type": {
@@ -403,6 +422,10 @@
         "result_type": {
           "name": "Pet",
           "type": "named"
+        },
+        "original_result_type": {
+          "name": "Pet",
+          "type": "named"
         }
       },
       "createModel": {
@@ -436,6 +459,13 @@
             "type": "named"
           },
           "type": "array"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "ProgressResponse",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "putPetXml": {
@@ -463,6 +493,10 @@
         },
         "description": "Update an existing pet",
         "result_type": {
+          "name": "PetXml",
+          "type": "named"
+        },
+        "original_result_type": {
           "name": "PetXml",
           "type": "named"
         }

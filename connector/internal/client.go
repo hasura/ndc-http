@@ -61,7 +61,6 @@ func (client *HTTPClient) Send(ctx context.Context, selection schema.NestedField
 	}
 
 	result = client.createHeaderForwardingResponse(result, headers)
-
 	if len(selection) > 0 {
 		var err error
 		result, err = utils.EvalNestedColumnFields(selection, result)

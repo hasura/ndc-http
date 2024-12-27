@@ -438,9 +438,9 @@ func cloneOperationInfo(operation rest.OperationInfo, req *rest.Request) rest.Op
 	}
 
 	originalResultType := operation.OriginalResultType
-	if len(operation.OriginalResultType) == 0 {
-		originalResultType = operation.ResultType
-	}
+	// if len(operation.OriginalResultType) == 0 {
+	// 	originalResultType = operation.ResultType
+	// }
 
 	return rest.OperationInfo{
 		Request:            req,

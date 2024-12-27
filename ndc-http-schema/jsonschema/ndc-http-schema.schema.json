@@ -421,6 +421,10 @@
         "result_type": {
           "$ref": "#/$defs/Type",
           "description": "The name of the result type"
+        },
+        "original_result_type": {
+          "$ref": "#/$defs/Type",
+          "description": "The original result type is used when header forwarding or distributed execution is enabled"
         }
       },
       "additionalProperties": false,

@@ -106,6 +106,13 @@
         "result_type": {
           "name": "FindPetsHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "findPetsByStatus": {
@@ -163,6 +170,13 @@
         "result_type": {
           "name": "FindPetsByStatusHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "findPetsByStatusDistributed": {
@@ -220,6 +234,13 @@
         "result_type": {
           "name": "FindPetsByStatusDistributedHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "findPetsDistributed": {
@@ -256,6 +277,13 @@
         "result_type": {
           "name": "FindPetsDistributedHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "petRetry": {
@@ -291,6 +319,13 @@
         "result_type": {
           "name": "PetRetryHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "petRetryDistributed": {
@@ -326,6 +361,13 @@
         "result_type": {
           "name": "PetRetryDistributedHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "Pet",
+            "type": "named"
+          },
+          "type": "array"
         }
       }
     },
@@ -933,9 +975,7 @@
                 "type": "named"
               }
             },
-            "http": {
-              "type": null
-            }
+            "http": {}
           },
           "id": {
             "type": {
@@ -1213,6 +1253,10 @@
         "result_type": {
           "name": "AddPetHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "name": "Pet",
+          "type": "named"
         }
       },
       "addPetDistributed": {
@@ -1272,6 +1316,10 @@
         "result_type": {
           "name": "AddPetDistributedHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "name": "Pet",
+          "type": "named"
         }
       },
       "createModel": {
@@ -1322,6 +1370,13 @@
         "result_type": {
           "name": "CreateModelHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "ProgressResponse",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "createModelDistributed": {
@@ -1372,6 +1427,13 @@
         "result_type": {
           "name": "CreateModelDistributedHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "element_type": {
+            "name": "ProgressResponse",
+            "type": "named"
+          },
+          "type": "array"
         }
       },
       "putPetXml": {
@@ -1421,6 +1483,10 @@
         "result_type": {
           "name": "PutPetXmlHeadersResponse",
           "type": "named"
+        },
+        "original_result_type": {
+          "name": "PetXml",
+          "type": "named"
         }
       },
       "putPetXmlDistributed": {
@@ -1469,6 +1535,10 @@
         "description": "Update an existing pet",
         "result_type": {
           "name": "PutPetXmlDistributedHeadersResponse",
+          "type": "named"
+        },
+        "original_result_type": {
+          "name": "PetXml",
           "type": "named"
         }
       }

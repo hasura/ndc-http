@@ -257,7 +257,7 @@ type OperationInfo struct {
 	// The name of the result type
 	ResultType schema.Type `json:"result_type" mapstructure:"result_type" yaml:"result_type"`
 	// The original result type is used when header forwarding or distributed execution is enabled
-	OriginalResultType schema.Type `json:"original_result_type,omitempty" mapstructure:"original_result_type,omitempty" yaml:"original_result_type,omitempty"`
+	OriginalResultType schema.Type `json:"original_result_type,omitempty" mapstructure:"original_result_type" yaml:"original_result_type,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -287,18 +287,27 @@ func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 
 	rawResultType, ok := raw["result_type"]
 	if !ok {
-		return errors.New("field result_type in ProcedureInfo: required")
+		return errors.New("field result_type in OperationInfo: required")
 	}
 	var resultType schema.Type
 	if err := json.Unmarshal(rawResultType, &resultType); err != nil {
-		return fmt.Errorf("field result_type in ProcedureInfo: %w", err)
+		return fmt.Errorf("field result_type in OperationInfo: %w", err)
 	}
 	j.ResultType = resultType
+
+	rawOriginalResultType, ok := raw["original_result_type"]
+	if ok {
+		var originalResultType schema.Type
+		if err := json.Unmarshal(rawOriginalResultType, &originalResultType); err != nil {
+			return fmt.Errorf("field original_result_type in OperationInfo: %w", err)
+		}
+		j.OriginalResultType = originalResultType
+	}
 
 	if rawDescription, ok := raw["description"]; ok {
 		var description string
 		if err := json.Unmarshal(rawDescription, &description); err != nil {
-			return fmt.Errorf("field description in ProcedureInfo: %w", err)
+			return fmt.Errorf("field description in OperationInfo: %w", err)
 		}
 		j.Description = &description
 	}
