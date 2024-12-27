@@ -100,9 +100,268 @@
         "name": "PaymentSource",
         "type": "named"
       }
+    },
+    "getPets": {
+      "request": {
+        "url": "/pets",
+        "method": "get",
+        "response": {
+          "contentType": "application/json"
+        }
+      },
+      "arguments": {},
+      "description": "GET /pets",
+      "result_type": {
+        "element_type": {
+          "name": "GetPetsResult",
+          "type": "named"
+        },
+        "type": "array"
+      }
     }
   },
   "object_types": {
+    "CatInput": {
+      "fields": {
+        "age": {
+          "type": {
+            "name": "Int32",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "integer"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "metadata": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "JSON",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {}
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "type": {
+          "type": {
+            "name": "CatType",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "DogInput": {
+      "fields": {
+        "icon": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "format": "data-time"
+          }
+        },
+        "text": {
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "type": {
+          "type": {
+            "name": "DogType",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "GetPetsResult": {
+      "fields": {
+        "age": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ]
+          }
+        },
+        "icon": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "metadata": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "JSON",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {}
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "text": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "type": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "GetPetsResultTypeEnum",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
     "PaymentSource": {
       "fields": {
         "allow_redisplay": {
@@ -160,7 +419,7 @@
           }
         },
         "country": {
-          "description": "Two-letter ISO code representing the country of the card. You could use this attribute to get a sense of the international breakdown of cards you've collected.",
+          "description": "The account's country.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -176,7 +435,7 @@
           }
         },
         "created": {
-          "description": "Time at which the object was created. Measured in seconds since the Unix epoch.",
+          "description": "Time at which the account was connected. Measured in seconds since the Unix epoch.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -192,7 +451,7 @@
           }
         },
         "currency": {
-          "description": "Three-letter [ISO code for the currency](https://stripe.com/docs/currencies) associated with the source. This is the currency for which the source will be chargeable once ready. Required for `single_use` sources.",
+          "description": "Three-letter [ISO code for currency](https://www.iso.org/iso-4217-currency-codes.html) in lowercase. Must be a [supported currency](https://docs.stripe.com/currencies). Only applicable on accounts (not customers or recipients). The card can be used as a transfer destination for funds in this currency. This property is only available for accounts where [controller.requirement_collection](/api/accounts/object#account_object-controller-requirement_collection) is `application`, which includes Custom accounts.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -240,7 +499,7 @@
           }
         },
         "default_for_currency": {
-          "description": "Whether this card is the default external account for its currency. This property is only available for accounts where [controller.requirement_collection](/api/accounts/object#account_object-controller-requirement_collection) is `application`, which includes Custom accounts.",
+          "description": "Whether this bank account is the default external account for its currency.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -332,7 +591,7 @@
           }
         },
         "fingerprint": {
-          "description": "Uniquely identifies this particular card number. You can use this attribute to check whether two customers whove signed up with you are using the same card number, for example. For payment methods that tokenize card information (Apple Pay, Google Pay), the tokenized number might be provided instead of the underlying card number.  *As of May 1, 2021, card fingerprint in India for Connect changed to allow two fingerprints for the same card---one for India and one for the rest of the world.*",
+          "description": "Uniquely identifies this particular bank account. You can use this attribute to check whether two bank accounts are the same.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -396,7 +655,7 @@
           }
         },
         "last4": {
-          "description": "The last four digits of the card.",
+          "description": "The last four digits of the bank account number.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -490,7 +749,7 @@
           }
         },
         "status": {
-          "description": "The status of the source, one of `canceled`, `chargeable`, `consumed`, `failed`, or `pending`. Only `chargeable` sources can be used to create a charge.",
+          "description": "For bank accounts, possible values are `new`, `validated`, `verified`, `verification_failed`, or `errored`. A bank account that hasn't had any activity or validation performed is `new`. If Stripe can determine that the bank account exists, its status will be `validated`. Note that there often isnt enough information to know (e.g., for smaller credit unions), and the validation is not always run. If customer bank account verification has succeeded, the bank account status will be `verified`. If the verification failed for any reason, such as microdeposit failure, the status will be `verification_failed`. If a payout sent to this bank account fails, we'll set the status to `errored` and will not continue to send [scheduled payouts](https://stripe.com/docs/payouts#payout-schedule) until the bank details are updated.  For external accounts, possible values are `new`, `errored` and `verification_failed`. If a payout fails, the status is set to `errored` and scheduled payouts are stopped until account details are updated. In the US and India, if we can't [verify the owner of the bank account](https://support.stripe.com/questions/bank-account-ownership-verification), we'll set the status to `verification_failed`. Other validations aren't run against external accounts because they're only used for payouts. This means the other statuses don't apply.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -522,7 +781,7 @@
           }
         },
         "type": {
-          "description": "The `type` of the source. The `type` is a payment method, one of `ach_credit_transfer`, `ach_debit`, `alipay`, `bancontact`, `card`, `card_present`, `eps`, `giropay`, `ideal`, `multibanco`, `klarna`, `p24`, `sepa_debit`, `sofort`, `three_d_secure`, or `wechat`. An additional hash is included on the source with a name matching this value. It contains additional information specific to the [payment method](https://stripe.com/docs/sources) used.",
+          "description": "The Stripe account type. Can be `standard`, `express`, `custom`, or `none`.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -555,115 +814,6 @@
       }
     },
     "Pet": {
-      "fields": {
-        "age": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "Int32",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "integer"
-            ]
-          }
-        },
-        "icon": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "id": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "metadata": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "element_type": {
-                "name": "JSON",
-                "type": "named"
-              },
-              "type": "array"
-            }
-          },
-          "http": {
-            "type": [
-              "array"
-            ],
-            "items": {
-              "type": []
-            }
-          }
-        },
-        "text": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "type": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "PetTypeEnum",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        },
-        "value": {
-          "description": "The value of this recipient's custom field",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ]
-          }
-        }
-      }
-    },
-    "PetBodyInput": {
       "fields": {
         "age": {
           "type": {
@@ -719,9 +869,22 @@
             "type": [
               "array"
             ],
-            "items": {
-              "type": []
+            "items": {}
+          }
+        },
+        "starred_at": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
             }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "format": "data-time"
           }
         },
         "text": {
@@ -739,7 +902,22 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetBodyTypeEnum",
+              "name": "PetTypeEnum",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "value": {
+          "description": "The value of this recipient's custom field",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
               "type": "named"
             }
           },
@@ -753,7 +931,7 @@
     }
   },
   "procedures": {
-    "postPets": {
+    "postPets_Cat": {
       "request": {
         "url": "/pets",
         "method": "post",
@@ -768,11 +946,50 @@
         "body": {
           "description": "Request body of POST /pets",
           "type": {
-            "name": "PetBodyInput",
+            "name": "CatInput",
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
+          }
+        }
+      },
+      "description": "POST /pets",
+      "result_type": {
+        "name": "Pet",
+        "type": "named"
+      }
+    },
+    "postPets_Dog": {
+      "request": {
+        "url": "/pets",
+        "method": "post",
+        "requestBody": {
+          "contentType": "application/json"
+        },
+        "response": {
+          "contentType": "application/json"
+        }
+      },
+      "arguments": {
+        "body": {
+          "description": "Request body of POST /pets",
+          "type": {
+            "name": "DogInput",
+            "type": "named"
+          },
+          "http": {
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -821,6 +1038,37 @@
         "one_of": [
           "regulated",
           "unregulated"
+        ],
+        "type": "enum"
+      }
+    },
+    "CatType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cat"
+        ],
+        "type": "enum"
+      }
+    },
+    "DogType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "dog"
+        ],
+        "type": "enum"
+      }
+    },
+    "GetPetsResultTypeEnum": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cat",
+          "dog"
         ],
         "type": "enum"
       }
@@ -878,17 +1126,6 @@
           "standard",
           "three_d_secure",
           "wechat"
-        ],
-        "type": "enum"
-      }
-    },
-    "PetBodyTypeEnum": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "cat",
-          "dog"
         ],
         "type": "enum"
       }

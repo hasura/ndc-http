@@ -25,7 +25,6 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
@@ -303,10 +302,8 @@ func (client *HTTPClient) doRequest(ctx context.Context, request *RetryableReque
 	if retryCount > 0 {
 		span.SetAttributes(attribute.Int("http.request.resend_count", retryCount))
 	}
-	setHeaderAttributes(span, "http.request.header.", request.Headers)
 
-	client.manager.propagator.Inject(ctx, propagation.HeaderCarrier(request.Headers))
-	resp, cancel, err := client.manager.ExecuteRequest(ctx, request, namespace)
+	resp, cancel, err := client.manager.ExecuteRequest(ctx, span, request, namespace)
 	if err != nil {
 		span.SetStatus(codes.Error, "error happened when executing the request")
 		span.RecordError(err)
@@ -552,6 +549,7 @@ func parseContentType(input string) string {
 		return ""
 	}
 	parts := strings.Split(input, ";")
+	contentTypeParts := strings.Split(parts[0], ",")
 
-	return strings.TrimSpace(parts[0])
+	return strings.TrimSpace(contentTypeParts[0])
 }

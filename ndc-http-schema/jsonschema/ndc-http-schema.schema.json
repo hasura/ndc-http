@@ -72,7 +72,9 @@
                 "literal"
               ]
             },
-            "value": true
+            "value": {
+              "description": "The literal value"
+            }
           },
           "type": "object",
           "required": [
@@ -89,7 +91,8 @@
               ]
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Environment variable name"
             }
           },
           "type": "object",
@@ -107,7 +110,8 @@
               ]
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "description": "Header name, require enable headers forwarding"
             }
           },
           "type": "object",
@@ -969,9 +973,6 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "required": [
-        "type"
-      ],
       "description": "TypeSchema represents a serializable object of OpenAPI schema that is used for validation"
     },
     "XMLSchema": {

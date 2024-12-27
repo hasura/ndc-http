@@ -169,36 +169,24 @@ func (oc *OAS2Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v2.
 		oc.schema.Functions[funcName] = *funcGet
 	}
 
-	procPost, procPostName, err := newOAS2OperationBuilder(oc, pathKey, "post").BuildProcedure(pathValue.Post, pathValue.Parameters)
+	err = newOAS2OperationBuilder(oc, pathKey, "post").BuildProcedure(pathValue.Post, pathValue.Parameters)
 	if err != nil {
 		return err
-	}
-	if procPost != nil {
-		oc.schema.Procedures[procPostName] = *procPost
 	}
 
-	procPut, procPutName, err := newOAS2OperationBuilder(oc, pathKey, "put").BuildProcedure(pathValue.Put, pathValue.Parameters)
+	err = newOAS2OperationBuilder(oc, pathKey, "put").BuildProcedure(pathValue.Put, pathValue.Parameters)
 	if err != nil {
 		return err
-	}
-	if procPut != nil {
-		oc.schema.Procedures[procPutName] = *procPut
 	}
 
-	procPatch, procPatchName, err := newOAS2OperationBuilder(oc, pathKey, "patch").BuildProcedure(pathValue.Patch, pathValue.Parameters)
+	err = newOAS2OperationBuilder(oc, pathKey, "patch").BuildProcedure(pathValue.Patch, pathValue.Parameters)
 	if err != nil {
 		return err
-	}
-	if procPatch != nil {
-		oc.schema.Procedures[procPatchName] = *procPatch
 	}
 
-	procDelete, procDeleteName, err := newOAS2OperationBuilder(oc, pathKey, "delete").BuildProcedure(pathValue.Delete, pathValue.Parameters)
+	err = newOAS2OperationBuilder(oc, pathKey, "delete").BuildProcedure(pathValue.Delete, pathValue.Parameters)
 	if err != nil {
 		return err
-	}
-	if procDelete != nil {
-		oc.schema.Procedures[procDeleteName] = *procDelete
 	}
 
 	return nil

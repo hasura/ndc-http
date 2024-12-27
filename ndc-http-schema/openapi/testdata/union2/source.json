@@ -5,6 +5,31 @@
   "schemes": ["https", "http"],
   "paths": {
     "/pet": {
+      "get": {
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Cat"
+                  }
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Dog"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
       "post": {
         "tags": ["pet"],
         "summary": "Add a new pet to the store",
@@ -35,7 +60,7 @@
   },
   "definitions": {
     "PetBody": {
-      "allOf": [
+      "oneOf": [
         {
           "$ref": "#/definitions/Dog"
         },
@@ -45,7 +70,7 @@
       ]
     },
     "Pet": {
-      "oneOf": [
+      "allOf": [
         {
           "$ref": "#/definitions/Dog"
         },

@@ -113,7 +113,9 @@ func (c *HTTPConnector) execMutationOperation(parentCtx context.Context, state *
 	var err error
 	if operation.Name == internal.ProcedureSendHTTPRequest {
 		requests, err = internal.NewRawRequestBuilder(operation, c.config.ForwardHeaders).Build()
-		requests.Operation = &c.procSendHttpRequest
+		if err == nil {
+			requests.Operation = &c.procSendHttpRequest
+		}
 	} else {
 		requests, err = c.explainProcedure(&operation)
 	}

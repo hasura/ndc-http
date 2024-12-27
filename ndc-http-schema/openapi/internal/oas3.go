@@ -32,6 +32,7 @@ type SchemaInfoCache struct {
 	TypeRead   schema.TypeEncoder
 	TypeWrite  schema.TypeEncoder
 	TypeSchema *rest.TypeSchema
+	OneOf      []SchemaInfoCache
 }
 
 // NewOAS3Builder creates an OAS3Builder instance
@@ -214,36 +215,24 @@ func (oc *OAS3Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v3.
 		}
 	}
 
-	procPost, procPostName, err := newOAS3OperationBuilder(oc, pathKey, "post", pathValue.Parameters).BuildProcedure(pathValue.Post)
+	err := newOAS3OperationBuilder(oc, pathKey, "post", pathValue.Parameters).BuildProcedure(pathValue.Post)
 	if err != nil {
 		return err
-	}
-	if procPost != nil {
-		oc.schema.Procedures[procPostName] = *procPost
 	}
 
-	procPut, procPutName, err := newOAS3OperationBuilder(oc, pathKey, "put", pathValue.Parameters).BuildProcedure(pathValue.Put)
+	err = newOAS3OperationBuilder(oc, pathKey, "put", pathValue.Parameters).BuildProcedure(pathValue.Put)
 	if err != nil {
 		return err
-	}
-	if procPut != nil {
-		oc.schema.Procedures[procPutName] = *procPut
 	}
 
-	procPatch, procPutName, err := newOAS3OperationBuilder(oc, pathKey, "patch", pathValue.Parameters).BuildProcedure(pathValue.Patch)
+	err = newOAS3OperationBuilder(oc, pathKey, "patch", pathValue.Parameters).BuildProcedure(pathValue.Patch)
 	if err != nil {
 		return err
-	}
-	if procPatch != nil {
-		oc.schema.Procedures[procPutName] = *procPatch
 	}
 
-	procDelete, procDeleteName, err := newOAS3OperationBuilder(oc, pathKey, "delete", pathValue.Parameters).BuildProcedure(pathValue.Delete)
+	err = newOAS3OperationBuilder(oc, pathKey, "delete", pathValue.Parameters).BuildProcedure(pathValue.Delete)
 	if err != nil {
 		return err
-	}
-	if procDelete != nil {
-		oc.schema.Procedures[procDeleteName] = *procDelete
 	}
 
 	return nil
@@ -314,14 +303,6 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 	}
 
 	return err
-}
-
-func (oc *OAS3Builder) trimPathPrefix(input string) string {
-	if oc.ConvertOptions.TrimPrefix == "" {
-		return input
-	}
-
-	return strings.TrimPrefix(input, oc.ConvertOptions.TrimPrefix)
 }
 
 // build a named type for JSON scalar

@@ -8,7 +8,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "BrowsersEnum",
+              "name": "GETBrowsersStats",
               "type": "named"
             }
           }
@@ -964,7 +964,6 @@
     "GETGeoStatsResultStats": {
       "fields": {
         "metrics": {
-          "description": "The individual events and their stats.",
           "type": {
             "type": "nullable",
             "underlying_type": {
@@ -1727,6 +1726,7 @@
     {
       "arguments": {
         "body": {
+          "description": "Request body of POST /oauth2/register",
           "type": {
             "name": "OAuth2ClientInput",
             "type": "named"
@@ -1879,18 +1879,6 @@
         "type": "boolean"
       }
     },
-    "BrowsersEnum": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "day",
-          "week",
-          "month"
-        ],
-        "type": "enum"
-      }
-    },
     "ContactdbCustomFieldType": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -1908,6 +1896,18 @@
       "comparison_operators": {},
       "representation": {
         "type": "float64"
+      }
+    },
+    "GETBrowsersStats": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "day",
+          "week",
+          "month"
+        ],
+        "type": "enum"
       }
     },
     "Int32": {

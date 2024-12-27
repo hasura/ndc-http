@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
+	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/schema"
 	"github.com/hasura/ndc-sdk-go/utils"
 )
@@ -27,7 +28,7 @@ func NewJSONDecoder(httpSchema *rest.NDCHttpSchema) *JSONDecoder {
 
 // Decode unmarshals json and evaluate the schema type.
 func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
-	underlyingType, _, err := UnwrapNullableType(resultType)
+	underlyingType, _, err := restUtils.UnwrapNullableType(resultType)
 	if err != nil {
 		return nil, err
 	}

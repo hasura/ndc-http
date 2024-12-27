@@ -14,7 +14,7 @@
     },
     "schemas": {
       "PetBody": {
-        "allOf": [
+        "oneOf": [
           {
             "$ref": "#/components/schemas/Dog"
           },
@@ -24,7 +24,7 @@
         ]
       },
       "Pet": {
-        "oneOf": [
+        "allOf": [
           {
             "$ref": "#/components/schemas/Dog"
           },
@@ -57,6 +57,10 @@
           },
           "icon": {
             "type": "string"
+          },
+          "starred_at": {
+            "type": "string",
+            "format": "data-time"
           }
         },
         "required": ["id", "type", "text"]
@@ -73,6 +77,10 @@
           },
           "age": {
             "type": "integer"
+          },
+          "starred_at": {
+            "type": "string",
+            "examples": ["\"2020-07-09T00:17:42Z\""]
           },
           "metadata": {
             "type": "array",
@@ -403,6 +411,32 @@
   },
   "paths": {
     "/pets": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Cat"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Dog"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "requestBody": {
           "required": true,

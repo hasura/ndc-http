@@ -40,13 +40,21 @@ You can use argument presets to set default values to request arguments. Argumen
           "value": 1
         },
         "targets": ["addPet"]
+      },
+      {
+        "path": "body.categories[*].id",
+        "value": {
+          "type": "literal",
+          "value": 1
+        },
+        "targets": []
       }
     ]
   }
 }
 ```
 
-The target argument field is removed from the `arguments` schema if the selector is the root field. If the path selects the nested field the target field becomes nullable.
+The target argument field is removed from the `arguments` schema if the selector is the root field. If the path selects the nested field the target field becomes nullable. Support object properties and array selectors.
 
 ## Configuration options
 

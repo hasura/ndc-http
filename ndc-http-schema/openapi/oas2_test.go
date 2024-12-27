@@ -86,7 +86,12 @@ func TestOpenAPIv2ToRESTSchema(t *testing.T) {
 				t.FailNow()
 			}
 
-			assertRESTSchemaEqual(t, &expected, output)
+			bs, err := json.Marshal(output)
+			assert.NilError(t, err)
+
+			var result rest.NDCHttpSchema
+			assert.NilError(t, json.Unmarshal(bs, &result))
+			assertRESTSchemaEqual(t, &expected, &result)
 			assertConnectorSchema(t, tc.Schema, output)
 		})
 	}

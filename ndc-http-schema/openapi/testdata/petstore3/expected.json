@@ -76,7 +76,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "InvoicesCollectionMethod",
+              "name": "GetInvoicesCollectionMethod",
               "type": "named"
             }
           },
@@ -105,9 +105,7 @@
             "explode": true,
             "name": "created",
             "in": "query",
-            "schema": {
-              "type": []
-            }
+            "schema": {}
           }
         },
         "customer": {
@@ -144,9 +142,7 @@
             "explode": true,
             "name": "due_date",
             "in": "query",
-            "schema": {
-              "type": []
-            }
+            "schema": {}
           }
         },
         "ending_before": {
@@ -246,7 +242,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "InvoicesStatus",
+              "name": "GetInvoicesStatus",
               "type": "named"
             }
           },
@@ -330,7 +326,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetStatus",
+              "name": "FindPetsByStatusStatus",
               "type": "named"
             }
           },
@@ -582,7 +578,7 @@
         "in": {
           "description": "Where to search and apply a XPath expression: either the list of projects or the list of packages.  Example of a result when `projects` is selected: ```                                      x86_64                        x86_64                Standard OBS instance at build.opensuse.org     This instance delivers the default build targets for OBS.     https://api.opensuse.org/public     ```  Example of a result when `packages` is selected: ```                   ```",
           "type": {
-            "name": "SearchIn",
+            "name": "GetSearchXmlIn",
             "type": "named"
           },
           "http": {
@@ -759,6 +755,69 @@
     }
   },
   "object_types": {
+    "Address": {
+      "fields": {
+        "city": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "state": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "street": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "zip": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "xml": {
+        "name": "address"
+      }
+    },
     "AddressInput": {
       "fields": {
         "city": {
@@ -1211,6 +1270,136 @@
         }
       }
     },
+    "Customer": {
+      "fields": {
+        "address": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "Address",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "address"
+              }
+            },
+            "xml": {
+              "name": "addresses",
+              "wrapped": true
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "username": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "xml": {
+        "name": "customer"
+      }
+    },
+    "CustomerInput": {
+      "fields": {
+        "address": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "AddressInput",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "address"
+              }
+            },
+            "xml": {
+              "name": "addresses",
+              "wrapped": true
+            }
+          }
+        },
+        "id": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int64",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "format": "int64"
+          }
+        },
+        "username": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      },
+      "xml": {
+        "name": "customer"
+      }
+    },
     "GetArchitecturesResult": {
       "fields": {
         "count": {
@@ -1429,7 +1618,7 @@
         "object": {
           "description": "String representing the object's type. Objects of the same type share the same value. Always has the value `list`.",
           "type": {
-            "name": "InvoicesObject",
+            "name": "GetInvoicesResultObject",
             "type": "named"
           },
           "http": {
@@ -1717,6 +1906,23 @@
             ]
           }
         },
+        "customer": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Customer",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ],
+            "xml": {
+              "name": "customer"
+            }
+          }
+        },
         "id": {
           "type": {
             "type": "nullable",
@@ -1811,6 +2017,23 @@
             "type": [
               "boolean"
             ]
+          }
+        },
+        "customer": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "CustomerInput",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ],
+            "xml": {
+              "name": "customer"
+            }
           }
         },
         "id": {
@@ -1921,9 +2144,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "id": {
           "type": {
@@ -2052,9 +2273,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "id": {
           "type": {
@@ -2336,7 +2555,7 @@
         },
         "type": {
           "type": {
-            "name": "CheckoutType",
+            "name": "PostCheckoutSessionsBodyAutomaticTaxLiabilityType",
             "type": "named"
           },
           "http": {
@@ -2368,7 +2587,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutPromotions",
+              "name": "PostCheckoutSessionsBodyConsentCollectionPromotions",
               "type": "named"
             }
           },
@@ -2382,7 +2601,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutTermsOfService",
+              "name": "PostCheckoutSessionsBodyConsentCollectionTermsOfService",
               "type": "named"
             }
           },
@@ -2398,7 +2617,7 @@
       "fields": {
         "position": {
           "type": {
-            "name": "CheckoutPosition",
+            "name": "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementPosition",
             "type": "named"
           },
           "http": {
@@ -2777,7 +2996,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutAddress",
+              "name": "PostCheckoutSessionsBodyCustomerUpdateAddress",
               "type": "named"
             }
           },
@@ -2791,7 +3010,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutName",
+              "name": "PostCheckoutSessionsBodyCustomerUpdateName",
               "type": "named"
             }
           },
@@ -2805,7 +3024,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutShipping",
+              "name": "PostCheckoutSessionsBodyCustomerUpdateShipping",
               "type": "named"
             }
           },
@@ -2903,7 +3122,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutBillingAddressCollection",
+              "name": "PostCheckoutSessionsBodyBillingAddressCollection",
               "type": "named"
             }
           },
@@ -3034,7 +3253,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutCustomerCreation",
+              "name": "PostCheckoutSessionsBodyCustomerCreation",
               "type": "named"
             }
           },
@@ -3180,7 +3399,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutLocale",
+              "name": "PostCheckoutSessionsBodyLocale",
               "type": "named"
             }
           },
@@ -3210,7 +3429,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutMode",
+              "name": "PostCheckoutSessionsBodyMode",
               "type": "named"
             }
           },
@@ -3240,7 +3459,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutPaymentMethodCollection",
+              "name": "PostCheckoutSessionsBodyPaymentMethodCollection",
               "type": "named"
             }
           },
@@ -3287,7 +3506,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "CheckoutPaymentMethodTypes",
+                "name": "PostCheckoutSessionsBodyPaymentMethodTypes",
                 "type": "named"
               },
               "type": "array"
@@ -3324,7 +3543,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutRedirectOnCompletion",
+              "name": "PostCheckoutSessionsBodyRedirectOnCompletion",
               "type": "named"
             }
           },
@@ -3408,7 +3627,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutSubmitType",
+              "name": "PostCheckoutSessionsBodySubmitType",
               "type": "named"
             }
           },
@@ -3469,7 +3688,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutUiMode",
+              "name": "PostCheckoutSessionsBodyUiMode",
               "type": "named"
             }
           },
@@ -3678,7 +3897,7 @@
         },
         "type": {
           "type": {
-            "name": "CheckoutType",
+            "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerType",
             "type": "named"
           },
           "http": {
@@ -3695,7 +3914,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutAmountTaxDisplay",
+              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAmountTaxDisplay",
               "type": "named"
             }
           },
@@ -3917,7 +4136,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutTaxBehavior",
+              "name": "PostCheckoutSessionsBodyLineItemsPriceDataTaxBehavior",
               "type": "named"
             }
           },
@@ -4044,7 +4263,7 @@
       "fields": {
         "interval": {
           "type": {
-            "name": "CheckoutInterval",
+            "name": "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInterval",
             "type": "named"
           },
           "http": {
@@ -4090,7 +4309,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutCaptureMethod",
+              "name": "PostCheckoutSessionsBodyPaymentIntentDataCaptureMethod",
               "type": "named"
             }
           },
@@ -4161,7 +4380,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentIntentDataSetupFutureUsage",
               "type": "named"
             }
           },
@@ -4460,7 +4679,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutCurrency",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitCurrency",
               "type": "named"
             }
           },
@@ -4502,7 +4721,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutVerificationMethod",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitVerificationMethod",
               "type": "named"
             }
           },
@@ -4535,7 +4754,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "CheckoutDefaultFor",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsDefaultFor",
                 "type": "named"
               },
               "type": "array"
@@ -4571,7 +4790,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutPaymentSchedule",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsPaymentSchedule",
               "type": "named"
             }
           },
@@ -4585,7 +4804,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutTransactionType",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsTransactionType",
               "type": "named"
             }
           },
@@ -4757,7 +4976,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutRequestThreeDSecure",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardRequestThreeDSecure",
               "type": "named"
             }
           },
@@ -4771,7 +4990,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardSetupFutureUsage",
               "type": "named"
             }
           },
@@ -4886,7 +5105,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "CheckoutRequestedAddressTypes",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferRequestedAddressTypes",
                 "type": "named"
               },
               "type": "array"
@@ -4936,7 +5155,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutFundingType",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceFundingType",
               "type": "named"
             }
           },
@@ -5647,7 +5866,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutPreferredLocale",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalPreferredLocale",
               "type": "named"
             }
           },
@@ -5801,7 +6020,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "CheckoutPermissions",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPermissions",
                 "type": "named"
               },
               "type": "array"
@@ -5824,7 +6043,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "CheckoutPrefetch",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPrefetch",
                 "type": "named"
               },
               "type": "array"
@@ -5908,7 +6127,7 @@
         },
         "client": {
           "type": {
-            "name": "CheckoutClient",
+            "name": "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayClient",
             "type": "named"
           },
           "http": {
@@ -6003,7 +6222,7 @@
         "allowed_countries": {
           "type": {
             "element_type": {
-              "name": "CheckoutAllowedCountries",
+              "name": "PostCheckoutSessionsBodyShippingAddressCollectionAllowedCountries",
               "type": "named"
             },
             "type": "array"
@@ -6090,7 +6309,7 @@
       "fields": {
         "unit": {
           "type": {
-            "name": "CheckoutUnit",
+            "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumUnit",
             "type": "named"
           },
           "http": {
@@ -6116,7 +6335,7 @@
       "fields": {
         "unit": {
           "type": {
-            "name": "CheckoutUnit",
+            "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumUnit",
             "type": "named"
           },
           "http": {
@@ -6238,7 +6457,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutTaxBehavior",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTaxBehavior",
               "type": "named"
             }
           },
@@ -6394,7 +6613,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "CheckoutProrationBehavior",
+              "name": "PostCheckoutSessionsBodySubscriptionDataProrationBehavior",
               "type": "named"
             }
           },
@@ -6499,7 +6718,7 @@
         },
         "type": {
           "type": {
-            "name": "CheckoutType",
+            "name": "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerType",
             "type": "named"
           },
           "http": {
@@ -6543,7 +6762,7 @@
       "fields": {
         "missing_payment_method": {
           "type": {
-            "name": "CheckoutMissingPaymentMethod",
+            "name": "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorMissingPaymentMethod",
             "type": "named"
           },
           "http": {
@@ -6622,9 +6841,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": []
-          }
+          "http": {}
         }
       }
     },
@@ -6708,7 +6925,7 @@
         "purpose": {
           "description": "The [purpose](https://stripe.com/docs/file-upload#uploading-a-file) of the uploaded file.",
           "type": {
-            "name": "FilesPurpose",
+            "name": "PostFilesBodyPurpose",
             "type": "named"
           },
           "http": {
@@ -6726,7 +6943,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "TestHelpersCode",
+              "name": "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsCode",
               "type": "named"
             }
           },
@@ -7525,9 +7742,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": null
-          }
+          "http": {}
         },
         "created": {
           "description": "Time at which the object was created. Measured in seconds since the Unix epoch.",
@@ -7736,9 +7951,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": []
-          }
+          "http": {}
         }
       }
     },
@@ -8190,7 +8403,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -8229,7 +8447,12 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -8343,7 +8566,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         }
       },
@@ -8408,7 +8636,12 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "headerXRateLimitLimit": {
@@ -8465,7 +8698,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "id": {
@@ -8519,7 +8757,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "pet"
+              }
+            }
           }
         }
       },
@@ -8563,7 +8809,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "CreateFineTuningJobRequest"
+              }
+            }
           }
         }
       },
@@ -8598,7 +8852,20 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "type": [
+                  "object"
+                ],
+                "xml": {
+                  "name": "user"
+                }
+              }
+            }
           }
         }
       },
@@ -8763,7 +9030,15 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "order"
+              }
+            }
           }
         }
       },
@@ -8795,7 +9070,17 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "book",
+                "prefix": "smp",
+                "namespace": "http://example.com/schema"
+              }
+            }
           }
         }
       },
@@ -8827,7 +9112,15 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "comments"
+              }
+            }
           }
         }
       },
@@ -8864,7 +9157,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "pet"
+              }
+            }
           }
         }
       },
@@ -8901,7 +9202,15 @@
             "type": "named"
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ],
+              "xml": {
+                "name": "pet"
+              }
+            }
           }
         }
       },
@@ -9042,7 +9351,13 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "string"
+              ],
+              "format": "binary"
+            }
           }
         },
         "petId": {
@@ -9110,7 +9425,12 @@
             }
           },
           "http": {
-            "in": "body"
+            "in": "body",
+            "schema": {
+              "type": [
+                "object"
+              ]
+            }
           }
         },
         "headerXRateLimitLimit": {
@@ -9162,448 +9482,14 @@
         "type": "boolean"
       }
     },
-    "CheckoutAddress": {
+    "FindPetsByStatusStatus": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
         "one_of": [
-          "auto",
-          "never"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutAllowedCountries": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "AC",
-          "AD"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutAmountTaxDisplay": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "",
-          "exclude_tax",
-          "include_inclusive_tax"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutBillingAddressCollection": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "auto",
-          "required"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutCaptureMethod": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "automatic",
-          "automatic_async",
-          "manual"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutClient": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "android",
-          "ios",
-          "web"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutCurrency": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "cad",
-          "usd"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutCustomerCreation": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "always",
-          "if_required"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutDefaultFor": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "invoice",
-          "subscription"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutFundingType": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "bank_transfer"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutInterval": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "day",
-          "month",
-          "week",
-          "year"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutLocale": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "auto",
-          "bg",
-          "cs"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutMissingPaymentMethod": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "cancel",
-          "create_invoice",
-          "pause"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutMode": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "payment",
-          "setup",
-          "subscription"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutName": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "auto",
-          "never"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPaymentMethodCollection": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "always",
-          "if_required"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPaymentMethodTypes": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "acss_debit",
-          "affirm"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPaymentSchedule": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "combined",
-          "interval",
-          "sporadic"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPermissions": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "balances",
-          "ownership",
-          "payment_method",
-          "transactions"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPosition": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "auto",
-          "hidden"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPreferredLocale": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "cs-CZ",
-          "da-DK"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPrefetch": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "balances",
-          "transactions"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutPromotions": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "auto",
-          "none"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutProrationBehavior": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "create_prorations",
-          "none"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutRedirectOnCompletion": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "always",
-          "if_required",
-          "never"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutRequestThreeDSecure": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "any",
-          "automatic",
-          "challenge"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutRequestedAddressTypes": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "aba",
-          "iban"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutSetupFutureUsage": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "off_session",
-          "on_session"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutShipping": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "auto",
-          "never"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutSubmitType": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "auto",
-          "book",
-          "donate",
-          "pay"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutTaxBehavior": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "exclusive",
-          "inclusive",
-          "unspecified"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutTermsOfService": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "none",
-          "required"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutTransactionType": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "business",
-          "personal"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutType": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "account",
-          "self"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutUiMode": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "embedded",
-          "hosted"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutUnit": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "business_day",
-          "day",
-          "hour",
-          "month",
-          "week"
-        ],
-        "type": "enum"
-      }
-    },
-    "CheckoutVerificationMethod": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "automatic",
-          "instant",
-          "microdeposits"
-        ],
-        "type": "enum"
-      }
-    },
-    "FilesPurpose": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "account_requirement",
-          "additional_verification",
-          "business_icon",
-          "business_logo",
-          "customer_signature",
-          "dispute_evidence",
-          "identity_document",
-          "issuing_regulatory_reporting",
-          "pci_document",
-          "tax_document_user_upload",
-          "terminal_reader_splashscreen"
+          "available",
+          "pending",
+          "sold"
         ],
         "type": "enum"
       }
@@ -9613,6 +9499,52 @@
       "comparison_operators": {},
       "representation": {
         "type": "float64"
+      }
+    },
+    "GetInvoicesCollectionMethod": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "charge_automatically",
+          "send_invoice"
+        ],
+        "type": "enum"
+      }
+    },
+    "GetInvoicesResultObject": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "list"
+        ],
+        "type": "enum"
+      }
+    },
+    "GetInvoicesStatus": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "draft",
+          "open",
+          "paid",
+          "uncollectible",
+          "void"
+        ],
+        "type": "enum"
+      }
+    },
+    "GetSearchXmlIn": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "projects",
+          "packages"
+        ],
+        "type": "enum"
       }
     },
     "Int32": {
@@ -9627,41 +9559,6 @@
       "comparison_operators": {},
       "representation": {
         "type": "int64"
-      }
-    },
-    "InvoicesCollectionMethod": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "charge_automatically",
-          "send_invoice"
-        ],
-        "type": "enum"
-      }
-    },
-    "InvoicesObject": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "list"
-        ],
-        "type": "enum"
-      }
-    },
-    "InvoicesStatus": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "draft",
-          "open",
-          "paid",
-          "uncollectible",
-          "void"
-        ],
-        "type": "enum"
       }
     },
     "JSON": {
@@ -9702,6 +9599,61 @@
         "type": "enum"
       }
     },
+    "PostCheckoutSessionsBodyAutomaticTaxLiabilityType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "account",
+          "self"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyBillingAddressCollection": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "auto",
+          "required"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementPosition": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "auto",
+          "hidden"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyConsentCollectionPromotions": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "auto",
+          "none"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyConsentCollectionTermsOfService": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "none",
+          "required"
+        ],
+        "type": "enum"
+      }
+    },
     "PostCheckoutSessionsBodyCustomFieldsLabelType": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -9724,6 +9676,201 @@
         "type": "enum"
       }
     },
+    "PostCheckoutSessionsBodyCustomerCreation": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "always",
+          "if_required"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyCustomerUpdateAddress": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "auto",
+          "never"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyCustomerUpdateName": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "auto",
+          "never"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyCustomerUpdateShipping": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "auto",
+          "never"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "account",
+          "self"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAmountTaxDisplay": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "",
+          "exclude_tax",
+          "include_inclusive_tax"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInterval": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "day",
+          "month",
+          "week",
+          "year"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyLineItemsPriceDataTaxBehavior": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "exclusive",
+          "inclusive",
+          "unspecified"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyLocale": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "auto",
+          "bg",
+          "cs"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyMode": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "payment",
+          "setup",
+          "subscription"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentIntentDataCaptureMethod": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "automatic",
+          "automatic_async",
+          "manual"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentIntentDataSetupFutureUsage": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "off_session",
+          "on_session"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodCollection": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "always",
+          "if_required"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitCurrency": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cad",
+          "usd"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsDefaultFor": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "invoice",
+          "subscription"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsPaymentSchedule": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "combined",
+          "interval",
+          "sporadic"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsTransactionType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "business",
+          "personal"
+        ],
+        "type": "enum"
+      }
+    },
     "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitSetupFutureUsage": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -9732,6 +9879,18 @@
           "none",
           "off_session",
           "on_session"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitVerificationMethod": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "automatic",
+          "instant",
+          "microdeposits"
         ],
         "type": "enum"
       }
@@ -9810,6 +9969,29 @@
         "type": "enum"
       }
     },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCardRequestThreeDSecure": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "any",
+          "automatic",
+          "challenge"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCardSetupFutureUsage": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "off_session",
+          "on_session"
+        ],
+        "type": "enum"
+      }
+    },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCashappSetupFutureUsage": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -9822,6 +10004,17 @@
         "type": "enum"
       }
     },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferRequestedAddressTypes": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "aba",
+          "iban"
+        ],
+        "type": "enum"
+      }
+    },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferType": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -9829,6 +10022,16 @@
         "one_of": [
           "eu_bank_transfer",
           "gb_bank_transfer"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceFundingType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "bank_transfer"
         ],
         "type": "enum"
       }
@@ -9965,6 +10168,17 @@
         "type": "enum"
       }
     },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalPreferredLocale": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cs-CZ",
+          "da-DK"
+        ],
+        "type": "enum"
+      }
+    },
     "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalSetupFutureUsage": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -10010,6 +10224,30 @@
         "type": "enum"
       }
     },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPermissions": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "balances",
+          "ownership",
+          "payment_method",
+          "transactions"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPrefetch": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "balances",
+          "transactions"
+        ],
+        "type": "enum"
+      }
+    },
     "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountSetupFutureUsage": {
       "aggregate_functions": {},
       "comparison_operators": {},
@@ -10033,12 +10271,98 @@
         "type": "enum"
       }
     },
+    "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayClient": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "android",
+          "ios",
+          "web"
+        ],
+        "type": "enum"
+      }
+    },
     "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPaySetupFutureUsage": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
         "one_of": [
           "none"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyPaymentMethodTypes": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "acss_debit",
+          "affirm"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyRedirectOnCompletion": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "always",
+          "if_required",
+          "never"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyShippingAddressCollectionAllowedCountries": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "AC",
+          "AD"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumUnit": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "business_day",
+          "day",
+          "hour",
+          "month",
+          "week"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumUnit": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "business_day",
+          "day",
+          "hour",
+          "month",
+          "week"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTaxBehavior": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "exclusive",
+          "inclusive",
+          "unspecified"
         ],
         "type": "enum"
       }
@@ -10053,13 +10377,102 @@
         "type": "enum"
       }
     },
-    "SearchIn": {
+    "PostCheckoutSessionsBodySubmitType": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
         "one_of": [
-          "projects",
-          "packages"
+          "auto",
+          "book",
+          "donate",
+          "pay"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "account",
+          "self"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodySubscriptionDataProrationBehavior": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "create_prorations",
+          "none"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorMissingPaymentMethod": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "cancel",
+          "create_invoice",
+          "pause"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostCheckoutSessionsBodyUiMode": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "embedded",
+          "hosted"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostFilesBodyPurpose": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "account_requirement",
+          "additional_verification",
+          "business_icon",
+          "business_logo",
+          "customer_signature",
+          "dispute_evidence",
+          "identity_document",
+          "issuing_regulatory_reporting",
+          "pci_document",
+          "tax_document_user_upload",
+          "terminal_reader_splashscreen"
+        ],
+        "type": "enum"
+      }
+    },
+    "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsCode": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "account_closed",
+          "account_frozen",
+          "bank_account_restricted",
+          "bank_ownership_changed",
+          "debit_not_authorized",
+          "incorrect_account_holder_address",
+          "incorrect_account_holder_name",
+          "incorrect_account_holder_tax_id",
+          "insufficient_funds",
+          "invalid_account_number",
+          "invalid_currency",
+          "no_account",
+          "other"
         ],
         "type": "enum"
       }
@@ -10081,28 +10494,6 @@
       "comparison_operators": {},
       "representation": {
         "type": "string"
-      }
-    },
-    "TestHelpersCode": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "one_of": [
-          "account_closed",
-          "account_frozen",
-          "bank_account_restricted",
-          "bank_ownership_changed",
-          "debit_not_authorized",
-          "incorrect_account_holder_address",
-          "incorrect_account_holder_name",
-          "incorrect_account_holder_tax_id",
-          "insufficient_funds",
-          "invalid_account_number",
-          "invalid_currency",
-          "no_account",
-          "other"
-        ],
-        "type": "enum"
       }
     },
     "TimestampTZ": {
