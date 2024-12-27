@@ -4,6 +4,7 @@ packagingDefinition:
 supportedEnvironmentVariables: []
 commands:
   update: ndc-http-schema update
+  upgradeConfiguration: ndc-http-schema version
 cliPlugin:
   name: ndc-http
   version: "{{VERSION}}"
