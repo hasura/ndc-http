@@ -377,7 +377,7 @@ func buildDistributedResultObjectType(restSchema *rest.NDCHttpSchema, operationN
 					Type:        schema.NewNamedType(rest.HTTPServerIDScalarName).Encode(),
 				},
 			},
-			DistributedObjectResultsDataKey: {
+			"data": {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("A result of " + operationName),
 					Type:        underlyingType,
@@ -389,13 +389,13 @@ func buildDistributedResultObjectType(restSchema *rest.NDCHttpSchema, operationN
 	restSchema.ObjectTypes[distResultType] = rest.ObjectType{
 		Description: utils.ToPtr("Distributed responses of " + operationName),
 		Fields: map[string]rest.ObjectField{
-			DistributedObjectResultsKey: {
+			"results": {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("Results of " + operationName),
 					Type:        schema.NewArrayType(schema.NewNamedType(distResultDataType)).Encode(),
 				},
 			},
-			DistributedObjectErrorsKey: {
+			"errors": {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("Error responses of " + operationName),
 					Type:        schema.NewArrayType(schema.NewNamedType(rest.DistributedErrorObjectName)).Encode(),
@@ -438,9 +438,9 @@ func cloneOperationInfo(operation rest.OperationInfo, req *rest.Request) rest.Op
 	}
 
 	originalResultType := operation.OriginalResultType
-	// if len(operation.OriginalResultType) == 0 {
-	// 	originalResultType = operation.ResultType
-	// }
+	if len(operation.OriginalResultType) == 0 {
+		originalResultType = operation.ResultType
+	}
 
 	return rest.OperationInfo{
 		Request:            req,

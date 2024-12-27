@@ -94,6 +94,7 @@ type DistributedResponse[T any] struct {
 	Errors  []DistributedError     `json:"errors"  yaml:"errors"`
 }
 
+// ToMap serializes the distributed response to a map
 func (dr DistributedResponse[T]) ToMap() map[string]any {
 	results := make([]map[string]any, len(dr.Results))
 	for i, result := range dr.Results {

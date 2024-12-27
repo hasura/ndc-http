@@ -250,12 +250,6 @@ type ConvertCommandArguments struct {
 	PatchAfter          []string          `help:"Patch files to be applied into the input file after converting"`
 }
 
-const (
-	DistributedObjectResultsKey     = "results"
-	DistributedObjectErrorsKey      = "errors"
-	DistributedObjectResultsDataKey = "data"
-)
-
 // the object type of HTTP execution options for single server
 var singleObjectType = rest.ObjectType{
 	Description: utils.ToPtr("Execution options for HTTP requests to a single server"),
