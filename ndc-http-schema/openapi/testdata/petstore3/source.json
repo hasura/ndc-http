@@ -1557,8 +1557,7 @@
                         "x-stripeBypassValidation": true
                       }
                     },
-                    "title": "customer_update_params",
-                    "type": "object"
+                    "title": "customer_update_params"
                   },
                   "discounts": {
                     "description": "The coupon or promotion code to apply to this Session. Currently, only up to one may be specified.",
@@ -3970,6 +3969,7 @@
           },
           "tags": {
             "type": "array",
+            "additionalProperties": true,
             "xml": {
               "wrapped": true
             },
@@ -4369,7 +4369,6 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
               "items": {
                 "$ref": "#/components/schemas/User"
               }

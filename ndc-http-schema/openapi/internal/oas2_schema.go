@@ -60,44 +60,41 @@ func (oc *oas2SchemaBuilder) getSchemaTypeFromParameter(param *v2.Parameter, fie
 }
 
 // get and convert an OpenAPI data type to a NDC type
-func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths []string) (*SchemaInfoCache, error) {
-	if typeSchema == nil {
+func (oc *oas2SchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []string) (*SchemaInfoCache, error) {
+	if baseSchema == nil {
 		return nil, errParameterSchemaEmpty(fieldPaths)
 	}
 
-	if oc.builder.ConvertOptions.NoDeprecation && typeSchema.Deprecated != nil && *typeSchema.Deprecated {
+	if oc.builder.ConvertOptions.NoDeprecation && baseSchema.Deprecated != nil && *baseSchema.Deprecated {
 		return nil, nil
 	}
 
-	if len(typeSchema.AllOf) > 0 {
-		return oc.buildUnionSchemaType(typeSchema, typeSchema.AllOf, oasAllOf, fieldPaths)
+	if len(baseSchema.AllOf) > 0 {
+		return oc.buildUnionSchemaType(baseSchema, baseSchema.AllOf, oasAllOf, fieldPaths)
 	}
 
-	if len(typeSchema.AnyOf) > 0 {
-		return oc.buildUnionSchemaType(typeSchema, typeSchema.AnyOf, oasAnyOf, fieldPaths)
+	if len(baseSchema.AnyOf) > 0 {
+		return oc.buildUnionSchemaType(baseSchema, baseSchema.AnyOf, oasAnyOf, fieldPaths)
 	}
 
-	if len(typeSchema.OneOf) > 0 {
-		return oc.buildUnionSchemaType(typeSchema, typeSchema.OneOf, oasOneOf, fieldPaths)
+	if len(baseSchema.OneOf) > 0 {
+		return oc.buildUnionSchemaType(baseSchema, baseSchema.OneOf, oasOneOf, fieldPaths)
 	}
 
-	oasTypes, nullable := extractNullableFromOASTypes(typeSchema.Type)
-	nullable = nullable || (typeSchema.Nullable != nil && *typeSchema.Nullable)
-	if typeSchema.AdditionalProperties != nil && (typeSchema.AdditionalProperties.B || typeSchema.AdditionalProperties.A != nil) {
-		var result schema.TypeEncoder = oc.builder.buildScalarJSON()
-		if nullable {
-			result = schema.NewNullableType(result)
+	oasTypes, nullable := extractNullableFromOASTypes(baseSchema.Type)
+	nullable = nullable || (baseSchema.Nullable != nil && *baseSchema.Nullable)
+
+	if len(oasTypes) == 0 {
+		// if the OAS schema has properties or items we can consider this type as an object or array
+		if baseSchema.Properties != nil && baseSchema.Properties.Len() > 0 {
+			oasTypes = []string{"object"}
+		} else if baseSchema.Items != nil && baseSchema.Items.A != nil {
+			oasTypes = []string{"array"}
 		}
-
-		return &SchemaInfoCache{
-			TypeRead:   result,
-			TypeWrite:  result,
-			TypeSchema: createSchemaFromOpenAPISchema(typeSchema),
-		}, nil
 	}
 
 	if len(oasTypes) != 1 || isPrimitiveScalar(oasTypes) {
-		scalarName := getScalarFromType(oc.builder.schema, oasTypes, typeSchema.Format, typeSchema.Enum, fieldPaths)
+		scalarName := getScalarFromType(oc.builder.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
 		var resultType schema.TypeEncoder = schema.NewNamedType(scalarName)
 		if nullable {
 			resultType = schema.NewNullableType(resultType)
@@ -106,7 +103,7 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		return &SchemaInfoCache{
 			TypeRead:   resultType,
 			TypeWrite:  resultType,
-			TypeSchema: createSchemaFromOpenAPISchema(typeSchema),
+			TypeSchema: createSchemaFromOpenAPISchema(baseSchema),
 		}, nil
 	}
 
@@ -115,14 +112,14 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 	typeName := oasTypes[0]
 	switch typeName {
 	case "object":
-		typeResult, err = oc.evalObjectType(typeSchema, fieldPaths)
+		typeResult, err = oc.evalObjectType(baseSchema, fieldPaths)
 		if err != nil {
 			return nil, err
 		}
 	case "array":
 		var itemSchema *SchemaInfoCache
-		if typeSchema.Items != nil || typeSchema.Items.A != nil {
-			itemSchema, err = oc.getSchemaTypeFromProxy(typeSchema.Items.A, false, fieldPaths)
+		if baseSchema.Items != nil || baseSchema.Items.A != nil {
+			itemSchema, err = oc.getSchemaTypeFromProxy(baseSchema.Items.A, false, fieldPaths)
 			if err != nil {
 				return nil, err
 			}
@@ -136,7 +133,7 @@ func (oc *oas2SchemaBuilder) getSchemaType(typeSchema *base.Schema, fieldPaths [
 		}
 
 		typeResult = &SchemaInfoCache{
-			TypeSchema: createSchemaFromOpenAPISchema(typeSchema),
+			TypeSchema: createSchemaFromOpenAPISchema(baseSchema),
 			TypeRead:   schema.NewArrayType(itemSchema.TypeRead),
 			TypeWrite:  schema.NewArrayType(itemSchema.TypeWrite),
 		}
@@ -161,7 +158,7 @@ func (oc *oas2SchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths 
 	typeResult := createSchemaFromOpenAPISchema(baseSchema)
 	refName := utils.StringSliceToPascalCase(fieldPaths)
 
-	if baseSchema.Properties == nil || baseSchema.Properties.IsZero() {
+	if baseSchema.Properties == nil || baseSchema.Properties.IsZero() || (baseSchema.AdditionalProperties != nil && (baseSchema.AdditionalProperties.B || baseSchema.AdditionalProperties.A != nil)) {
 		// treat no-property objects as a JSON scalar
 		var scalarType schema.TypeEncoder = oc.builder.buildScalarJSON()
 		if baseSchema.Nullable != nil && *baseSchema.Nullable {

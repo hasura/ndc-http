@@ -3287,11 +3287,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "type": [
-              "object"
-            ]
-          }
+          "http": {}
         },
         "discounts": {
           "description": "The coupon or promotion code to apply to this Session. Currently, only up to one may be specified.",
