@@ -578,8 +578,11 @@ func TestHTTPConnector_distribution(t *testing.T) {
 		var body []struct {
 			Rows []struct {
 				Value struct {
-					Errors  []internal.DistributedError                           `json:"errors"`
-					Results []internal.DistributedResult[[]distributedResultData] `json:"results"`
+					Headers  map[string]string `json:"headers"`
+					Response struct {
+						Errors  []internal.DistributedError                           `json:"errors"`
+						Results []internal.DistributedResult[[]distributedResultData] `json:"results"`
+					} `json:"response"`
 				} `json:"__value"`
 			} `json:"rows"`
 		}
@@ -589,14 +592,14 @@ func TestHTTPConnector_distribution(t *testing.T) {
 
 		assert.Equal(t, 1, len(body))
 		row := body[0].Rows[0]
-		assert.Equal(t, 0, len(row.Value.Errors))
-		assert.Equal(t, 2, len(row.Value.Results))
+		assert.Equal(t, 0, len(row.Value.Response.Errors))
+		assert.Equal(t, 2, len(row.Value.Response.Results))
 
-		slices.SortFunc(row.Value.Results, func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
+		slices.SortFunc(row.Value.Response.Results, func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
 			return strings.Compare(a.Server, b.Server)
 		})
 
-		assert.DeepEqual(t, expectedResults, row.Value.Results)
+		assert.DeepEqual(t, expectedResults, row.Value.Response.Results)
 
 		assert.Equal(t, int32(1), mock.catCount)
 		assert.Equal(t, int32(1), mock.dogCount)
@@ -653,8 +656,11 @@ func TestHTTPConnector_distribution(t *testing.T) {
 		var body struct {
 			OperationResults []struct {
 				Result struct {
-					Errors  []internal.DistributedError                           `json:"errors"`
-					Results []internal.DistributedResult[[]distributedResultData] `json:"results"`
+					Headers  map[string]string `json:"headers"`
+					Response struct {
+						Errors  []internal.DistributedError                           `json:"errors"`
+						Results []internal.DistributedResult[[]distributedResultData] `json:"results"`
+					} `json:"response"`
 				} `json:"result"`
 			} `json:"operation_results"`
 		}
@@ -663,14 +669,14 @@ func TestHTTPConnector_distribution(t *testing.T) {
 		}
 
 		row := body.OperationResults[0].Result
-		assert.Equal(t, 0, len(row.Errors))
-		assert.Equal(t, 2, len(row.Results))
+		assert.Equal(t, 0, len(row.Response.Errors))
+		assert.Equal(t, 2, len(row.Response.Results))
 
-		slices.SortFunc(row.Results, func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
+		slices.SortFunc(row.Response.Results, func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
 			return strings.Compare(a.Server, b.Server)
 		})
 
-		assert.DeepEqual(t, expectedResults, row.Results)
+		assert.DeepEqual(t, expectedResults, row.Response.Results)
 		assert.Equal(t, int32(1), mock.catCount)
 		assert.Equal(t, int32(1), mock.dogCount)
 	})
@@ -718,15 +724,20 @@ func TestHTTPConnector_distribution(t *testing.T) {
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
 				Rows: []map[string]any{
-
 					{"__value": map[string]any{
-						"errors": []any{},
-						"results": []any{
-							map[string]any{
-								"data": []any{
-									map[string]any{"name": "cat"},
+						"headers": map[string]any{
+							"Content-Length": "17",
+							"Content-Type":   "application/json",
+						},
+						"response": map[string]any{
+							"errors": []any{},
+							"results": []any{
+								map[string]any{
+									"data": []any{
+										map[string]any{"name": "cat"},
+									},
+									"server": string("cat"),
 								},
-								"server": string("cat"),
 							},
 						},
 					}},

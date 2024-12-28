@@ -150,7 +150,7 @@ func TestConvertToNDCSchema(t *testing.T) {
 				t.Errorf("cannot decode the output file json at %s: %s", tc.expected, err)
 				t.FailNow()
 			}
-			assertDeepEqual(t, expectedSchema.Settings, output.Settings)
+			assert.DeepEqual(t, expectedSchema.Settings, output.Settings)
 			assert.DeepEqual(t, expectedSchema.Functions, output.Functions)
 			assert.DeepEqual(t, expectedSchema.Procedures, output.Procedures)
 			assert.DeepEqual(t, expectedSchema.ScalarTypes, output.ScalarTypes)

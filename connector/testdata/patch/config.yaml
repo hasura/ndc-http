@@ -1,3 +1,18 @@
+# yaml-language-server: $schema=../../../ndc-http-schema/jsonschema/configuration.schema.json
+strict: true
+concurrency:
+  query: 1
+  mutation: 1
+  http: 1
+forwardHeaders:
+  enabled: true
+  argumentField: null
+  responseHeaders:
+    headersField: headers
+    resultField: response
+    forwardHeaders:
+      - Content-Type
+      - Content-Length
 files:
   - file: ../auth/schema.yaml
     spec: ndc
