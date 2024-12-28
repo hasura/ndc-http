@@ -981,6 +981,16 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *httptest
 		}
 	})
 
+	mux.HandleFunc("/oauth2/token", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet, http.MethodPost:
+			w.WriteHeader(http.StatusBadRequest)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+	})
+
 	return httptest.NewServer(mux)
 }
 
@@ -1150,6 +1160,37 @@ func TestConnectorOAuth(t *testing.T) {
 			},
 		},
 	})
+
+	failureBody := []byte(`{
+		"collection": "findPetsOAuth",
+		"query": {
+			"fields": {
+				"__value": {
+					"type": "column",
+					"column": "__value"
+				}
+			}
+		},
+		"arguments": {
+			"httpOptions": {
+				"type": "literal",
+				"value": {
+					"servers": ["1"]
+				}
+			}
+		},
+		"collection_relationships": {}
+	}`)
+
+	res, err = http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(failureBody))
+	assert.NilError(t, err)
+	defer res.Body.Close()
+
+	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+
+	respBody, err := io.ReadAll(res.Body)
+	assert.NilError(t, err)
+	assert.Assert(t, strings.Contains(string(respBody), "oauth2: cannot fetch token: 400 Bad Request"))
 }
 
 type mockTLSServer struct {
