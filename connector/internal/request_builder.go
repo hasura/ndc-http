@@ -17,7 +17,7 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
-// RequestBuilder builds requests to the remote service
+// RequestBuilder builds requests to the remote service.
 type RequestBuilder struct {
 	Schema    *rest.NDCHttpSchema
 	Operation *rest.OperationInfo
@@ -25,7 +25,7 @@ type RequestBuilder struct {
 	Runtime   rest.RuntimeSettings
 }
 
-// NewRequestBuilder creates a new RequestBuilder instance
+// NewRequestBuilder creates a new RequestBuilder instance.
 func NewRequestBuilder(restSchema *rest.NDCHttpSchema, operation *rest.OperationInfo, arguments map[string]any, runtime rest.RuntimeSettings) *RequestBuilder {
 	return &RequestBuilder{
 		Schema:    restSchema,
@@ -35,7 +35,7 @@ func NewRequestBuilder(restSchema *rest.NDCHttpSchema, operation *rest.Operation
 	}
 }
 
-// Build evaluates and builds a RetryableRequest
+// Build evaluates and builds a RetryableRequest.
 func (c *RequestBuilder) Build() (*RetryableRequest, error) {
 	endpoint, headers, err := c.evalURLAndHeaderParameters()
 	if err != nil {
@@ -201,7 +201,7 @@ func (c *RequestBuilder) getRequestUploadBody(rawRequest *rest.Request, bodyInfo
 	return rawRequest.RequestBody
 }
 
-// evaluate URL and header parameters
+// evaluate URL and header parameters.
 func (c *RequestBuilder) evalURLAndHeaderParameters() (*url.URL, http.Header, error) {
 	endpoint, err := url.Parse(c.Operation.Request.URL)
 	if err != nil {

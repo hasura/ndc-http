@@ -8,7 +8,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 )
 
-// APIKeyCredential presents an API key credential
+// APIKeyCredential presents an API key credential.
 type ApiKeyCredential struct {
 	In    schema.APIKeyLocation
 	Name  string
@@ -38,7 +38,7 @@ func (akc ApiKeyCredential) GetClient() *http.Client {
 	return akc.client
 }
 
-// Inject the credential into the incoming request
+// Inject the credential into the incoming request.
 func (akc ApiKeyCredential) Inject(req *http.Request) (bool, error) {
 	if akc.Value == "" {
 		return false, nil

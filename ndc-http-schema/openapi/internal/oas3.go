@@ -15,7 +15,7 @@ import (
 	"github.com/pb33f/libopenapi/orderedmap"
 )
 
-// OAS3Builder the NDC schema builder from OpenAPI 3.0 specification
+// OAS3Builder the NDC schema builder from OpenAPI 3.0 specification.
 type OAS3Builder struct {
 	*OASBuilderState
 }
@@ -28,7 +28,7 @@ type SchemaInfoCache struct {
 	OneOf      []SchemaInfoCache
 }
 
-// NewOAS3Builder creates an OAS3Builder instance
+// NewOAS3Builder creates an OAS3Builder instance.
 func NewOAS3Builder(options ConvertOptions) *OAS3Builder {
 	return &OAS3Builder{
 		OASBuilderState: NewOASBuilderState(options),
@@ -294,7 +294,7 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 	return err
 }
 
-// transform and reassign write object types to arguments
+// transform and reassign write object types to arguments.
 func (oc *OAS3Builder) transformWriteSchema() {
 	for _, fn := range oc.schema.Functions {
 		for key, arg := range fn.Arguments {

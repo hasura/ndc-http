@@ -15,12 +15,12 @@ import (
 	"github.com/pb33f/libopenapi/orderedmap"
 )
 
-// OAS2Builder the NDC schema builder from OpenAPI 2.0 specification
+// OAS2Builder the NDC schema builder from OpenAPI 2.0 specification.
 type OAS2Builder struct {
 	*OASBuilderState
 }
 
-// NewOAS2Builder creates an OAS3Builder instance
+// NewOAS2Builder creates an OAS3Builder instance.
 func NewOAS2Builder(options ConvertOptions) *OAS2Builder {
 	return &OAS2Builder{
 		OASBuilderState: NewOASBuilderState(options),
@@ -246,7 +246,7 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 	return err
 }
 
-// get and convert an OpenAPI data type to a NDC type from parameter
+// get and convert an OpenAPI data type to a NDC type from parameter.
 func (oc *OAS2Builder) getSchemaTypeFromParameter(param *v2.Parameter, fieldPaths []string) (schema.TypeEncoder, error) {
 	var typeEncoder schema.TypeEncoder
 	nullable := param.Required == nil || !*param.Required

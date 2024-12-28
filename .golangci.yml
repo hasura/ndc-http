@@ -1,14 +1,11 @@
 linters:
   enable-all: true
   disable:
-    - dupl
     - err113
     - lll
     - gocognit
     - exportloopref
     - funlen
-    - godot
-    - gofumpt
     - gomoddirectives
     - depguard
     - gosec
@@ -20,20 +17,14 @@ linters:
     - varnamelen
     - exhaustive
     - exhaustruct
-    - gocyclo
-    - prealloc
     - ireturn
     - gochecknoglobals
-    - gocyclo
-    - godox
     - stylecheck
     - nilnil
-    - maintidx
     - mnd
     - tagliatelle
     - goconst
     - noctx
-    - unparam
     - recvcheck
 
 linters-settings:
@@ -45,6 +36,8 @@ linters-settings:
   gocritic:
     disabled-checks:
       - appendAssign
+  gocyclo:
+    min-complexity: 40
 
 issues:
   exclude-files:

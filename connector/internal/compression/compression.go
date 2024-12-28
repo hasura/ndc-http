@@ -53,7 +53,7 @@ func (c Compressors) Compress(w io.Writer, encoding string, data []byte) (int, e
 	return compressor.Compress(w, data)
 }
 
-// Decompress reads and decompresses the reader with equivalent the content encoding
+// Decompress reads and decompresses the reader with equivalent the content encoding.
 func (c Compressors) Decompress(reader io.ReadCloser, encoding string) (io.ReadCloser, error) {
 	compressor, ok := c.compressors[strings.ToLower(strings.TrimSpace(encoding))]
 	if !ok {

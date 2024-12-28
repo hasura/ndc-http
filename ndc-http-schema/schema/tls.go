@@ -9,13 +9,13 @@ import (
 )
 
 // We should avoid that users unknowingly use a vulnerable TLS version.
-// The defaults should be a safe configuration
+// The defaults should be a safe configuration.
 const defaultMinTLSVersion = tls.VersionTLS12
 
-// Uses the default MaxVersion from "crypto/tls" which is the maximum supported version
+// Uses the default MaxVersion from "crypto/tls" which is the maximum supported version.
 const defaultMaxTLSVersion = 0
 
-// TLSConfig represents the transport layer security (LTS) configuration for the mutualTLS authentication
+// TLSConfig represents the transport layer security (LTS) configuration for the mutualTLS authentication.
 type TLSConfig struct {
 	// Path to the TLS cert to use for TLS required connections.
 	CertFile *utils.EnvString `json:"certFile,omitempty" mapstructure:"certFile" yaml:"certFile,omitempty"`
@@ -47,7 +47,7 @@ type TLSConfig struct {
 	ServerName *utils.EnvString `json:"serverName,omitempty" mapstructure:"serverName" yaml:"serverName,omitempty"`
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (tc TLSConfig) Validate() error {
 	minTLS, err := tc.GetMinVersion()
 	if err != nil {

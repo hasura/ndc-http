@@ -15,9 +15,7 @@ var (
 	oasVariableRegex = regexp.MustCompile(`^\{([a-zA-Z0-9_-]+)\}$`)
 )
 
-var (
-	errParameterNameRequired = errors.New("parameter name is empty")
-)
+var errParameterNameRequired = errors.New("parameter name is empty")
 
 var preferredContentTypes = []string{rest.ContentTypeJSON, rest.ContentTypeXML}
 
@@ -171,7 +169,7 @@ var xmlValueField = rest.ObjectField{
 	},
 }
 
-// ConvertOptions represent the common convert options for both OpenAPI v2 and v3
+// ConvertOptions represent the common convert options for both OpenAPI v2 and v3.
 type ConvertOptions struct {
 	MethodAlias         map[string]string
 	AllowedContentTypes []string

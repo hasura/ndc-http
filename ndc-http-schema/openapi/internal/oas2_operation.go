@@ -30,7 +30,7 @@ func newOAS2OperationBuilder(builder *OAS2Builder, pathKey string, method string
 	}
 }
 
-// BuildFunction build a HTTP NDC function information from OpenAPI v2 operation
+// BuildFunction build a HTTP NDC function information from OpenAPI v2 operation.
 func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonParams []*v2.Parameter) (*rest.OperationInfo, string, error) {
 	if operation == nil {
 		return nil, "", nil
@@ -75,7 +75,7 @@ func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonPar
 	return &function, funcName, nil
 }
 
-// BuildProcedure build a HTTP NDC function information from OpenAPI v2 operation
+// BuildProcedure build a HTTP NDC function information from OpenAPI v2 operation.
 func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonParams []*v2.Parameter) error {
 	if operation == nil {
 		return nil

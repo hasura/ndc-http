@@ -36,7 +36,7 @@ func buildPathMethodName(apiPath string, method string, options *ConvertOptions)
 	return utils.ToCamelCase(method + encodedPath)
 }
 
-// getMethodAlias merge method alias map with default value
+// getMethodAlias merge method alias map with default value.
 func getMethodAlias(inputs ...map[string]string) map[string]string {
 	methodAlias := map[string]string{
 		"get":    "get",
@@ -82,7 +82,7 @@ func convertSecurity(security *base.SecurityRequirement) rest.AuthSecurity {
 	return results
 }
 
-// get the inner named type of the type encoder
+// get the inner named type of the type encoder.
 func getNamedType(typeSchema schema.TypeEncoder, recursive bool, defaultValue string) string {
 	switch ty := typeSchema.(type) {
 	case *schema.NullableType:
@@ -400,7 +400,7 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 	return result, isMatched
 }
 
-// encodeHeaderArgumentName encodes header key to NDC schema field name
+// encodeHeaderArgumentName encodes header key to NDC schema field name.
 func encodeHeaderArgumentName(name string) string {
 	return "header" + utils.ToPascalCase(name)
 }
@@ -413,12 +413,12 @@ func errParameterSchemaEmpty(fieldPaths []string) error {
 	return fmt.Errorf("parameter schema of $.%s is empty", strings.Join(fieldPaths, "."))
 }
 
-// redirection and information response status codes aren't supported
+// redirection and information response status codes aren't supported.
 func isUnsupportedResponseCodes[T int | int64](code T) bool {
 	return code < 200 || (code >= 300 && code < 400)
 }
 
-// format the operation name and remove special characters
+// format the operation name and remove special characters.
 func formatOperationName(input string) string {
 	if input == "" {
 		return ""

@@ -202,7 +202,7 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(reflectValue
 		}
 
 		return []ParameterItem{NewParameterItem([]Key{}, []string{value})}, nil
-	case *schema.TypeRepresentationInteger, *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64, *schema.TypeRepresentationBigInteger: //nolint:all
+	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64, *schema.TypeRepresentationBigInteger:
 		value, err := utils.DecodeIntReflection[int64](reflectValue)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), err)
@@ -211,7 +211,7 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(reflectValue
 		return []ParameterItem{
 			NewParameterItem([]Key{}, []string{strconv.FormatInt(value, 10)}),
 		}, nil
-	case *schema.TypeRepresentationNumber, *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64, *schema.TypeRepresentationBigDecimal: //nolint:all
+	case *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64, *schema.TypeRepresentationBigDecimal:
 		value, err := utils.DecodeFloatReflection[float64](reflectValue)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), err)
@@ -402,7 +402,7 @@ func buildParamQueryKey(name string, encObject rest.EncodingObject, keys Keys, v
 	return strings.Join(resultKeys, "")
 }
 
-// EvalQueryParameterURL evaluate the query parameter URL
+// EvalQueryParameterURL evaluate the query parameter URL.
 func EvalQueryParameterURL(q *url.Values, name string, encObject rest.EncodingObject, keys Keys, values []string) {
 	if len(values) == 0 {
 		return
@@ -455,7 +455,7 @@ func EncodeQueryValues(qValues url.Values, allowReserved bool) string {
 	return builder.String()
 }
 
-// SetHeaderParameters set parameters to request headers
+// SetHeaderParameters set parameters to request headers.
 func SetHeaderParameters(header *http.Header, param *rest.RequestParameter, queryParams ParameterItems) {
 	defaultParam := queryParams.FindDefault()
 	// the param is an array

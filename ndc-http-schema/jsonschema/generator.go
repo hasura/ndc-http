@@ -34,7 +34,7 @@ func jsonSchemaConvertConfig() error {
 		return err
 	}
 
-	return os.WriteFile("convert-config.schema.json", schemaBytes, 0644)
+	return os.WriteFile("convert-config.schema.json", schemaBytes, 0o644)
 }
 
 func jsonSchemaConnectorConfiguration() error {
@@ -49,7 +49,7 @@ func jsonSchemaConnectorConfiguration() error {
 		return err
 	}
 
-	return os.WriteFile("configuration.schema.json", schemaBytes, 0644)
+	return os.WriteFile("configuration.schema.json", schemaBytes, 0o644)
 }
 
 func jsonSchemaNDCHttpSchema() error {
@@ -68,5 +68,5 @@ func jsonSchemaNDCHttpSchema() error {
 		return err
 	}
 
-	return os.WriteFile("ndc-http-schema.schema.json", schemaBytes, 0644)
+	return os.WriteFile("ndc-http-schema.schema.json", schemaBytes, 0o644)
 }

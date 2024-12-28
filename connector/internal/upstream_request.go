@@ -66,13 +66,7 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 			return nil, err
 		}
 		req.Namespace = runtimeSchema.Name
-
-		if err := evalForwardedHeaders(req, headers); err != nil {
-			return nil, schema.UnprocessableContentError("invalid forwarded headers", map[string]any{
-				"cause": err.Error(),
-			})
-		}
-
+		evalForwardedHeaders(req, headers)
 		results.Requests = []*RetryableRequest{req}
 
 		return results, nil

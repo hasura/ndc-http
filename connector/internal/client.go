@@ -31,13 +31,13 @@ import (
 
 var tracer = connector.NewTracer("HTTPClient")
 
-// HTTPClient represents a http client wrapper with advanced methods
+// HTTPClient represents a http client wrapper with advanced methods.
 type HTTPClient struct {
 	manager  *UpstreamManager
 	requests *RequestBuilderResults
 }
 
-// Send creates and executes the request and evaluate response selection
+// Send creates and executes the request and evaluate response selection.
 func (client *HTTPClient) Send(ctx context.Context, selection schema.NestedField) (any, http.Header, error) {
 	httpOptions := client.requests.HTTPOptions
 	var result any
@@ -72,7 +72,7 @@ func (client *HTTPClient) Send(ctx context.Context, selection schema.NestedField
 	return result, headers, nil
 }
 
-// execute a request to a list of remote servers in sequence
+// execute a request to a list of remote servers in sequence.
 func (client *HTTPClient) sendSequence(ctx context.Context, requests []*RetryableRequest) (*DistributedResponse[any], http.Header) {
 	results := NewDistributedResponse[any]()
 	var firstHeaders http.Header
@@ -98,7 +98,7 @@ func (client *HTTPClient) sendSequence(ctx context.Context, requests []*Retryabl
 	return results, firstHeaders
 }
 
-// execute a request to a list of remote servers in parallel
+// execute a request to a list of remote servers in parallel.
 func (client *HTTPClient) sendParallel(ctx context.Context, requests []*RetryableRequest) (*DistributedResponse[any], http.Header) {
 	var firstHeaders http.Header
 	httpOptions := client.requests.HTTPOptions
@@ -154,7 +154,7 @@ func (client *HTTPClient) sendParallel(ctx context.Context, requests []*Retryabl
 	return r, firstHeaders
 }
 
-// execute a request to the remote server with retries
+// execute a request to the remote server with retries.
 func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequest, mode string) (any, http.Header, *schema.ConnectorError) {
 	ctx, span := tracer.Start(ctx, "Send Request to Server "+request.ServerID)
 	defer span.End()
@@ -236,7 +236,7 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 	defer cancel()
 
 	contentType := parseContentType(resp.Header.Get(rest.ContentTypeHeader))
-	if resp.StatusCode >= 400 {
+	if resp.StatusCode >= http.StatusBadRequest {
 		details := make(map[string]any)
 		switch contentType {
 		case rest.ContentTypeJSON:
@@ -259,7 +259,7 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 		span.SetStatus(codes.Error, "received error from remote server")
 
 		statusCode := resp.StatusCode
-		if statusCode < 500 {
+		if statusCode < http.StatusInternalServerError {
 			statusCode = http.StatusUnprocessableEntity
 		}
 

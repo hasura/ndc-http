@@ -16,7 +16,7 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
-// BuildSchemaFromConfig build NDC HTTP schema from the configuration
+// BuildSchemaFromConfig build NDC HTTP schema from the configuration.
 func BuildSchemaFromConfig(config *Configuration, configDir string, logger *slog.Logger) ([]NDCHttpRuntimeSchema, map[string][]string) {
 	schemas := make([]NDCHttpRuntimeSchema, len(config.Files))
 	errors := make(map[string][]string)
@@ -56,7 +56,7 @@ func BuildSchemaFromConfig(config *Configuration, configDir string, logger *slog
 	return schemas, errors
 }
 
-// ReadSchemaOutputFile reads the schema output file in disk
+// ReadSchemaOutputFile reads the schema output file in disk.
 func ReadSchemaOutputFile(configDir string, filePath string, logger *slog.Logger) ([]NDCHttpRuntimeSchema, error) {
 	if filePath == "" {
 		return nil, nil
@@ -80,7 +80,7 @@ func ReadSchemaOutputFile(configDir string, filePath string, logger *slog.Logger
 	return result, nil
 }
 
-// MergeNDCHttpSchemas merge HTTP schemas into a single schema object
+// MergeNDCHttpSchemas merge HTTP schemas into a single schema object.
 func MergeNDCHttpSchemas(config *Configuration, schemas []NDCHttpRuntimeSchema) (*rest.NDCHttpSchema, []NDCHttpRuntimeSchema, map[string][]string) {
 	ndcSchema := &rest.NDCHttpSchema{
 		ScalarTypes: make(schema.SchemaResponseScalarTypes),
@@ -469,7 +469,7 @@ func NewHeaderForwardingResponseObjectType(resultType schema.Type, settings *For
 	}
 }
 
-// NewHeadersArgumentInfo creates a new forwarding headers argument information
+// NewHeadersArgumentInfo creates a new forwarding headers argument information.
 func NewHeadersArgumentInfo() rest.ArgumentInfo {
 	return rest.ArgumentInfo{
 		ArgumentInfo: schema.ArgumentInfo{

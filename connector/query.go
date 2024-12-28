@@ -93,7 +93,7 @@ func (c *HTTPConnector) execQueryAsync(ctx context.Context, state *State, reques
 	for i, requestVar := range requestVars {
 		func(index int, vars schema.QueryRequestVariablesElem) {
 			eg.Go(func() error {
-				result, err := c.execQuery(ctx, state, request, valueField, requestVar, i)
+				result, err := c.execQuery(ctx, state, request, valueField, vars, i)
 				if err != nil {
 					return err
 				}

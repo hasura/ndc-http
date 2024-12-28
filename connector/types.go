@@ -7,9 +7,7 @@ import (
 	"github.com/hasura/ndc-sdk-go/connector"
 )
 
-var (
-	errBuildSchemaFailed = errors.New("failed to build NDC HTTP schema")
-)
+var errBuildSchemaFailed = errors.New("failed to build NDC HTTP schema")
 
 // State is the global state which is shared for every connector request.
 type State struct {
@@ -26,10 +24,10 @@ var defaultOptions options = options{
 	},
 }
 
-// Option is an interface to set custom HTTP connector options
+// Option is an interface to set custom HTTP connector options.
 type Option (func(*options))
 
-// WithClient sets the custom HTTP client that satisfy the Doer interface
+// WithClient sets the custom HTTP client that satisfy the Doer interface.
 func WithClient(client *http.Client) Option {
 	return func(opts *options) {
 		opts.client = client

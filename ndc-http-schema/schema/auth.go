@@ -16,11 +16,9 @@ const (
 	AuthorizationHeader  = "Authorization"
 )
 
-var (
-	errSecuritySchemerRequired = errors.New("SecuritySchemer is required")
-)
+var errSecuritySchemerRequired = errors.New("SecuritySchemer is required")
 
-// SecuritySchemeType represents the authentication scheme enum
+// SecuritySchemeType represents the authentication scheme enum.
 type SecuritySchemeType string
 
 const (
@@ -43,7 +41,7 @@ var securityScheme_enums = []SecuritySchemeType{
 	MutualTLSScheme,
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j SecuritySchemeType) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
@@ -68,7 +66,7 @@ func (j *SecuritySchemeType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ParseSecuritySchemeType parses SecurityScheme from string
+// ParseSecuritySchemeType parses SecurityScheme from string.
 func ParseSecuritySchemeType(value string) (SecuritySchemeType, error) {
 	result := SecuritySchemeType(value)
 	if !slices.Contains(securityScheme_enums, result) {
@@ -78,7 +76,7 @@ func ParseSecuritySchemeType(value string) (SecuritySchemeType, error) {
 	return result, nil
 }
 
-// ApiKeyLocation represents the location enum for apiKey auth
+// ApiKeyLocation represents the location enum for apiKey auth.
 type APIKeyLocation string
 
 const (
@@ -89,7 +87,7 @@ const (
 
 var apiKeyLocation_enums = []APIKeyLocation{APIKeyInHeader, APIKeyInQuery, APIKeyInCookie}
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j APIKeyLocation) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
@@ -114,7 +112,7 @@ func (j *APIKeyLocation) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ParseAPIKeyLocation parses APIKeyLocation from string
+// ParseAPIKeyLocation parses APIKeyLocation from string.
 func ParseAPIKeyLocation(value string) (APIKeyLocation, error) {
 	result := APIKeyLocation(value)
 	if !slices.Contains(apiKeyLocation_enums, result) {
@@ -138,7 +136,7 @@ type SecurityScheme struct {
 	SecuritySchemer
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j SecurityScheme) JSONSchema() *jsonschema.Schema {
 	envStringRef := &jsonschema.Schema{
 		Ref: "#/$defs/EnvString",
@@ -305,7 +303,7 @@ func (j SecurityScheme) MarshalJSON() ([]byte, error) {
 	return json.Marshal(j.SecuritySchemer)
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss *SecurityScheme) Validate() error {
 	if ss.SecuritySchemer == nil {
 		return errSecuritySchemerRequired
@@ -352,7 +350,7 @@ func (j *APIKeyAuthConfig) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss *APIKeyAuthConfig) Validate() error {
 	if ss.Name == "" {
 		return errors.New("name is required for apiKey security")
@@ -364,7 +362,7 @@ func (ss *APIKeyAuthConfig) Validate() error {
 	return nil
 }
 
-// GetValue get the authentication credential value
+// GetValue get the authentication credential value.
 func (ss APIKeyAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -392,7 +390,7 @@ func NewHTTPAuthConfig(scheme string, header string, value utils.EnvString) *HTT
 	}
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss *HTTPAuthConfig) Validate() error {
 	if ss.Scheme == "" {
 		return errors.New("schema is required for http security")
@@ -401,7 +399,7 @@ func (ss *HTTPAuthConfig) Validate() error {
 	return nil
 }
 
-// GetValue get the authentication credential value
+// GetValue get the authentication credential value.
 func (ss HTTPAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -425,17 +423,17 @@ func NewBasicAuthConfig(username, password utils.EnvString) *BasicAuthConfig {
 	}
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss *BasicAuthConfig) Validate() error {
 	return nil
 }
 
-// GetValue get the authentication credential value
+// GetValue get the authentication credential value.
 func (ss BasicAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
 
-// OAuthFlowType represents the OAuth flow type enum
+// OAuthFlowType represents the OAuth flow type enum.
 type OAuthFlowType string
 
 const (
@@ -469,7 +467,7 @@ func (j *OAuthFlowType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ParseOAuthFlowType parses OAuthFlowType from string
+// ParseOAuthFlowType parses OAuthFlowType from string.
 func ParseOAuthFlowType(value string) (OAuthFlowType, error) {
 	result := OAuthFlowType(value)
 	if !slices.Contains(oauthFlow_enums, result) {
@@ -492,7 +490,7 @@ type OAuthFlow struct {
 	EndpointParams   map[string]utils.EnvString `json:"endpointParams,omitempty"   mapstructure:"endpointParams"   yaml:"endpointParams,omitempty"`
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss OAuthFlow) Validate(flowType OAuthFlowType) error {
 	if ss.TokenURL == nil {
 		if slices.Contains([]OAuthFlowType{PasswordFlow, ClientCredentialsFlow, AuthorizationCodeFlow}, flowType) {
@@ -539,12 +537,12 @@ func NewOAuth2Config(flows map[OAuthFlowType]OAuthFlow) *OAuth2Config {
 	}
 }
 
-// GetValue get the authentication credential value
+// GetValue get the authentication credential value.
 func (ss OAuth2Config) GetType() SecuritySchemeType {
 	return ss.Type
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss OAuth2Config) Validate() error {
 	if len(ss.Flows) == 0 {
 		return errors.New("require at least 1 flow for oauth2 security")
@@ -559,7 +557,7 @@ func (ss OAuth2Config) Validate() error {
 	return nil
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j OAuth2Config) JSONSchema() *jsonschema.Schema {
 	oauth2Schema := orderedmap.New[string, *jsonschema.Schema]()
 	oauth2Schema.Set("type", &jsonschema.Schema{
@@ -632,12 +630,12 @@ func NewOpenIDConnectConfig(oidcURL string) *OpenIDConnectConfig {
 	}
 }
 
-// GetValue get the authentication credential value
+// GetValue get the authentication credential value.
 func (ss OpenIDConnectConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss OpenIDConnectConfig) Validate() error {
 	if ss.OpenIDConnectURL == "" {
 		return errors.New("openIdConnectUrl is required for oidc security")
@@ -664,12 +662,12 @@ func NewCookieAuthConfig() *CookieAuthConfig {
 	}
 }
 
-// GetValue get the authentication credential value
+// GetValue get the authentication credential value.
 func (ss CookieAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss CookieAuthConfig) Validate() error {
 	return nil
 }
@@ -688,27 +686,27 @@ func NewMutualTLSAuthConfig() *MutualTLSAuthConfig {
 	}
 }
 
-// GetValue get the authentication credential value
+// GetValue get the authentication credential value.
 func (ss MutualTLSAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss MutualTLSAuthConfig) Validate() error {
 	return nil
 }
 
-// AuthSecurity wraps the raw security requirement with helpers
+// AuthSecurity wraps the raw security requirement with helpers.
 type AuthSecurity map[string][]string
 
-// NewAuthSecurity creates an AuthSecurity instance from name and scope
+// NewAuthSecurity creates an AuthSecurity instance from name and scope.
 func NewAuthSecurity(name string, scopes []string) AuthSecurity {
 	return AuthSecurity{
 		name: scopes,
 	}
 }
 
-// Name returns the name of security requirement
+// Name returns the name of security requirement.
 func (as AuthSecurity) Name() string {
 	if len(as) > 0 {
 		for k := range as {
@@ -719,7 +717,7 @@ func (as AuthSecurity) Name() string {
 	return ""
 }
 
-// Scopes returns scopes of security requirement
+// Scopes returns scopes of security requirement.
 func (as AuthSecurity) Scopes() []string {
 	if len(as) > 0 {
 		for _, scopes := range as {
@@ -730,20 +728,20 @@ func (as AuthSecurity) Scopes() []string {
 	return []string{}
 }
 
-// IsOptional checks if the security is optional
+// IsOptional checks if the security is optional.
 func (as AuthSecurity) IsOptional() bool {
 	return len(as) == 0
 }
 
-// AuthSecurities wraps list of security requirements with helpers
+// AuthSecurities wraps list of security requirements with helpers.
 type AuthSecurities []AuthSecurity
 
-// IsEmpty checks if there is no security
+// IsEmpty checks if there is no security.
 func (ass AuthSecurities) IsEmpty() bool {
 	return len(ass) == 0
 }
 
-// IsOptional checks if the security is optional
+// IsOptional checks if the security is optional.
 func (ass AuthSecurities) IsOptional() bool {
 	if ass.IsEmpty() {
 		return true
@@ -758,12 +756,12 @@ func (ass AuthSecurities) IsOptional() bool {
 	return false
 }
 
-// Add adds a security with name and scope
+// Add adds a security with name and scope.
 func (ass *AuthSecurities) Add(item AuthSecurity) {
 	*ass = append(*ass, item)
 }
 
-// Get gets a security by name
+// Get gets a security by name.
 func (ass AuthSecurities) Get(name string) AuthSecurity {
 	for _, as := range ass {
 		if as.Name() == name {
@@ -774,7 +772,7 @@ func (ass AuthSecurities) Get(name string) AuthSecurity {
 	return nil
 }
 
-// First returns the first security
+// First returns the first security.
 func (ass AuthSecurities) First() AuthSecurity {
 	for _, as := range ass {
 		return as

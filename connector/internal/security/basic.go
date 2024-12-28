@@ -9,7 +9,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 )
 
-// BasicCredential represents the basic authentication credential
+// BasicCredential represents the basic authentication credential.
 type BasicCredential struct {
 	UserInfo *url.Userinfo
 	Header   string
@@ -49,7 +49,7 @@ func (bc BasicCredential) GetClient() *http.Client {
 	return bc.client
 }
 
-// Inject the credential into the incoming request
+// Inject the credential into the incoming request.
 func (bc BasicCredential) Inject(req *http.Request) (bool, error) {
 	if bc.UserInfo == nil {
 		return false, nil

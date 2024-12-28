@@ -9,16 +9,14 @@ import (
 	"unicode/utf8"
 )
 
-var (
-	nonAlphaDigitRegex = regexp.MustCompile(`[^\w]+`)
-)
+var nonAlphaDigitRegex = regexp.MustCompile(`[^\w]+`)
 
 const (
 	htmlTagStart = 60 // Unicode `<`
 	htmlTagEnd   = 62 // Unicode `>`
 )
 
-// ToCamelCase convert a string to camelCase
+// ToCamelCase convert a string to camelCase.
 func ToCamelCase(input string) string {
 	pascalCase := ToPascalCase(input)
 	if pascalCase == "" {
@@ -28,12 +26,12 @@ func ToCamelCase(input string) string {
 	return strings.ToLower(pascalCase[:1]) + pascalCase[1:]
 }
 
-// StringSliceToCamelCase convert a slice of strings to camelCase
+// StringSliceToCamelCase convert a slice of strings to camelCase.
 func StringSliceToCamelCase(inputs []string) string {
 	return ToCamelCase(inputs[0]) + StringSliceToPascalCase(inputs[1:])
 }
 
-// ToPascalCase convert a string to PascalCase
+// ToPascalCase convert a string to PascalCase.
 func ToPascalCase(input string) string {
 	if input == "" {
 		return input
@@ -50,13 +48,13 @@ func ToPascalCase(input string) string {
 	return strings.Join(parts, "")
 }
 
-// stringSliceToCase convert a slice of string with a transform function
+// stringSliceToCase convert a slice of string with a transform function.
 func stringSliceToCase(inputs []string, convert func(string) string, sep string) string {
 	if len(inputs) == 0 {
 		return ""
 	}
 
-	var results []string
+	results := []string{}
 	for _, item := range inputs {
 		trimmed := strings.TrimSpace(item)
 		if trimmed == "" {
@@ -68,12 +66,12 @@ func stringSliceToCase(inputs []string, convert func(string) string, sep string)
 	return strings.Join(results, sep)
 }
 
-// StringSliceToPascalCase convert a slice of string to PascalCase
+// StringSliceToPascalCase convert a slice of string to PascalCase.
 func StringSliceToPascalCase(inputs []string) string {
 	return stringSliceToCase(inputs, ToPascalCase, "")
 }
 
-// ToSnakeCase converts string to snake_case
+// ToSnakeCase converts string to snake_case.
 func ToSnakeCase(input string) string {
 	var sb strings.Builder
 	inputLen := len(input)
@@ -120,24 +118,24 @@ func ToSnakeCase(input string) string {
 	return sb.String()
 }
 
-// StringSliceToSnakeCase convert a slice of string to snake_case
+// StringSliceToSnakeCase convert a slice of string to snake_case.
 func StringSliceToSnakeCase(inputs []string) string {
 	return stringSliceToCase(inputs, ToSnakeCase, "_")
 }
 
-// ToConstantCase converts string to CONSTANT_CASE
+// ToConstantCase converts string to CONSTANT_CASE.
 func ToConstantCase(input string) string {
 	return strings.ToUpper(ToSnakeCase(input))
 }
 
-// StringSliceToConstantCase convert a slice of string to CONSTANT_CASE
+// StringSliceToConstantCase convert a slice of string to CONSTANT_CASE.
 func StringSliceToConstantCase(inputs []string) string {
 	return strings.ToUpper(StringSliceToSnakeCase(inputs))
 }
 
-// SplitStrings wrap strings.Split with all leading and trailing white space removed
+// SplitStrings wrap strings.Split with all leading and trailing white space removed.
 func SplitStringsAndTrimSpaces(input string, sep string) []string {
-	var results []string
+	results := []string{}
 	items := strings.Split(input, sep)
 	for _, item := range items {
 		trimmed := strings.TrimSpace(item)
@@ -196,7 +194,7 @@ func StripHTMLTags(str string) string {
 	return strings.TrimSpace(builder.String())
 }
 
-// RemoveYAMLSpecialCharacters remote special characters to avoid YAML unmarshaling error
+// RemoveYAMLSpecialCharacters remote special characters to avoid YAML unmarshaling error.
 func RemoveYAMLSpecialCharacters(input []byte) string {
 	if len(input) == 0 {
 		return ""
@@ -267,7 +265,7 @@ func getu4(s []byte) rune {
 	return r
 }
 
-// MaskString masks the string value for security
+// MaskString masks the string value for security.
 func MaskString(input string) string {
 	inputLength := len(input)
 	switch {

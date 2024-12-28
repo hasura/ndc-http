@@ -14,7 +14,7 @@ import (
 	"github.com/hasura/ndc-sdk-go/schema"
 )
 
-// HTTPConnector implements the SDK interface of NDC specification
+// HTTPConnector implements the SDK interface of NDC specification.
 type HTTPConnector struct {
 	config              *configuration.Configuration
 	metadata            internal.MetadataCollection
@@ -25,7 +25,7 @@ type HTTPConnector struct {
 	procSendHttpRequest rest.OperationInfo
 }
 
-// NewHTTPConnector creates a HTTP connector instance
+// NewHTTPConnector creates a HTTP connector instance.
 func NewHTTPConnector(opts ...Option) *HTTPConnector {
 	for _, opt := range opts {
 		opt(&defaultOptions)

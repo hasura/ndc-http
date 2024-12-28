@@ -9,9 +9,9 @@ import (
 
 type ParameterItems []ParameterItem
 
-// String implements fmt.Stringer interface
+// String implements fmt.Stringer interface.
 func (ssp ParameterItems) String() string {
-	var results []string
+	results := []string{}
 	sortedPairs := append([]ParameterItem{}, ssp...)
 	slices.SortFunc(sortedPairs, func(a, b ParameterItem) int {
 		return strings.Compare(a.keys.String(), b.keys.String())
@@ -82,10 +82,10 @@ func (ssp ParameterItems) find(keys []Key) (*ParameterItem, int) {
 	return nil, -1
 }
 
-// Keys represent a key slice
+// Keys represent a key slice.
 type Keys []Key
 
-// String implements fmt.Stringer interface
+// String implements fmt.Stringer interface.
 func (ks Keys) String() string {
 	if len(ks) == 0 {
 		return ""
@@ -109,38 +109,38 @@ func (ks Keys) String() string {
 	return sb.String()
 }
 
-// Key represents a key string or index
+// Key represents a key string or index.
 type Key struct {
 	key   string
 	index *int
 }
 
-// NewIndexKey creates an index key
+// NewIndexKey creates an index key.
 func NewIndexKey(index int) Key {
 	return Key{index: &index}
 }
 
-// NewKey creates a string key
+// NewKey creates a string key.
 func NewKey(key string) Key {
 	return Key{key: key}
 }
 
-// IsEmpty checks if the key is empty
+// IsEmpty checks if the key is empty.
 func (k Key) IsEmpty() bool {
 	return k.key == "" && k.index == nil
 }
 
-// Key gets the string key
+// Key gets the string key.
 func (k Key) Key() string {
 	return k.key
 }
 
-// Index gets the integer key
+// Index gets the integer key.
 func (k Key) Index() *int {
 	return k.index
 }
 
-// String implements fmt.Stringer interface
+// String implements fmt.Stringer interface.
 func (k Key) String() string {
 	if k.index != nil {
 		return strconv.Itoa(*k.index)
@@ -149,13 +149,13 @@ func (k Key) String() string {
 	return k.key
 }
 
-// ParameterItem represents the key-value slice pair
+// ParameterItem represents the key-value slice pair.
 type ParameterItem struct {
 	keys   Keys
 	values []string
 }
 
-// NewParameterItem creates a parameter value pair
+// NewParameterItem creates a parameter value pair.
 func NewParameterItem(keys Keys, values []string) ParameterItem {
 	return ParameterItem{
 		keys:   keys,
@@ -163,7 +163,7 @@ func NewParameterItem(keys Keys, values []string) ParameterItem {
 	}
 }
 
-// String implements fmt.Stringer interface
+// String implements fmt.Stringer interface.
 func (ssp ParameterItem) String() string {
 	key := ssp.keys.String()
 	value := strings.Join(ssp.values, ",")
@@ -174,7 +174,7 @@ func (ssp ParameterItem) String() string {
 	return fmt.Sprintf("%s=%s", key, value)
 }
 
-// Keys returns keys of the parameter item
+// Keys returns keys of the parameter item.
 func (ssp ParameterItem) Keys() Keys {
 	return ssp.keys
 }

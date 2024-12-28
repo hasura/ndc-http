@@ -14,7 +14,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ConvertToNDCSchema converts to NDC HTTP schema from file
+// ConvertToNDCSchema converts to NDC HTTP schema from file.
 func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logger *slog.Logger) error {
 	start := time.Now()
 	if args.File == "" && args.Config == "" {
@@ -66,7 +66,6 @@ func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logg
 	)
 
 	result, err := configuration.ConvertToNDCSchema(&config, logger)
-
 	if err != nil {
 		logger.Error(err.Error())
 

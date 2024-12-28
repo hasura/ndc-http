@@ -35,7 +35,7 @@ func newOAS3OperationBuilder(builder *OAS3Builder, pathKey string, method string
 	}
 }
 
-// BuildFunction build a HTTP NDC function information from OpenAPI v3 operation
+// BuildFunction build a HTTP NDC function information from OpenAPI v3 operation.
 func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.OperationInfo, string, error) {
 	if oc.builder.ConvertOptions.NoDeprecation && itemGet.Deprecated != nil && *itemGet.Deprecated {
 		return nil, "", nil

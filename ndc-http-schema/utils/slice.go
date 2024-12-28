@@ -7,7 +7,7 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
-// SliceUnorderedEqual compares if both slices are equal with unordered positions
+// SliceUnorderedEqual compares if both slices are equal with unordered positions.
 func SliceUnorderedEqual[T cmp.Ordered](a []T, b []T) bool {
 	sortedA := slices.Clone(a)
 	slices.Sort(sortedA)

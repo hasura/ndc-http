@@ -16,7 +16,7 @@ var (
 	errUnknownPatchStrategy = errors.New("unable to detect patch strategy")
 )
 
-// PatchStrategy represents the patch strategy enum
+// PatchStrategy represents the patch strategy enum.
 type PatchStrategy string
 
 const (
@@ -30,13 +30,13 @@ const (
 	PatchStrategyJSON6902 PatchStrategy = "json6902"
 )
 
-// PatchConfig the configuration for JSON patch
+// PatchConfig the configuration for JSON patch.
 type PatchConfig struct {
 	Path     string        `json:"path"     yaml:"path"`
 	Strategy PatchStrategy `json:"strategy" jsonschema:"enum=merge,enum=json6902" yaml:"strategy"`
 }
 
-// ApplyPatchToHTTPSchema applies JSON patches to NDC HTTP schema and validate the output
+// ApplyPatchToHTTPSchema applies JSON patches to NDC HTTP schema and validate the output.
 func ApplyPatchToHTTPSchema(input *schema.NDCHttpSchema, patchFiles []PatchConfig) (*schema.NDCHttpSchema, error) {
 	if len(patchFiles) == 0 {
 		return input, nil
@@ -59,7 +59,7 @@ func ApplyPatchToHTTPSchema(input *schema.NDCHttpSchema, patchFiles []PatchConfi
 	return &result, nil
 }
 
-// ApplyPatch applies patches to the raw bytes input
+// ApplyPatch applies patches to the raw bytes input.
 func ApplyPatch(input []byte, patchFiles []PatchConfig) ([]byte, error) {
 	jsonInput, err := convertMaybeYAMLToJSONBytes(input)
 	if err != nil {
@@ -69,7 +69,7 @@ func ApplyPatch(input []byte, patchFiles []PatchConfig) ([]byte, error) {
 	return ApplyPatchFromRawJSON(jsonInput, patchFiles)
 }
 
-// ApplyPatchFromRawJSON applies patches to the raw JSON bytes input without validation request
+// ApplyPatchFromRawJSON applies patches to the raw JSON bytes input without validation request.
 func ApplyPatchFromRawJSON(input []byte, patchFiles []PatchConfig) ([]byte, error) {
 	for _, patchFile := range patchFiles {
 		walkError := WalkFiles(patchFile.Path, func(data []byte) error {

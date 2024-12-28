@@ -6,10 +6,10 @@ import (
 	"github.com/hasura/ndc-sdk-go/schema"
 )
 
-// MetadataCollection stores list of HTTP metadata with helper methods
+// MetadataCollection stores list of HTTP metadata with helper methods.
 type MetadataCollection []configuration.NDCHttpRuntimeSchema
 
-// GetFunction gets the NDC function by name
+// GetFunction gets the NDC function by name.
 func (rms MetadataCollection) GetFunction(name string) (*rest.OperationInfo, *configuration.NDCHttpRuntimeSchema, error) {
 	for _, rm := range rms {
 		fn := rm.GetFunction(name)
@@ -21,7 +21,7 @@ func (rms MetadataCollection) GetFunction(name string) (*rest.OperationInfo, *co
 	return nil, nil, schema.UnprocessableContentError("unsupported query: "+name, nil)
 }
 
-// GetProcedure gets the NDC procedure by name
+// GetProcedure gets the NDC procedure by name.
 func (rms MetadataCollection) GetProcedure(name string) (*rest.OperationInfo, *configuration.NDCHttpRuntimeSchema, error) {
 	for _, rm := range rms {
 		fn := rm.GetProcedure(name)

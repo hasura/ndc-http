@@ -9,7 +9,7 @@ import (
 	"github.com/pb33f/libopenapi"
 )
 
-// OpenAPIv2ToNDCSchema converts OpenAPI v2 JSON bytes to NDC HTTP schema
+// OpenAPIv2ToNDCSchema converts OpenAPI v2 JSON bytes to NDC HTTP schema.
 func OpenAPIv2ToNDCSchema(input []byte, options ConvertOptions) (*rest.NDCHttpSchema, []error) {
 	input = []byte(utils.RemoveYAMLSpecialCharacters(input))
 	document, err := libopenapi.NewDocument(input)

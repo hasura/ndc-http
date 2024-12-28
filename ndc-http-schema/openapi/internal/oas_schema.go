@@ -54,7 +54,7 @@ func newOASSchemaBuilder(state *OASBuilderState, apiPath string, location rest.P
 	}
 }
 
-// get and convert an OpenAPI data type to a NDC type
+// get and convert an OpenAPI data type to a NDC type.
 func (oc *oasSchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProxy, nullable bool, fieldPaths []string) (*SchemaInfoCache, error) {
 	if schemaProxy == nil {
 		return nil, errParameterSchemaEmpty(fieldPaths)
@@ -112,7 +112,7 @@ func (oc *oasSchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProxy
 	return result, nil
 }
 
-// get and convert an OpenAPI data type to a NDC type
+// get and convert an OpenAPI data type to a NDC type.
 func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []string) (*SchemaInfoCache, error) {
 	if baseSchema == nil {
 		return nil, errParameterSchemaEmpty(fieldPaths)
@@ -324,7 +324,7 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 	return result, nil
 }
 
-// Support converting oneOf, allOf or anyOf to object types with merge strategy
+// Support converting oneOf, allOf or anyOf to object types with merge strategy.
 func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schemaProxies []*base.SchemaProxy, unionType oasUnionType, fieldPaths []string) (*SchemaInfoCache, error) {
 	proxies, mergedType, isNullable, isEmptyObject := evalSchemaProxiesSlice(schemaProxies, oc.location)
 	nullable := isNullable || (baseSchema.Nullable != nil && *baseSchema.Nullable)
@@ -406,8 +406,8 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 		return result, nil
 	}
 
-	var unionSchemas []SchemaInfoCache
-	var oneOfInfos []SchemaInfoCache
+	unionSchemas := []SchemaInfoCache{}
+	oneOfInfos := []SchemaInfoCache{}
 
 	for i, item := range proxies {
 		schemaResult, err := newOASSchemaBuilder(oc.state, oc.apiPath, oc.location).
