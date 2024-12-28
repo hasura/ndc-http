@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/hasura/ndc-http/connector/internal/argument"
@@ -58,12 +59,12 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 		}
 	}
 
+	var defaultServerURL *url.URL
 	settings := UpstreamSetting{
-		servers:     make(map[string]Server),
-		security:    runtimeSchema.Settings.Security,
-		headers:     um.getHeadersFromEnv(logger, namespace, runtimeSchema.Settings.Headers),
-		credentials: um.registerSecurityCredentials(ctx, httpClient, runtimeSchema.Settings.SecuritySchemes, logger.With(slog.String("namespace", namespace))),
-		httpClient:  httpClient,
+		servers:    make(map[string]Server),
+		security:   runtimeSchema.Settings.Security,
+		headers:    um.getHeadersFromEnv(logger, namespace, runtimeSchema.Settings.Headers),
+		httpClient: httpClient,
 	}
 
 	if len(runtimeSchema.Settings.ArgumentPresets) > 0 {
@@ -89,6 +90,10 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 			continue
 		}
 
+		if defaultServerURL == nil {
+			defaultServerURL = serverURL
+		}
+
 		serverClient := httpClient
 		if server.TLS != nil {
 			tlsClient, err := security.NewHTTPClientTLS(um.defaultClient, server.TLS, logger)
@@ -105,7 +110,7 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 			URL:         serverURL,
 			Headers:     um.getHeadersFromEnv(logger, namespace, server.Headers),
 			Security:    server.Security,
-			Credentials: um.registerSecurityCredentials(ctx, serverClient, server.SecuritySchemes, logger.With(slog.String("namespace", namespace), slog.String("server_id", serverID))),
+			Credentials: um.registerSecurityCredentials(ctx, serverClient, serverURL, server.SecuritySchemes, logger.With(slog.String("namespace", namespace), slog.String("server_id", serverID))),
 			HTTPClient:  serverClient,
 		}
 
@@ -119,6 +124,8 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 
 		settings.servers[serverID] = newServer
 	}
+
+	settings.credentials = um.registerSecurityCredentials(ctx, httpClient, defaultServerURL, runtimeSchema.Settings.SecuritySchemes, logger.With(slog.String("namespace", namespace)))
 
 	um.upstreams[namespace] = settings
 
@@ -292,11 +299,11 @@ func (um *UpstreamManager) getHeadersFromEnv(logger *slog.Logger, namespace stri
 	return results
 }
 
-func (um *UpstreamManager) registerSecurityCredentials(ctx context.Context, httpClient *http.Client, securitySchemes map[string]rest.SecurityScheme, logger *slog.Logger) map[string]security.Credential {
+func (um *UpstreamManager) registerSecurityCredentials(ctx context.Context, httpClient *http.Client, baseServerURL *url.URL, securitySchemes map[string]rest.SecurityScheme, logger *slog.Logger) map[string]security.Credential {
 	credentials := make(map[string]security.Credential)
 
 	for key, ss := range securitySchemes {
-		cred, headerForwardRequired, err := security.NewCredential(ctx, httpClient, ss)
+		cred, headerForwardRequired, err := security.NewCredential(ctx, httpClient, baseServerURL, ss)
 		if err != nil {
 			// Relax the error to allow schema introspection without environment variables setting.
 			// Moreover, because there are many security schemes the user may use one of them.

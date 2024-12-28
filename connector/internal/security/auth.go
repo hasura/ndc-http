@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 )
@@ -19,7 +20,7 @@ type Credential interface {
 }
 
 // NewCredential creates a generic credential from the security scheme.
-func NewCredential(ctx context.Context, httpClient *http.Client, security schema.SecurityScheme) (Credential, bool, error) {
+func NewCredential(ctx context.Context, httpClient *http.Client, baseServerURL *url.URL, security schema.SecurityScheme) (Credential, bool, error) {
 	if security.SecuritySchemer == nil {
 		return nil, false, errors.New("empty security scheme")
 	}
@@ -44,7 +45,7 @@ func NewCredential(ctx context.Context, httpClient *http.Client, security schema
 				headerForwardingRequired = true
 			}
 
-			cred, err := NewOAuth2Client(ctx, httpClient, flowType, &flow)
+			cred, err := NewOAuth2Client(ctx, httpClient, baseServerURL, flowType, &flow)
 
 			return cred, headerForwardingRequired || err != nil, err
 		}

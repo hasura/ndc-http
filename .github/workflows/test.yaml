@@ -22,7 +22,8 @@ jobs:
           sleep 5
           go test -v -coverpkg=./... -race -timeout 3m -coverprofile=coverage.out.tmp ./...
           docker compose down -v
-          cat coverage.out.tmp | grep -v "main.go" > coverage.out
+          cat coverage.out.tmp | grep -v "main.go" > coverage.out.tmp2
+          cat coverage.out.tmp2 | grep -v "version.go" > coverage.out
       - name: Run integration tests
         run: |
           ./scripts/test.sh

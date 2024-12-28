@@ -3,6 +3,22 @@ settings:
   servers:
     - url:
         env: PET_STORE_URL
+    - url:
+        env: PET_STORE_URL
+      securitySchemes:
+        petstore_auth:
+          type: oauth2
+          flows:
+            clientCredentials:
+              tokenUrl:
+                value: /oauth2/token
+              clientId:
+                env: OAUTH2_CLIENT_ID
+              clientSecret:
+                env: OAUTH2_CLIENT_SECRET
+              scopes:
+                read:pets: read your pets
+                write:pets: modify pets in your account
   securitySchemes:
     api_key:
       type: apiKey
