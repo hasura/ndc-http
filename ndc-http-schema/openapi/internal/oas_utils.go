@@ -11,22 +11,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func getSchemaRefTypeNameV2(name string) string {
-	result := schemaRefNameV2Regexp.FindStringSubmatch(name)
-	if len(result) < 2 {
+func getSchemaRefTypeName(name string) string {
+	fragments := strings.Split(name, "/")
+	if len(fragments) < 2 {
 		return ""
 	}
 
-	return result[1]
-}
-
-func getSchemaRefTypeNameV3(name string) string {
-	result := schemaRefNameV3Regexp.FindStringSubmatch(name)
-	if len(result) < 2 {
-		return ""
-	}
-
-	return result[1]
+	return fragments[len(fragments)-1]
 }
 
 func extractNullableFromOASTypes(names []string) ([]string, bool) {
@@ -45,26 +36,18 @@ func extractNullableFromOASTypes(names []string) ([]string, bool) {
 }
 
 func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, fieldPaths []string) string {
-	var scalarName string
-	var scalarType *schema.ScalarType
-
 	namesLen := len(names)
 	switch {
 	case namesLen == 0 && len(enumNodes) > 0:
-		scalarName, scalarType = buildEnumScalar(sm, enumNodes, fieldPaths)
+		return buildEnumScalar(sm, enumNodes, fieldPaths)
 	case namesLen == 1:
-		scalarName, scalarType = getScalarFromOASType(sm, names, format, enumNodes, fieldPaths)
+		return getScalarFromOASType(sm, names, format, enumNodes, fieldPaths)
 	default:
-		scalarName = string(rest.ScalarJSON)
-		scalarType = defaultScalarTypes[rest.ScalarJSON]
+		return string(rest.ScalarJSON)
 	}
-
-	sm.AddScalar(scalarName, *scalarType)
-
-	return scalarName
 }
 
-func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths []string) (string, *schema.ScalarType) {
+func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths []string) string {
 	enums := make([]string, len(enumNodes))
 	for i, enum := range enumNodes {
 		if enum.Value == "null" {
@@ -78,51 +61,40 @@ func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths 
 	scalarType.Representation = schema.NewTypeRepresentationEnum(enums).Encode()
 
 	scalarName := utils.StringSliceToPascalCase(fieldPaths)
-	if canSetEnumToSchema(sm, scalarName, enums) {
-		return scalarName, scalarType
+	if !canSetEnumToSchema(sm, scalarName, enums) {
+		// if the name exists, add enum above name with Enum suffix
+		scalarName += "Enum"
 	}
 
-	// if the name exists, add enum above name with Enum suffix
-	scalarName += "Enum"
+	sm.AddScalar(scalarName, *scalarType)
 
-	return scalarName, scalarType
+	return scalarName
 }
 
-func getScalarFromOASType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, fieldPaths []string) (string, *schema.ScalarType) {
-	var scalarName string
-	var scalarType *schema.ScalarType
-
+func getScalarFromOASType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, fieldPaths []string) string {
 	switch names[0] {
 	case "boolean":
-		scalarName = string(rest.ScalarBoolean)
-		scalarType = defaultScalarTypes[rest.ScalarBoolean]
+		return string(rest.ScalarBoolean)
 	case "integer":
 		switch format {
 		case "unix-time":
-			scalarName = string(rest.ScalarUnixTime)
-			scalarType = defaultScalarTypes[rest.ScalarUnixTime]
+			return string(rest.ScalarUnixTime)
 		case "int64":
-			scalarName = string(rest.ScalarInt64)
-			scalarType = defaultScalarTypes[rest.ScalarInt64]
+			return string(rest.ScalarInt64)
 		default:
-			scalarName = string(rest.ScalarInt32)
-			scalarType = defaultScalarTypes[rest.ScalarInt32]
+			return string(rest.ScalarInt32)
 		}
 	case "long":
-		scalarName = string(rest.ScalarInt64)
-		scalarType = defaultScalarTypes[rest.ScalarInt64]
+		return string(rest.ScalarInt64)
 	case "number":
 		switch format {
 		case "float":
-			scalarName = string(rest.ScalarFloat32)
-			scalarType = defaultScalarTypes[rest.ScalarFloat32]
+			return string(rest.ScalarFloat32)
 		default:
-			scalarName = string(rest.ScalarFloat64)
-			scalarType = defaultScalarTypes[rest.ScalarFloat64]
+			return string(rest.ScalarFloat64)
 		}
 	case "file":
-		scalarName = string(rest.ScalarBinary)
-		scalarType = defaultScalarTypes[rest.ScalarBinary]
+		return string(rest.ScalarBinary)
 	case "string":
 		if len(enumNodes) > 0 {
 			return buildEnumScalar(sm, enumNodes, fieldPaths)
@@ -130,39 +102,27 @@ func getScalarFromOASType(sm *rest.NDCHttpSchema, names []string, format string,
 
 		switch format {
 		case "date":
-			scalarName = string(rest.ScalarDate)
-			scalarType = defaultScalarTypes[rest.ScalarDate]
+			return string(rest.ScalarDate)
 		case "date-time":
-			scalarName = string(rest.ScalarTimestampTZ)
-			scalarType = defaultScalarTypes[rest.ScalarTimestampTZ]
+			return string(rest.ScalarTimestampTZ)
 		case "byte", "base64":
-			scalarName = string(rest.ScalarBytes)
-			scalarType = defaultScalarTypes[rest.ScalarBytes]
+			return string(rest.ScalarBytes)
 		case "binary":
-			scalarName = string(rest.ScalarBinary)
-			scalarType = defaultScalarTypes[rest.ScalarBinary]
+			return string(rest.ScalarBinary)
 		case "uuid":
-			scalarName = string(rest.ScalarUUID)
-			scalarType = defaultScalarTypes[rest.ScalarUUID]
+			return string(rest.ScalarUUID)
 		case "uri":
-			scalarName = string(rest.ScalarURI)
-			scalarType = defaultScalarTypes[rest.ScalarURI]
+			return string(rest.ScalarURI)
 		case "ipv4":
-			scalarName = string(rest.ScalarIPV4)
-			scalarType = defaultScalarTypes[rest.ScalarIPV4]
+			return string(rest.ScalarIPV4)
 		case "ipv6":
-			scalarName = string(rest.ScalarIPV6)
-			scalarType = defaultScalarTypes[rest.ScalarIPV6]
+			return string(rest.ScalarIPV6)
 		default:
-			scalarName = string(rest.ScalarString)
-			scalarType = defaultScalarTypes[rest.ScalarString]
+			return string(rest.ScalarString)
 		}
 	default:
-		scalarName = string(rest.ScalarJSON)
-		scalarType = defaultScalarTypes[rest.ScalarJSON]
+		return string(rest.ScalarJSON)
 	}
-
-	return scalarName, scalarType
 }
 
 func canSetEnumToSchema(sm *rest.NDCHttpSchema, scalarName string, enums []string) bool {
@@ -311,7 +271,9 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 			continue
 		}
 		sc := proxy.Schema()
-		if sc == nil || (len(sc.Type) == 0 && len(sc.AllOf) == 0 && len(sc.AnyOf) == 0 && len(sc.OneOf) == 0) {
+		if sc == nil || (len(sc.Type) == 0 && len(sc.AllOf) == 0 && len(sc.AnyOf) == 0 && len(sc.OneOf) == 0 &&
+			(sc.Properties == nil || sc.Properties.Len() == 0) &&
+			(sc.Items == nil || sc.Items.A != nil)) {
 			continue
 		}
 
@@ -332,13 +294,10 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 		}
 
 		results = append(results, proxy)
-		if len(sc.Type) == 0 {
-			typeNames = append(typeNames, "any")
-		} else if !slices.Contains(typeNames, sc.Type[0]) {
-			typeNames = append(typeNames, sc.Type[0])
-		}
+		typeNames = append(typeNames, sc.Type...)
 	}
 
+	typeNames = utils.SliceUnique(typeNames)
 	if len(typeNames) == 1 && len(results) > 1 && typeNames[0] == "string" {
 		// if the anyOf array contains both string and enum
 		// we can cast them to string
@@ -351,7 +310,7 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 }
 
 // guess the result type from content type
-func getResultTypeFromContentType(httpSchema *rest.NDCHttpSchema, contentType string) schema.TypeEncoder {
+func getResultTypeFromContentType(contentType string) schema.TypeEncoder {
 	var scalarName rest.ScalarName
 	switch {
 	case strings.HasPrefix(contentType, "text/"):
@@ -361,8 +320,6 @@ func getResultTypeFromContentType(httpSchema *rest.NDCHttpSchema, contentType st
 	default:
 		scalarName = rest.ScalarJSON
 	}
-
-	httpSchema.AddScalar(string(scalarName), *defaultScalarTypes[scalarName])
 
 	return schema.NewNamedType(string(scalarName))
 }

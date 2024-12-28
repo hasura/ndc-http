@@ -669,7 +669,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraDeliveryData",
+              "name": "HasuraPlatformDeliveryDataEmail",
               "type": "named"
             }
           }
@@ -705,7 +705,215 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraDeliveryData",
+              "name": "HasuraPlatformDeliveryDataSms",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "HasuraPlatformDeliveryDataEmail": {
+      "fields": {
+        "bounced": {
+          "description": "Number of recipients who registered as a hard or soft bounce and didn't receive your email.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "clicks": {
+          "description": "Number of clicked links from your email. This can include the recipient clicking email links multiple times.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "converted": {
+          "description": "Number of messages that were clicked.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "errored": {
+          "description": "Number of errors reported.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "failed": {
+          "description": "Number of messages sent to unsubscribed devices.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "opened": {
+          "description": "Number of times an email has been opened.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "received": {
+          "description": "Number of devices that received the message.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "reported_spam": {
+          "description": "Number of recipients who reported this email as spam.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "successful": {
+          "description": "Number of messages delivered to push servers, mobile carriers, or email service providers.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "unique_clicks": {
+          "description": "Number of unique clicks that your recipients have made on links from your email.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "unique_opens": {
+          "description": "Number of unique recipients who have opened your email.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "unsubscribed": {
+          "description": "Number of recipients who opted out of your emails using the unsubscribe link in this email.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "HasuraPlatformDeliveryDataSms": {
+      "fields": {
+        "converted": {
+          "description": "Number of messages that were clicked.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "errored": {
+          "description": "Number of errors reported.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "failed": {
+          "description": "Number of messages sent to unsubscribed devices.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "provider_errored": {
+          "description": "Number of errors reported by the SMS service provider.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "provider_failed": {
+          "description": "Number of recipients who didn't receive your message as reported by the SMS service provider.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "provider_successful": {
+          "description": "Number of messages reported as delivered successfully by the SMS service provider.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "received": {
+          "description": "Number of devices that received the message.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "successful": {
+          "description": "Number of messages delivered to push servers, mobile carriers, or email service providers.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
               "type": "named"
             }
           }

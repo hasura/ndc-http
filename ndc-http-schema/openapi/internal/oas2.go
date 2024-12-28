@@ -17,25 +17,14 @@ import (
 
 // OAS2Builder the NDC schema builder from OpenAPI 2.0 specification
 type OAS2Builder struct {
-	*ConvertOptions
-
-	schema *rest.NDCHttpSchema
-	// stores prebuilt and evaluating information of component schema types.
-	// some undefined schema types aren't stored in either object nor scalar,
-	// or self-reference types that haven't added into the object_types map yet.
-	// This cache temporarily stores them to avoid infinite recursive reference.
-	schemaCache map[string]SchemaInfoCache
+	*OASBuilderState
 }
 
 // NewOAS2Builder creates an OAS3Builder instance
 func NewOAS2Builder(options ConvertOptions) *OAS2Builder {
-	builder := &OAS2Builder{
-		schema:         rest.NewNDCHttpSchema(),
-		schemaCache:    make(map[string]SchemaInfoCache),
-		ConvertOptions: applyConvertOptions(options),
+	return &OAS2Builder{
+		OASBuilderState: NewOASBuilderState(options),
 	}
-
-	return builder
 }
 
 func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.Swagger]) (*rest.NDCHttpSchema, error) {
@@ -208,7 +197,7 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		return nil
 	}
 
-	schemaResult, err := newOAS2SchemaBuilder(oc, "", rest.InBody).getSchemaType(typeSchema, []string{typeKey})
+	schemaResult, err := newOASSchemaBuilder(oc.OASBuilderState, "", rest.InBody).getSchemaType(typeSchema, []string{typeKey})
 	if err != nil {
 		return err
 	}
@@ -257,12 +246,39 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 	return err
 }
 
-// build a named type for JSON scalar
-func (oc *OAS2Builder) buildScalarJSON() *schema.NamedType {
-	scalarName := string(rest.ScalarJSON)
-	if _, ok := oc.schema.ScalarTypes[scalarName]; !ok {
-		oc.schema.ScalarTypes[scalarName] = *defaultScalarTypes[rest.ScalarJSON]
+// get and convert an OpenAPI data type to a NDC type from parameter
+func (oc *OAS2Builder) getSchemaTypeFromParameter(param *v2.Parameter, fieldPaths []string) (schema.TypeEncoder, error) {
+	var typeEncoder schema.TypeEncoder
+	nullable := param.Required == nil || !*param.Required
+
+	paramType := param.Type
+	hasArrayItem := param.Items != nil && param.Items.Type != ""
+	if param.Type == "" && hasArrayItem {
+		paramType = "array"
 	}
 
-	return schema.NewNamedType(scalarName)
+	switch paramType {
+	case "object":
+		return nil, fmt.Errorf("%s: unsupported object parameter", strings.Join(fieldPaths, "."))
+	case "array":
+		if param.Items == nil || param.Items.Type == "" {
+			typeEncoder = schema.NewArrayType(schema.NewNamedType(string(rest.ScalarJSON)))
+		} else {
+			itemName := getScalarFromType(oc.schema, []string{param.Items.Type}, param.Format, param.Enum, fieldPaths)
+			typeEncoder = schema.NewArrayType(schema.NewNamedType(itemName))
+		}
+	default:
+		if !isPrimitiveScalar([]string{param.Type}) {
+			return nil, fmt.Errorf("%s: unsupported schema type %s", strings.Join(fieldPaths, "."), param.Type)
+		}
+
+		scalarName := getScalarFromType(oc.schema, []string{param.Type}, param.Format, param.Enum, fieldPaths)
+		typeEncoder = schema.NewNamedType(scalarName)
+	}
+
+	if nullable {
+		return schema.NewNullableType(typeEncoder), nil
+	}
+
+	return typeEncoder, nil
 }

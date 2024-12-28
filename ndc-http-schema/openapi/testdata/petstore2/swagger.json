@@ -169,6 +169,7 @@
             "description": "successful operation",
             "schema": {
               "type": "array",
+              "additionalProperties": true,
               "items": { "$ref": "#/definitions/Pet" }
             }
           },

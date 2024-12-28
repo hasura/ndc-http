@@ -11,10 +11,8 @@ import (
 )
 
 var (
-	bracketRegexp         = regexp.MustCompile(`[\{\}]`)
-	oasVariableRegex      = regexp.MustCompile(`^\{([a-zA-Z0-9_-]+)\}$`)
-	schemaRefNameV2Regexp = regexp.MustCompile(`^#/definitions/(.+)$`)
-	schemaRefNameV3Regexp = regexp.MustCompile(`^#/components/schemas/(.+)$`)
+	bracketRegexp    = regexp.MustCompile(`[\{\}]`)
+	oasVariableRegex = regexp.MustCompile(`^\{([a-zA-Z0-9_-]+)\}$`)
 )
 
 var (
@@ -23,7 +21,7 @@ var (
 
 var preferredContentTypes = []string{rest.ContentTypeJSON, rest.ContentTypeXML}
 
-var defaultScalarTypes = map[rest.ScalarName]*schema.ScalarType{
+var defaultScalarTypes = map[rest.ScalarName]schema.ScalarType{
 	rest.ScalarBoolean: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
