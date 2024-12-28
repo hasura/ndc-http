@@ -19,7 +19,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// MarshalSchema encodes the NDC HTTP schema to bytes
+// MarshalSchema encodes the NDC HTTP schema to bytes.
 func MarshalSchema(content any, format schema.SchemaFileFormat) ([]byte, error) {
 	var fileBuffer bytes.Buffer
 	switch format {
@@ -44,7 +44,7 @@ func MarshalSchema(content any, format schema.SchemaFileFormat) ([]byte, error) 
 	return fileBuffer.Bytes(), nil
 }
 
-// WriteSchemaFile writes the NDC HTTP schema to file
+// WriteSchemaFile writes the NDC HTTP schema to file.
 func WriteSchemaFile(outputPath string, content any) error {
 	format, err := schema.ParseSchemaFileFormat(strings.TrimLeft(filepath.Ext(outputPath), "."))
 	if err != nil {
@@ -66,7 +66,7 @@ func WriteSchemaFile(outputPath string, content any) error {
 	return os.WriteFile(outputPath, rawBytes, 0o664)
 }
 
-// ReadFileFromPath read file content from either file path or URL
+// ReadFileFromPath read file content from either file path or URL.
 func ReadFileFromPath(filePath string) ([]byte, error) {
 	var result []byte
 
@@ -106,7 +106,7 @@ func ReadFileFromPath(filePath string) ([]byte, error) {
 	return result, nil
 }
 
-// WalkFiles read one file or many files in a folder if the file path is a directory
+// WalkFiles read one file or many files in a folder if the file path is a directory.
 func WalkFiles(filePath string, callback func(data []byte) error) error {
 	fileURL, err := url.Parse(filePath)
 	if err == nil && slices.Contains([]string{"http", "https"}, strings.ToLower(fileURL.Scheme)) {
@@ -173,7 +173,7 @@ func WalkFiles(filePath string, callback func(data []byte) error) error {
 	})
 }
 
-// ResolveFilePath resolves file path with directory
+// ResolveFilePath resolves file path with directory.
 func ResolveFilePath(dir string, filePath string) string {
 	if !strings.HasPrefix(filePath, "/") && !strings.HasPrefix(filePath, "\\") && !strings.HasPrefix(filePath, "http") {
 		return path.Join(dir, filePath)

@@ -12,7 +12,6 @@ import (
 	"github.com/hasura/ndc-http/connector/internal/security"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/schema"
 )
 
 // Server contains server settings.
@@ -53,14 +52,9 @@ func (us *UpstreamSetting) buildRequest(runtimeSchema *configuration.NDCHttpRunt
 	if err != nil {
 		return nil, err
 	}
+
+	evalForwardedHeaders(req, headers)
 	req.Namespace = runtimeSchema.Name
-
-	if err := evalForwardedHeaders(req, headers); err != nil {
-		return nil, schema.UnprocessableContentError("invalid forwarded headers", map[string]any{
-			"cause": err.Error(),
-		})
-	}
-
 	req.URL.Scheme = baseURL.Scheme
 	req.URL.Host = baseURL.Host
 	req.URL.Path = path.Join(baseURL.Path, req.URL.Path)
@@ -70,8 +64,8 @@ func (us *UpstreamSetting) buildRequest(runtimeSchema *configuration.NDCHttpRunt
 }
 
 func (us *UpstreamSetting) getBaseURLFromServers(namespace string, serverIDs []string) (*url.URL, string, error) {
-	var results []*url.URL
-	var selectedServerIDs []string
+	results := []*url.URL{}
+	selectedServerIDs := []string{}
 	for key, server := range us.servers {
 		if len(serverIDs) > 0 && !slices.Contains(serverIDs, key) {
 			continue

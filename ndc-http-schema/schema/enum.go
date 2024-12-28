@@ -10,7 +10,7 @@ import (
 
 const BodyKey = "body"
 
-// SchemaSpecType represents the spec enum of schema
+// SchemaSpecType represents the spec enum of schema.
 type SchemaSpecType string
 
 const (
@@ -23,7 +23,7 @@ const (
 
 var schemaSpecType_enums = []SchemaSpecType{OAS3Spec, OAS2Spec, OpenAPIv3Spec, OpenAPIv2Spec, NDCSpec}
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j SchemaSpecType) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
@@ -48,7 +48,7 @@ func (j *SchemaSpecType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ParseSchemaSpecType parses SchemaSpecType from string
+// ParseSchemaSpecType parses SchemaSpecType from string.
 func ParseSchemaSpecType(value string) (SchemaSpecType, error) {
 	result := SchemaSpecType(value)
 	if !slices.Contains(schemaSpecType_enums, result) {
@@ -58,7 +58,7 @@ func ParseSchemaSpecType(value string) (SchemaSpecType, error) {
 	return result, nil
 }
 
-// SchemaFileFormat represents the file format enum for NDC HTTP schema file
+// SchemaFileFormat represents the file format enum for NDC HTTP schema file.
 type SchemaFileFormat string
 
 const (
@@ -68,7 +68,7 @@ const (
 
 var schemaFileFormat_enums = []SchemaFileFormat{SchemaFileYAML, SchemaFileJSON}
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j SchemaFileFormat) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
@@ -93,12 +93,12 @@ func (j *SchemaFileFormat) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// IsEmpty checks if the style enum is valid
+// IsEmpty checks if the style enum is valid.
 func (j SchemaFileFormat) IsValid() bool {
 	return slices.Contains(schemaFileFormat_enums, j)
 }
 
-// ParseSchemaFileFormat parses SchemaFileFormat from file extension
+// ParseSchemaFileFormat parses SchemaFileFormat from file extension.
 func ParseSchemaFileFormat(extension string) (SchemaFileFormat, error) {
 	result := SchemaFileFormat(extension)
 	if !result.IsValid() {
@@ -125,7 +125,7 @@ const (
 
 var parameterLocation_enums = []ParameterLocation{InQuery, InHeader, InPath, InCookie, InBody, InFormData}
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j ParameterLocation) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
@@ -150,12 +150,12 @@ func (j *ParameterLocation) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// IsEmpty checks if the style enum is valid
+// IsEmpty checks if the style enum is valid.
 func (j ParameterLocation) IsValid() bool {
 	return slices.Contains(parameterLocation_enums, j)
 }
 
-// ParseParameterLocation parses ParameterLocation from string
+// ParseParameterLocation parses ParameterLocation from string.
 func ParseParameterLocation(input string) (ParameterLocation, error) {
 	result := ParameterLocation(input)
 	if !result.IsValid() {
@@ -165,7 +165,7 @@ func ParseParameterLocation(input string) (ParameterLocation, error) {
 	return result, nil
 }
 
-// ScalarName defines supported scalar name enums of the OpenAPI spec
+// ScalarName defines supported scalar name enums of the OpenAPI spec.
 type ScalarName string
 
 const (
@@ -210,7 +210,7 @@ var scalarName_enums = []ScalarName{
 	ScalarIPV6,
 }
 
-// IsDefaultScalar checks if the scalar name is
+// IsDefaultScalar checks if the scalar name is.
 func IsDefaultScalar(name string) bool {
 	return slices.Contains(scalarName_enums, ScalarName(name))
 }
@@ -262,7 +262,7 @@ var parameterEncodingStyle_enums = []ParameterEncodingStyle{
 	EncodingStyleDeepObject,
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j ParameterEncodingStyle) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
@@ -287,12 +287,12 @@ func (j *ParameterEncodingStyle) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// IsEmpty checks if the style enum is valid
+// IsEmpty checks if the style enum is valid.
 func (j ParameterEncodingStyle) IsValid() bool {
 	return slices.Contains(parameterEncodingStyle_enums, j)
 }
 
-// ParseParameterEncodingStyle parses ParameterEncodingStyle from string
+// ParseParameterEncodingStyle parses ParameterEncodingStyle from string.
 func ParseParameterEncodingStyle(input string) (ParameterEncodingStyle, error) {
 	result := ParameterEncodingStyle(input)
 	if !result.IsValid() {

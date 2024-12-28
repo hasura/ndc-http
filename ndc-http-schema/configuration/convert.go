@@ -11,7 +11,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 )
 
-// ConvertToNDCSchema converts to NDC HTTP schema from config
+// ConvertToNDCSchema converts to NDC HTTP schema from config.
 func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDCHttpSchema, error) {
 	rawContent, err := utils.ReadFileFromPath(config.File)
 	if err != nil {
@@ -57,7 +57,7 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 	return utils.ApplyPatchToHTTPSchema(result, config.PatchAfter)
 }
 
-// ResolveConvertConfigArguments resolves convert config arguments
+// ResolveConvertConfigArguments resolves convert config arguments.
 func ResolveConvertConfigArguments(config *ConvertConfig, configDir string, args *ConvertCommandArguments) {
 	if args != nil {
 		if args.Spec != "" {

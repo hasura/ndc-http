@@ -41,13 +41,11 @@ func setHeaderAttributes(span trace.Span, prefix string, httpHeaders http.Header
 	}
 }
 
-func evalForwardedHeaders(req *RetryableRequest, headers map[string]string) error {
+func evalForwardedHeaders(req *RetryableRequest, headers map[string]string) {
 	for key, value := range headers {
 		if req.Headers.Get(key) != "" {
 			continue
 		}
 		req.Headers.Set(key, value)
 	}
-
-	return nil
 }

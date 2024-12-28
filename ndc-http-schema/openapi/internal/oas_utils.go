@@ -139,7 +139,7 @@ func canSetEnumToSchema(sm *rest.NDCHttpSchema, scalarName string, enums []strin
 	return false
 }
 
-// remove nullable types from raw OpenAPI types
+// remove nullable types from raw OpenAPI types.
 func evaluateOpenAPITypes(input []string) []string {
 	var typeNames []string
 	for _, t := range input {
@@ -182,7 +182,7 @@ func createSchemaFromOpenAPISchema(input *base.Schema) *rest.TypeSchema {
 	return ps
 }
 
-// check if the OAS type is a scalar
+// check if the OAS type is a scalar.
 func isPrimitiveScalar(names []string) bool {
 	for _, name := range names {
 		if !slices.Contains([]string{"boolean", "integer", "number", "string", "file", "long", "null"}, name) {
@@ -260,10 +260,10 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 	}
 }
 
-// evaluate and filter invalid types in allOf, anyOf or oneOf schemas
+// evaluate and filter invalid types in allOf, anyOf or oneOf schemas.
 func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.ParameterLocation) ([]*base.SchemaProxy, *base.Schema, bool, bool) {
-	var results []*base.SchemaProxy
-	var typeNames []string
+	results := []*base.SchemaProxy{}
+	typeNames := []string{}
 	var nullable, isEmptyObject bool
 
 	for _, proxy := range schemaProxies {
@@ -309,7 +309,7 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 	return results, nil, nullable, isEmptyObject
 }
 
-// guess the result type from content type
+// guess the result type from content type.
 func getResultTypeFromContentType(contentType string) schema.TypeEncoder {
 	var scalarName rest.ScalarName
 	switch {

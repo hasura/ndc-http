@@ -79,7 +79,7 @@ func (cc NoopCredential) GetClient() *http.Client {
 	return cc.client
 }
 
-// Inject the credential into the incoming request
+// Inject the credential into the incoming request.
 func (cc NoopCredential) Inject(req *http.Request) (bool, error) {
 	return false, nil
 }

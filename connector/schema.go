@@ -15,7 +15,7 @@ func (c *HTTPConnector) GetSchema(ctx context.Context, configuration *configurat
 	return c.rawSchema, nil
 }
 
-// ApplyNDCHttpSchemas applies slice of raw NDC HTTP schemas to the connector
+// ApplyNDCHttpSchemas applies slice of raw NDC HTTP schemas to the connector.
 func (c *HTTPConnector) ApplyNDCHttpSchemas(ctx context.Context, config *configuration.Configuration, schemas []configuration.NDCHttpRuntimeSchema, logger *slog.Logger) error {
 	httpSchema, metadata, errs := configuration.MergeNDCHttpSchemas(config, schemas)
 	if len(errs) > 0 {

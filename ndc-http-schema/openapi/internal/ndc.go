@@ -40,7 +40,7 @@ func (ndc *NDCBuilder) Build() (*rest.NDCHttpSchema, error) {
 	return ndc.newSchema, nil
 }
 
-// Validate checks if the schema is valid
+// Validate checks if the schema is valid.
 func (nsc *NDCBuilder) validate() error {
 	for key, operation := range nsc.schema.Functions {
 		op, err := nsc.validateOperation(key, operation)
@@ -65,7 +65,7 @@ func (nsc *NDCBuilder) validate() error {
 	return nil
 }
 
-// recursively validate and clean unused objects as well as their inner properties
+// recursively validate and clean unused objects as well as their inner properties.
 func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.OperationInfo) (*rest.OperationInfo, error) {
 	result := &rest.OperationInfo{
 		Request:     operation.Request,
@@ -95,7 +95,7 @@ func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.Op
 	return result, nil
 }
 
-// recursively validate used types as well as their inner properties
+// recursively validate used types as well as their inner properties.
 func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder, error) {
 	rawType, err := schemaType.InterfaceT()
 

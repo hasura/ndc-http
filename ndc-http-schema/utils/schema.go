@@ -6,12 +6,12 @@ import (
 	"github.com/hasura/ndc-sdk-go/schema"
 )
 
-// UnwrapNullableType unwraps the underlying type of the nullable type
+// UnwrapNullableType unwraps the underlying type of the nullable type.
 func UnwrapNullableType(input schema.Type) (schema.TypeEncoder, bool, error) {
 	return UnwrapNullableTypeEncoder(input.Interface())
 }
 
-// UnwrapNullableTypeEncoder unwraps the underlying type of the nullable type
+// UnwrapNullableTypeEncoder unwraps the underlying type of the nullable type.
 func UnwrapNullableTypeEncoder(input schema.TypeEncoder) (schema.TypeEncoder, bool, error) {
 	switch ty := input.(type) {
 	case *schema.NullableType:

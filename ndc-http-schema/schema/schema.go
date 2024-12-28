@@ -31,7 +31,7 @@ type NDCHttpSchema struct {
 	ScalarTypes schema.SchemaResponseScalarTypes `json:"scalar_types" mapstructure:"scalar_types" yaml:"scalar_types"`
 }
 
-// NewNDCHttpSchema creates a NDCHttpSchema instance
+// NewNDCHttpSchema creates a NDCHttpSchema instance.
 func NewNDCHttpSchema() *NDCHttpSchema {
 	return &NDCHttpSchema{
 		SchemaRef:   "https://raw.githubusercontent.com/hasura/ndc-http/refs/heads/main/ndc-http-schema/jsonschema/ndc-http-schema.schema.json",
@@ -43,7 +43,7 @@ func NewNDCHttpSchema() *NDCHttpSchema {
 	}
 }
 
-// ToSchemaResponse converts the instance to NDC schema.SchemaResponse
+// ToSchemaResponse converts the instance to NDC schema.SchemaResponse.
 func (ndc NDCHttpSchema) ToSchemaResponse() *schema.SchemaResponse {
 	functionKeys := utils.GetSortedKeys(ndc.Functions)
 	functions := make([]schema.FunctionInfo, len(functionKeys))
@@ -72,7 +72,7 @@ func (ndc NDCHttpSchema) ToSchemaResponse() *schema.SchemaResponse {
 	}
 }
 
-// GetFunction gets the NDC function by name
+// GetFunction gets the NDC function by name.
 func (rm NDCHttpSchema) GetFunction(name string) *OperationInfo {
 	fn, ok := rm.Functions[name]
 	if !ok {
@@ -82,7 +82,7 @@ func (rm NDCHttpSchema) GetFunction(name string) *OperationInfo {
 	return &fn
 }
 
-// GetProcedure gets the NDC procedure by name
+// GetProcedure gets the NDC procedure by name.
 func (rm NDCHttpSchema) GetProcedure(name string) *OperationInfo {
 	fn, ok := rm.Procedures[name]
 	if !ok {
@@ -104,13 +104,13 @@ type Response struct {
 	ContentType string `json:"contentType" mapstructure:"contentType" yaml:"contentType"`
 }
 
-// RuntimeSettings contain runtime settings for a server
+// RuntimeSettings contain runtime settings for a server.
 type RuntimeSettings struct { // configure the request timeout in seconds, default 30s
 	Timeout uint        `json:"timeout,omitempty" mapstructure:"timeout" yaml:"timeout,omitempty"`
 	Retry   RetryPolicy `json:"retry,omitempty"   mapstructure:"retry"   yaml:"retry,omitempty"`
 }
 
-// Request represents the HTTP request information of the webhook
+// Request represents the HTTP request information of the webhook.
 type Request struct {
 	URL         string                     `json:"url,omitempty"         mapstructure:"url"                                              yaml:"url,omitempty"`
 	Method      string                     `json:"method,omitempty"      jsonschema:"enum=get,enum=post,enum=put,enum=patch,enum=delete" mapstructure:"method"        yaml:"method,omitempty"`
@@ -123,7 +123,7 @@ type Request struct {
 	*RuntimeSettings `yaml:",inline"`
 }
 
-// Clone copies this instance to a new one
+// Clone copies this instance to a new one.
 func (r Request) Clone() *Request {
 	return &Request{
 		URL:             r.URL,
@@ -137,7 +137,7 @@ func (r Request) Clone() *Request {
 	}
 }
 
-// RequestParameter represents an HTTP request parameter
+// RequestParameter represents an HTTP request parameter.
 type RequestParameter struct {
 	EncodingObject `yaml:",inline"`
 	Name           string            `json:"name,omitempty"         mapstructure:"name"                   yaml:"name,omitempty"`
@@ -147,7 +147,7 @@ type RequestParameter struct {
 }
 
 // TypeSchema represents a serializable object of OpenAPI schema
-// that is used for validation
+// that is used for validation.
 type TypeSchema struct {
 	Type        []string    `json:"type,omitempty"      mapstructure:"type"      yaml:"type,omitempty"`
 	Format      string      `json:"format,omitempty"    mapstructure:"format"    yaml:"format,omitempty"`
@@ -163,7 +163,7 @@ type TypeSchema struct {
 	WriteOnly   bool        `json:"-"                   yaml:"-"`
 }
 
-// RetryPolicy represents the retry policy of request
+// RetryPolicy represents the retry policy of request.
 type RetryPolicy struct {
 	// Number of retry times
 	Times uint `json:"times,omitempty" mapstructure:"times" yaml:"times,omitempty"`
@@ -173,7 +173,7 @@ type RetryPolicy struct {
 	HTTPStatus []int `json:"httpStatus,omitempty" mapstructure:"httpStatus" yaml:"httpStatus,omitempty"`
 }
 
-// Schema returns the object type schema of this type
+// Schema returns the object type schema of this type.
 func (rp RetryPolicy) Schema() schema.ObjectType {
 	return schema.ObjectType{
 		Description: utils.ToPtr("Retry policy of request"),
@@ -220,7 +220,7 @@ type EncodingObject struct {
 	Headers map[string]RequestParameter `json:"headers,omitempty" mapstructure:"headers" yaml:"headers,omitempty"`
 }
 
-// SetHeader sets the encoding header
+// SetHeader sets the encoding header.
 func (eo *EncodingObject) SetHeader(key string, param RequestParameter) {
 	if eo.Headers == nil {
 		eo.Headers = make(map[string]RequestParameter)
@@ -228,7 +228,7 @@ func (eo *EncodingObject) SetHeader(key string, param RequestParameter) {
 	eo.Headers[key] = param
 }
 
-// GetHeader gets the encoding header by key
+// GetHeader gets the encoding header by key.
 func (eo *EncodingObject) GetHeader(key string) *RequestParameter {
 	if len(eo.Headers) == 0 {
 		return nil
@@ -241,13 +241,13 @@ func (eo *EncodingObject) GetHeader(key string) *RequestParameter {
 	return &result
 }
 
-// RequestBody defines flexible request body with content types
+// RequestBody defines flexible request body with content types.
 type RequestBody struct {
 	ContentType string                    `json:"contentType,omitempty" mapstructure:"contentType" yaml:"contentType,omitempty"`
 	Encoding    map[string]EncodingObject `json:"encoding,omitempty"    mapstructure:"encoding"    yaml:"encoding,omitempty"`
 }
 
-// OperationInfo extends connector command operation with OpenAPI HTTP information
+// OperationInfo extends connector command operation with OpenAPI HTTP information.
 type OperationInfo struct {
 	Request *Request `json:"request" mapstructure:"request" yaml:"request"`
 	// Any arguments that this collection requires
@@ -315,7 +315,7 @@ func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Schema returns the connector schema of the function
+// Schema returns the connector schema of the function.
 func (j OperationInfo) FunctionSchema(name string) schema.FunctionInfo {
 	arguments := make(schema.FunctionInfoArguments)
 	for key, argument := range j.Arguments {
@@ -330,7 +330,7 @@ func (j OperationInfo) FunctionSchema(name string) schema.FunctionInfo {
 	}
 }
 
-// Schema returns the connector schema of the function
+// Schema returns the connector schema of the function.
 func (j OperationInfo) ProcedureSchema(name string) schema.ProcedureInfo {
 	arguments := make(schema.ProcedureInfoArguments)
 	for key, argument := range j.Arguments {
@@ -345,7 +345,7 @@ func (j OperationInfo) ProcedureSchema(name string) schema.ProcedureInfo {
 	}
 }
 
-// ObjectType represents the object type of http schema
+// ObjectType represents the object type of http schema.
 type ObjectType struct {
 	// Description of this type
 	Description *string `json:"description,omitempty" mapstructure:"description,omitempty" yaml:"description,omitempty"`
@@ -355,7 +355,7 @@ type ObjectType struct {
 	XML *XMLSchema `json:"xml,omitempty" mapstructure:"xml" yaml:"xml,omitempty"`
 }
 
-// Schema returns schema the object field
+// Schema returns schema the object field.
 func (of ObjectType) Schema() schema.ObjectType {
 	result := schema.ObjectType{
 		Description: of.Description,
@@ -369,7 +369,7 @@ func (of ObjectType) Schema() schema.ObjectType {
 	return result
 }
 
-// ObjectField defined on this object type
+// ObjectField defined on this object type.
 type ObjectField struct {
 	schema.ObjectField `yaml:",inline"`
 
@@ -377,7 +377,7 @@ type ObjectField struct {
 	HTTP *TypeSchema `json:"http,omitempty" mapstructure:"http" yaml:"http,omitempty"`
 }
 
-// Schema returns schema the object field
+// Schema returns schema the object field.
 func (of ObjectField) Schema() schema.ObjectField {
 	return of.ObjectField
 }
@@ -423,7 +423,7 @@ func (j *ObjectField) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ArgumentInfo the information of HTTP request argument
+// ArgumentInfo the information of HTTP request argument.
 type ArgumentInfo struct {
 	schema.ArgumentInfo `yaml:",inline"`
 
@@ -493,7 +493,7 @@ func (xs XMLSchema) GetFullName() string {
 	return xs.Prefix + ":" + xs.Name
 }
 
-// GetNamespaceAttribute gets the namespace attribute
+// GetNamespaceAttribute gets the namespace attribute.
 func (xs XMLSchema) GetNamespaceAttribute() xml.Attr {
 	// xmlns:smp="http://example.com/schema"
 	name := "xmlns"

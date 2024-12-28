@@ -12,17 +12,17 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
-// MultipartWriter extends multipart.Writer with helpers
+// MultipartWriter extends multipart.Writer with helpers.
 type MultipartWriter struct {
 	*multipart.Writer
 }
 
-// NewMultipartWriter creates a MultipartWriter instance
+// NewMultipartWriter creates a MultipartWriter instance.
 func NewMultipartWriter(w io.Writer) *MultipartWriter {
 	return &MultipartWriter{multipart.NewWriter(w)}
 }
 
-// WriteDataURI write a file from data URI string
+// WriteDataURI write a file from data URI string.
 func (w *MultipartWriter) WriteDataURI(name string, value any, headers http.Header) error {
 	b64, err := utils.DecodeString(value)
 	if err != nil {

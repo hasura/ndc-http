@@ -15,7 +15,7 @@ import (
 	"github.com/hasura/ndc-sdk-go/schema"
 )
 
-// RawRequestBuilder represents a type to build a raw HTTP request
+// RawRequestBuilder represents a type to build a raw HTTP request.
 type RawRequestBuilder struct {
 	operation      schema.MutationOperation
 	forwardHeaders configuration.ForwardHeadersSettings

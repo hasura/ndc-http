@@ -39,7 +39,7 @@ type ConcurrencySettings struct {
 	HTTP uint `json:"http" yaml:"http"`
 }
 
-// ForwardHeadersSettings hold settings of header forwarding from and to Hasura engine
+// ForwardHeadersSettings hold settings of header forwarding from and to Hasura engine.
 type ForwardHeadersSettings struct {
 	// Enable headers forwarding.
 	Enabled bool `json:"enabled" yaml:"enabled"`
@@ -101,7 +101,7 @@ func (j ForwardResponseHeadersSettings) Validate() error {
 	return nil
 }
 
-// RetryPolicySetting represents retry policy settings
+// RetryPolicySetting represents retry policy settings.
 type RetryPolicySetting struct {
 	// Number of retry times
 	Times utils.EnvInt `json:"times,omitempty" mapstructure:"times" yaml:"times,omitempty"`
@@ -111,7 +111,7 @@ type RetryPolicySetting struct {
 	HTTPStatus []int `json:"httpStatus,omitempty" mapstructure:"httpStatus" yaml:"httpStatus,omitempty"`
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (rs RetryPolicySetting) Validate() (*rest.RetryPolicy, error) {
 	var errs []error
 	times, err := rs.Times.Get()
@@ -149,7 +149,7 @@ func (rs RetryPolicySetting) Validate() (*rest.RetryPolicy, error) {
 	return result, nil
 }
 
-// ConfigItem extends the ConvertConfig with advanced options
+// ConfigItem extends the ConvertConfig with advanced options.
 type ConfigItem struct {
 	ConvertConfig `yaml:",inline"`
 
@@ -160,12 +160,12 @@ type ConfigItem struct {
 	Retry   *RetryPolicySetting `json:"retry,omitempty"   mapstructure:"retry"   yaml:"retry,omitempty"`
 }
 
-// IsDistributed checks if the distributed option is enabled
+// IsDistributed checks if the distributed option is enabled.
 func (ci ConfigItem) IsDistributed() bool {
 	return ci.Distributed != nil && *ci.Distributed
 }
 
-// GetRuntimeSettings validate and get runtime settings
+// GetRuntimeSettings validate and get runtime settings.
 func (ci ConfigItem) GetRuntimeSettings() (*rest.RuntimeSettings, error) {
 	result := &rest.RuntimeSettings{}
 	var errs []error
@@ -196,7 +196,7 @@ func (ci ConfigItem) GetRuntimeSettings() (*rest.RuntimeSettings, error) {
 	return result, nil
 }
 
-// ConvertConfig represents the content of convert config file
+// ConvertConfig represents the content of convert config file.
 type ConvertConfig struct {
 	// File path needs to be converted
 	File string `json:"file" jsonschema:"required" yaml:"file"`
@@ -224,14 +224,14 @@ type ConvertConfig struct {
 	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 }
 
-// NDCHttpRuntimeSchema wraps NDCHttpSchema with runtime settings
+// NDCHttpRuntimeSchema wraps NDCHttpSchema with runtime settings.
 type NDCHttpRuntimeSchema struct {
 	Name    string               `json:"name" yaml:"name"`
 	Runtime rest.RuntimeSettings `json:"-"    yaml:"-"`
 	*rest.NDCHttpSchema
 }
 
-// ConvertCommandArguments represent available command arguments for the convert command
+// ConvertCommandArguments represent available command arguments for the convert command.
 type ConvertCommandArguments struct {
 	File                string            `help:"File path needs to be converted."                                                     short:"f"`
 	Config              string            `help:"Path of the config file."                                                             short:"c"`
@@ -250,7 +250,7 @@ type ConvertCommandArguments struct {
 	PatchAfter          []string          `help:"Patch files to be applied into the input file after converting"`
 }
 
-// the object type of HTTP execution options for single server
+// the object type of HTTP execution options for single server.
 var singleObjectType = rest.ObjectType{
 	Description: utils.ToPtr("Execution options for HTTP requests to a single server"),
 	Fields: map[string]rest.ObjectField{
@@ -263,7 +263,7 @@ var singleObjectType = rest.ObjectType{
 	},
 }
 
-// the object type of HTTP execution options for distributed servers
+// the object type of HTTP execution options for distributed servers.
 var distributedObjectType rest.ObjectType = rest.ObjectType{
 	Description: utils.ToPtr("Distributed execution options for HTTP requests to multiple servers"),
 	Fields: map[string]rest.ObjectField{

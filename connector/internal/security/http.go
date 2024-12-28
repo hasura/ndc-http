@@ -8,7 +8,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 )
 
-// HTTPCredential presents a header authentication credential
+// HTTPCredential presents a header authentication credential.
 type HTTPCredential struct {
 	Header string
 	Scheme string
@@ -39,7 +39,7 @@ func (hc HTTPCredential) GetClient() *http.Client {
 	return hc.client
 }
 
-// Inject the credential into the incoming request
+// Inject the credential into the incoming request.
 func (hc HTTPCredential) Inject(req *http.Request) (bool, error) {
 	if hc.Value == "" {
 		return false, nil
@@ -74,7 +74,7 @@ func (hc HTTPCredential) inject(req *http.Request, value string) {
 	req.Header.Set(headerName, scheme+" "+value)
 }
 
-// CookieCredential presents a cookie credential
+// CookieCredential presents a cookie credential.
 type CookieCredential struct {
 	client *http.Client
 }
@@ -93,7 +93,7 @@ func (cc CookieCredential) GetClient() *http.Client {
 	return cc.client
 }
 
-// Inject the credential into the incoming request
+// Inject the credential into the incoming request.
 func (cc CookieCredential) Inject(req *http.Request) (bool, error) {
 	return false, nil
 }

@@ -101,6 +101,7 @@ func (c *XMLDecoder) getArrayItemObjectField(field rest.ObjectField, t *schema.A
 
 	return fieldItem
 }
+
 func (c *XMLDecoder) evalArrayField(block *xmlBlock, fieldName string, field rest.ObjectField, t *schema.ArrayType, fieldPaths []string) (any, error) {
 	if block.Fields == nil {
 		return nil, nil
@@ -335,13 +336,13 @@ func (c *XMLDecoder) decodeSimpleScalarValue(block *xmlBlock, scalarType schema.
 		}
 
 		result = block.Data
-	case *schema.TypeRepresentationInteger, *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64: //nolint:all
+	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64:
 		if len(block.Data) == 0 {
 			break
 		}
 
 		result, err = strconv.ParseInt(block.Data, 10, 64)
-	case *schema.TypeRepresentationNumber, *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64: //nolint:all
+	case *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64:
 		if len(block.Data) == 0 {
 			break
 		}

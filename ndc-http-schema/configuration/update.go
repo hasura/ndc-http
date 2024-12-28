@@ -13,7 +13,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// UpdateHTTPConfiguration validates and updates the HTTP configuration
+// UpdateHTTPConfiguration validates and updates the HTTP configuration.
 func UpdateHTTPConfiguration(configurationDir string, logger *slog.Logger) (*Configuration, []NDCHttpRuntimeSchema, *schema.NDCHttpSchema, error) {
 	config, err := ReadConfigurationFile(configurationDir)
 	if err != nil {
@@ -56,7 +56,7 @@ func printSchemaValidationError(logger *slog.Logger, errors map[string][]string)
 	logger.Error("errors happen when validating NDC HTTP schemas", slog.Any("errors", errors))
 }
 
-// ReadConfigurationFile reads and decodes the configuration file from the configuration directory
+// ReadConfigurationFile reads and decodes the configuration file from the configuration directory.
 func ReadConfigurationFile(configurationDir string) (*Configuration, error) {
 	var config Configuration
 	jsonBytes, err := os.ReadFile(configurationDir + "/config.json")

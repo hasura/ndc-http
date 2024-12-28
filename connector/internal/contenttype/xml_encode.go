@@ -37,7 +37,6 @@ func (c *XMLEncoder) Encode(bodyInfo *rest.ArgumentInfo, bodyData any) ([]byte, 
 		},
 		HTTP: bodyInfo.HTTP.Schema,
 	}, bodyData, []string{})
-
 	if err != nil {
 		return nil, err
 	}
@@ -92,142 +91,149 @@ func (c *XMLEncoder) evalXMLField(enc *xml.Encoder, name string, field rest.Obje
 			return fmt.Errorf("%s: expect an array, got null", strings.Join(fieldPaths, "."))
 		}
 
-		vi := innerValue.Interface()
-		values, ok := vi.([]any)
-		if !ok {
-			return fmt.Errorf("%s: expect an array, got %v", strings.Join(fieldPaths, "."), vi)
-		}
-
-		var wrapped bool
-		xmlName := name
-		if field.HTTP.XML != nil {
-			wrapped = field.HTTP.XML.Wrapped
-			if field.HTTP.XML.Name != "" {
-				xmlName = field.HTTP.XML.Name
-			}
-		}
-
-		if wrapped {
-			err := enc.EncodeToken(xml.StartElement{
-				Name: xml.Name{Space: "", Local: xmlName},
-			})
-			if err != nil {
-				return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
-			}
-		}
-
-		for i, v := range values {
-			err := c.evalXMLField(enc, name, rest.ObjectField{
-				ObjectField: schema.ObjectField{
-					Type: t.ElementType,
-				},
-				HTTP: field.HTTP.Items,
-			}, v, append(fieldPaths, strconv.FormatInt(int64(i), 10)))
-
-			if err != nil {
-				return err
-			}
-		}
-
-		if wrapped {
-			err := enc.EncodeToken(xml.EndElement{
-				Name: xml.Name{Space: "", Local: xmlName},
-			})
-			if err != nil {
-				return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
-			}
-		}
-
-		return nil
+		return c.evalXMLFieldArray(enc, name, field, t, innerValue, fieldPaths)
 	case *schema.NamedType:
 		if !notNull {
 			return fmt.Errorf("%s: expect a non-null type, got null", strings.Join(fieldPaths, "."))
 		}
 
-		xmlName := getTypeSchemaXMLName(field.HTTP, name)
-		var attributes []xml.Attr
-		if field.HTTP != nil && field.HTTP.XML != nil && field.HTTP.XML.Namespace != "" {
-			attributes = append(attributes, field.HTTP.XML.GetNamespaceAttribute())
-		}
-
-		if _, ok := c.schema.ScalarTypes[t.Name]; ok {
-			if err := c.encodeSimpleScalar(enc, xmlName, reflect.ValueOf(value), attributes, fieldPaths); err != nil {
-				return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
-			}
-
-			return nil
-		}
-
-		objectType, ok := c.schema.ObjectTypes[t.Name]
-		if !ok {
-			return fmt.Errorf("%s: invalid type %s", strings.Join(fieldPaths, "."), t.Name)
-		}
-
-		iv := innerValue.Interface()
-		values, ok := iv.(map[string]any)
-		if !ok {
-			return fmt.Errorf("%s: expected a map, got %s", strings.Join(fieldPaths, "."), innerValue.Kind())
-		}
-
-		attributes, fieldKeys, err := c.evalAttributes(objectType, utils.GetSortedKeys(objectType.Fields), values, fieldPaths)
-		if err != nil {
-			return err
-		}
-
-		xmlName = getXMLName(objectType.XML, name)
-		if objectType.XML != nil && objectType.XML.Namespace != "" {
-			attributes = append(attributes, objectType.XML.GetNamespaceAttribute())
-		}
-
-		err = enc.EncodeToken(xml.StartElement{
-			Name: xml.Name{Space: "", Local: xmlName},
-			Attr: attributes,
-		})
-		if err != nil {
-			return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
-		}
-
-		if len(fieldKeys) == 1 && objectType.Fields[fieldKeys[0]].HTTP != nil && objectType.Fields[fieldKeys[0]].HTTP.XML != nil && objectType.Fields[fieldKeys[0]].HTTP.XML.Text {
-			objectField := objectType.Fields[fieldKeys[0]]
-			fieldValue, ok := values[fieldKeys[0]]
-			if ok && fieldValue != nil {
-				textValue, err := c.encodeXMLText(objectField.Type, reflect.ValueOf(fieldValue), fieldPaths)
-				if err != nil {
-					return err
-				}
-
-				if textValue != nil {
-					err = enc.EncodeToken(xml.CharData(*textValue))
-					if err != nil {
-						return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
-					}
-				}
-			}
-		} else {
-			for _, key := range fieldKeys {
-				objectField := objectType.Fields[key]
-				fieldValue := values[key]
-				if err := c.evalXMLField(enc, key, objectField, fieldValue, append(fieldPaths, key)); err != nil {
-					return err
-				}
-			}
-		}
-
-		err = enc.EncodeToken(xml.EndElement{
-			Name: xml.Name{Space: "", Local: xmlName},
-		})
-		if err != nil {
-			return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
-		}
-
-		return nil
+		return c.evalXMLFieldNamed(enc, name, field, t, innerValue, fieldPaths)
 	default:
 		return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 	}
 }
 
+func (c *XMLEncoder) evalXMLFieldArray(enc *xml.Encoder, name string, field rest.ObjectField, t *schema.ArrayType, value reflect.Value, fieldPaths []string) error {
+	vi := value.Interface()
+	values, ok := vi.([]any)
+	if !ok {
+		return fmt.Errorf("%s: expect an array, got %v", strings.Join(fieldPaths, "."), vi)
+	}
+
+	var wrapped bool
+	xmlName := name
+	if field.HTTP.XML != nil {
+		wrapped = field.HTTP.XML.Wrapped
+		if field.HTTP.XML.Name != "" {
+			xmlName = field.HTTP.XML.Name
+		}
+	}
+
+	if wrapped {
+		err := enc.EncodeToken(xml.StartElement{
+			Name: xml.Name{Space: "", Local: xmlName},
+		})
+		if err != nil {
+			return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
+		}
+	}
+
+	for i, v := range values {
+		err := c.evalXMLField(enc, name, rest.ObjectField{
+			ObjectField: schema.ObjectField{
+				Type: t.ElementType,
+			},
+			HTTP: field.HTTP.Items,
+		}, v, append(fieldPaths, strconv.FormatInt(int64(i), 10)))
+		if err != nil {
+			return err
+		}
+	}
+
+	if wrapped {
+		err := enc.EncodeToken(xml.EndElement{
+			Name: xml.Name{Space: "", Local: xmlName},
+		})
+		if err != nil {
+			return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
+		}
+	}
+
+	return nil
+}
+
+func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest.ObjectField, t *schema.NamedType, innerValue reflect.Value, fieldPaths []string) error {
+	var attributes []xml.Attr
+	xmlName := getTypeSchemaXMLName(field.HTTP, name)
+	if field.HTTP != nil && field.HTTP.XML != nil && field.HTTP.XML.Namespace != "" {
+		attributes = append(attributes, field.HTTP.XML.GetNamespaceAttribute())
+	}
+
+	if _, ok := c.schema.ScalarTypes[t.Name]; ok {
+		if err := c.encodeSimpleScalar(enc, xmlName, innerValue, attributes, fieldPaths); err != nil {
+			return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
+		}
+
+		return nil
+	}
+
+	objectType, ok := c.schema.ObjectTypes[t.Name]
+	if !ok {
+		return fmt.Errorf("%s: invalid type %s", strings.Join(fieldPaths, "."), t.Name)
+	}
+
+	iv := innerValue.Interface()
+	values, ok := iv.(map[string]any)
+	if !ok {
+		return fmt.Errorf("%s: expected a map, got %s", strings.Join(fieldPaths, "."), innerValue.Kind())
+	}
+
+	attributes, fieldKeys, err := c.evalAttributes(objectType, utils.GetSortedKeys(objectType.Fields), values, fieldPaths)
+	if err != nil {
+		return err
+	}
+
+	xmlName = getXMLName(objectType.XML, name)
+	if objectType.XML != nil && objectType.XML.Namespace != "" {
+		attributes = append(attributes, objectType.XML.GetNamespaceAttribute())
+	}
+
+	err = enc.EncodeToken(xml.StartElement{
+		Name: xml.Name{Space: "", Local: xmlName},
+		Attr: attributes,
+	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
+	}
+
+	if len(fieldKeys) == 1 && objectType.Fields[fieldKeys[0]].HTTP != nil && objectType.Fields[fieldKeys[0]].HTTP.XML != nil && objectType.Fields[fieldKeys[0]].HTTP.XML.Text {
+		objectField := objectType.Fields[fieldKeys[0]]
+		fieldValue, ok := values[fieldKeys[0]]
+		if ok && fieldValue != nil {
+			textValue, err := c.encodeXMLText(objectField.Type, reflect.ValueOf(fieldValue), fieldPaths)
+			if err != nil {
+				return err
+			}
+
+			if textValue != nil {
+				err = enc.EncodeToken(xml.CharData(*textValue))
+				if err != nil {
+					return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
+				}
+			}
+		}
+	} else {
+		for _, key := range fieldKeys {
+			objectField := objectType.Fields[key]
+			fieldValue := values[key]
+			if err := c.evalXMLField(enc, key, objectField, fieldValue, append(fieldPaths, key)); err != nil {
+				return err
+			}
+		}
+	}
+
+	err = enc.EncodeToken(xml.EndElement{
+		Name: xml.Name{Space: "", Local: xmlName},
+	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
+	}
+
+	return nil
+}
+
 func (c *XMLEncoder) evalAttributes(objectType rest.ObjectType, keys []string, values map[string]any, fieldPaths []string) ([]xml.Attr, []string, error) {
-	var attrs []xml.Attr
+	attrs := []xml.Attr{}
 	remainKeys := make([]string, 0)
 	for _, key := range keys {
 		objectField := objectType.Fields[key]

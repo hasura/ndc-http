@@ -13,7 +13,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-// OAuth2Client represent the client of the OAuth2 client credentials
+// OAuth2Client represent the client of the OAuth2 client credentials.
 type OAuth2Client struct {
 	client  *http.Client
 	isEmpty bool
@@ -21,7 +21,7 @@ type OAuth2Client struct {
 
 var _ Credential = &OAuth2Client{}
 
-// NewOAuth2Client creates an OAuth2 client from the security scheme
+// NewOAuth2Client creates an OAuth2 client from the security scheme.
 func NewOAuth2Client(ctx context.Context, httpClient *http.Client, baseServerURL *url.URL, flowType schema.OAuthFlowType, config *schema.OAuthFlow) (*OAuth2Client, error) {
 	if flowType != schema.ClientCredentialsFlow || config.TokenURL == nil || config.ClientID == nil || config.ClientSecret == nil {
 		return &OAuth2Client{
@@ -101,7 +101,7 @@ func (oc OAuth2Client) GetClient() *http.Client {
 	return oc.client
 }
 
-// Inject the credential into the incoming request
+// Inject the credential into the incoming request.
 func (oc OAuth2Client) Inject(req *http.Request) (bool, error) {
 	return !oc.isEmpty, nil
 }

@@ -122,7 +122,6 @@ func (cv *ConfigValidator) Render(w io.Writer) {
 			"ServiceName": serviceName,
 			"Variables":   variables,
 		})
-
 		if err != nil {
 			slog.Error(fmt.Sprintf("failed to render environment variables: %s", err))
 		}

@@ -27,7 +27,7 @@ type NDCHttpSettings struct {
 	TLS             *TLSConfig                 `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (rs *NDCHttpSettings) Validate() error {
 	for _, server := range rs.Servers {
 		if err := server.Validate(); err != nil {
@@ -67,7 +67,7 @@ type ServerConfig struct {
 	TLS             *TLSConfig                 `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss *ServerConfig) Validate() error {
 	rawURL, err := ss.URL.Get()
 	if err != nil {
@@ -92,7 +92,7 @@ func (ss *ServerConfig) Validate() error {
 	return nil
 }
 
-// Validate if the current instance is valid
+// Validate if the current instance is valid.
 func (ss ServerConfig) GetURL() (*url.URL, error) {
 	rawURL, err := ss.URL.Get()
 	if err != nil {
@@ -180,7 +180,7 @@ var argumentPresetValueType_enums = []ArgumentPresetValueType{
 	ArgumentPresetValueTypeForwardHeader,
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j ArgumentPresetValueType) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		Type: "string",
@@ -205,7 +205,7 @@ func (j *ArgumentPresetValueType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ParseArgumentPresetValueType parses ArgumentPresetValueType from string
+// ParseArgumentPresetValueType parses ArgumentPresetValueType from string.
 func ParseArgumentPresetValueType(value string) (ArgumentPresetValueType, error) {
 	result := ArgumentPresetValueType(value)
 	if !slices.Contains(argumentPresetValueType_enums, result) {
@@ -278,7 +278,7 @@ func (j ArgumentPresetValue) MarshalJSON() ([]byte, error) {
 	return json.Marshal(j.inner)
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j ArgumentPresetValue) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		OneOf: []*jsonschema.Schema{
@@ -300,7 +300,7 @@ type ArgumentPresetValueLiteral struct {
 	Value any                     `json:"value" mapstructure:"value" yaml:"value"`
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j ArgumentPresetValueLiteral) JSONSchema() *jsonschema.Schema {
 	properties := orderedmap.New[string, *jsonschema.Schema]()
 	properties.Set("type", &jsonschema.Schema{
@@ -330,7 +330,7 @@ type ArgumentPresetValueEnv struct {
 	Name string                  `json:"name" mapstructure:"name" yaml:"name"`
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j ArgumentPresetValueEnv) JSONSchema() *jsonschema.Schema {
 	properties := orderedmap.New[string, *jsonschema.Schema]()
 	properties.Set("type", &jsonschema.Schema{
@@ -361,7 +361,7 @@ type ArgumentPresetValueForwardHeader struct {
 	Name string                  `json:"name" mapstructure:"name" yaml:"name"`
 }
 
-// JSONSchema is used to generate a custom jsonschema
+// JSONSchema is used to generate a custom jsonschema.
 func (j ArgumentPresetValueForwardHeader) JSONSchema() *jsonschema.Schema {
 	properties := orderedmap.New[string, *jsonschema.Schema]()
 	properties.Set("type", &jsonschema.Schema{
@@ -386,7 +386,7 @@ func (apv ArgumentPresetValueForwardHeader) GetType() ArgumentPresetValueType {
 	return apv.Type
 }
 
-// ParseHttpURL parses and validate if the URL has HTTP scheme
+// ParseHttpURL parses and validate if the URL has HTTP scheme.
 func ParseHttpURL(input string) (*url.URL, error) {
 	if !strings.HasPrefix(input, "https://") && !strings.HasPrefix(input, "http://") {
 		return nil, errors.New("invalid HTTP URL " + input)

@@ -12,7 +12,7 @@ import (
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 )
 
-// RetryableRequest wraps the raw request with retryable
+// RetryableRequest wraps the raw request with retryable.
 type RetryableRequest struct {
 	RawRequest  *rest.Request
 	URL         url.URL
@@ -24,7 +24,7 @@ type RetryableRequest struct {
 	Runtime     rest.RuntimeSettings
 }
 
-// CreateRequest creates an HTTP request with body copied
+// CreateRequest creates an HTTP request with body copied.
 func (r *RetryableRequest) CreateRequest(ctx context.Context) (*http.Request, context.CancelFunc, error) {
 	var body io.Reader
 	if len(r.Body) > 0 {

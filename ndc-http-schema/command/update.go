@@ -9,12 +9,12 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 )
 
-// UpdateCommandArguments represent input arguments of the `update` command
+// UpdateCommandArguments represent input arguments of the `update` command.
 type UpdateCommandArguments struct {
 	Dir string `default:"." env:"HASURA_PLUGIN_CONNECTOR_CONTEXT_PATH" help:"The directory where the config.yaml file is present" short:"d"`
 }
 
-// UpdateConfiguration updates the configuration for the HTTP connector
+// UpdateConfiguration updates the configuration for the HTTP connector.
 func UpdateConfiguration(args *UpdateCommandArguments, logger *slog.Logger, noColor bool) error {
 	start := time.Now()
 	config, schemas, mergedSchema, err := configuration.UpdateHTTPConfiguration(args.Dir, logger)

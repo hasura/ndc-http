@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	// EncodingBase64 is base64 encoding for the data url
+	// EncodingBase64 is base64 encoding for the data url.
 	EncodingBase64 = "base64"
-	// EncodingASCII is ascii encoding for the data url
+	// EncodingASCII is ascii encoding for the data url.
 	EncodingASCII = "ascii"
 )
 
