@@ -311,7 +311,9 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 			continue
 		}
 		sc := proxy.Schema()
-		if sc == nil || (len(sc.Type) == 0 && len(sc.AllOf) == 0 && len(sc.AnyOf) == 0 && len(sc.OneOf) == 0) {
+		if sc == nil || (len(sc.Type) == 0 && len(sc.AllOf) == 0 && len(sc.AnyOf) == 0 && len(sc.OneOf) == 0 &&
+			(sc.Properties == nil || sc.Properties.Len() == 0) &&
+			(sc.Items == nil || sc.Items.A != nil)) {
 			continue
 		}
 
@@ -332,13 +334,10 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 		}
 
 		results = append(results, proxy)
-		if len(sc.Type) == 0 {
-			typeNames = append(typeNames, "any")
-		} else if !slices.Contains(typeNames, sc.Type[0]) {
-			typeNames = append(typeNames, sc.Type[0])
-		}
+		typeNames = append(typeNames, sc.Type...)
 	}
 
+	typeNames = utils.SliceUnique(typeNames)
 	if len(typeNames) == 1 && len(results) > 1 && typeNames[0] == "string" {
 		// if the anyOf array contains both string and enum
 		// we can cast them to string

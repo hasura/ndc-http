@@ -324,7 +324,7 @@ func (oc *oas3SchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schem
 			}, nil
 		}
 
-		if len(oasTypes) == 1 && baseSchema.Type[0] == "object" {
+		if len(oasTypes) == 1 && (baseSchema.Type[0] == "object" || (baseSchema.Properties != nil && baseSchema.Properties.Len() > 0)) {
 			schemaResult, err := oc.evalObjectType(baseSchema, fieldPaths)
 			if err != nil {
 				return nil, err
