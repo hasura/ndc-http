@@ -17,14 +17,7 @@ import (
 
 // OAS3Builder the NDC schema builder from OpenAPI 3.0 specification
 type OAS3Builder struct {
-	*ConvertOptions
-
-	schema *rest.NDCHttpSchema
-	// stores prebuilt and evaluating information of component schema types.
-	// some undefined schema types aren't stored in either object nor scalar,
-	// or self-reference types that haven't added into the object_types map yet.
-	// This cache temporarily stores them to avoid infinite recursive references.
-	schemaCache map[string]SchemaInfoCache
+	*OASBuilderState
 }
 
 // SchemaInfoCache stores prebuilt information of component schema types.
@@ -37,13 +30,9 @@ type SchemaInfoCache struct {
 
 // NewOAS3Builder creates an OAS3Builder instance
 func NewOAS3Builder(options ConvertOptions) *OAS3Builder {
-	builder := &OAS3Builder{
-		schema:         rest.NewNDCHttpSchema(),
-		schemaCache:    make(map[string]SchemaInfoCache),
-		ConvertOptions: applyConvertOptions(options),
+	return &OAS3Builder{
+		OASBuilderState: NewOASBuilderState(options),
 	}
-
-	return builder
 }
 
 func (oc *OAS3Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v3.Document]) (*rest.NDCHttpSchema, error) {
@@ -255,7 +244,7 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		return nil
 	}
 
-	schemaResult, err := newOAS3SchemaBuilder(oc, "", rest.InBody).
+	schemaResult, err := newOASSchemaBuilder(oc.OASBuilderState, "", rest.InBody).
 		getSchemaType(typeSchema, []string{typeKey})
 	if err != nil {
 		return err
@@ -303,14 +292,6 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 	}
 
 	return err
-}
-
-// build a named type for JSON scalar
-func (oc *OAS3Builder) buildScalarJSON() *schema.NamedType {
-	scalarName := string(rest.ScalarJSON)
-	oc.schema.AddScalar(scalarName, *defaultScalarTypes[rest.ScalarJSON])
-
-	return schema.NewNamedType(scalarName)
 }
 
 // transform and reassign write object types to arguments

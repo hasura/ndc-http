@@ -132,10 +132,6 @@ func mergeUnionTypeSchemas(httpSchema *rest.NDCHttpSchema, baseSchema *base.Sche
 	}
 
 	scalarName := rest.ScalarJSON
-	if _, ok := httpSchema.ScalarTypes[string(scalarName)]; !ok {
-		httpSchema.ScalarTypes[string(scalarName)] = *defaultScalarTypes[scalarName]
-	}
-
 	scalarType := schema.NewNamedType(string(scalarName))
 	typeSchema := createSchemaFromOpenAPISchema(baseSchema)
 
@@ -500,7 +496,7 @@ func createTLSConfig(keys []string) *rest.TLSConfig {
 	}
 }
 
-func evalOperationPath(httpSchema *rest.NDCHttpSchema, rawPath string, arguments map[string]rest.ArgumentInfo) (string, map[string]rest.ArgumentInfo, error) {
+func evalOperationPath(rawPath string, arguments map[string]rest.ArgumentInfo) (string, map[string]rest.ArgumentInfo, error) {
 	var pathURL *url.URL
 	var isAbsolute bool
 	var err error
@@ -538,7 +534,6 @@ func evalOperationPath(httpSchema *rest.NDCHttpSchema, rawPath string, arguments
 			continue
 		}
 
-		httpSchema.AddScalar(string(rest.ScalarString), *defaultScalarTypes[rest.ScalarString])
 		arguments[variableName] = rest.ArgumentInfo{
 			ArgumentInfo: schema.ArgumentInfo{
 				Type: schema.NewNamedType(string(rest.ScalarString)).Encode(),
@@ -621,25 +616,23 @@ func transformNullableObjectPropertiesSchema(httpSchema *rest.NDCHttpSchema, res
 	var ok bool
 	result.TypeRead, ok = transformNullableObjectProperties(httpSchema, result.TypeRead.Encode(), readSchemaName)
 	if !ok {
-		return createSchemaInfoJSONScalar(httpSchema, nullable)
+		return createSchemaInfoJSONScalar(nullable)
 	}
 
 	result.TypeWrite, ok = transformNullableObjectProperties(httpSchema, result.TypeWrite.Encode(), writeSchemaName)
 	if !ok {
-		return createSchemaInfoJSONScalar(httpSchema, nullable)
+		return createSchemaInfoJSONScalar(nullable)
 	}
 
 	return result
 }
 
-func createSchemaInfoJSONScalar(httpSchema *rest.NDCHttpSchema, nullable bool) *SchemaInfoCache {
+func createSchemaInfoJSONScalar(nullable bool) *SchemaInfoCache {
 	scalarName := rest.ScalarJSON
 	var result schema.TypeEncoder = schema.NewNamedType(string(scalarName))
 	if nullable {
 		result = schema.NewNullableType(result)
 	}
-
-	httpSchema.AddScalar(string(scalarName), *defaultScalarTypes[scalarName])
 
 	return &SchemaInfoCache{
 		TypeRead:   result,

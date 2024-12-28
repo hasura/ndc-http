@@ -68,7 +68,7 @@ func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.Oper
 	}
 
 	description := oc.getOperationDescription(itemGet)
-	requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, oc.Arguments)
+	requestURL, arguments, err := evalOperationPath(oc.pathKey, oc.Arguments)
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
 	}
@@ -164,7 +164,7 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 		}
 
 		description := oc.getOperationDescription(operation)
-		requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, arguments)
+		requestURL, arguments, err := evalOperationPath(oc.pathKey, arguments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", procName, err)
 		}
@@ -206,7 +206,7 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 		if param.Required != nil && *param.Required {
 			paramRequired = true
 		}
-		schemaResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.ParameterLocation(param.In)).
+		schemaResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.ParameterLocation(param.In)).
 			getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 		if err != nil {
 			return err
@@ -287,7 +287,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 	if contentType == rest.ContentTypeFormURLEncoded {
 		location = rest.InQuery
 	}
-	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, location).
+	typeResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, location).
 		getSchemaTypeFromProxy(content.Schema, !bodyRequired, fieldPaths)
 	if err != nil {
 		return nil, nil, err
@@ -340,7 +340,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 					continue
 				}
 
-				headerResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InHeader).
+				headerResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.InHeader).
 					getSchemaTypeFromProxy(header.Schema, header.AllowEmptyValue, append(fieldPaths, key))
 				if err != nil {
 					return nil, nil, err
@@ -420,7 +420,6 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 		if statusCode == http.StatusNoContent {
 			scalarName = rest.ScalarBoolean
 		}
-		oc.builder.schema.AddScalar(string(scalarName), *defaultScalarTypes[scalarName])
 
 		return schema.NewNullableNamedType(string(scalarName)), &rest.Response{
 			ContentType: rest.ContentTypeJSON,
@@ -431,7 +430,6 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 	if bodyContent == nil {
 		if statusCode == http.StatusNoContent {
 			scalarName := rest.ScalarBoolean
-			oc.builder.schema.AddScalar(string(scalarName), *defaultScalarTypes[scalarName])
 
 			return schema.NewNullableNamedType(string(scalarName)), &rest.Response{
 				ContentType: rest.ContentTypeJSON,
@@ -440,7 +438,6 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 
 		if contentType != "" {
 			scalarName := guessScalarResultTypeFromContentType(contentType)
-			oc.builder.schema.AddScalar(string(scalarName), *defaultScalarTypes[scalarName])
 
 			return schema.NewNamedType(string(scalarName)), &rest.Response{
 				ContentType: contentType,
@@ -454,10 +451,10 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 		ContentType: contentType,
 	}
 	if bodyContent.Schema == nil {
-		return getResultTypeFromContentType(oc.builder.schema, contentType), schemaResponse, nil
+		return getResultTypeFromContentType(contentType), schemaResponse, nil
 	}
 
-	typeResult, err := newOAS3SchemaBuilder(oc.builder, apiPath, rest.InBody).
+	typeResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.InBody).
 		getSchemaTypeFromProxy(bodyContent.Schema, false, fieldPaths)
 	if err != nil {
 		return nil, nil, err

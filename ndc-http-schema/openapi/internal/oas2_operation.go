@@ -55,7 +55,7 @@ func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonPar
 	}
 
 	description := oc.getOperationDescription(operation)
-	requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, oc.Arguments)
+	requestURL, arguments, err := evalOperationPath(oc.pathKey, oc.Arguments)
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
 	}
@@ -142,7 +142,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 		}
 
 		description := oc.getOperationDescription(operation)
-		requestURL, arguments, err := evalOperationPath(oc.builder.schema, oc.pathKey, arguments)
+		requestURL, arguments, err := evalOperationPath(oc.pathKey, arguments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", procName, err)
 		}
@@ -204,8 +204,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 
 		switch {
 		case param.Type != "":
-			typeEncoder, err := newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).
-				getSchemaTypeFromParameter(param, fieldPaths)
+			typeEncoder, err := oc.builder.getSchemaTypeFromParameter(param, fieldPaths)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -235,13 +234,13 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 				schemaResult.TypeSchema.MinLength = &minLength
 			}
 		case param.Schema != nil:
-			schemaResult, err = newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.ParameterLocation(param.In)).
+			schemaResult, err = newOASSchemaBuilder(oc.builder.OASBuilderState, oc.pathKey, rest.ParameterLocation(param.In)).
 				getSchemaTypeFromProxy(param.Schema, !paramRequired, fieldPaths)
 			if err != nil {
 				return nil, nil, err
 			}
 		default:
-			typeEncoder := oc.builder.buildScalarJSON()
+			typeEncoder := schema.NewNamedType(string(rest.ScalarJSON))
 			schemaResult = &SchemaInfoCache{
 				TypeRead:  typeEncoder,
 				TypeWrite: typeEncoder,
@@ -382,24 +381,22 @@ func (oc *oas2OperationBuilder) convertResponse(operation *v2.Operation, fieldPa
 	if resp == nil || resp.Schema == nil {
 		if statusCode == http.StatusNoContent {
 			scalarName := rest.ScalarBoolean
-			oc.builder.schema.AddScalar(string(scalarName), *defaultScalarTypes[scalarName])
 
 			return schema.NewNullableNamedType(string(scalarName)), response, nil
 		}
 
 		if contentType != "" {
 			scalarName := guessScalarResultTypeFromContentType(contentType)
-			oc.builder.schema.AddScalar(string(scalarName), *defaultScalarTypes[scalarName])
 
 			return schema.NewNamedType(string(scalarName)), response, nil
 		}
 	}
 
 	if resp.Schema == nil {
-		return getResultTypeFromContentType(oc.builder.schema, contentType), response, nil
+		return getResultTypeFromContentType(contentType), response, nil
 	}
 
-	schemaResult, err := newOAS2SchemaBuilder(oc.builder, oc.pathKey, rest.InBody).
+	schemaResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, oc.pathKey, rest.InBody).
 		getSchemaTypeFromProxy(resp.Schema, false, fieldPaths)
 	if err != nil {
 		return nil, nil, err
