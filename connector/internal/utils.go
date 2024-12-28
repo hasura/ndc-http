@@ -2,7 +2,6 @@ package internal
 
 import (
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -51,20 +50,4 @@ func evalForwardedHeaders(req *RetryableRequest, headers map[string]string) erro
 	}
 
 	return nil
-}
-
-func cloneURL(input *url.URL) *url.URL {
-	return &url.URL{
-		Scheme:      input.Scheme,
-		Opaque:      input.Opaque,
-		User:        input.User,
-		Host:        input.Host,
-		Path:        input.Path,
-		RawPath:     input.RawPath,
-		OmitHost:    input.OmitHost,
-		ForceQuery:  input.ForceQuery,
-		RawQuery:    input.RawQuery,
-		Fragment:    input.Fragment,
-		RawFragment: input.RawFragment,
-	}
 }

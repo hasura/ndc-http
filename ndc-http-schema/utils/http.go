@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"net/url"
 	"strings"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
@@ -29,4 +30,21 @@ func IsContentTypeBinary(contentType string) bool {
 // IsContentTypeMultipartForm checks the content type relates to multipart form.
 func IsContentTypeMultipartForm(contentType string) bool {
 	return strings.HasPrefix(contentType, "multipart/")
+}
+
+// CloneURL clones the input URL to a new instance.
+func CloneURL(input *url.URL) *url.URL {
+	return &url.URL{
+		Scheme:      input.Scheme,
+		Opaque:      input.Opaque,
+		User:        input.User,
+		Host:        input.Host,
+		Path:        input.Path,
+		RawPath:     input.RawPath,
+		OmitHost:    input.OmitHost,
+		ForceQuery:  input.ForceQuery,
+		RawQuery:    input.RawQuery,
+		Fragment:    input.Fragment,
+		RawFragment: input.RawFragment,
+	}
 }

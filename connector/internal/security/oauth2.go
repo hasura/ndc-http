@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"path"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
+	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -20,7 +22,7 @@ type OAuth2Client struct {
 var _ Credential = &OAuth2Client{}
 
 // NewOAuth2Client creates an OAuth2 client from the security scheme
-func NewOAuth2Client(ctx context.Context, httpClient *http.Client, flowType schema.OAuthFlowType, config *schema.OAuthFlow) (*OAuth2Client, error) {
+func NewOAuth2Client(ctx context.Context, httpClient *http.Client, baseServerURL *url.URL, flowType schema.OAuthFlowType, config *schema.OAuthFlow) (*OAuth2Client, error) {
 	if flowType != schema.ClientCredentialsFlow || config.TokenURL == nil || config.ClientID == nil || config.ClientSecret == nil {
 		return &OAuth2Client{
 			client:  httpClient,
@@ -28,13 +30,28 @@ func NewOAuth2Client(ctx context.Context, httpClient *http.Client, flowType sche
 		}, nil
 	}
 
-	tokenURL, err := config.TokenURL.Get()
+	rawTokenURL, err := config.TokenURL.Get()
 	if err != nil {
 		return nil, fmt.Errorf("tokenUrl: %w", err)
 	}
 
-	if _, err := schema.ParseRelativeOrHttpURL(tokenURL); err != nil {
+	tokenURL, err := schema.ParseRelativeOrHttpURL(rawTokenURL)
+	if err != nil {
 		return nil, fmt.Errorf("tokenUrl: %w", err)
+	}
+
+	// if the token URL is a relative path it will be joined with the base server URL
+	if tokenURL.Host == "" {
+		tu := utils.CloneURL(baseServerURL)
+		tu.Path = path.Join(tu.Path, tokenURL.Path)
+		q := tu.Query()
+		for k, v := range tokenURL.Query() {
+			q[k] = v
+		}
+		tu.RawQuery = q.Encode()
+		tu.RawFragment = tokenURL.RawFragment
+
+		tokenURL = tu
 	}
 
 	scopes := make([]string, 0, len(config.Scopes))
@@ -68,7 +85,7 @@ func NewOAuth2Client(ctx context.Context, httpClient *http.Client, flowType sche
 		ClientID:       clientID,
 		ClientSecret:   clientSecret,
 		Scopes:         scopes,
-		TokenURL:       tokenURL,
+		TokenURL:       tokenURL.String(),
 		EndpointParams: endpointParams,
 	}
 

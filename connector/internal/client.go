@@ -282,7 +282,7 @@ func (client *HTTPClient) doRequest(ctx context.Context, request *RetryableReque
 	ctx, span := tracer.Start(ctx, fmt.Sprintf("%s %s", method, request.RawRequest.URL), trace.WithSpanKind(trace.SpanKindClient))
 	defer span.End()
 
-	urlAttr := cloneURL(&request.URL)
+	urlAttr := restUtils.CloneURL(&request.URL)
 	password, hasPassword := urlAttr.User.Password()
 	if urlAttr.User.String() != "" || hasPassword {
 		maskedUser := restUtils.MaskString(urlAttr.User.Username())
