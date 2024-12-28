@@ -135,111 +135,112 @@ func (mfb *MultipartFormEncoder) evalMultipartFieldValueRecursive(w *MultipartWr
 		if !notNull {
 			return fmt.Errorf("%s: %w", name, errArgumentRequired)
 		}
+		if enc != nil && slices.Contains(enc.ContentType, rest.ContentTypeJSON) {
+			var headers http.Header
+			var err error
+			if len(enc.Headers) > 0 {
+				headers, err = mfb.evalEncodingHeaders(enc.Headers)
+				if err != nil {
+					return err
+				}
+			}
 
-		return mfb.evalMultipartFieldValueArray(w, name, argType, underlyingValue, fieldInfo, enc)
+			return w.WriteJSON(name, value.Interface(), headers)
+		}
+
+		if !slices.Contains([]reflect.Kind{reflect.Slice, reflect.Array}, value.Kind()) {
+			return fmt.Errorf("%s: expected array type, got %v", name, value.Kind())
+		}
+
+		for i := range value.Len() {
+			elem := value.Index(i)
+			err := mfb.evalMultipartFieldValueRecursive(w, name+"[]", elem, &rest.ObjectField{
+				ObjectField: schema.ObjectField{
+					Type: argType.ElementType,
+				},
+				HTTP: fieldInfo.HTTP.Items,
+			}, enc)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	case *schema.NullableType:
+		if !notNull {
+			return nil
+		}
+
+		return mfb.evalMultipartFieldValueRecursive(w, name, underlyingValue, &rest.ObjectField{
+			ObjectField: schema.ObjectField{
+				Type: argType.UnderlyingType,
+			},
+			HTTP: fieldInfo.HTTP,
+		}, enc)
 	case *schema.NamedType:
 		if !notNull {
 			return fmt.Errorf("%s: %w", name, errArgumentRequired)
 		}
-
-		return mfb.evalMultipartFieldValueNamed(w, name, argType, underlyingValue, fieldInfo, enc)
-	case *schema.PredicateType:
-		return fmt.Errorf("%s: predicate type is not supported", name)
-	default:
-		return fmt.Errorf("%s: %w", name, err)
-	}
-}
-
-func (mfb *MultipartFormEncoder) evalMultipartFieldValueArray(w *MultipartWriter, name string, argType *schema.ArrayType, value reflect.Value, fieldInfo *rest.ObjectField, enc *rest.EncodingObject) error {
-	if enc != nil && slices.Contains(enc.ContentType, rest.ContentTypeJSON) {
 		var headers http.Header
 		var err error
-		if len(enc.Headers) > 0 {
+		if enc != nil && len(enc.Headers) > 0 {
 			headers, err = mfb.evalEncodingHeaders(enc.Headers)
 			if err != nil {
 				return err
 			}
 		}
 
-		return w.WriteJSON(name, value.Interface(), headers)
-	}
+		if iScalar, ok := mfb.schema.ScalarTypes[argType.Name]; ok {
+			switch iScalar.Representation.Interface().(type) {
+			case *schema.TypeRepresentationBytes:
+				return w.WriteDataURI(name, value.Interface(), headers)
+			default:
+			}
+		}
 
-	if !slices.Contains([]reflect.Kind{reflect.Slice, reflect.Array}, value.Kind()) {
-		return fmt.Errorf("%s: expected array type, got %v", name, value.Kind())
-	}
+		if enc != nil && slices.Contains(enc.ContentType, rest.ContentTypeJSON) {
+			return w.WriteJSON(name, value, headers)
+		}
 
-	for i := range value.Len() {
-		elem := value.Index(i)
-		err := mfb.evalMultipartFieldValueRecursive(w, name+"[]", elem, &rest.ObjectField{
-			ObjectField: schema.ObjectField{
-				Type: argType.ElementType,
-			},
-			HTTP: fieldInfo.HTTP.Items,
-		}, enc)
+		params, err := mfb.paramEncoder.EncodeParameterValues(fieldInfo, value, []string{})
 		if err != nil {
 			return err
 		}
-	}
 
-	return nil
-}
-
-func (mfb *MultipartFormEncoder) evalMultipartFieldValueNamed(w *MultipartWriter, name string, argType *schema.NamedType, value reflect.Value, fieldInfo *rest.ObjectField, enc *rest.EncodingObject) error {
-	var headers http.Header
-	var err error
-	if enc != nil && len(enc.Headers) > 0 {
-		headers, err = mfb.evalEncodingHeaders(enc.Headers)
-		if err != nil {
-			return err
-		}
-	}
-
-	if iScalar, ok := mfb.schema.ScalarTypes[argType.Name]; ok {
-		switch iScalar.Representation.Interface().(type) {
-		case *schema.TypeRepresentationBytes:
-			return w.WriteDataURI(name, value.Interface(), headers)
-		default:
-		}
-	}
-
-	if enc != nil && slices.Contains(enc.ContentType, rest.ContentTypeJSON) {
-		return w.WriteJSON(name, value, headers)
-	}
-
-	params, err := mfb.paramEncoder.EncodeParameterValues(fieldInfo, value, []string{})
-	if err != nil {
-		return err
-	}
-
-	if len(params) == 0 {
-		return nil
-	}
-
-	for _, p := range params {
-		keys := p.Keys()
-		values := p.Values()
-		fieldName := name
-
-		if len(keys) > 0 {
-			keys = append([]Key{NewKey(name)}, keys...)
-			fieldName = keys.String()
+		if len(params) == 0 {
+			return nil
 		}
 
-		if len(values) > 1 {
-			fieldName += "[]"
-			for _, v := range values {
-				if err = w.WriteField(fieldName, v, headers); err != nil {
+		for _, p := range params {
+			keys := p.Keys()
+			values := p.Values()
+			fieldName := name
+
+			if len(keys) > 0 {
+				keys = append([]Key{NewKey(name)}, keys...)
+				fieldName = keys.String()
+			}
+
+			if len(values) > 1 {
+				fieldName += "[]"
+				for _, v := range values {
+					if err = w.WriteField(fieldName, v, headers); err != nil {
+						return err
+					}
+				}
+			} else if len(values) == 1 {
+				if err = w.WriteField(fieldName, values[0], headers); err != nil {
 					return err
 				}
 			}
-		} else if len(values) == 1 {
-			if err = w.WriteField(fieldName, values[0], headers); err != nil {
-				return err
-			}
 		}
-	}
 
-	return nil
+		return nil
+	case *schema.PredicateType:
+		return fmt.Errorf("%s: predicate type is not supported", name)
+	default:
+		return fmt.Errorf("%s: %w", name, err)
+	}
 }
 
 func (mfb *MultipartFormEncoder) evalEncodingHeaders(encHeaders map[string]rest.RequestParameter) (http.Header, error) {
