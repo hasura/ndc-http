@@ -251,7 +251,13 @@ func (oc *OAS2Builder) getSchemaTypeFromParameter(param *v2.Parameter, fieldPath
 	var typeEncoder schema.TypeEncoder
 	nullable := param.Required == nil || !*param.Required
 
-	switch param.Type {
+	paramType := param.Type
+	hasArrayItem := param.Items != nil && param.Items.Type != ""
+	if param.Type == "" && hasArrayItem {
+		paramType = "array"
+	}
+
+	switch paramType {
 	case "object":
 		return nil, fmt.Errorf("%s: unsupported object parameter", strings.Join(fieldPaths, "."))
 	case "array":
