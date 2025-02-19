@@ -501,9 +501,11 @@ func (client *HTTPClient) createHeaderForwardingResponse(result any, rawHeaders 
 	}
 }
 
-// The HTTP Retry-After response header indicates how long the user agent should wait before making a follow-up request.
+// The HTTP [Retry-After] response header indicates how long the user agent should wait before making a follow-up request.
 // The client finds this header if exist and decodes to duration.
 // If the header doesn't exist or there is any error happened, fallback to the retry delay setting.
+//
+// [Retry-After]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
 func (client *HTTPClient) getRetryDelay(resp *http.Response, options rest.RuntimeSettings) (time.Duration, bool) {
 	if rawRetryAfter := resp.Header.Get("Retry-After"); rawRetryAfter != "" {
 		// A non-negative decimal integer indicating the seconds to delay after the response is received.
@@ -515,7 +517,7 @@ func (client *HTTPClient) getRetryDelay(resp *http.Response, options rest.Runtim
 		// A date after which to retry, e.g. Tue, 29 Oct 2024 16:56:32 GMT
 		retryTime, err := time.Parse(time.RFC1123, rawRetryAfter)
 		if err == nil && retryTime.After(time.Now()) {
-			duration := retryTime.Sub(time.Now())
+			duration := time.Until(retryTime)
 
 			return duration, options.Timeout == 0 || duration < (time.Duration(options.Timeout)*time.Second)
 		}

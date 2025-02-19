@@ -3,8 +3,8 @@ packagingDefinition:
   dockerImage: ghcr.io/hasura/ndc-http:{{VERSION}}
 supportedEnvironmentVariables: []
 commands:
-  update: ndc-http update
-  upgradeConfiguration: ndc-http version
+  update: hasura-ndc-http update
+  upgradeConfiguration: hasura-ndc-http version
 cliPlugin:
   name: ndc-http
   version: "{{VERSION}}"
