@@ -52,7 +52,8 @@ files:
       times:
         value: 1
       delay:
-        # delay between each retry in milliseconds
+        # The default delay between each retry in milliseconds.
+        # The connector prefers the Retry-After header in the response if exists
         value: 500
       httpStatus: [429, 500, 502, 503]
 ```

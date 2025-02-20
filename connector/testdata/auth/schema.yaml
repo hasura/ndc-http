@@ -108,7 +108,17 @@ functions:
       security: []
       response:
         contentType: application/json
-    arguments: {}
+    arguments:
+      retry_after:
+        type:
+          type: nullable
+          underlying_type:
+            name: Boolean
+            type: named
+        http:
+          in: query
+          schema:
+            type: [boolean]
     result_type:
       element_type:
         name: Pet

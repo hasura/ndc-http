@@ -31,11 +31,11 @@ import (
 func TestHTTPConnectorAuthentication(t *testing.T) {
 	apiKey := "random_api_key"
 	bearerToken := "random_bearer_token"
-	// slog.SetLogLoggerLevel(slog.LevelDebug)
-	server := createMockServer(t, apiKey, bearerToken)
-	defer server.Close()
+	slog.SetLogLoggerLevel(slog.LevelDebug)
+	state := createMockServer(t, apiKey, bearerToken)
+	defer state.Server.Close()
 
-	t.Setenv("PET_STORE_URL", server.URL)
+	t.Setenv("PET_STORE_URL", state.Server.URL)
 	t.Setenv("PET_STORE_API_KEY", apiKey)
 	t.Setenv("PET_STORE_BEARER_TOKEN", bearerToken)
 	connServer, err := connector.NewServer(NewHTTPConnector(), &connector.ServerOptions{
@@ -64,7 +64,7 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
 			Details: schema.ExplainResponseDetails{
-				"url":     server.URL + "/pet",
+				"url":     state.Server.URL + "/pet",
 				"headers": `{"Accept":["application/json"],"Api_key":["ran*******(14)"],"Content-Type":["application/json"]}`,
 			},
 		})
@@ -122,7 +122,7 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
 			Details: schema.ExplainResponseDetails{
-				"url":     server.URL + "/pet",
+				"url":     state.Server.URL + "/pet",
 				"headers": `{"Accept":["application/json"],"Api_key":["ran*******(14)"],"Content-Type":["application/json"]}`,
 				"body":    "{\"name\":\"pet\"}\n",
 			},
@@ -174,7 +174,7 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
 			Details: schema.ExplainResponseDetails{
-				"url":     server.URL + "/pet/findByStatus?status=available",
+				"url":     state.Server.URL + "/pet/findByStatus?status=available",
 				"headers": `{"Accept":["application/json"],"Authorization":["Bearer ran*******(19)"],"Content-Type":["application/json"],"X-Custom-Header":["This is a test"]}`,
 			},
 		})
@@ -286,23 +286,42 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	})
 
 	t.Run("retry", func(t *testing.T) {
-		reqBody := []byte(`{
-			"collection": "petRetry",
-			"query": {
-				"fields": {
-					"__value": {
-						"type": "column",
-						"column": "__value"
+		getReqBody := func(retryAfter bool) []byte {
+			return []byte(fmt.Sprintf(`{
+				"collection": "petRetry",
+				"query": {
+					"fields": {
+						"__value": {
+							"type": "column",
+							"column": "__value"
+						}
 					}
-				}
-			},
-			"arguments": {},
-			"collection_relationships": {}
-		}`)
+				},
+				"arguments": {
+					"retry_after": {
+						"type": "literal",
+						"value": %t
+					}
+				},
+				"collection_relationships": {}
+			}`, retryAfter))
+		}
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(getReqBody(false)))
 		assert.NilError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, res.StatusCode)
+		assert.Equal(t, state.RetryCount, int32(2))
+
+		atomic.StoreInt32(&state.RetryCount, 0)
+		start := time.Now()
+		res, err = http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(getReqBody(true)))
+		assert.NilError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, res.StatusCode)
+		assert.Equal(t, state.RetryCount, int32(2))
+
+		delay := time.Since(start)
+		log.Println("delay", delay)
+		assert.Assert(t, delay >= time.Second && delay <= 2*time.Second)
 	})
 
 	t.Run("encoding-ndjson", func(t *testing.T) {
@@ -827,8 +846,15 @@ func TestHTTPConnector_multiSchemas(t *testing.T) {
 	assert.Equal(t, int32(1), mock.dogCount)
 }
 
-func createMockServer(t *testing.T, apiKey string, bearerToken string) *httptest.Server {
+type mockServerState struct {
+	Server     *httptest.Server
+	RetryCount int32
+}
+
+func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServerState {
 	t.Helper()
+
+	state := mockServerState{}
 	mux := http.NewServeMux()
 
 	writeResponse := func(w http.ResponseWriter, body string) {
@@ -881,12 +907,21 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *httptest
 		}
 	})
 
-	var requestCount int
 	mux.HandleFunc("/pet/retry", func(w http.ResponseWriter, r *http.Request) {
-		requestCount++
-		if requestCount > 3 {
+		atomic.AddInt32(&state.RetryCount, 1)
+		if state.RetryCount > 3 {
 			panic("retry count must not be larger than 2")
 		}
+
+		if r.URL.Query().Get("retry_after") == "true" {
+			switch state.RetryCount {
+			case 1:
+				w.Header().Set("Retry-After", "1")
+			case 2:
+				w.Header().Set("Retry-After", time.Now().Add(time.Hour).Format(time.RFC1123))
+			}
+		}
+
 		w.WriteHeader(http.StatusTooManyRequests)
 	})
 
@@ -991,7 +1026,10 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *httptest
 		}
 	})
 
-	return httptest.NewServer(mux)
+	server := httptest.NewServer(mux)
+	state.Server = server
+
+	return &state
 }
 
 type mockDistributedServer struct {
@@ -1115,10 +1153,10 @@ func TestConnectorOAuth(t *testing.T) {
 		t.Fatal(string(body))
 	}
 
-	server := createMockServer(t, apiKey, bearerToken)
-	defer server.Close()
+	state := createMockServer(t, apiKey, bearerToken)
+	defer state.Server.Close()
 
-	t.Setenv("PET_STORE_URL", server.URL)
+	t.Setenv("PET_STORE_URL", state.Server.URL)
 	t.Setenv("PET_STORE_API_KEY", apiKey)
 	t.Setenv("PET_STORE_BEARER_TOKEN", bearerToken)
 	t.Setenv("OAUTH2_CLIENT_ID", oauth2ClientID)
