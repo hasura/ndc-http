@@ -206,9 +206,8 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 	var cancel context.CancelFunc
 
 	times := int(request.Runtime.Retry.Times)
-	delayMs := int(math.Max(float64(request.Runtime.Retry.Delay), 100))
 	for i := 0; i <= times; i++ {
-		resp, errorBytes, cancel, err = client.doRequest(ctx, request, port, i) //nolint:all
+		resp, errorBytes, cancel, err = client.doRequest(ctx, request, port, i) //nolint:bodyclose
 		if err != nil {
 			span.SetStatus(codes.Error, "failed to execute the request")
 			span.RecordError(err)
@@ -230,7 +229,14 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 			)
 		}
 
-		time.Sleep(time.Duration(delayMs) * time.Millisecond)
+		nextRetryDuration, ok := client.getRetryDelay(resp, request.Runtime)
+		if !ok {
+			// The next retry time is greater than the timeout.
+			// The client shouldn't uselessly lock the entire request until reaching timeout.
+			break
+		}
+
+		time.Sleep(nextRetryDuration)
 	}
 
 	defer cancel()
@@ -493,6 +499,33 @@ func (client *HTTPClient) createHeaderForwardingResponse(result any, rawHeaders 
 		forwardHeaders.ResponseHeaders.HeadersField: headers,
 		forwardHeaders.ResponseHeaders.ResultField:  result,
 	}
+}
+
+// The HTTP [Retry-After] response header indicates how long the user agent should wait before making a follow-up request.
+// The client finds this header if exist and decodes to duration.
+// If the header doesn't exist or there is any error happened, fallback to the retry delay setting.
+//
+// [Retry-After]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
+func (client *HTTPClient) getRetryDelay(resp *http.Response, options rest.RuntimeSettings) (time.Duration, bool) {
+	if rawRetryAfter := resp.Header.Get("Retry-After"); rawRetryAfter != "" {
+		// A non-negative decimal integer indicating the seconds to delay after the response is received.
+		retryAfterSecs, err := strconv.ParseInt(rawRetryAfter, 10, 32)
+		if err == nil && retryAfterSecs > 0 {
+			return time.Second * time.Duration(retryAfterSecs), options.Timeout == 0 || retryAfterSecs < int64(options.Timeout)
+		}
+
+		// A date after which to retry, e.g. Tue, 29 Oct 2024 16:56:32 GMT
+		retryTime, err := time.Parse(time.RFC1123, rawRetryAfter)
+		if err == nil && retryTime.After(time.Now()) {
+			duration := time.Until(retryTime)
+
+			return duration, options.Timeout == 0 || duration < (time.Duration(options.Timeout)*time.Second)
+		}
+	}
+
+	canRetry := options.Timeout == 0 || (options.Retry.Delay/1000 < options.Timeout)
+
+	return time.Duration(math.Max(float64(options.Retry.Delay), 100)) * time.Millisecond, canRetry
 }
 
 func parseContentType(input string) string {
