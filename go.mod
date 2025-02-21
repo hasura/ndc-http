@@ -7,18 +7,19 @@ toolchain go1.23.4
 require (
 	github.com/go-viper/mapstructure/v2 v2.2.1
 	github.com/google/uuid v1.6.0
+	github.com/hasura/ndc-http/exhttp v0.0.1
 	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20241221004524-ddf3d328677d
-	github.com/hasura/ndc-sdk-go v1.6.4-0.20241220173928-1c66c55ba78d
+	github.com/hasura/ndc-sdk-go v1.7.0
 	github.com/theory/jsonpath v0.2.1
 	go.opentelemetry.io/otel v1.33.0
 	go.opentelemetry.io/otel/trace v1.33.0
 	golang.org/x/oauth2 v0.24.0
 	golang.org/x/sync v0.10.0
-	gotest.tools/v3 v3.5.1
+	gotest.tools/v3 v3.5.2
 )
 
 require (
-	github.com/alecthomas/kong v1.6.0 // indirect
+	github.com/alecthomas/kong v1.8.1 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
@@ -30,7 +31,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
-	github.com/invopop/jsonschema v0.12.0 // indirect
+	github.com/invopop/jsonschema v0.13.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -70,3 +71,5 @@ require (
 )
 
 replace github.com/hasura/ndc-http/ndc-http-schema => ./ndc-http-schema
+
+replace github.com/hasura/ndc-http/exhttp => ./exhttp

@@ -9,6 +9,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-sdk-go/utils"
 	"github.com/invopop/jsonschema"
 	"github.com/theory/jsonpath"
@@ -24,7 +25,7 @@ type NDCHttpSettings struct {
 	SecuritySchemes map[string]SecurityScheme  `json:"securitySchemes,omitempty" mapstructure:"securitySchemes" yaml:"securitySchemes,omitempty"`
 	Security        AuthSecurities             `json:"security,omitempty"        mapstructure:"security"        yaml:"security,omitempty"`
 	Version         string                     `json:"version,omitempty"         mapstructure:"version"         yaml:"version,omitempty"`
-	TLS             *TLSConfig                 `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
+	TLS             *exhttp.TLSConfig          `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -64,7 +65,7 @@ type ServerConfig struct {
 	Headers         map[string]utils.EnvString `json:"headers,omitempty"         mapstructure:"headers"         yaml:"headers,omitempty"`
 	SecuritySchemes map[string]SecurityScheme  `json:"securitySchemes,omitempty" mapstructure:"securitySchemes" yaml:"securitySchemes,omitempty"`
 	Security        AuthSecurities             `json:"security,omitempty"        mapstructure:"security"        yaml:"security,omitempty"`
-	TLS             *TLSConfig                 `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
+	TLS             *exhttp.TLSConfig          `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
 }
 
 // Validate if the current instance is valid.

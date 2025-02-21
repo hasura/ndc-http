@@ -106,7 +106,7 @@
       "required": [
         "file"
       ],
-      "description": "ConfigItem extends the ConvertConfig with advanced options"
+      "description": "ConfigItem extends the ConvertConfig with advanced options."
     },
     "Configuration": {
       "properties": {
@@ -200,7 +200,7 @@
         "argumentField",
         "responseHeaders"
       ],
-      "description": "ForwardHeadersSettings hold settings of header forwarding from and to Hasura engine"
+      "description": "ForwardHeadersSettings hold settings of header forwarding from and to Hasura engine."
     },
     "ForwardResponseHeadersSettings": {
       "properties": {
@@ -271,7 +271,7 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "RetryPolicySetting represents retry policy settings"
+      "description": "RetryPolicySetting represents retry policy settings."
     },
     "SchemaSpecType": {
       "type": "string",

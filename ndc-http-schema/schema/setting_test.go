@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-sdk-go/utils"
 	"gotest.tools/v3/assert"
 )
@@ -195,7 +196,7 @@ func TestNDCHttpSettings(t *testing.T) {
 					},
 					{
 						URL: utils.NewEnvStringValue("https://petstore3.swagger.io/api/v3.1"),
-						TLS: &TLSConfig{
+						TLS: &exhttp.TLSConfig{
 							CertFile: &utils.EnvString{
 								Variable: utils.ToPtr("PET_STORE_CERT_FILE"),
 							},
@@ -286,7 +287,7 @@ func TestNDCHttpSettings(t *testing.T) {
 					NewAuthSecurity("petstore_auth", []string{"write:pets", "read:pets"}),
 				},
 				Version: "1.0.19",
-				TLS: &TLSConfig{
+				TLS: &exhttp.TLSConfig{
 					CertFile: &utils.EnvString{
 						Variable: utils.ToPtr("PET_STORE_CERT_FILE"),
 					},

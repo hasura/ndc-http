@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"time"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -186,6 +187,12 @@ func (ci ConfigItem) GetRuntimeSettings() (*rest.RuntimeSettings, error) {
 		if err != nil {
 			errs = append(errs, fmt.Errorf("ConfigItem.retry: %w", err))
 		}
+
+		if retryPolicy.Delay > 0 && result.Timeout > 0 &&
+			time.Duration(retryPolicy.Delay)*time.Millisecond > time.Duration(result.Timeout)*time.Second {
+			errs = append(errs, errors.New("retry delay duration must be less than the timeout"))
+		}
+
 		result.Retry = *retryPolicy
 	}
 
