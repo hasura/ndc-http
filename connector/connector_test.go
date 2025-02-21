@@ -31,7 +31,7 @@ import (
 func TestHTTPConnectorAuthentication(t *testing.T) {
 	apiKey := "random_api_key"
 	bearerToken := "random_bearer_token"
-	slog.SetLogLoggerLevel(slog.LevelDebug)
+	// slog.SetLogLoggerLevel(slog.LevelDebug)
 	state := createMockServer(t, apiKey, bearerToken)
 	defer state.Server.Close()
 

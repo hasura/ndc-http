@@ -10,6 +10,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/utils"
 	"gopkg.in/yaml.v3"
@@ -232,7 +233,7 @@ func (cv *ConfigValidator) validateArgumentPresets(namespace string, key string,
 	}
 }
 
-func (cv *ConfigValidator) validateTLS(namespace string, key string, tlsConfig *schema.TLSConfig) {
+func (cv *ConfigValidator) validateTLS(namespace string, key string, tlsConfig *exhttp.TLSConfig) {
 	if tlsConfig.CAPem != nil || tlsConfig.CAFile != nil {
 		var err error
 		if tlsConfig.CAPem != nil {

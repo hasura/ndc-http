@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/hasura/ndc-http/exhttp"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/schema"
@@ -472,7 +473,7 @@ func isXMLLeafObject(objectType rest.ObjectType) bool {
 	return true
 }
 
-func createTLSConfig(keys []string) *rest.TLSConfig {
+func createTLSConfig(keys []string) *exhttp.TLSConfig {
 	caPem := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CA_PEM")))
 	caFile := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CA_FILE")))
 	certPem := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CERT_PEM")))
@@ -483,7 +484,7 @@ func createTLSConfig(keys []string) *rest.TLSConfig {
 	insecureSkipVerify := sdkUtils.NewEnvBool(utils.StringSliceToConstantCase(append(keys, "INSECURE_SKIP_VERIFY")), false)
 	includeSystemCACertsPool := sdkUtils.NewEnvBool(utils.StringSliceToConstantCase(append(keys, "INCLUDE_SYSTEM_CA_CERTS_POOL")), false)
 
-	return &rest.TLSConfig{
+	return &exhttp.TLSConfig{
 		CAFile:                   &caFile,
 		CAPem:                    &caPem,
 		CertFile:                 &certFile,
