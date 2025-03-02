@@ -34,7 +34,7 @@ var tlsVersions = map[string]uint16{
 func NewTLSTransport(baseTransport http.RoundTripper, tlsConfig *TLSConfig, logger *slog.Logger) (*http.Transport, error) {
 	bTransport, ok := baseTransport.(*http.Transport)
 	if !ok {
-		bTransport, _ = baseTransport.(*http.Transport)
+		bTransport, _ = http.DefaultTransport.(*http.Transport)
 	}
 
 	tlsCfg, err := loadTLSConfig(tlsConfig, logger)
