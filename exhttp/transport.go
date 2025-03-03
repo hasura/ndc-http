@@ -145,15 +145,25 @@ func (ttc HTTPTransportConfig) ToTransport() *http.Transport {
 	return defaultTransport
 }
 
-// ToTLSTransport creates an http transport from the configuration with TLS.
-func (ttc HTTPTransportConfig) ToTLSTransport(tlsConfig *TLSConfig, logger *slog.Logger) (*http.Transport, error) {
-	tls, err := loadTLSConfig(tlsConfig, logger)
-	if err != nil {
-		return nil, err
-	}
+// HTTPTransportTLSConfig stores the http.Transport configuration for the http client with TLS.
+type HTTPTransportTLSConfig struct {
+	HTTPTransportConfig
 
-	transport := ttc.ToTransport()
-	transport.TLSClientConfig = tls
+	TLS *TLSConfig `json:"tls,omitempty" jsonschema:"nullable" yaml:"tls"`
+}
+
+// ToTransport creates an http transport from the configuration with TLS.
+func (hc HTTPTransportTLSConfig) ToTransport(logger *slog.Logger) (*http.Transport, error) {
+	transport := hc.HTTPTransportConfig.ToTransport()
+
+	if hc.TLS != nil {
+		tls, err := loadTLSConfig(hc.TLS, logger)
+		if err != nil {
+			return nil, err
+		}
+
+		transport.TLSClientConfig = tls
+	}
 
 	return transport, nil
 }
