@@ -26,6 +26,7 @@ clean:
 .PHONY: go-tidy
 go-tidy:
 	go mod tidy
+	cd exhttp && go mod tidy
 	cd ndc-http-schema && go mod tidy
 
 .PHONY: build-jsonschema

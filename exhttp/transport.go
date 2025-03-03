@@ -13,17 +13,17 @@ import (
 type DialerConfig struct {
 	// The maximum amount of time a dial will wait for a connect to complete.
 	// If Deadline is also set, it may fail earlier.
-	Timeout *model.Duration `json:"timeout,omitempty" yaml:"timeout"`
+	Timeout *model.Duration `json:"timeout,omitempty" jsonschema:"nullable;type=string;pattern=^(([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h)$" yaml:"timeout"`
 	// Keep-alive probes are enabled by default.
 	KeepAliveEnabled *bool `json:"keepAliveEnabled,omitempty" yaml:"keepAliveEnabled"`
 	// The time between keep-alive probes. If zero, a default value of 15 seconds is used.
-	KeepAliveInterval *model.Duration `json:"keepAliveInterval,omitempty" yaml:"keepAliveInterval"`
+	KeepAliveInterval *model.Duration `json:"keepAliveInterval,omitempty" jsonschema:"nullable;type=string;pattern=^(([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h)$" yaml:"keepAliveInterval"`
 	// The maximum number of keep-alive probes that can go unanswered before dropping a connection.
 	// If zero, a default value of 9 is used.
-	KeepAliveCount *uint `json:"keepAliveCount,omitempty" jsonschema:"nullable,min=0" yaml:"keepAliveCount"`
+	KeepAliveCount *uint `json:"keepAliveCount,omitempty" jsonschema:"nullable;min=0" yaml:"keepAliveCount"`
 	// The time that the connection must be idle before the first keep-alive probe is sent.
 	// If zero, a default value of 15 seconds is used.
-	KeepAliveIdle *model.Duration `json:"keepAliveIdle,omitempty" yaml:"keepAliveIdle"`
+	KeepAliveIdle *model.Duration `json:"keepAliveIdle,omitempty" jsonschema:"nullable;type=string;pattern=^(([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h)$" yaml:"keepAliveIdle"`
 }
 
 // HTTPTransportConfig stores the http.Transport configuration for the http client.
@@ -31,31 +31,31 @@ type HTTPTransportConfig struct {
 	// Options the http.Dialer to connect to an address
 	Dialer *DialerConfig `json:"dialer,omitempty" yaml:"dialer"`
 	// The maximum amount of time an idle (keep-alive) connection will remain idle before closing itself. Zero means no limit.
-	IdleConnTimeout *model.Duration `json:"idleConnTimeout,omitempty" yaml:"idleConnTimeout"`
+	IdleConnTimeout *model.Duration `json:"idleConnTimeout,omitempty" jsonschema:"nullable;type=string;pattern=^(([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h)$" yaml:"idleConnTimeout"`
 	// If non-zero, specifies the amount of time to wait for a server's response headers after fully writing the request (including its body, if any).
 	// This time does not include the time to read the response body.
 	// This timeout is used to cover cases where the tcp connection works but the server never answers.
-	ResponseHeaderTimeout *model.Duration `json:"responseHeaderTimeout,omitempty" yaml:"responseHeaderTimeout"`
+	ResponseHeaderTimeout *model.Duration `json:"responseHeaderTimeout,omitempty" jsonschema:"nullable;type=string;pattern=^(([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h)$" yaml:"responseHeaderTimeout"`
 	// The maximum amount of time to wait for a TLS handshake. Zero means no timeout.
-	TLSHandshakeTimeout *model.Duration `json:"tlsHandshakeTimeout,omitempty" yaml:"tlsHandshakeTimeout"`
+	TLSHandshakeTimeout *model.Duration `json:"tlsHandshakeTimeout,omitempty" jsonschema:"nullable;type=string;pattern=^(([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h)$" yaml:"tlsHandshakeTimeout"`
 	// If non-zero, specifies the amount of time to wait for a server's first response headers after fully writing the request headers if the request has an "Expect: 100-continue" header.
-	ExpectContinueTimeout *model.Duration `json:"expectContinueTimeout,omitempty" yaml:"expectContinueTimeout"`
+	ExpectContinueTimeout *model.Duration `json:"expectContinueTimeout,omitempty" jsonschema:"nullable;type=string;pattern=^(([0-9]+h)?([0-9]+m)?([0-9]+s))|(([0-9]+h)?([0-9]+m))|([0-9]+h)$" yaml:"expectContinueTimeout"`
 	// MaxIdleConns controls the maximum number of idle (keep-alive) connections across all hosts. Zero means no limit.
-	MaxIdleConns *int `json:"maxIdleConns,omitempty" yaml:"maxIdleConns"`
+	MaxIdleConns *int `json:"maxIdleConns,omitempty" jsonschema:"nullable;min=0" yaml:"maxIdleConns"`
 	// MaxIdleConnsPerHost, if non-zero, controls the maximum idle (keep-alive) connections to keep per-host.
-	MaxIdleConnsPerHost *int `json:"maxIdleConnsPerHost,omitempty" jsonschema:"nullable,min=0" yaml:"maxIdleConnsPerHost"`
+	MaxIdleConnsPerHost *int `json:"maxIdleConnsPerHost,omitempty" jsonschema:"nullable;min=0" yaml:"maxIdleConnsPerHost"`
 	// Optionally limits the total number of connections per host, including connections in the dialing, active, and idle states.
 	// On limit violation, dials will block. Zero means no limit.
-	MaxConnsPerHost *int `json:"maxConnsPerHost,omitempty" jsonschema:"nullable,min=0" yaml:"maxConnsPerHost"`
+	MaxConnsPerHost *int `json:"maxConnsPerHost,omitempty" jsonschema:"nullable;min=0" yaml:"maxConnsPerHost"`
 	// Specifies a limit on how many response bytes are allowed in the server's response header.
 	// Zero means to use a default limit.
-	MaxResponseHeaderBytes *int64 `json:"maxResponseHeaderBytes,omitempty" jsonschema:"nullable,min=0" yaml:"maxResponseHeaderBytes"`
+	MaxResponseHeaderBytes *int64 `json:"maxResponseHeaderBytes,omitempty" jsonschema:"nullable;min=0" yaml:"maxResponseHeaderBytes"`
 	// ReadBufferSize specifies the size of the read buffer used when reading from the transport.
 	// If zero, a default (currently 4KB) is used.
-	ReadBufferSize *int `json:"readBufferSize,omitempty" jsonschema:"nullable,min=0" yaml:"readBufferSize"`
+	ReadBufferSize *int `json:"readBufferSize,omitempty" jsonschema:"nullable;min=0" yaml:"readBufferSize"`
 	// WriteBufferSize specifies the size of the write buffer used when writing to the transport.
 	// If zero, a default (currently 4KB) is used.
-	WriteBufferSize *int `json:"writeBufferSize,omitempty" jsonschema:"nullable,min=0" yaml:"writeBufferSize"`
+	WriteBufferSize *int `json:"writeBufferSize,omitempty" jsonschema:"nullable;min=0" yaml:"writeBufferSize"`
 }
 
 // ToTransport creates an http transport from the configuration.

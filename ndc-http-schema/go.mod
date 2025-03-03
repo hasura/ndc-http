@@ -9,7 +9,7 @@ require (
 	github.com/evanphx/json-patch v0.5.2
 	github.com/google/go-cmp v0.6.0
 	github.com/hasura/ndc-http/exhttp v0.0.1
-	github.com/hasura/ndc-sdk-go v1.7.0
+	github.com/hasura/ndc-sdk-go v1.8.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/lmittmann/tint v1.0.7
 	github.com/pb33f/libopenapi v0.18.7
@@ -28,11 +28,11 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.61.0 // indirect
+	github.com/prometheus/common v0.62.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
 	go.opentelemetry.io/otel v1.33.0 // indirect
-	google.golang.org/protobuf v1.36.0 // indirect
+	google.golang.org/protobuf v1.36.1 // indirect
 )
 
 replace github.com/hasura/ndc-http/exhttp => ../exhttp
