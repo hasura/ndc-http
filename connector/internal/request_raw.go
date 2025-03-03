@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hasura/ndc-http/connector/internal/contenttype"
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -101,7 +102,7 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 	if err := json.Unmarshal(rawURL, &urlString); err != nil {
 		return nil, fmt.Errorf("url: %w", err)
 	}
-	requestURL, err := rest.ParseHttpURL(urlString)
+	requestURL, err := exhttp.ParseHttpURL(urlString)
 	if err != nil {
 		return nil, fmt.Errorf("url: %w", err)
 	}
