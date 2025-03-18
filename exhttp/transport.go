@@ -149,7 +149,7 @@ func (ttc HTTPTransportConfig) ToTransport() *http.Transport {
 type HTTPTransportTLSConfig struct {
 	HTTPTransportConfig
 
-	TLS *TLSConfig `json:"tls,omitempty" jsonschema:"nullable" yaml:"tls"`
+	TLS *TLSConfig `json:"tls,omitempty" jsonschema:"nullable" mapstructure:"tls" yaml:"tls"`
 }
 
 // ToTransport creates an http transport from the configuration with TLS.
