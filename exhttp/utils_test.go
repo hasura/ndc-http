@@ -20,5 +20,18 @@ func TestPort(t *testing.T) {
 	assert.Equal(t, 10000, port)
 
 	_, err = ParsePort("abc", "http")
-	assert.ErrorContains(t, err, `strconv.ParseInt: parsing "abc": invalid syntax`)
+	assert.ErrorContains(t, err, `strconv.Atoi: parsing "abc": invalid syntax`)
+}
+
+func TestParseHTTPUrl(t *testing.T) {
+	expected := "http://localhost:8080/v1/api"
+	result, err := ParseHttpURL(expected)
+	assert.NilError(t, err)
+	assert.Equal(t, expected, result.String())
+
+	_, err = ParseHttpURL("!@#$%")
+	assert.ErrorContains(t, err, "invalid URL escape")
+
+	_, err = ParseHttpURL("gs://path/to/file")
+	assert.ErrorContains(t, err, "invalid http(s) scheme")
 }
