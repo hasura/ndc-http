@@ -16,14 +16,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
-      - name: Run Go unit tests
-        run: |
-          docker compose up -d hydra hydra-migrate
-          sleep 5
-          go test -v -coverpkg=./... -race -timeout 3m -coverprofile=coverage.out.tmp ./...
-          docker compose down -v
-          cat coverage.out.tmp | grep -v "main.go" > coverage.out.tmp2
-          cat coverage.out.tmp2 | grep -v "version.go" > coverage.out
       - name: Run integration tests
         run: |
           ./scripts/test.sh
@@ -32,7 +24,7 @@ jobs:
         run: |
           go get github.com/boumenot/gocover-cobertura
           go install github.com/boumenot/gocover-cobertura
-          gocover-cobertura < coverage.out > coverage.xml
+          gocover-cobertura < ./coverage/coverage.out > coverage.xml
       - name: Code Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         if: ${{ github.event_name == 'pull_request' }}

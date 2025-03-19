@@ -4,6 +4,7 @@ FROM golang:1.23 AS builder
 WORKDIR /app
 
 ARG VERSION
+COPY exhttp ./exhttp
 COPY ndc-http-schema ./ndc-http-schema
 COPY go.mod go.sum go.work ./
 RUN go mod download

@@ -2,3 +2,8 @@
 *.hml
 .github/
 assets/
+coverage/
+docs/
+connector-definition/
+tests/
+tmp/
