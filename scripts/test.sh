@@ -34,9 +34,12 @@ go test -v -race -timeout 3m -cover ./exhttp/... -args -test.gocoverdir=$PWD/cov
 docker compose up -d hydra hydra-migrate
 http_wait http://localhost:4444/health/ready
 
-go test -v -race -timeout 3m -coverpkg=./... -cover ./connector/... -args -test.gocoverdir=$PWD/coverage/connector ./...
+go test -v -race -timeout 3m -coverpkg=./... -cover ./... -args -test.gocoverdir=$PWD/coverage/connector ./...
 docker compose down -v
-go tool covdata textfmt -i=./coverage/connector,./coverage/exhttp -o coverage/profile
+go tool covdata textfmt -i=./coverage/connector,./coverage/exhttp -o ./coverage/profile.tmp
+
+cat ./coverage/profile.tmp | grep -v "main.go" > ./coverage/profile.tmp2
+cat ./coverage/profile.tmp2 | grep -v "version.go" > ./coverage/profile
 
 # start ndc-test
 NDC_TEST_VERSION=v0.1.6
