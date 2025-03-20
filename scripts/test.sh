@@ -18,7 +18,7 @@ http_wait() {
     fi
   done
   printf "\n${RED}ERROR${NC}: cannot connect to $1.\n"
-  
+
   exit 1
 }
 
@@ -28,18 +28,15 @@ mkdir -p ./coverage/exhttp
 mkdir -p ./coverage/connector
 mkdir -p ./coverage/schema
 
-go test -v -race -timeout 3m -cover ./exhttp/... -args -test.gocoverdir=$PWD/coverage/exhttp ./...
+go test -v -race -timeout 3m -cover ./exhttp/... -args -test.gocoverdir=$PWD/coverage/exhttp ./exhttp/...
 # go test -v -race -timeout 3m -cover ./ndc-http-schema/... -args -test.gocoverdir=$PWD/coverage/schema ./...
 
 docker compose up -d hydra hydra-migrate
 http_wait http://localhost:4444/health/ready
 
-go test -v -race -timeout 3m -cover ./... -args -test.gocoverdir=$PWD/coverage/connector ./...
+go test -v -race -timeout 3m -coverpkg=./... -cover ./connector/... -args -test.gocoverdir=$PWD/coverage/connector ./...
 docker compose down -v
 go tool covdata textfmt -i=./coverage/connector,./coverage/exhttp -o coverage/profile
-
-# cat ./coverage/coverage.out.tmp | grep -v "main.go" > ./coverage/coverage.out.tmp2
-# cat ./coverage/coverage.out.tmp2 | grep -v "version.go" > ./coverage/coverage.out
 
 # start ndc-test
 NDC_TEST_VERSION=v0.1.6
