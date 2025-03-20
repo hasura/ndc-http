@@ -790,9 +790,7 @@
           }
         }
       },
-      "xml": {
-        "name": "advanced_stats_clicks"
-      }
+      "alias": "advanced_stats_clicks"
     },
     "AdvancedStatsClicksOpens": {
       "description": "The individual events and their stats.",
@@ -904,9 +902,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "ApiResponse"
       }
     },
     "Category": {
@@ -977,6 +972,7 @@
           }
         }
       },
+      "alias": "Category",
       "xml": {
         "name": "Category"
       }
@@ -1070,9 +1066,7 @@
           }
         }
       },
-      "xml": {
-        "name": "contactdb_recipient"
-      }
+      "alias": "contactdb_recipient"
     },
     "ContactdbRecipientRecipients": {
       "fields": {
@@ -1114,9 +1108,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "contactdb_recipient"
       }
     },
     "DomainAuthenticationDomainSpf": {
@@ -1273,9 +1264,7 @@
           }
         }
       },
-      "xml": {
-        "name": "domain_authentication:domain_spf"
-      }
+      "alias": "domain_authentication:domain_spf"
     },
     "DomainAuthenticationDomainSpfDns": {
       "description": "The DNS records for this authenticated domain.",
@@ -1328,9 +1317,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "domain_authentication:domain_spf"
       }
     },
     "DomainAuthenticationDomainSpfDnsDkim": {
@@ -1384,9 +1370,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "domain_authentication:domain_spf"
       }
     },
     "DomainAuthenticationDomainSpfDnsDomainSpf": {
@@ -1440,9 +1423,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "domain_authentication:domain_spf"
       }
     },
     "DomainAuthenticationDomainSpfDnsMailServer": {
@@ -1496,9 +1476,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "domain_authentication:domain_spf"
       }
     },
     "DomainAuthenticationDomainSpfDnsSubdomainSpf": {
@@ -1552,9 +1529,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "domain_authentication:domain_spf"
       }
     },
     "GETBrowsersStatsResult": {
@@ -1597,9 +1571,6 @@
             }
           }
         }
-      },
-      "xml": {
-        "name": "GET_browsers_stats"
       }
     },
     "GETBrowsersStatsResultStats": {
@@ -1616,10 +1587,7 @@
           "http": {
             "type": [
               "object"
-            ],
-            "xml": {
-              "name": "advanced_stats_clicks"
-            }
+            ]
           }
         },
         "name": {
@@ -1652,9 +1620,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "GET_browsers_stats"
       }
     },
     "GETContactdbListsListIdRecipientsResult": {
@@ -1677,16 +1642,10 @@
             "items": {
               "type": [
                 "object"
-              ],
-              "xml": {
-                "name": "contactdb_recipient"
-              }
+              ]
             }
           }
         }
-      },
-      "xml": {
-        "name": "GET_contactdb_lists_list_id_recipients"
       }
     },
     "GETGeoStatsResult": {
@@ -1729,9 +1688,6 @@
             }
           }
         }
-      },
-      "xml": {
-        "name": "GET_geo_stats"
       }
     },
     "GETGeoStatsResultStats": {
@@ -1747,10 +1703,7 @@
           "http": {
             "type": [
               "object"
-            ],
-            "xml": {
-              "name": "advanced_stats_clicks_opens"
-            }
+            ]
           }
         },
         "name": {
@@ -1783,9 +1736,6 @@
             ]
           }
         }
-      },
-      "xml": {
-        "name": "GET_geo_stats"
       }
     },
     "OAuth2Client": {
@@ -1867,9 +1817,7 @@
           }
         }
       },
-      "xml": {
-        "name": "oAuth2Client"
-      }
+      "alias": "oAuth2Client"
     },
     "OAuth2ClientInput": {
       "fields": {
@@ -1950,9 +1898,7 @@
           }
         }
       },
-      "xml": {
-        "name": "oAuth2Client"
-      }
+      "alias": "oAuth2Client"
     },
     "Order": {
       "fields": {
@@ -2142,6 +2088,7 @@
           }
         }
       },
+      "alias": "Order",
       "xml": {
         "name": "Order"
       }
@@ -2400,6 +2347,7 @@
           }
         }
       },
+      "alias": "Pet",
       "xml": {
         "name": "Pet"
       }
@@ -2446,6 +2394,7 @@
           }
         }
       },
+      "alias": "snake_object",
       "xml": {
         "name": "User"
       }
@@ -2518,6 +2467,7 @@
           }
         }
       },
+      "alias": "Tag",
       "xml": {
         "name": "Tag"
       }
@@ -2830,6 +2780,7 @@
           }
         }
       },
+      "alias": "User",
       "xml": {
         "name": "User"
       }
@@ -3042,10 +2993,7 @@
             "schema": {
               "type": [
                 "object"
-              ],
-              "xml": {
-                "name": "oAuth2Client"
-              }
+              ]
             }
           }
         }

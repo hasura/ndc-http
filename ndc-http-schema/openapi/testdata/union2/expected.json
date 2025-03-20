@@ -95,9 +95,7 @@
           }
         }
       },
-      "xml": {
-        "name": "Cat"
-      }
+      "alias": "Cat"
     },
     "DogInput": {
       "fields": {
@@ -149,9 +147,7 @@
           }
         }
       },
-      "xml": {
-        "name": "Dog"
-      }
+      "alias": "Dog"
     },
     "GetPetResult": {
       "fields": {

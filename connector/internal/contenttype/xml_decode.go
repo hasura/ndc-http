@@ -485,15 +485,26 @@ func findXMLLeafObjectField(objectType rest.ObjectType) (*rest.ObjectField, stri
 	return f, fieldName, true
 }
 
-func getTypeSchemaXMLName(typeSchema *rest.TypeSchema, defaultName string) string {
+func getTypeSchemaXMLName(typeSchema *rest.TypeSchema, defaultNames ...string) string {
+	var xmlSchema *rest.XMLSchema
 	if typeSchema != nil {
-		return getXMLName(typeSchema.XML, defaultName)
+		xmlSchema = typeSchema.XML
 	}
 
-	return defaultName
+	return getXMLName(xmlSchema, defaultNames...)
 }
 
-func getXMLName(xmlSchema *rest.XMLSchema, defaultName string) string {
+func getXMLName(xmlSchema *rest.XMLSchema, defaultNames ...string) string {
+	var defaultName string
+
+	for _, name := range defaultNames {
+		if name != "" {
+			defaultName = name
+
+			break
+		}
+	}
+
 	if xmlSchema != nil {
 		if xmlSchema.Name != "" {
 			return xmlSchema.GetFullName()

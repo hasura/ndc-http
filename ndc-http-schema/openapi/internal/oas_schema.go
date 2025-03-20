@@ -209,6 +209,8 @@ func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []
 func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths []string) (*SchemaInfoCache, error) {
 	typeResult := createSchemaFromOpenAPISchema(baseSchema)
 	refName := utils.StringSliceToPascalCase(fieldPaths)
+	writeRefName := formatWriteObjectName(refName)
+
 	if baseSchema.Properties == nil || baseSchema.Properties.IsZero() || (baseSchema.AdditionalProperties != nil && (baseSchema.AdditionalProperties.B || baseSchema.AdditionalProperties.A != nil)) {
 		// treat no-property objects as a JSON scalar
 		var scalarType schema.TypeEncoder = schema.NewNamedType(string(rest.ScalarJSON))
@@ -224,21 +226,26 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 	}
 
 	xmlSchema := typeResult.XML
-	if xmlSchema == nil {
-		xmlSchema = &rest.XMLSchema{}
-	}
-
-	if xmlSchema.Name == "" {
-		xmlSchema.Name = fieldPaths[0]
-	}
-
 	readObject := rest.ObjectType{
 		Fields: make(map[string]rest.ObjectField),
 		XML:    xmlSchema,
 	}
+
 	writeObject := rest.ObjectType{
 		Fields: make(map[string]rest.ObjectField),
 		XML:    xmlSchema,
+	}
+
+	// assume that the object type is a root field,
+	// get the openapi schema name as the alias.
+	if len(fieldPaths) == 1 {
+		if refName != fieldPaths[0] {
+			readObject.Alias = fieldPaths[0]
+		}
+
+		if writeRefName != fieldPaths[0] {
+			writeObject.Alias = fieldPaths[0]
+		}
 	}
 
 	if typeResult.Description != "" {
@@ -298,7 +305,6 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 		}
 	}
 
-	writeRefName := formatWriteObjectName(refName)
 	if isXMLLeafObject(readObject) {
 		readObject.Fields[xmlValueFieldName] = xmlValueField
 	}

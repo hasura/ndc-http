@@ -147,6 +147,7 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 		nsc.usedTypes[t.Name] = newName
 
 		newObjectType := rest.ObjectType{
+			Alias:       objectType.Alias,
 			Description: objectType.Description,
 			XML:         objectType.XML,
 			Fields:      make(map[string]rest.ObjectField),

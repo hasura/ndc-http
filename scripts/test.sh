@@ -29,14 +29,14 @@ mkdir -p ./coverage/connector
 mkdir -p ./coverage/schema
 
 go test -v -race -timeout 3m -cover ./exhttp/... -args -test.gocoverdir=$PWD/coverage/exhttp ./exhttp/...
-# go test -v -race -timeout 3m -cover ./ndc-http-schema/... -args -test.gocoverdir=$PWD/coverage/schema ./...
+go test -v -race -timeout 3m -cover ./ndc-http-schema/... -args -test.gocoverdir=$PWD/coverage/schema ./ndc-http-schema/...
 
 docker compose up -d hydra hydra-migrate
 http_wait http://localhost:4444/health/ready
 
 go test -v -race -timeout 3m -coverpkg=./... -cover ./... -args -test.gocoverdir=$PWD/coverage/connector ./...
 docker compose down -v
-go tool covdata textfmt -i=./coverage/connector,./coverage/exhttp -o ./coverage/profile.tmp
+go tool covdata textfmt -i=./coverage/connector,./coverage/exhttp,./coverage/schema -o ./coverage/profile.tmp
 
 cat ./coverage/profile.tmp | grep -v "main.go" > ./coverage/profile.tmp2
 cat ./coverage/profile.tmp2 | grep -v "version.go" > ./coverage/profile
