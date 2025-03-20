@@ -145,6 +145,10 @@ func SplitStringsAndTrimSpaces(input string, sep string) []string {
 		results = append(results, trimmed)
 	}
 
+	if len(results) == 0 {
+		return nil
+	}
+
 	return results
 }
 

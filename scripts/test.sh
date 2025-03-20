@@ -5,6 +5,7 @@ trap 'docker compose down -v --remove-orphans' EXIT
 
 http_wait() {
   printf "$1:\t "
+
   for i in {1..120};
   do
     local code="$(curl -s -o /dev/null -m 2 -w '%{http_code}' $1)"
@@ -17,6 +18,7 @@ http_wait() {
     fi
   done
   printf "\n${RED}ERROR${NC}: cannot connect to $1.\n"
+  
   exit 1
 }
 
@@ -24,8 +26,10 @@ http_wait() {
 rm -rf ./coverage
 mkdir -p ./coverage/exhttp
 mkdir -p ./coverage/connector
+mkdir -p ./coverage/schema
 
 go test -v -race -timeout 3m -cover ./exhttp/... -args -test.gocoverdir=$PWD/coverage/exhttp ./...
+# go test -v -race -timeout 3m -cover ./ndc-http-schema/... -args -test.gocoverdir=$PWD/coverage/schema ./...
 
 docker compose up -d hydra hydra-migrate
 http_wait http://localhost:4444/health/ready
