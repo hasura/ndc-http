@@ -33,7 +33,7 @@
       "required": [
         "type"
       ],
-      "description": "ArgumentInfo the information of HTTP request argument"
+      "description": "ArgumentInfo the information of HTTP request argument."
     },
     "ArgumentPresetConfig": {
       "properties": {
@@ -127,7 +127,7 @@
         "$ref": "#/$defs/AuthSecurity"
       },
       "type": "array",
-      "description": "AuthSecurities wraps list of security requirements with helpers"
+      "description": "AuthSecurities wraps list of security requirements with helpers."
     },
     "AuthSecurity": {
       "additionalProperties": {
@@ -137,7 +137,7 @@
         "type": "array"
       },
       "type": "object",
-      "description": "AuthSecurity wraps the raw security requirement with helpers"
+      "description": "AuthSecurity wraps the raw security requirement with helpers."
     },
     "ComparisonOperatorDefinition": {
       "type": "object"
@@ -369,7 +369,7 @@
       "required": [
         "type"
       ],
-      "description": "ObjectField defined on this object type"
+      "description": "ObjectField defined on this object type."
     },
     "ObjectFieldArguments": {
       "additionalProperties": {
@@ -400,7 +400,7 @@
       "required": [
         "fields"
       ],
-      "description": "ObjectType represents the object type of http schema"
+      "description": "ObjectType represents the object type of http schema."
     },
     "OperationInfo": {
       "properties": {
@@ -434,7 +434,7 @@
         "arguments",
         "result_type"
       ],
-      "description": "OperationInfo extends connector command operation with OpenAPI HTTP information"
+      "description": "OperationInfo extends connector command operation with OpenAPI HTTP information."
     },
     "ParameterEncodingStyle": {
       "type": "string",
@@ -507,7 +507,7 @@
       "required": [
         "response"
       ],
-      "description": "Request represents the HTTP request information of the webhook"
+      "description": "Request represents the HTTP request information of the webhook."
     },
     "RequestBody": {
       "properties": {
@@ -523,7 +523,7 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "RequestBody defines flexible request body with content types"
+      "description": "RequestBody defines flexible request body with content types."
     },
     "RequestParameter": {
       "properties": {
@@ -568,7 +568,7 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "RequestParameter represents an HTTP request parameter"
+      "description": "RequestParameter represents an HTTP request parameter."
     },
     "Response": {
       "properties": {
@@ -602,7 +602,7 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "RetryPolicy represents the retry policy of request"
+      "description": "RetryPolicy represents the retry policy of request."
     },
     "ScalarType": {
       "properties": {
@@ -881,60 +881,47 @@
     "TLSConfig": {
       "properties": {
         "certFile": {
-          "$ref": "#/$defs/EnvString",
-          "description": "Path to the TLS cert to use for TLS required connections."
+          "$ref": "#/$defs/EnvString"
         },
         "certPem": {
-          "$ref": "#/$defs/EnvString",
-          "description": "Alternative to cert_file. Provide the certificate contents as a base64-encoded string instead of a filepath."
+          "$ref": "#/$defs/EnvString"
         },
         "keyFile": {
-          "$ref": "#/$defs/EnvString",
-          "description": "Path to the TLS key to use for TLS required connections."
+          "$ref": "#/$defs/EnvString"
         },
         "keyPem": {
-          "$ref": "#/$defs/EnvString",
-          "description": "Alternative to key_file. Provide the key contents as a base64-encoded string instead of a filepath."
+          "$ref": "#/$defs/EnvString"
         },
         "caFile": {
-          "$ref": "#/$defs/EnvString",
-          "description": "Path to the CA cert. For a client this verifies the server certificate. For a server this verifies client certificates.\nIf empty uses system root CA."
+          "$ref": "#/$defs/EnvString"
         },
         "caPem": {
-          "$ref": "#/$defs/EnvString",
-          "description": "Alternative to ca_file. Provide the CA cert contents as a base64-encoded string instead of a filepath."
+          "$ref": "#/$defs/EnvString"
         },
         "insecureSkipVerify": {
-          "$ref": "#/$defs/EnvBool",
-          "description": "Additionally you can configure TLS to be enabled but skip verifying the server's certificate chain."
+          "$ref": "#/$defs/EnvBool"
         },
         "includeSystemCACertsPool": {
-          "$ref": "#/$defs/EnvBool",
-          "description": "Whether to load the system certificate authorities pool alongside the certificate authority."
+          "$ref": "#/$defs/EnvBool"
         },
         "minVersion": {
-          "type": "string",
-          "description": "Minimum acceptable TLS version."
+          "type": "string"
         },
         "maxVersion": {
-          "type": "string",
-          "description": "Maximum acceptable TLS version."
+          "type": "string"
         },
         "cipherSuites": {
           "items": {
             "type": "string"
           },
-          "type": "array",
-          "description": "Explicit cipher suites can be set. If left blank, a safe default list is used.\nSee https://go.dev/src/crypto/tls/cipher_suites.go for a list of supported cipher suites."
+          "type": "array"
         },
         "serverName": {
-          "$ref": "#/$defs/EnvString",
-          "description": "ServerName requested by client for virtual hosting.\nThis sets the ServerName in the TLSConfig. Please refer to\nhttps://godoc.org/crypto/tls#Config for more information. (optional)"
+          "$ref": "#/$defs/EnvString"
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "description": "TLSConfig represents the transport layer security (LTS) configuration for the mutualTLS authentication"
+      "type": "object"
     },
     "Type": {
       "type": "object"
@@ -977,7 +964,7 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "TypeSchema represents a serializable object of OpenAPI schema that is used for validation"
+      "description": "TypeSchema represents a serializable object of OpenAPI schema that is used for validation."
     },
     "XMLSchema": {
       "properties": {

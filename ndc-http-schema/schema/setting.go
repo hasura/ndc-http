@@ -9,6 +9,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-sdk-go/utils"
 	"github.com/invopop/jsonschema"
 	"github.com/theory/jsonpath"
@@ -24,7 +25,7 @@ type NDCHttpSettings struct {
 	SecuritySchemes map[string]SecurityScheme  `json:"securitySchemes,omitempty" mapstructure:"securitySchemes" yaml:"securitySchemes,omitempty"`
 	Security        AuthSecurities             `json:"security,omitempty"        mapstructure:"security"        yaml:"security,omitempty"`
 	Version         string                     `json:"version,omitempty"         mapstructure:"version"         yaml:"version,omitempty"`
-	TLS             *TLSConfig                 `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
+	TLS             *exhttp.TLSConfig          `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -64,7 +65,7 @@ type ServerConfig struct {
 	Headers         map[string]utils.EnvString `json:"headers,omitempty"         mapstructure:"headers"         yaml:"headers,omitempty"`
 	SecuritySchemes map[string]SecurityScheme  `json:"securitySchemes,omitempty" mapstructure:"securitySchemes" yaml:"securitySchemes,omitempty"`
 	Security        AuthSecurities             `json:"security,omitempty"        mapstructure:"security"        yaml:"security,omitempty"`
-	TLS             *TLSConfig                 `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
+	TLS             *exhttp.TLSConfig          `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -78,7 +79,7 @@ func (ss *ServerConfig) Validate() error {
 		return errors.New("url is required for server")
 	}
 
-	_, err = ParseHttpURL(rawURL)
+	_, err = exhttp.ParseHttpURL(rawURL)
 	if err != nil {
 		return fmt.Errorf("server url: %w", err)
 	}
@@ -98,7 +99,7 @@ func (ss ServerConfig) GetURL() (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	urlValue, err := ParseHttpURL(rawURL)
+	urlValue, err := exhttp.ParseHttpURL(rawURL)
 	if err != nil {
 		return nil, fmt.Errorf("server url: %w", err)
 	}
@@ -386,21 +387,12 @@ func (apv ArgumentPresetValueForwardHeader) GetType() ArgumentPresetValueType {
 	return apv.Type
 }
 
-// ParseHttpURL parses and validate if the URL has HTTP scheme.
-func ParseHttpURL(input string) (*url.URL, error) {
-	if !strings.HasPrefix(input, "https://") && !strings.HasPrefix(input, "http://") {
-		return nil, errors.New("invalid HTTP URL " + input)
-	}
-
-	return url.Parse(input)
-}
-
 func ParseRelativeOrHttpURL(input string) (*url.URL, error) {
 	if strings.HasPrefix(input, "/") {
 		return &url.URL{Path: input}, nil
 	}
 
-	return ParseHttpURL(input)
+	return exhttp.ParseHttpURL(input)
 }
 
 func getStringFromAnyMap(input map[string]any, key string) (string, error) {

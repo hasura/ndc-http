@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/hasura/ndc-http/connector/internal/contenttype"
+	"github.com/hasura/ndc-http/exhttp"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/connector"
@@ -162,14 +163,10 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 	span.SetAttributes(attribute.String("execution.mode", mode))
 
 	requestURL := request.URL.String()
-	rawPort := request.URL.Port()
-	port := 80
-	if rawPort != "" {
-		if p, err := strconv.ParseInt(rawPort, 10, 32); err == nil {
-			port = int(p)
-		}
-	} else if strings.HasPrefix(request.URL.Scheme, "https") {
-		port = 443
+
+	port, portErr := exhttp.ParsePort(request.URL.Port(), request.URL.Scheme)
+	if portErr != nil {
+		return nil, nil, schema.UnprocessableContentError(portErr.Error(), nil)
 	}
 
 	logger := connector.GetLogger(ctx)

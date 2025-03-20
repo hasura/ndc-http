@@ -7,7 +7,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./tests/configuration:/etc/connector:ro
+      - ${CONFIG_PATH:-./tests/configuration}:/etc/connector:ro
     extra_hosts:
       - local.hasura.dev=host-gateway
     environment:

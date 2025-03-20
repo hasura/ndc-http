@@ -29,3 +29,4 @@ go.work.sum
 release/
 _output/
 schema.output.json
+coverage/
