@@ -271,11 +271,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "ChatCompletionRequestAssistantMessageFunctionCallInput",
-                "type": "named"
-              }
+              "name": "ChatCompletionRequestAssistantMessageFunctionCallInput",
+              "type": "named"
             }
           },
           "http": {
@@ -679,11 +676,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "JSON",
-                "type": "named"
-              }
+              "name": "JSON",
+              "type": "named"
             }
           },
           "http": {
@@ -881,11 +875,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "ChatCompletionStreamOptionsInput",
-                "type": "named"
-              }
+              "name": "ChatCompletionStreamOptionsInput",
+              "type": "named"
             }
           },
           "http": {
@@ -1151,11 +1142,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "CreateChatCompletionResponseChoicesLogprobs",
-                "type": "named"
-              }
+              "name": "CreateChatCompletionResponseChoicesLogprobs",
+              "type": "named"
             }
           },
           "http": {
@@ -1264,11 +1252,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "CreateThreadRequestToolResourcesInput",
-                "type": "named"
-              }
+              "name": "CreateThreadRequestToolResourcesInput",
+              "type": "named"
             }
           },
           "http": {

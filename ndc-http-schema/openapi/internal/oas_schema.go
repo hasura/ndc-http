@@ -100,13 +100,8 @@ func (oc *oasSchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProxy
 	}
 
 	if nullable {
-		if !isNullableType(result.TypeRead) {
-			result.TypeRead = schema.NewNullableType(result.TypeRead)
-		}
-
-		if !isNullableType(result.TypeWrite) {
-			result.TypeWrite = schema.NewNullableType(result.TypeWrite)
-		}
+		result.TypeRead = utils.WrapNullableTypeEncoder(result.TypeRead)
+		result.TypeWrite = utils.WrapNullableTypeEncoder(result.TypeWrite)
 	}
 
 	return result, nil
@@ -199,8 +194,8 @@ func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []
 	}
 
 	if nullable {
-		typeResult.TypeRead = schema.NewNullableType(typeResult.TypeRead)
-		typeResult.TypeWrite = schema.NewNullableType(typeResult.TypeWrite)
+		typeResult.TypeRead = utils.WrapNullableTypeEncoder(typeResult.TypeRead)
+		typeResult.TypeWrite = utils.WrapNullableTypeEncoder(typeResult.TypeWrite)
 	}
 
 	return typeResult, nil
@@ -374,8 +369,8 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 			}
 
 			if nullable || isNullable {
-				schemaResult.TypeRead = schema.NewNullableType(schemaResult.TypeRead)
-				schemaResult.TypeWrite = schema.NewNullableType(schemaResult.TypeWrite)
+				schemaResult.TypeRead = utils.WrapNullableTypeEncoder(schemaResult.TypeRead)
+				schemaResult.TypeWrite = utils.WrapNullableTypeEncoder(schemaResult.TypeWrite)
 			}
 
 			return schemaResult, nil

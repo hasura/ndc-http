@@ -101,12 +101,6 @@ func getNamedType(typeSchema schema.TypeEncoder, recursive bool, defaultValue st
 	}
 }
 
-func isNullableType(input schema.TypeEncoder) bool {
-	_, ok := input.(*schema.NullableType)
-
-	return ok
-}
-
 func unwrapNullableUnionTypeSchemas(inputs []SchemaInfoCache) ([]SchemaInfoCache, bool, bool) {
 	var readNullable bool
 	var writeNullable bool
@@ -280,11 +274,12 @@ func mergeUnionTypeSchemasRecursive(httpSchema *rest.NDCHttpSchema, baseSchema *
 		return nil, false
 	}
 
-	if readNullable && !isNullableType(result.TypeRead) {
-		result.TypeRead = schema.NewNullableType(result.TypeRead)
+	if readNullable {
+		result.TypeRead = utils.WrapNullableTypeEncoder(result.TypeRead)
 	}
-	if writeNullable && !isNullableType(result.TypeWrite) {
-		result.TypeWrite = schema.NewNullableType(result.TypeWrite)
+
+	if writeNullable {
+		result.TypeWrite = utils.WrapNullableTypeEncoder(result.TypeWrite)
 	}
 
 	return result, ok
@@ -303,11 +298,8 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 	switch at := a.Interface().(type) {
 	case *schema.NullableType:
 		result, ok := mergeUnionTypes(httpSchema, at.UnderlyingType, bType, fieldPaths)
-		if !isNullableType(result) {
-			result = schema.NewNullableType(result)
-		}
 
-		return result, ok
+		return utils.WrapNullableTypeEncoder(result), ok
 	case *schema.ArrayType:
 		bt, err := bType.AsArray()
 		if err != nil {
@@ -394,8 +386,8 @@ func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Typ
 		result = schema.NewNamedType(string(rest.ScalarJSON))
 	}
 
-	if bNullErr != nil && !isNullableType(result) {
-		result = schema.NewNullableType(result)
+	if bNullErr != nil {
+		result = utils.WrapNullableTypeEncoder(result)
 	}
 
 	return result, isMatched
@@ -573,7 +565,7 @@ func transformNullableObjectProperties(httpSchema *rest.NDCHttpSchema, input sch
 	case *schema.NullableType:
 		result, isObject := transformNullableObjectProperties(httpSchema, t.UnderlyingType, newName)
 
-		return schema.NewNullableType(result), isObject
+		return utils.WrapNullableTypeEncoder(result), isObject
 	case *schema.ArrayType:
 		result, isObject := transformNullableObjectProperties(httpSchema, t.ElementType, newName)
 
@@ -596,9 +588,7 @@ func transformNullableObjectProperties(httpSchema *rest.NDCHttpSchema, input sch
 
 		for key, field := range objType.Fields {
 			fieldType := field.Type.Interface()
-			if !isNullableType(fieldType) {
-				field.Type = schema.NewNullableType(fieldType).Encode()
-			}
+			field.Type = utils.WrapNullableTypeEncoder(fieldType).Encode()
 			newObjectType.Fields[key] = field
 		}
 

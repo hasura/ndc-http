@@ -313,7 +313,7 @@ func (oc *OAS3Builder) populateWriteSchemaType(schemaType schema.Type) (schema.T
 	case *schema.NullableType:
 		ut, name, isInput := oc.populateWriteSchemaType(ty.UnderlyingType)
 
-		return schema.NewNullableType(ut.Interface()).Encode(), name, isInput
+		return utils.WrapNullableTypeEncoder(ut.Interface()).Encode(), name, isInput
 	case *schema.ArrayType:
 		ut, name, isInput := oc.populateWriteSchemaType(ty.ElementType)
 

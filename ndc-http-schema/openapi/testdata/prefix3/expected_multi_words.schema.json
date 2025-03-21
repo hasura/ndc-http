@@ -235,11 +235,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "JSON",
-                "type": "named"
-              }
+              "name": "JSON",
+              "type": "named"
             }
           }
         },
@@ -248,11 +245,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "JSON",
-                "type": "named"
-              }
+              "name": "JSON",
+              "type": "named"
             }
           }
         },

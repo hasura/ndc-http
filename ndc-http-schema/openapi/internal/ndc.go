@@ -106,7 +106,7 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 			return nil, err
 		}
 
-		return schema.NewNullableType(underlyingType), nil
+		return utils.WrapNullableTypeEncoder(underlyingType), nil
 	case *schema.ArrayType:
 		elementType, err := nsc.validateType(t.ElementType)
 		if err != nil {
@@ -128,8 +128,10 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 			if !rest.IsDefaultScalar(t.Name) {
 				newName = nsc.formatTypeName(t.Name)
 			}
+
 			newNameType := schema.NewNamedType(newName)
 			nsc.usedTypes[t.Name] = newName
+
 			if _, ok := nsc.newSchema.ScalarTypes[newName]; !ok {
 				nsc.newSchema.ScalarTypes[newName] = st
 			}
@@ -158,6 +160,7 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 			if err != nil {
 				return nil, fmt.Errorf("%s.%s: %w", t.Name, key, err)
 			}
+
 			newObjectType.Fields[key] = rest.ObjectField{
 				ObjectField: schema.ObjectField{
 					Type:        fieldType.Encode(),
