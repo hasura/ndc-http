@@ -390,6 +390,10 @@
           "type": "object",
           "description": "Fields defined on this object type"
         },
+        "alias": {
+          "type": "string",
+          "description": "The alias of the object. It can be the original name of OpenAPI schema."
+        },
         "xml": {
           "$ref": "#/$defs/XMLSchema",
           "description": "XML schema"

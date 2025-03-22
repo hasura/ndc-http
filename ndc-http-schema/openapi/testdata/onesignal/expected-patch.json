@@ -57,10 +57,7 @@
           "http": {
             "in": "body",
             "schema": {
-              "type": ["object"],
-              "xml": {
-                "name": "Notification"
-              }
+              "type": ["object"]
             }
           }
         }

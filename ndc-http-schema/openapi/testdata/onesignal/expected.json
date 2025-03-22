@@ -205,11 +205,7 @@
               "type": "named"
             }
           },
-          "http": {
-            "xml": {
-              "name": "Notification200Errors"
-            }
-          }
+          "http": {}
         },
         "external_id": {
           "type": {
@@ -466,7 +462,8 @@
             ]
           }
         }
-      }
+      },
+      "alias": "Filter"
     },
     "GetNotificationHistoryBodyInput": {
       "fields": {
@@ -568,11 +565,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "JSON",
-                "type": "named"
-              }
+              "name": "JSON",
+              "type": "named"
             }
           },
           "http": {
@@ -586,11 +580,8 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "JSON",
-                "type": "named"
-              }
+              "name": "JSON",
+              "type": "named"
             }
           },
           "http": {
@@ -772,10 +763,7 @@
             "items": {
               "type": [
                 "object"
-              ],
-              "xml": {
-                "name": "NotificationWithMeta"
-              }
+              ]
             }
           }
         },
@@ -1637,7 +1625,8 @@
             ]
           }
         }
-      }
+      },
+      "alias": "StringMap"
     }
   },
   "procedures": {
@@ -1720,10 +1709,7 @@
             "schema": {
               "type": [
                 "object"
-              ],
-              "xml": {
-                "name": "Notification"
-              }
+              ]
             }
           }
         }

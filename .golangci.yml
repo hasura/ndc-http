@@ -4,7 +4,6 @@ linters:
     - err113
     - lll
     - gocognit
-    - exportloopref
     - funlen
     - gomoddirectives
     - depguard

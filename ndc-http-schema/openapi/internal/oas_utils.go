@@ -214,7 +214,7 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 				HTTP: fields[0].HTTP,
 			}
 
-			if unionType != oasAllOf && !isNullableType(newField.Type.Interface()) {
+			if unionType != oasAllOf && !utils.IsNullableTypeEncoder(newField.Type.Interface()) {
 				newField.Type = (schema.NullableType{
 					Type:           schema.TypeNullable,
 					UnderlyingType: newField.Type,
@@ -249,7 +249,7 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 			}
 		}
 
-		if len(fields) < len(srcObjects) && unionType != oasAllOf && !isNullableType(unionField.Type.Interface()) {
+		if len(fields) < len(srcObjects) && unionType != oasAllOf && !utils.IsNullableTypeEncoder(unionField.Type.Interface()) {
 			unionField.Type = (schema.NullableType{
 				Type:           schema.TypeNullable,
 				UnderlyingType: unionField.Type,

@@ -211,15 +211,6 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		typeName = getNamedType(schemaResult.TypeRead, true, "")
 	}
 
-	if schemaResult.TypeSchema != nil {
-		if schemaResult.TypeSchema.XML == nil {
-			schemaResult.TypeSchema.XML = &rest.XMLSchema{}
-		}
-		if schemaResult.TypeSchema.XML.Name == "" {
-			schemaResult.TypeSchema.XML.Name = typeKey
-		}
-	}
-
 	// If the result type is a scalar, the builder returns the raw scalar name (String, Int).
 	// We should check and add the alias type to scalar objects
 	pascalTypeName := utils.ToPascalCase(typeKey)

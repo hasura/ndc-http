@@ -188,7 +188,8 @@
             ]
           }
         }
-      }
+      },
+      "alias": "Cat"
     },
     "DogInput": {
       "fields": {
@@ -254,7 +255,8 @@
             ]
           }
         }
-      }
+      },
+      "alias": "Dog"
     },
     "GetPetsResult": {
       "fields": {

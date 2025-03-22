@@ -154,12 +154,14 @@ func (c *XMLEncoder) evalXMLFieldArray(enc *xml.Encoder, name string, field rest
 
 func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest.ObjectField, t *schema.NamedType, innerValue reflect.Value, fieldPaths []string) error {
 	var attributes []xml.Attr
-	xmlName := getTypeSchemaXMLName(field.HTTP, name)
 	if field.HTTP != nil && field.HTTP.XML != nil && field.HTTP.XML.Namespace != "" {
 		attributes = append(attributes, field.HTTP.XML.GetNamespaceAttribute())
 	}
 
 	if _, ok := c.schema.ScalarTypes[t.Name]; ok {
+		// this field doesn't have the name, skip
+		xmlName := getTypeSchemaXMLName(field.HTTP, name, t.Name)
+
 		if err := c.encodeSimpleScalar(enc, xmlName, innerValue, attributes, fieldPaths); err != nil {
 			return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 		}
@@ -183,7 +185,7 @@ func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest
 		return err
 	}
 
-	xmlName = getXMLName(objectType.XML, name)
+	xmlName := getXMLName(objectType.XML, name, objectType.Alias, t.Name)
 	if objectType.XML != nil && objectType.XML.Namespace != "" {
 		attributes = append(attributes, objectType.XML.GetNamespaceAttribute())
 	}

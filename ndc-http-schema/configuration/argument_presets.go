@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
+	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/schema"
 	"github.com/theory/jsonpath"
 	"github.com/theory/jsonpath/spec"
@@ -124,11 +125,7 @@ func evalArgumentFromJSONPath(httpSchema *rest.NDCHttpSchema, typeSchema schema.
 			return nil, nil, nil
 		}
 
-		if _, ok := underlyingType.(*schema.NullableType); ok {
-			return underlyingType, typeRep, nil
-		}
-
-		return schema.NewNullableType(underlyingType), typeRep, nil
+		return utils.WrapNullableTypeEncoder(underlyingType), typeRep, nil
 	case *schema.ArrayType:
 		if len(segments) == 0 {
 			return schema.NewNullableType(t), schema.NewTypeRepresentationJSON().Encode(), nil

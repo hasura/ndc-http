@@ -351,6 +351,8 @@ type ObjectType struct {
 	Description *string `json:"description,omitempty" mapstructure:"description,omitempty" yaml:"description,omitempty"`
 	// Fields defined on this object type
 	Fields map[string]ObjectField `json:"fields" mapstructure:"fields" yaml:"fields"`
+	// The alias of the object. It can be the original name of OpenAPI schema.
+	Alias string `json:"alias,omitempty" mapstructure:"alias" yaml:"alias,omitempty"`
 	// XML schema
 	XML *XMLSchema `json:"xml,omitempty" mapstructure:"xml" yaml:"xml,omitempty"`
 }

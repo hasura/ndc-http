@@ -877,6 +877,7 @@
           }
         }
       },
+      "alias": "Address",
       "xml": {
         "name": "address"
       }
@@ -1022,7 +1023,8 @@
             "format": "unix-time"
           }
         }
-      }
+      },
+      "alias": "billing.meter_event"
     },
     "Book": {
       "fields": {
@@ -1087,8 +1089,8 @@
           }
         }
       },
+      "alias": "book",
       "xml": {
-        "name": "book",
         "prefix": "smp",
         "namespace": "http://example.com/schema"
       }
@@ -1156,8 +1158,8 @@
           }
         }
       },
+      "alias": "book",
       "xml": {
-        "name": "book",
         "prefix": "smp",
         "namespace": "http://example.com/schema"
       }
@@ -1230,6 +1232,7 @@
           }
         }
       },
+      "alias": "Category",
       "xml": {
         "name": "category"
       }
@@ -1268,7 +1271,8 @@
             ]
           }
         }
-      }
+      },
+      "alias": "CreateFineTuningJobRequest"
     },
     "Customer": {
       "fields": {
@@ -1396,6 +1400,7 @@
           }
         }
       },
+      "alias": "Customer",
       "xml": {
         "name": "customer"
       }
@@ -2112,6 +2117,7 @@
           }
         }
       },
+      "alias": "Order",
       "xml": {
         "name": "order"
       }
@@ -2370,6 +2376,7 @@
           }
         }
       },
+      "alias": "Pet",
       "xml": {
         "name": "pet"
       }
@@ -4665,10 +4672,7 @@
           "http": {
             "type": [
               "object"
-            ],
-            "xml": {
-              "name": "payment_method_affirm"
-            }
+            ]
           }
         },
         "currency": {
@@ -7533,7 +7537,8 @@
             }
           }
         }
-      }
+      },
+      "alias": "snake_object"
     },
     "SnakeObjectId": {
       "fields": {
@@ -7663,6 +7668,7 @@
           }
         }
       },
+      "alias": "tag",
       "xml": {
         "name": "tag"
       }
@@ -7699,6 +7705,7 @@
           }
         }
       },
+      "alias": "tag",
       "xml": {
         "name": "tag"
       }
@@ -7949,7 +7956,8 @@
           },
           "http": {}
         }
-      }
+      },
+      "alias": "treasury.inbound_transfer"
     },
     "TreasuryInboundTransfersResourceFailureDetails": {
       "fields": {
@@ -7965,7 +7973,8 @@
             ]
           }
         }
-      }
+      },
+      "alias": "treasury_inbound_transfers_resource_failure_details"
     },
     "TreasuryInboundTransfersResourceInboundTransferResourceStatusTransitions": {
       "fields": {
@@ -8017,7 +8026,8 @@
             "format": "unix-time"
           }
         }
-      }
+      },
+      "alias": "treasury_inbound_transfers_resource_inbound_transfer_resource_status_transitions"
     },
     "UploadPetMultipartBodyInput": {
       "fields": {
@@ -8354,6 +8364,7 @@
           }
         }
       },
+      "alias": "User",
       "xml": {
         "name": "user"
       }
@@ -8809,10 +8820,7 @@
             "schema": {
               "type": [
                 "object"
-              ],
-              "xml": {
-                "name": "CreateFineTuningJobRequest"
-              }
+              ]
             }
           }
         }
@@ -9072,7 +9080,6 @@
                 "object"
               ],
               "xml": {
-                "name": "book",
                 "prefix": "smp",
                 "namespace": "http://example.com/schema"
               }

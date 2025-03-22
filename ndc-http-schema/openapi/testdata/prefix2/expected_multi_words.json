@@ -131,9 +131,6 @@
             "format": "int64"
           }
         }
-      },
-      "xml": {
-        "name": "Post"
       }
     },
     "HasuraMockJsonPostInput": {
@@ -197,9 +194,7 @@
           }
         }
       },
-      "xml": {
-        "name": "Post"
-      }
+      "alias": "Post"
     }
   },
   "procedures": {
@@ -226,10 +221,7 @@
             "schema": {
               "type": [
                 "object"
-              ],
-              "xml": {
-                "name": "Post"
-              }
+              ]
             }
           }
         }
