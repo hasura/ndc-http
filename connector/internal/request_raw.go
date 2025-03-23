@@ -250,7 +250,9 @@ func (rqe *RawRequestBuilder) evalRequestBody(rawBody json.RawMessage, contentTy
 			return []byte(bodyStr), contentType, nil
 		}
 
-		r, err := contenttype.NewURLParameterEncoder(nil, rest.ContentTypeFormURLEncoded).EncodeArbitrary(bodyData)
+		r, err := contenttype.NewURLParameterEncoder(nil, &rest.RequestBody{
+			ContentType: contentType,
+		}).EncodeArbitrary(bodyData)
 
 		return r, contentType, err
 	default:

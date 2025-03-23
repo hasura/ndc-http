@@ -129,10 +129,12 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 
 			return nil
 		case contentType == rest.ContentTypeFormURLEncoded:
-			r, err := contenttype.NewURLParameterEncoder(c.Schema, rest.ContentTypeFormURLEncoded).Encode(&bodyInfo, bodyData)
+			r, err := contenttype.NewURLParameterEncoder(c.Schema, rawRequest.RequestBody).
+				EncodeFormBody(&bodyInfo, bodyData)
 			if err != nil {
 				return err
 			}
+
 			request.Body = r
 
 			return nil
@@ -207,12 +209,14 @@ func (c *RequestBuilder) evalURLAndHeaderParameters() (*url.URL, http.Header, er
 	if err != nil {
 		return nil, nil, err
 	}
+
 	headers := http.Header{}
 	for k, h := range c.Operation.Request.Headers {
 		v, err := h.Get()
 		if err != nil {
 			return nil, nil, fmt.Errorf("invalid header value, key: %s, %w", k, err)
 		}
+
 		if v != "" {
 			headers.Add(k, v)
 		}
@@ -222,6 +226,7 @@ func (c *RequestBuilder) evalURLAndHeaderParameters() (*url.URL, http.Header, er
 		if argumentInfo.HTTP == nil || !slices.Contains(urlAndHeaderLocations, argumentInfo.HTTP.In) {
 			continue
 		}
+
 		if err := c.evalURLAndHeaderParameterBySchema(endpoint, &headers, argumentKey, &argumentInfo, c.Arguments[argumentKey]); err != nil {
 			return nil, nil, fmt.Errorf("%s: %w", argumentKey, err)
 		}
@@ -237,7 +242,10 @@ func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(endpoint *url.URL, he
 	if argumentInfo.HTTP.Name != "" {
 		argumentKey = argumentInfo.HTTP.Name
 	}
-	queryParams, err := contenttype.NewURLParameterEncoder(c.Schema, rest.ContentTypeFormURLEncoded).EncodeParameterValues(&rest.ObjectField{
+
+	queryParams, err := contenttype.NewURLParameterEncoder(c.Schema, &rest.RequestBody{
+		ContentType: rest.ContentTypeFormURLEncoded,
+	}).EncodeParameterValues(&rest.ObjectField{
 		ObjectField: schema.ObjectField{
 			Type: argumentInfo.Type,
 		},
@@ -259,9 +267,7 @@ func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(endpoint *url.URL, he
 		contenttype.SetHeaderParameters(header, argumentInfo.HTTP, queryParams)
 	case rest.InQuery:
 		q := endpoint.Query()
-		for _, qp := range queryParams {
-			contenttype.EvalQueryParameterURL(&q, argumentKey, argumentInfo.HTTP.EncodingObject, qp.Keys(), qp.Values())
-		}
+		contenttype.EvalQueryParameters(&q, argumentKey, queryParams, argumentInfo.HTTP.EncodingObject)
 		endpoint.RawQuery = contenttype.EncodeQueryValues(q, argumentInfo.HTTP.AllowReserved)
 	case rest.InPath:
 		defaultParam := queryParams.FindDefault()

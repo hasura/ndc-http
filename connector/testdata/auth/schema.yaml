@@ -101,6 +101,34 @@ functions:
         name: Pet
         type: named
       type: array
+  findPetsByTags:
+    request:
+      url: "/pet/findByTags"
+      method: get
+      security: []
+      response:
+        contentType: application/json
+    arguments:
+      tags:
+        type:
+          type: array
+          element_type:
+            name: String
+            type: named
+        http:
+          in: query
+          style: form
+          explode: false
+          schema:
+            type: [array]
+            items:
+              type: [String]
+    description: Finds Pets by status
+    result_type:
+      element_type:
+        name: Pet
+        type: named
+      type: array
   petRetry:
     request:
       url: "/pet/retry"

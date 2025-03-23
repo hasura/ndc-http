@@ -128,6 +128,8 @@ func convertMaybeYAMLToJSONBytes(input []byte) ([]byte, error) {
 	}
 
 	var anyOutput any
+	input = []byte(replaceYAMLNumberKeysToString(string(input)))
+
 	if err := yaml.Unmarshal(input, &anyOutput); err != nil {
 		return nil, fmt.Errorf("input bytes are not in either yaml or json format: %w", err)
 	}

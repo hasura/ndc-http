@@ -324,6 +324,33 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		assert.Assert(t, delay >= time.Second && delay <= 2*time.Second)
 	})
 
+	t.Run("query-form-non-explode", func(t *testing.T) {
+		rawBody := []byte(`{
+			"collection": "findPetsByTags",
+			"query": {
+				"fields": {
+					"__value": {
+						"type": "column",
+						"column": "__value"
+					}
+				}
+			},
+			"arguments": {
+				"tags": {
+					"type": "literal",
+					"value": ["foo", "bar"]
+				}
+			},
+			"collection_relationships": {}
+		}`)
+
+		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(rawBody))
+		assert.NilError(t, err)
+		res.Body.Close()
+
+		assert.Equal(t, res.StatusCode, http.StatusOK)
+	})
+
 	t.Run("encoding-ndjson", func(t *testing.T) {
 		reqBody := []byte(`{
 			"operations": [
@@ -900,6 +927,21 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 				t.Fatalf("expected query param: status=available, got: %s", r.URL.Query().Encode())
 				return
 			}
+			writeResponse(w, "[{}]")
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+	})
+
+	mux.HandleFunc("/pet/findByTags", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			if r.URL.Query().Get("tags") != "foo,bar" {
+				t.Fatalf("expected query param: tags=foo,bar, got: %s", r.URL.Query().Encode())
+				return
+			}
+
 			writeResponse(w, "[{}]")
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)

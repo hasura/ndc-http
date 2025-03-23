@@ -184,7 +184,7 @@ const (
 	ScalarJSON        ScalarName = "JSON"
 	ScalarUnixTime    ScalarName = "UnixTime"
 	ScalarEmail       ScalarName = "EmailString"
-	ScalarURI         ScalarName = "URI"
+	ScalarURI         ScalarName = "URIString"
 	ScalarIPV4        ScalarName = "IPv4"
 	ScalarIPV6        ScalarName = "IPv6"
 )

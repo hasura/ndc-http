@@ -389,14 +389,18 @@ func (oc *OAS3Builder) convertV3OAuthFLow(key string, input *v3.OAuthFlow) rest.
 
 	if input.Scopes != nil {
 		scopes := make(map[string]string)
+
 		for iter := input.Scopes.First(); iter != nil; iter = iter.Next() {
 			key := iter.Key()
 			value := iter.Value()
-			if key == "" || value == "" {
+
+			if key == "" {
 				continue
 			}
+
 			scopes[key] = value
 		}
+
 		result.Scopes = scopes
 	}
 
