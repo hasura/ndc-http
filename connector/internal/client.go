@@ -269,15 +269,20 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 		return nil, nil, schema.NewConnectorError(statusCode, resp.Status, details)
 	}
 
-	result, headers, evalErr := client.evalHTTPResponse(ctx, span, resp, contentType, logger)
+	result, evalErr := client.evalHTTPResponse(ctx, span, resp, contentType, logger)
 	if evalErr != nil {
+		// return the null result if the status code is no content.
+		if resp.StatusCode == http.StatusNoContent {
+			return nil, resp.Header, nil
+		}
+
 		span.SetStatus(codes.Error, "failed to decode the http response")
 		span.RecordError(evalErr)
 
 		return nil, nil, evalErr
 	}
 
-	return result, headers, nil
+	return result, resp.Header, nil
 }
 
 func (client *HTTPClient) doRequest(ctx context.Context, request *RetryableRequest, port int, retryCount int) (*http.Response, []byte, context.CancelFunc, error) {
@@ -347,6 +352,7 @@ func (client *HTTPClient) doRequest(ctx context.Context, request *RetryableReque
 
 	defer resp.Body.Close()
 	span.SetStatus(codes.Error, "Non-2xx status")
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		span.RecordError(err)
@@ -358,13 +364,14 @@ func (client *HTTPClient) doRequest(ctx context.Context, request *RetryableReque
 	return resp, body, cancel, nil
 }
 
-func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span, resp *http.Response, contentType string, logger *slog.Logger) (any, http.Header, *schema.ConnectorError) {
+func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span, resp *http.Response, contentType string, logger *slog.Logger) (any, *schema.ConnectorError) {
 	if logger.Enabled(ctx, slog.LevelDebug) {
 		logAttrs := []any{
 			slog.Int("http_status", resp.StatusCode),
 			slog.Any("response_headers", resp.Header),
 		}
-		if resp.Body != nil && resp.StatusCode != http.StatusNoContent {
+
+		if resp.Body != nil {
 			respBody, readErr := io.ReadAll(resp.Body)
 			_ = resp.Body.Close()
 
@@ -372,10 +379,11 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 				span.SetStatus(codes.Error, "error happened when reading response body")
 				span.RecordError(readErr)
 
-				return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, "error happened when reading response body", map[string]any{
+				return nil, schema.NewConnectorError(http.StatusInternalServerError, "error happened when reading response body", map[string]any{
 					"error": readErr.Error(),
 				})
 			}
+
 			resp.Body = io.NopCloser(bytes.NewBuffer(respBody))
 			logAttrs = append(logAttrs, slog.String("response_body", string(respBody)))
 		}
@@ -389,12 +397,8 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 		}
 	}()
 
-	if resp.StatusCode == http.StatusNoContent {
-		return true, resp.Header, nil
-	}
-
 	if resp.Body == nil || resp.ContentLength == 0 {
-		return nil, resp.Header, nil
+		return nil, nil
 	}
 
 	resultType := client.requests.Operation.OriginalResultType
@@ -403,25 +407,25 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 	case restUtils.IsContentTypeText(contentType):
 		respBody, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
+			return nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
 
-		return string(respBody), resp.Header, nil
+		return string(respBody), nil
 	case restUtils.IsContentTypeXML(contentType):
 		var err error
 		result, err := contenttype.NewXMLDecoder(client.requests.Schema.NDCHttpSchema).Decode(resp.Body, resultType)
 		if err != nil {
-			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
+			return nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
 
-		return result, resp.Header, nil
+		return result, nil
 	case restUtils.IsContentTypeJSON(contentType):
 		if len(resultType) > 0 {
 			namedType, err := resultType.AsNamed()
 			if err == nil && namedType.Name == string(rest.ScalarString) {
 				respBytes, err := io.ReadAll(resp.Body)
 				if err != nil {
-					return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, "failed to read response", map[string]any{
+					return nil, schema.NewConnectorError(http.StatusInternalServerError, "failed to read response", map[string]any{
 						"reason": err.Error(),
 					})
 				}
@@ -429,10 +433,10 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 				var strResult string
 				if err := json.Unmarshal(respBytes, &strResult); err != nil {
 					// fallback to raw string response if the result type is String
-					return string(respBytes), resp.Header, nil
+					return string(respBytes), nil
 				}
 
-				return strResult, resp.Header, nil
+				return strResult, nil
 			}
 		}
 
@@ -445,10 +449,10 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 		}
 
 		if err != nil {
-			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
+			return nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
 
-		return result, resp.Header, nil
+		return result, nil
 	case contentType == rest.ContentTypeNdJSON:
 		var results []any
 		decoder := json.NewDecoder(resp.Body)
@@ -456,21 +460,21 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 			var r any
 			err := decoder.Decode(&r)
 			if err != nil {
-				return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
+				return nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 			}
 			results = append(results, r)
 		}
 
-		return results, resp.Header, nil
+		return results, nil
 	case restUtils.IsContentTypeBinary(contentType):
 		rawBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
+			return nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
 		}
 
-		return base64.StdEncoding.EncodeToString(rawBytes), resp.Header, nil
+		return base64.StdEncoding.EncodeToString(rawBytes), nil
 	default:
-		return nil, nil, schema.NewConnectorError(http.StatusInternalServerError, "failed to evaluate response", map[string]any{
+		return nil, schema.NewConnectorError(http.StatusInternalServerError, "failed to evaluate response", map[string]any{
 			"cause": "unsupported content type " + contentType,
 		})
 	}
