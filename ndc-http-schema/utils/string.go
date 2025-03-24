@@ -9,7 +9,10 @@ import (
 	"unicode/utf8"
 )
 
-var nonAlphaDigitRegex = regexp.MustCompile(`[^\w]+`)
+var (
+	nonAlphaDigitRegex         = regexp.MustCompile(`[^\w]+`)
+	yamlNumberObjectKeyPattern = regexp.MustCompile(`((\s|\t)+)([0-9]+):\s*(\n|$)`)
+)
 
 const (
 	htmlTagStart = 60 // Unicode `<`
@@ -280,4 +283,9 @@ func MaskString(input string) string {
 	default:
 		return input[0:3] + strings.Repeat("*", 7) + fmt.Sprintf("(%d)", inputLength)
 	}
+}
+
+// replaceYAMLNumberKeysToString wraps number keys in objects with quotes to avoid unexpected errors when parsing OpenAPI.
+func replaceYAMLNumberKeysToString(input string) string {
+	return yamlNumberObjectKeyPattern.ReplaceAllString(input, "$1\"$3\":\n")
 }

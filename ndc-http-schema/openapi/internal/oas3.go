@@ -259,15 +259,6 @@ func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 		typeName = getNamedType(schemaResult.TypeRead, true, "")
 	}
 
-	if schemaResult.TypeSchema != nil {
-		if schemaResult.TypeSchema.XML == nil {
-			schemaResult.TypeSchema.XML = &rest.XMLSchema{}
-		}
-		if schemaResult.TypeSchema.XML.Name == "" {
-			schemaResult.TypeSchema.XML.Name = typeKey
-		}
-	}
-
 	// If the result type is a scalar, the builder returns the raw scalar name (String, Int).
 	// We should check and add the alias type to scalar objects
 	pascalTypeName := utils.ToPascalCase(typeKey)
@@ -322,7 +313,7 @@ func (oc *OAS3Builder) populateWriteSchemaType(schemaType schema.Type) (schema.T
 	case *schema.NullableType:
 		ut, name, isInput := oc.populateWriteSchemaType(ty.UnderlyingType)
 
-		return schema.NewNullableType(ut.Interface()).Encode(), name, isInput
+		return utils.WrapNullableTypeEncoder(ut.Interface()).Encode(), name, isInput
 	case *schema.ArrayType:
 		ut, name, isInput := oc.populateWriteSchemaType(ty.ElementType)
 
@@ -398,14 +389,18 @@ func (oc *OAS3Builder) convertV3OAuthFLow(key string, input *v3.OAuthFlow) rest.
 
 	if input.Scopes != nil {
 		scopes := make(map[string]string)
+
 		for iter := input.Scopes.First(); iter != nil; iter = iter.Next() {
 			key := iter.Key()
 			value := iter.Value()
-			if key == "" || value == "" {
+
+			if key == "" {
 				continue
 			}
+
 			scopes[key] = value
 		}
+
 		result.Scopes = scopes
 	}
 

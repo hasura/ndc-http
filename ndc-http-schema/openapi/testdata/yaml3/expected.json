@@ -1,0 +1,392 @@
+{
+  "$schema": "https://raw.githubusercontent.com/hasura/ndc-http/refs/heads/main/ndc-http-schema/jsonschema/ndc-http-schema.schema.json",
+  "settings": {
+    "servers": [
+      {
+        "url": {
+          "value": "https://app.asana.com/api/1.0",
+          "env": "SERVER_URL"
+        }
+      }
+    ],
+    "securitySchemes": {
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://app.asana.com/-/oauth_authorize",
+            "tokenUrl": {
+              "value": "https://app.asana.com/-/oauth_token",
+              "env": "OAUTH2_TOKEN_URL"
+            },
+            "refreshUrl": "https://app.asana.com/-/oauth_token",
+            "scopes": {
+              "default": ""
+            }
+          }
+        }
+      },
+      "personalAccessToken": {
+        "type": "http",
+        "header": "Authorization",
+        "scheme": "bearer",
+        "value": {
+          "env": "PERSONAL_ACCESS_TOKEN_TOKEN"
+        }
+      }
+    },
+    "security": [
+      {
+        "personalAccessToken": []
+      },
+      {
+        "oauth2": []
+      }
+    ]
+  },
+  "functions": {
+    "getAllocation": {
+      "request": {
+        "url": "/allocations/{allocation_gid}",
+        "method": "get",
+        "response": {
+          "contentType": "application/json"
+        }
+      },
+      "arguments": {
+        "allocation_gid": {
+          "description": "Globally unique identifier for the allocation.",
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "name": "allocation_gid",
+            "in": "path",
+            "schema": {
+              "type": [
+                "string"
+              ]
+            }
+          }
+        },
+        "opt_fields": {
+          "description": "This endpoint returns a resource which excludes some properties by default. To include those optional properties, set this query parameter to a comma-separated list of the properties you wish to include.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "GetAllocationOptFields",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "style": "form",
+            "explode": false,
+            "name": "opt_fields",
+            "in": "query",
+            "schema": {
+              "type": [
+                "array"
+              ],
+              "items": {
+                "type": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        "opt_pretty": {
+          "description": "Provides pretty output. Provides the response in a pretty format. In the case of JSON this means doing proper line breaking and indentation to make it readable. This will take extra time and increase the response size so it is advisable only to use this during debugging.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Boolean",
+              "type": "named"
+            }
+          },
+          "http": {
+            "style": "form",
+            "name": "opt_pretty",
+            "in": "query",
+            "schema": {
+              "type": [
+                "boolean"
+              ]
+            }
+          }
+        }
+      },
+      "description": "Get an allocation",
+      "result_type": {
+        "name": "GetAllocationResult",
+        "type": "named"
+      }
+    }
+  },
+  "object_types": {
+    "AllocationBaseEffort": {
+      "description": "The amount of time associated with the allocation, represented as a percentage or number of hours",
+      "fields": {
+        "type": {
+          "description": "The units used for tracking effort on an allocation, either \"hours\" or \"percent\".",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "AllocationBaseEffortType",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "value": {
+          "description": "The numeric effort value on the allocation.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Float64",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "number"
+            ]
+          }
+        }
+      }
+    },
+    "AllocationResponse": {
+      "fields": {
+        "assignee": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "AllocationResponse1Assignee",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ]
+          }
+        },
+        "effort": {
+          "description": "The amount of time associated with the allocation, represented as a percentage or number of hours",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "AllocationBaseEffort",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ]
+          }
+        },
+        "end_date": {
+          "description": "The localized day on which the allocation ends.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Date",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "format": "date"
+          }
+        },
+        "gid": {
+          "description": "Globally unique identifier of the resource, as a string.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "resource_type": {
+          "description": "The base type of this resource.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "start_date": {
+          "description": "The localized day on which the allocation starts.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Date",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      }
+    },
+    "AllocationResponse1Assignee": {
+      "fields": {
+        "gid": {
+          "description": "Globally unique identifier of the resource, as a string.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "name": {
+          "description": "*Read-only except when same user as requester*. The users name.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "resource_type": {
+          "description": "The base type of this resource.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "GetAllocationResult": {
+      "fields": {
+        "data": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "AllocationResponse",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "procedures": {},
+  "scalar_types": {
+    "AllocationBaseEffortType": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "hours",
+          "percent"
+        ],
+        "type": "enum"
+      }
+    },
+    "Boolean": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "boolean"
+      }
+    },
+    "Date": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "date"
+      }
+    },
+    "Float64": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "float64"
+      }
+    },
+    "GetAllocationOptFields": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "one_of": [
+          "assignee",
+          "assignee.name",
+          "created_by",
+          "created_by.name",
+          "effort",
+          "effort.type",
+          "effort.value",
+          "end_date",
+          "parent",
+          "parent.name",
+          "resource_subtype",
+          "start_date"
+        ],
+        "type": "enum"
+      }
+    },
+    "String": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "string"
+      }
+    }
+  }
+}

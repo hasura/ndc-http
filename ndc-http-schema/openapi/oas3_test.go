@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
+	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"gotest.tools/v3/assert"
 )
 
@@ -81,11 +82,23 @@ func TestOpenAPIv3ToRESTSchema(t *testing.T) {
 			Schema:   "testdata/union3/schema.json",
 			Options:  ConvertOptions{},
 		},
+		// go run ./ndc-http-schema convert -f ./ndc-http-schema/openapi/testdata/yaml3/source.yaml -o ./ndc-http-schema/openapi/testdata/yaml3/expected.json --spec openapi3
+		// go run ./ndc-http-schema convert -f ./ndc-http-schema/openapi/testdata/yaml3/source.yaml -o ./ndc-http-schema/openapi/testdata/yaml3/schema.json --pure --spec openapi3
+		{
+			Name:     "yaml3",
+			Source:   "testdata/yaml3/source.yaml",
+			Expected: "testdata/yaml3/expected.json",
+			Schema:   "testdata/yaml3/schema.json",
+			Options:  ConvertOptions{},
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			sourceBytes, err := os.ReadFile(tc.Source)
+			assert.NilError(t, err)
+
+			sourceBytes, err = utils.ApplyPatch(sourceBytes, []utils.PatchConfig{})
 			assert.NilError(t, err)
 
 			expectedBytes, err := os.ReadFile(tc.Expected)

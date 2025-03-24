@@ -225,6 +225,7 @@ func (eo *EncodingObject) SetHeader(key string, param RequestParameter) {
 	if eo.Headers == nil {
 		eo.Headers = make(map[string]RequestParameter)
 	}
+
 	eo.Headers[key] = param
 }
 
@@ -233,12 +234,41 @@ func (eo *EncodingObject) GetHeader(key string) *RequestParameter {
 	if len(eo.Headers) == 0 {
 		return nil
 	}
+
 	result, ok := eo.Headers[key]
 	if !ok {
 		return nil
 	}
 
 	return &result
+}
+
+// GetStyle gets the parameter encoding style.
+// Default values (based on value of in):
+// - query or cookie => form.
+// - path or header => simple.
+func (eo EncodingObject) GetStyle(in ParameterLocation) ParameterEncodingStyle {
+	if eo.Style.IsValid() {
+		return eo.Style
+	}
+
+	switch in {
+	case InPath, InHeader:
+		return EncodingStyleSimple
+	default:
+		return EncodingStyleForm
+	}
+}
+
+// GetExplode gets the explode value.
+// When style is "form", the default value is true.
+// For all other styles, the default value is false.
+func (eo EncodingObject) GetExplode(in ParameterLocation) bool {
+	if eo.Explode != nil {
+		return *eo.Explode
+	}
+
+	return eo.GetStyle(in) == EncodingStyleForm
 }
 
 // RequestBody defines flexible request body with content types.
@@ -351,6 +381,8 @@ type ObjectType struct {
 	Description *string `json:"description,omitempty" mapstructure:"description,omitempty" yaml:"description,omitempty"`
 	// Fields defined on this object type
 	Fields map[string]ObjectField `json:"fields" mapstructure:"fields" yaml:"fields"`
+	// The alias of the object. It can be the original name of OpenAPI schema.
+	Alias string `json:"alias,omitempty" mapstructure:"alias" yaml:"alias,omitempty"`
 	// XML schema
 	XML *XMLSchema `json:"xml,omitempty" mapstructure:"xml" yaml:"xml,omitempty"`
 }

@@ -450,12 +450,13 @@ func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath
 	schemaResponse := &rest.Response{
 		ContentType: contentType,
 	}
+
 	if bodyContent.Schema == nil {
 		return getResultTypeFromContentType(contentType), schemaResponse, nil
 	}
 
 	typeResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.InBody).
-		getSchemaTypeFromProxy(bodyContent.Schema, false, fieldPaths)
+		getSchemaTypeFromProxy(bodyContent.Schema, statusCode == http.StatusNoContent, fieldPaths)
 	if err != nil {
 		return nil, nil, err
 	}

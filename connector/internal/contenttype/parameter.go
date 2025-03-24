@@ -39,10 +39,6 @@ func (ssp *ParameterItems) Add(keys []Key, values []string) {
 
 func (ssp ParameterItems) FindDefault() *ParameterItem {
 	item, _ := ssp.find([]Key{})
-	if item != nil {
-		return item
-	}
-	item, _ = ssp.find([]Key{})
 
 	return item
 }
@@ -64,16 +60,20 @@ func (ssp ParameterItems) find(keys []Key) (*ParameterItem, int) {
 		if len(keys) != len(item.keys) {
 			continue
 		}
+
 		if len(keys) == 0 {
 			return &item, i
 		}
+
 		isEqual := false
+
 		for j, value := range item.keys {
 			isEqual = value == keys[j]
 			if !isEqual {
 				return nil, -1
 			}
 		}
+
 		if isEqual {
 			return &item, i
 		}
@@ -84,6 +84,39 @@ func (ssp ParameterItems) find(keys []Key) (*ParameterItem, int) {
 
 // Keys represent a key slice.
 type Keys []Key
+
+// Format prints parameter keys with format.
+func (ks Keys) Format(isDeepObject bool) string {
+	lenKeys := len(ks)
+	if lenKeys == 0 {
+		return ""
+	}
+
+	var sb strings.Builder
+
+	for i, key := range ks {
+		// skip the last array element except the deep object style
+		if i == lenKeys-1 && key.Index() != nil {
+			if isDeepObject {
+				sb.WriteString("[]")
+			}
+
+			break
+		}
+
+		if i == 0 {
+			sb.WriteString(key.String())
+
+			continue
+		}
+
+		sb.WriteRune('[')
+		sb.WriteString(key.String())
+		sb.WriteRune(']')
+	}
+
+	return sb.String()
+}
 
 // String implements fmt.Stringer interface.
 func (ks Keys) String() string {

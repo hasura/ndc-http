@@ -2,6 +2,7 @@ package contenttype
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -17,40 +18,60 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
+var errURLEncodedBodyObjectRequired = errors.New("expected object body in content type " + rest.ContentTypeFormURLEncoded)
+
 // URLParameterEncoder represents a URL parameter encoder.
 type URLParameterEncoder struct {
 	schema      *rest.NDCHttpSchema
-	contentType string
+	requestBody *rest.RequestBody
 }
 
 // NewURLParameterEncoder creates a URLParameterEncoder instance.
-func NewURLParameterEncoder(schema *rest.NDCHttpSchema, contentType string) *URLParameterEncoder {
+func NewURLParameterEncoder(schema *rest.NDCHttpSchema, requestBody *rest.RequestBody) *URLParameterEncoder {
 	return &URLParameterEncoder{
 		schema:      schema,
-		contentType: contentType,
+		requestBody: requestBody,
 	}
 }
 
 // Encode URL parameters.
-func (c *URLParameterEncoder) Encode(bodyInfo *rest.ArgumentInfo, bodyData any) ([]byte, error) {
-	queryParams, err := c.EncodeParameterValues(&rest.ObjectField{
-		ObjectField: schema.ObjectField{
-			Type: bodyInfo.Type,
-		},
-		HTTP: bodyInfo.HTTP.Schema,
-	}, reflect.ValueOf(bodyData), []string{"body"})
+func (c *URLParameterEncoder) EncodeFormBody(bodyInfo *rest.ArgumentInfo, bodyData any) ([]byte, error) {
+	objectType, bodyObject, err := c.evalRequestBody(bodyInfo.Type, reflect.ValueOf(bodyData))
 	if err != nil {
 		return nil, err
 	}
 
-	if len(queryParams) == 0 {
-		return nil, nil
+	if objectType == nil {
+		return c.EncodeArbitrary(bodyData)
 	}
+
 	q := url.Values{}
-	for _, qp := range queryParams {
-		keys := qp.Keys()
-		EvalQueryParameterURL(&q, "", bodyInfo.HTTP.EncodingObject, keys, qp.Values())
+
+	for key, value := range bodyObject {
+		objectField, ok := objectType.Fields[key]
+		if !ok {
+			continue
+		}
+
+		queryParams, err := c.EncodeParameterValues(&objectField, reflect.ValueOf(value), []string{"body", key})
+		if err != nil {
+			return nil, err
+		}
+
+		if len(queryParams) == 0 {
+			continue
+		}
+
+		fieldEncoding := bodyInfo.HTTP.EncodingObject
+		if c.requestBody != nil && len(c.requestBody.Encoding) > 0 {
+			if enc, ok := c.requestBody.Encoding[key]; ok {
+				fieldEncoding = enc
+			}
+		}
+
+		EvalQueryParameters(&q, key, queryParams, fieldEncoding)
 	}
+
 	rawQuery := EncodeQueryValues(q, true)
 
 	return []byte(rawQuery), nil
@@ -66,12 +87,10 @@ func (c *URLParameterEncoder) EncodeArbitrary(bodyData any) ([]byte, error) {
 	if len(queryParams) == 0 {
 		return nil, nil
 	}
+
 	q := url.Values{}
 	encObject := rest.EncodingObject{}
-	for _, qp := range queryParams {
-		keys := qp.Keys()
-		EvalQueryParameterURL(&q, "", encObject, keys, qp.Values())
-	}
+	EvalQueryParameters(&q, "", queryParams, encObject)
 	rawQuery := EncodeQueryValues(q, true)
 
 	return []byte(rawQuery), nil
@@ -81,11 +100,11 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 	results := ParameterItems{}
 
 	typeSchema := objectField.HTTP
-	reflectValue, nonNull := utils.UnwrapPointerFromReflectValue(reflectValue)
+	reflectValue, notNull := utils.UnwrapPointerFromReflectValue(reflectValue)
 
 	switch ty := objectField.Type.Interface().(type) {
 	case *schema.NullableType:
-		if !nonNull {
+		if !notNull {
 			return results, nil
 		}
 
@@ -96,7 +115,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 			HTTP: typeSchema,
 		}, reflectValue, fieldPaths)
 	case *schema.ArrayType:
-		if !nonNull {
+		if !notNull {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), errArgumentRequired)
 		}
 
@@ -123,7 +142,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 
 		return results, nil
 	case *schema.NamedType:
-		if !nonNull {
+		if !notNull {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), errArgumentRequired)
 		}
 		iScalar, ok := c.schema.ScalarTypes[ty.Name]
@@ -273,7 +292,7 @@ func (c *URLParameterEncoder) encodeParameterReflectionValues(reflectValue refle
 	}
 
 	kind := reflectValue.Kind()
-	if c.contentType == rest.ContentTypeMultipartFormData {
+	if c.requestBody != nil && c.requestBody.ContentType == rest.ContentTypeMultipartFormData {
 		if result, err := StringifySimpleScalar(reflectValue, kind); err == nil {
 			return []ParameterItem{
 				NewParameterItem([]Key{}, []string{result}),
@@ -364,72 +383,134 @@ func (c *URLParameterEncoder) encodeParameterReflectionMap(reflectValue reflect.
 	return results, nil
 }
 
-func buildParamQueryKey(name string, encObject rest.EncodingObject, keys Keys, values []string) string {
-	resultKeys := []string{}
-	if name != "" {
-		resultKeys = append(resultKeys, name)
-	}
-	keysLength := len(keys)
-	// non-explode or explode form object does not require param name
-	// /users?role=admin&firstName=Alex
-	if (encObject.Explode != nil && !*encObject.Explode) ||
-		(len(values) == 1 && encObject.Style == rest.EncodingStyleForm && (keysLength > 1 || (keysLength == 1 && !keys[0].IsEmpty()))) {
-		resultKeys = []string{}
-	}
+func (c *URLParameterEncoder) evalRequestBody(bodyType schema.Type, bodyData reflect.Value) (*rest.ObjectType, map[string]any, error) {
+	reflectValue, notNull := utils.UnwrapPointerFromReflectValue(bodyData)
 
-	if keysLength > 0 {
-		if encObject.Style != rest.EncodingStyleDeepObject && keys[keysLength-1].IsEmpty() {
-			keys = keys[:keysLength-1]
+	switch ty := bodyType.Interface().(type) {
+	case *schema.NullableType:
+		if !notNull {
+			return nil, nil, nil
 		}
 
-		for i, key := range keys {
-			if len(resultKeys) == 0 {
-				resultKeys = append(resultKeys, key.String())
+		return c.evalRequestBody(ty.UnderlyingType, reflectValue)
+	case *schema.ArrayType:
+		return nil, nil, errURLEncodedBodyObjectRequired
+	case *schema.NamedType:
+		if !notNull {
+			return nil, nil, fmt.Errorf("%s: %w", "body", errArgumentRequired)
+		}
 
-				continue
+		object, ok := reflectValue.Interface().(map[string]any)
+		if !ok {
+			return nil, nil, errURLEncodedBodyObjectRequired
+		}
+
+		objectType, ok := c.schema.ObjectTypes[ty.Name]
+		if ok {
+			return &objectType, object, nil
+		}
+
+		iScalar, ok := c.schema.ScalarTypes[ty.Name]
+		if ok {
+			if _, err := iScalar.Representation.AsJSON(); err == nil {
+				return nil, object, nil
 			}
-			if i == len(keys)-1 && key.Index() != nil {
-				// the last element of array in the deepObject style doesn't have index
-				resultKeys = append(resultKeys, "[]")
-
-				continue
-			}
-
-			resultKeys = append(resultKeys, "["+key.String()+"]")
 		}
 	}
 
-	return strings.Join(resultKeys, "")
+	return nil, nil, errURLEncodedBodyObjectRequired
 }
 
-// EvalQueryParameterURL evaluate the query parameter URL.
-func EvalQueryParameterURL(q *url.Values, name string, encObject rest.EncodingObject, keys Keys, values []string) {
-	if len(values) == 0 {
-		return
-	}
-	paramKey := buildParamQueryKey(name, encObject, keys, values)
-	// encode explode queries, e.g /users?id=3&id=4&id=5
-	if encObject.Explode == nil || *encObject.Explode {
-		for _, value := range values {
-			q.Add(paramKey, value)
+// EvalQueryParameters evaluate the query parameter URL.
+func EvalQueryParameters(q *url.Values, name string, queryParams ParameterItems, encObject rest.EncodingObject) {
+	explode := encObject.GetExplode(rest.InQuery)
+
+	for _, qp := range queryParams {
+		keys := qp.Keys()
+		values := qp.Values()
+
+		if len(keys) == 0 {
+			if name != "" {
+				for _, v := range values {
+					q.Add(name, v)
+				}
+			}
+
+			continue
 		}
 
+		paramKey, values := buildURLQueryKeyValues(name, keys, values, encObject)
+
+		if paramKey == "" {
+			continue
+		}
+
+		for _, v := range values {
+			q.Add(paramKey, v)
+		}
+	}
+
+	// if explode=true, array values will be flatten to multiple key=value items,
+	// separated by &
+	// /users?id=3&id=4&id=5
+	if explode || encObject.Style == rest.EncodingStyleDeepObject {
 		return
 	}
 
-	switch encObject.Style {
-	case rest.EncodingStyleSpaceDelimited:
-		q.Add(name, strings.Join(values, " "))
-	case rest.EncodingStylePipeDelimited:
-		q.Add(name, strings.Join(values, "|"))
-	// default style is form
-	default:
-		paramValues := values
-		if paramKey != "" {
-			paramValues = append([]string{paramKey}, paramValues...)
+	for key, values := range *q {
+		switch encObject.Style {
+		case rest.EncodingStyleSpaceDelimited:
+			q.Set(key, strings.Join(values, " "))
+		case rest.EncodingStylePipeDelimited:
+			q.Set(key, strings.Join(values, "|"))
+		case rest.EncodingStyleDeepObject:
+		// default style is form
+		default:
+			q.Set(key, strings.Join(values, ","))
 		}
-		q.Add(name, strings.Join(paramValues, ","))
 	}
+}
+
+func buildURLQueryKeyValues(name string, keys Keys, values []string, encObject rest.EncodingObject) (string, []string) {
+	if name != "" {
+		keys = append(Keys{NewKey(name)}, keys...)
+	}
+
+	if len(keys) == 0 {
+		return "", nil
+	}
+
+	isDeepObject := encObject.Style == rest.EncodingStyleDeepObject
+	isArray := keys[len(keys)-1].Index() != nil
+
+	if isArray {
+		return keys.Format(isDeepObject), values
+	}
+
+	var resultKey string
+
+	if !isDeepObject {
+		resultKey = keys[0].String()
+
+		keys = keys[1:]
+	}
+
+	builtKey := keys.Format(isDeepObject)
+	// if explode=false, the root key will be excluded.
+	// Object id = {“role”: “admin”, “firstName”: “Alex”}
+	// => /users?role=admin&firstName=Alex
+	if isDeepObject || encObject.GetExplode(rest.InQuery) {
+		return builtKey, values
+	}
+
+	// if explode=false, child keys will be in query values.
+	// Object id = {“role”: “admin”, “firstName”: “Alex”}
+	// => /users?id=role,admin,firstName,Alex
+	if builtKey != "" {
+		values = append([]string{builtKey}, values...)
+	}
+
+	return resultKey, values
 }
 
 // EncodeQueryValues encode query values to string.
@@ -455,7 +536,7 @@ func EncodeQueryValues(qValues url.Values, allowReserved bool) string {
 	return builder.String()
 }
 
-// SetHeaderParameters set parameters to request headers.
+// SetHeaderParameters encode and set parameters to request headers.
 func SetHeaderParameters(header *http.Header, param *rest.RequestParameter, queryParams ParameterItems) {
 	defaultParam := queryParams.FindDefault()
 	// the param is an array
@@ -465,22 +546,110 @@ func SetHeaderParameters(header *http.Header, param *rest.RequestParameter, quer
 		return
 	}
 
-	if param.Explode != nil && *param.Explode {
-		var headerValues []string
-		for _, pair := range queryParams {
-			headerValues = append(headerValues, fmt.Sprintf("%s=%s", pair.Keys().String(), strings.Join(pair.Values(), ",")))
-		}
-		header.Set(param.Name, strings.Join(headerValues, ","))
-
-		return
-	}
-
-	var headerValues []string
-	for _, pair := range queryParams {
-		pairKey := pair.Keys().String()
-		for _, v := range pair.Values() {
-			headerValues = append(headerValues, pairKey, v)
-		}
-	}
+	explode := param.GetExplode(rest.InHeader)
+	headerValues := transformParameterItemStrings(queryParams, explode)
 	header.Set(param.Name, strings.Join(headerValues, ","))
+}
+
+// EncodePathParameters encode parameters to the request path.
+func EncodePathParameters(rawPath string, name string, queryParams ParameterItems, enc rest.EncodingObject) string {
+	value := encodePathParameterValue(name, queryParams, enc)
+
+	return strings.ReplaceAll(rawPath, "{"+name+"}", value)
+}
+
+func encodePathParameterValue(name string, queryParams ParameterItems, enc rest.EncodingObject) string {
+	style := enc.GetStyle(rest.InPath)
+	explode := enc.GetExplode(rest.InPath)
+
+	defaultParam := queryParams.FindDefault()
+	// the param is an array or a primitive value
+	if defaultParam != nil {
+		values := defaultParam.Values()
+
+		if len(values) == 0 || (len(values) == 1 && values[0] == "") {
+			switch style {
+			case rest.EncodingStyleMatrix:
+				return ";" + name
+			case rest.EncodingStyleLabel:
+				return "."
+			default:
+				return ""
+			}
+		}
+
+		switch style {
+		case rest.EncodingStyleMatrix:
+			if !explode {
+				// ;color=blue,black,brown
+				return ";" + name + "=" + strings.Join(values, ",")
+			}
+
+			// ;color=blue;color=black;color=brown
+			var sb strings.Builder
+
+			for _, value := range values {
+				sb.WriteRune(';')
+				sb.WriteString(name)
+				sb.WriteRune('=')
+				sb.WriteString(value)
+			}
+
+			return sb.String()
+		case rest.EncodingStyleLabel:
+			// .blue,black,brown
+			if explode {
+				return "." + strings.Join(values, ".")
+			}
+
+			return "." + strings.Join(values, ",")
+		default:
+			// blue,black,brown
+			return strings.Join(values, ",")
+		}
+	}
+
+	keyValues := transformParameterItemStrings(queryParams, explode)
+
+	switch style {
+	case rest.EncodingStyleMatrix:
+		if explode {
+			// ;R=100;G=200;B=150
+			return ";" + strings.Join(keyValues, ";")
+		}
+
+		// ;color=R,100,G,200,B,150
+		return ";" + name + "=" + strings.Join(keyValues, ",")
+	case rest.EncodingStyleLabel:
+		// .blue,black,brown
+		if explode {
+			return "." + strings.Join(keyValues, ".")
+		}
+
+		return "." + strings.Join(keyValues, ",")
+	default:
+		// blue,black,brown
+		return strings.Join(keyValues, ",")
+	}
+}
+
+func transformParameterItemStrings(queryParams ParameterItems, explode bool) []string {
+	var headerValues []string
+
+	for _, pair := range queryParams {
+		key := pair.Keys().Format(false)
+		for _, value := range pair.Values() {
+			if explode {
+				// R=100,G=200,B=150
+				headerValues = append(headerValues, key+"="+value)
+
+				continue
+			}
+
+			// R,100,G,200,B,150
+			headerValues = append(headerValues, key, value)
+		}
+	}
+
+	return headerValues
 }

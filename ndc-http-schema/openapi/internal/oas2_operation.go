@@ -392,12 +392,8 @@ func (oc *oas2OperationBuilder) convertResponse(operation *v2.Operation, fieldPa
 		}
 	}
 
-	if resp.Schema == nil {
-		return getResultTypeFromContentType(contentType), response, nil
-	}
-
 	schemaResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, oc.pathKey, rest.InBody).
-		getSchemaTypeFromProxy(resp.Schema, false, fieldPaths)
+		getSchemaTypeFromProxy(resp.Schema, statusCode == http.StatusNoContent, fieldPaths)
 	if err != nil {
 		return nil, nil, err
 	}
