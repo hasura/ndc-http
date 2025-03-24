@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"reflect"
 	"slices"
-	"strings"
 
 	"github.com/hasura/ndc-http/connector/internal/contenttype"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
@@ -270,10 +269,7 @@ func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(endpoint *url.URL, he
 		contenttype.EvalQueryParameters(&q, argumentKey, queryParams, argumentInfo.HTTP.EncodingObject)
 		endpoint.RawQuery = contenttype.EncodeQueryValues(q, argumentInfo.HTTP.AllowReserved)
 	case rest.InPath:
-		defaultParam := queryParams.FindDefault()
-		if defaultParam != nil {
-			endpoint.Path = strings.ReplaceAll(endpoint.Path, "{"+argumentKey+"}", strings.Join(defaultParam.Values(), ","))
-		}
+		endpoint.Path = contenttype.EncodePathParameters(endpoint.Path, argumentKey, queryParams, argumentInfo.HTTP.EncodingObject)
 	}
 
 	return nil

@@ -423,7 +423,7 @@ func (c *URLParameterEncoder) evalRequestBody(bodyType schema.Type, bodyData ref
 
 // EvalQueryParameters evaluate the query parameter URL.
 func EvalQueryParameters(q *url.Values, name string, queryParams ParameterItems, encObject rest.EncodingObject) {
-	explode := encObject.Explode == nil || *encObject.Explode
+	explode := encObject.GetExplode(rest.InQuery)
 
 	for _, qp := range queryParams {
 		keys := qp.Keys()
@@ -480,74 +480,37 @@ func buildURLQueryKeyValues(name string, keys Keys, values []string, encObject r
 		return "", nil
 	}
 
-	var sb strings.Builder
+	isDeepObject := encObject.Style == rest.EncodingStyleDeepObject
 	isArray := keys[len(keys)-1].Index() != nil
 
 	if isArray {
-		for i, key := range keys {
-			if i == len(keys)-1 {
-				if encObject.Style == rest.EncodingStyleDeepObject {
-					sb.WriteString("[]")
-				}
-
-				break
-			}
-
-			if i == 0 {
-				sb.WriteString(key.Key())
-
-				continue
-			}
-
-			sb.WriteRune('[')
-			sb.WriteString(key.String())
-			sb.WriteRune(']')
-		}
-
-		return sb.String(), values
+		return keys.Format(isDeepObject), values
 	}
 
 	var resultKey string
-	isFormStyle := (encObject.Style == "" || encObject.Style == rest.EncodingStyleForm)
 
-	if isFormStyle {
+	if !isDeepObject {
 		resultKey = keys[0].String()
 
 		keys = keys[1:]
 	}
 
-	for i, key := range keys {
-		if i == 0 {
-			sb.WriteString(key.String())
-
-			continue
-		}
-
-		sb.WriteRune('[')
-		sb.WriteString(key.String())
-		sb.WriteRune(']')
-	}
-
-	builtKey := sb.String()
-	if !isFormStyle {
+	builtKey := keys.Format(isDeepObject)
+	// if explode=false, the root key will be excluded.
+	// Object id = {“role”: “admin”, “firstName”: “Alex”}
+	// => /users?role=admin&firstName=Alex
+	if isDeepObject || encObject.GetExplode(rest.InQuery) {
 		return builtKey, values
 	}
 
 	// if explode=false, child keys will be in query values.
 	// Object id = {“role”: “admin”, “firstName”: “Alex”}
 	// => /users?id=role,admin,firstName,Alex
-	if encObject.Explode != nil && !*encObject.Explode {
-		if builtKey != "" {
-			values = append([]string{builtKey}, values...)
-		}
-
-		return resultKey, values
+	if builtKey != "" {
+		values = append([]string{builtKey}, values...)
 	}
 
-	// if explode=false, the root key will be excluded.
-	// Object id = {“role”: “admin”, “firstName”: “Alex”}
-	// => /users?role=admin&firstName=Alex
-	return builtKey, values
+	return resultKey, values
 }
 
 // EncodeQueryValues encode query values to string.
@@ -573,7 +536,7 @@ func EncodeQueryValues(qValues url.Values, allowReserved bool) string {
 	return builder.String()
 }
 
-// SetHeaderParameters set parameters to request headers.
+// SetHeaderParameters encode and set parameters to request headers.
 func SetHeaderParameters(header *http.Header, param *rest.RequestParameter, queryParams ParameterItems) {
 	defaultParam := queryParams.FindDefault()
 	// the param is an array
@@ -583,27 +546,110 @@ func SetHeaderParameters(header *http.Header, param *rest.RequestParameter, quer
 		return
 	}
 
-	if param.Explode != nil && *param.Explode {
-		var headerValues []string
+	explode := param.GetExplode(rest.InHeader)
+	headerValues := transformParameterItemStrings(queryParams, explode)
+	header.Set(param.Name, strings.Join(headerValues, ","))
+}
 
-		for _, pair := range queryParams {
-			headerValues = append(headerValues, fmt.Sprintf("%s=%s", pair.Keys().String(), strings.Join(pair.Values(), ",")))
+// EncodePathParameters encode parameters to the request path.
+func EncodePathParameters(rawPath string, name string, queryParams ParameterItems, enc rest.EncodingObject) string {
+	value := encodePathParameterValue(name, queryParams, enc)
+
+	return strings.ReplaceAll(rawPath, "{"+name+"}", value)
+}
+
+func encodePathParameterValue(name string, queryParams ParameterItems, enc rest.EncodingObject) string {
+	style := enc.GetStyle(rest.InPath)
+	explode := enc.GetExplode(rest.InPath)
+
+	defaultParam := queryParams.FindDefault()
+	// the param is an array or a primitive value
+	if defaultParam != nil {
+		values := defaultParam.Values()
+
+		if len(values) == 0 || (len(values) == 1 && values[0] == "") {
+			switch style {
+			case rest.EncodingStyleMatrix:
+				return ";" + name
+			case rest.EncodingStyleLabel:
+				return "."
+			default:
+				return ""
+			}
 		}
 
-		header.Set(param.Name, strings.Join(headerValues, ","))
+		switch style {
+		case rest.EncodingStyleMatrix:
+			if !explode {
+				// ;color=blue,black,brown
+				return ";" + name + "=" + strings.Join(values, ",")
+			}
 
-		return
+			// ;color=blue;color=black;color=brown
+			var sb strings.Builder
+
+			for _, value := range values {
+				sb.WriteRune(';')
+				sb.WriteString(name)
+				sb.WriteRune('=')
+				sb.WriteString(value)
+			}
+
+			return sb.String()
+		case rest.EncodingStyleLabel:
+			// .blue,black,brown
+			if explode {
+				return "." + strings.Join(values, ".")
+			}
+
+			return "." + strings.Join(values, ",")
+		default:
+			// blue,black,brown
+			return strings.Join(values, ",")
+		}
 	}
 
+	keyValues := transformParameterItemStrings(queryParams, explode)
+
+	switch style {
+	case rest.EncodingStyleMatrix:
+		if explode {
+			// ;R=100;G=200;B=150
+			return ";" + strings.Join(keyValues, ";")
+		}
+
+		// ;color=R,100,G,200,B,150
+		return ";" + name + "=" + strings.Join(keyValues, ",")
+	case rest.EncodingStyleLabel:
+		// .blue,black,brown
+		if explode {
+			return "." + strings.Join(keyValues, ".")
+		}
+
+		return "." + strings.Join(keyValues, ",")
+	default:
+		// blue,black,brown
+		return strings.Join(keyValues, ",")
+	}
+}
+
+func transformParameterItemStrings(queryParams ParameterItems, explode bool) []string {
 	var headerValues []string
 
 	for _, pair := range queryParams {
-		pairKey := pair.Keys().String()
+		key := pair.Keys().Format(false)
+		for _, value := range pair.Values() {
+			if explode {
+				// R=100,G=200,B=150
+				headerValues = append(headerValues, key+"="+value)
 
-		for _, v := range pair.Values() {
-			headerValues = append(headerValues, pairKey, v)
+				continue
+			}
+
+			// R,100,G,200,B,150
+			headerValues = append(headerValues, key, value)
 		}
 	}
 
-	header.Set(param.Name, strings.Join(headerValues, ","))
+	return headerValues
 }

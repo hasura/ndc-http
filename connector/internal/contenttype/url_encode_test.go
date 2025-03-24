@@ -2,6 +2,7 @@ package contenttype
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/url"
 	"slices"
 	"strings"
@@ -16,15 +17,18 @@ func TestEvalQueryParameterURL(t *testing.T) {
 	testCases := []struct {
 		name     string
 		param    *rest.RequestParameter
-		keys     []Key
-		values   []string
+		inputs   ParameterItems
 		expected string
 	}{
 		{
-			name:     "empty",
-			param:    &rest.RequestParameter{},
-			keys:     []Key{NewKey("")},
-			values:   []string{},
+			name:  "empty",
+			param: &rest.RequestParameter{},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("")},
+					values: []string{},
+				},
+			},
 			expected: "",
 		},
 		{
@@ -36,8 +40,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
 			expected: "id=3",
 		},
 		{
@@ -49,8 +57,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
 			expected: "id=3",
 		},
 		{
@@ -62,8 +74,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3", "4", "5"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
 			expected: "id=3,4,5",
 		},
 		{
@@ -75,12 +91,16 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3", "4", "5"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
 			expected: "id=3&id=4&id=5",
 		},
 		{
-			name: "spaceDelimited_multiple",
+			name: "spaceDelimited_array",
 			param: &rest.RequestParameter{
 				Name: "id",
 				EncodingObject: rest.EncodingObject{
@@ -88,12 +108,41 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleSpaceDelimited,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3", "4", "5"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
 			expected: "id=3 4 5",
 		},
 		{
-			name: "spaceDelimited_explode_multiple",
+			name: "spaceDelimited_object",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleSpaceDelimited,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: "color=R 100 G 200 B 150",
+		},
+		{
+			name: "spaceDelimited_explode_array",
 			param: &rest.RequestParameter{
 				Name: "id",
 				EncodingObject: rest.EncodingObject{
@@ -101,13 +150,16 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleSpaceDelimited,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3", "4", "5"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
 			expected: "id=3&id=4&id=5",
 		},
-
 		{
-			name: "pipeDelimited_multiple",
+			name: "pipeDelimited_array",
 			param: &rest.RequestParameter{
 				Name: "id",
 				EncodingObject: rest.EncodingObject{
@@ -115,12 +167,16 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStylePipeDelimited,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3", "4", "5"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
 			expected: "id=3|4|5",
 		},
 		{
-			name: "pipeDelimited_explode_multiple",
+			name: "pipeDelimited_explode_array",
 			param: &rest.RequestParameter{
 				Name: "id",
 				EncodingObject: rest.EncodingObject{
@@ -128,9 +184,38 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStylePipeDelimited,
 				},
 			},
-			keys:     []Key{},
-			values:   []string{"3", "4", "5"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
 			expected: "id=3&id=4&id=5",
+		},
+		{
+			name: "pipeDelimited_object",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStylePipeDelimited,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: "color=R|100|G|200|B|150",
 		},
 		{
 			name: "deepObject_explode_multiple",
@@ -141,8 +226,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleDeepObject,
 				},
 			},
-			keys:     []Key{NewIndexKey(0)},
-			values:   []string{"3", "4", "5"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewIndexKey(0)},
+					values: []string{"3", "4", "5"},
+				},
+			},
 			expected: "id[]=3&id[]=4&id[]=5",
 		},
 		{
@@ -154,8 +243,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{NewKey("role")},
-			values:   []string{"admin"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role")},
+					values: []string{"admin"},
+				},
+			},
 			expected: "id=role,admin",
 		},
 		{
@@ -167,8 +260,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{NewKey("role")},
-			values:   []string{"admin"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role")},
+					values: []string{"admin"},
+				},
+			},
 			expected: "role=admin",
 		},
 		{
@@ -180,8 +277,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleDeepObject,
 				},
 			},
-			keys:     []Key{NewKey("role")},
-			values:   []string{"admin"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role")},
+					values: []string{"admin"},
+				},
+			},
 			expected: "id[role]=admin",
 		},
 		{
@@ -193,8 +294,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{NewKey("role"), NewIndexKey(1), NewKey("user")},
-			values:   []string{"admin"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role"), NewIndexKey(1), NewKey("user")},
+					values: []string{"admin"},
+				},
+			},
 			expected: "id=role[1][user],admin",
 		},
 		{
@@ -206,8 +311,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{NewKey("role"), NewIndexKey(1), NewKey("user")},
-			values:   []string{"admin"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role"), NewIndexKey(1), NewKey("user")},
+					values: []string{"admin"},
+				},
+			},
 			expected: "role[1][user]=admin",
 		},
 		{
@@ -219,8 +328,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleForm,
 				},
 			},
-			keys:     []Key{NewKey("role"), NewIndexKey(0), NewKey("user"), NewIndexKey(0)},
-			values:   []string{"admin", "anonymous"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role"), NewIndexKey(0), NewKey("user"), NewIndexKey(0)},
+					values: []string{"admin", "anonymous"},
+				},
+			},
 			expected: "id[role][0][user]=admin&id[role][0][user]=anonymous",
 		},
 		{
@@ -232,8 +345,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleDeepObject,
 				},
 			},
-			keys:     []Key{NewKey("role"), NewKey(""), NewKey("user"), NewKey("")},
-			values:   []string{"admin"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role"), NewKey(""), NewKey("user"), NewKey("")},
+					values: []string{"admin"},
+				},
+			},
 			expected: "id[role][][user][]=admin",
 		},
 		{
@@ -245,8 +362,12 @@ func TestEvalQueryParameterURL(t *testing.T) {
 					Style:   rest.EncodingStyleDeepObject,
 				},
 			},
-			keys:     []Key{NewKey("role"), NewKey(""), NewKey("user"), NewKey("")},
-			values:   []string{"admin", "anonymous"},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("role"), NewKey(""), NewKey("user"), NewKey("")},
+					values: []string{"admin", "anonymous"},
+				},
+			},
 			expected: "id[role][][user][]=admin&id[role][][user][]=anonymous",
 		},
 	}
@@ -254,7 +375,7 @@ func TestEvalQueryParameterURL(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			qValues := url.Values{}
-			EvalQueryParameters(&qValues, tc.param.Name, ParameterItems{NewParameterItem(tc.keys, tc.values)}, tc.param.EncodingObject)
+			EvalQueryParameters(&qValues, tc.param.Name, tc.inputs, tc.param.EncodingObject)
 			assert.Equal(t, tc.expected, EncodeQueryValues(qValues, true))
 		})
 	}
@@ -711,6 +832,603 @@ func TestCreateFormURLEncoded(t *testing.T) {
 			result, err := builder.EncodeFormBody(&argumentInfo, arguments["body"])
 			assert.NilError(t, err)
 			assert.DeepEqual(t, parseQueryAndSort(tc.Expected), parseQueryAndSort(string(result)))
+		})
+	}
+}
+
+func TestEncodeHeaderParameters(t *testing.T) {
+	testCases := []struct {
+		name     string
+		param    *rest.RequestParameter
+		inputs   ParameterItems
+		expected string
+	}{
+		{
+			name:  "empty",
+			param: &rest.RequestParameter{},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{},
+				},
+			},
+			expected: "",
+		},
+		{
+			name: "single",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleForm,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
+			expected: "3",
+		},
+		{
+			name: "array",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleForm,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: "3,4,5",
+		},
+		{
+			name: "array_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleForm,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: "3,4,5",
+		},
+		{
+			name: "object",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleSpaceDelimited,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: "R,100,G,200,B,150",
+		},
+		{
+			name: "object_explode",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleSpaceDelimited,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: "R=100,G=200,B=150",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			headers := http.Header{}
+			SetHeaderParameters(&headers, tc.param, tc.inputs)
+			assert.Equal(t, tc.expected, headers.Get(tc.param.Name))
+		})
+	}
+}
+
+func TestEncodePathParameters(t *testing.T) {
+	testCases := []struct {
+		name     string
+		param    *rest.RequestParameter
+		inputs   ParameterItems
+		expected string
+	}{
+		{
+			name: "empty_simple",
+			param: &rest.RequestParameter{
+				Name: "color",
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{},
+				},
+			},
+			expected: "",
+		},
+		{
+			name: "empty_matrix",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Style: rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{},
+				},
+			},
+			expected: ";color",
+		},
+		{
+			name: "empty_matrix_explode",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Style:   rest.EncodingStyleMatrix,
+					Explode: utils.ToPtr(true),
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{},
+				},
+			},
+			expected: ";color",
+		},
+		{
+			name: "empty_label",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Style: rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{},
+				},
+			},
+			expected: ".",
+		},
+		{
+			name: "empty_label_explode",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Style:   rest.EncodingStyleLabel,
+					Explode: utils.ToPtr(true),
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{},
+				},
+			},
+			expected: ".",
+		},
+		{
+			name: "single_simple",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleForm,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
+			expected: "3",
+		},
+		{
+			name: "single_simple_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleForm,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
+			expected: "3",
+		},
+		{
+			name: "single_label",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
+			expected: ".3",
+		},
+		{
+			name: "single_simple_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
+			expected: ".3",
+		},
+		{
+			name: "single_matrix",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
+			expected: ";id=3",
+		},
+		{
+			name: "single_matrix_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3"},
+				},
+			},
+			expected: ";id=3",
+		},
+		{
+			name: "array_simple",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleSimple,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: "3,4,5",
+		},
+		{
+			name: "array_simple_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleSimple,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: "3,4,5",
+		},
+		{
+			name: "array_label",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: ".3,4,5",
+		},
+		{
+			name: "array_label_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: ".3.4.5",
+		},
+		{
+			name: "array_simple_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleSimple,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: "3,4,5",
+		},
+		{
+			name: "array_matrix",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: ";id=3,4,5",
+		},
+		{
+			name: "array_matrix_explode",
+			param: &rest.RequestParameter{
+				Name: "id",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"3", "4", "5"},
+				},
+			},
+			expected: ";id=3;id=4;id=5",
+		},
+		{
+			name: "object_simple",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleSimple,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: "R,100,G,200,B,150",
+		},
+		{
+			name: "object_simple_explode",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleSimple,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: "R=100,G=200,B=150",
+		},
+		{
+			name: "object_label",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: ".R,100,G,200,B,150",
+		},
+		{
+			name: "object_label_explode",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: ".R=100.G=200.B=150",
+		},
+		{
+			name: "object_matrix",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: ";color=R,100,G,200,B,150",
+		},
+		{
+			name: "object_matrix_explode",
+			param: &rest.RequestParameter{
+				Name: "color",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("R")},
+					values: []string{"100"},
+				},
+				{
+					keys:   []Key{NewKey("G")},
+					values: []string{"200"},
+				},
+				{
+					keys:   []Key{NewKey("B")},
+					values: []string{"150"},
+				},
+			},
+			expected: ";R=100;G=200;B=150",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := EncodePathParameters("{"+tc.param.Name+"}", tc.param.Name, tc.inputs, tc.param.EncodingObject)
+			assert.Equal(t, tc.expected, result)
 		})
 	}
 }
