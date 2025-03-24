@@ -145,11 +145,14 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 		if !notNull {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), errArgumentRequired)
 		}
+
 		iScalar, ok := c.schema.ScalarTypes[ty.Name]
 		if ok {
 			return c.encodeScalarParameterReflectionValues(reflectValue, &iScalar, fieldPaths)
 		}
+
 		kind := reflectValue.Kind()
+
 		objectInfo, ok := c.schema.ObjectTypes[ty.Name]
 		if !ok {
 			return nil, fmt.Errorf("%s: invalid type %s", strings.Join(fieldPaths, ""), ty.Name)
@@ -165,6 +168,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 
 			for key, fieldInfo := range objectInfo.Fields {
 				fieldVal := object[key]
+
 				output, err := c.EncodeParameterValues(&fieldInfo, reflect.ValueOf(fieldVal), append(fieldPaths, "."+key))
 				if err != nil {
 					return nil, err
@@ -179,6 +183,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 			for fieldIndex := range reflectValue.NumField() {
 				fieldVal := reflectValue.Field(fieldIndex)
 				fieldType := reflectType.Field(fieldIndex)
+
 				fieldInfo, ok := objectInfo.Fields[fieldType.Name]
 				if !ok {
 					continue
@@ -280,6 +285,17 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(reflectValue
 		}
 
 		return []ParameterItem{NewParameterItem([]Key{}, []string{rawValue})}, nil
+	case *schema.TypeRepresentationJSON:
+		// try to evaluate if the value is a json string
+		rawValue, err := utils.DecodeStringReflection(reflectValue)
+		if err == nil {
+			var anyValue any
+			if err := json.Unmarshal([]byte(rawValue), &anyValue); err == nil {
+				return c.encodeParameterReflectionValues(reflect.ValueOf(anyValue), fieldPaths)
+			}
+		}
+
+		return c.encodeParameterReflectionValues(reflectValue, fieldPaths)
 	default:
 		return c.encodeParameterReflectionValues(reflectValue, fieldPaths)
 	}

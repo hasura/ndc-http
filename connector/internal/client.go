@@ -62,6 +62,7 @@ func (client *HTTPClient) Send(ctx context.Context, selection schema.NestedField
 	}
 
 	result = client.createHeaderForwardingResponse(result, headers)
+
 	if len(selection) > 0 {
 		var err error
 		result, err = utils.EvalNestedColumnFields(selection, result)
@@ -445,7 +446,9 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 		if client.requests.Schema == nil || client.requests.Schema.NDCHttpSchema == nil {
 			err = json.NewDecoder(resp.Body).Decode(&result)
 		} else {
-			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema).Decode(resp.Body, resultType)
+			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema, contenttype.JSONDecodeOptions{
+				StringifyJSON: client.manager.config.PromptQL.Compatible,
+			}).Decode(resp.Body, resultType)
 		}
 
 		if err != nil {

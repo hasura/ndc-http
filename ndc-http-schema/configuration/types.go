@@ -28,6 +28,7 @@ type Configuration struct {
 	ForwardHeaders ForwardHeadersSettings `json:"forwardHeaders,omitempty" yaml:"forwardHeaders,omitempty"`
 	Concurrency    ConcurrencySettings    `json:"concurrency,omitempty"    yaml:"concurrency,omitempty"`
 	Files          []ConfigItem           `json:"files"                    yaml:"files"`
+	PromptQL       PromptQLSettings       `json:"promptql,omitempty"       yaml:"promptql,omitempty"`
 }
 
 // ConcurrencySettings represent settings for concurrent webhook executions to remote servers.
@@ -294,4 +295,9 @@ var httpSingleOptionsArgument = rest.ArgumentInfo{
 		Description: singleObjectType.Description,
 		Type:        schema.NewNullableNamedType(rest.HTTPSingleOptionsObjectName).Encode(),
 	},
+}
+
+// PromptQLSettings hold optional PromptQL settings.
+type PromptQLSettings struct {
+	Compatible bool `json:"compatible,omitempty" yaml:"compatible,omitempty"`
 }

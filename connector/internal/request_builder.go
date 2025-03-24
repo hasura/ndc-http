@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -118,7 +116,8 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 
 			return nil
 		case restUtils.IsContentTypeMultipartForm(contentType):
-			r, contentType, err := contenttype.NewMultipartFormEncoder(c.Schema, c.Operation, c.Arguments).Encode(bodyData)
+			r, contentType, err := contenttype.NewMultipartFormEncoder(c.Schema, c.Operation, c.Arguments).
+				Encode(bodyData)
 			if err != nil {
 				return err
 			}
@@ -138,15 +137,12 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 
 			return nil
 		case contentType == "" || restUtils.IsContentTypeJSON(contentType):
-			var buf bytes.Buffer
-			enc := json.NewEncoder(&buf)
-			enc.SetEscapeHTML(false)
-
-			if err := enc.Encode(bodyData); err != nil {
+			r, err := contenttype.NewJSONEncoder(c.Schema).Encode(bodyData, bodyInfo.Type)
+			if err != nil {
 				return err
 			}
 
-			request.Body = buf.Bytes()
+			request.Body = r
 
 			return nil
 		case restUtils.IsContentTypeXML(contentType):

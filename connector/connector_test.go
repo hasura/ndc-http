@@ -124,7 +124,7 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			Details: schema.ExplainResponseDetails{
 				"url":     state.Server.URL + "/pet",
 				"headers": `{"Accept":["application/json"],"Api_key":["ran*******(14)"],"Content-Type":["application/json"]}`,
-				"body":    "{\"name\":\"pet\"}\n",
+				"body":    "{\"name\":\"pet\"}",
 			},
 		})
 	})

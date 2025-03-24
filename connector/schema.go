@@ -32,7 +32,7 @@ func (c *HTTPConnector) ApplyNDCHttpSchemas(ctx context.Context, config *configu
 	}
 
 	ndcSchema, procSendHttp := internal.ApplyDefaultConnectorSchema(httpSchema.ToSchemaResponse(), config.ForwardHeaders)
-	schemaBytes, err := json.Marshal(ndcSchema)
+	schemaBytes, err := json.Marshal(internal.ApplyPromptQLSettingsToSchema(ndcSchema, config.PromptQL))
 	if err != nil {
 		return err
 	}

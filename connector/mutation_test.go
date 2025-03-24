@@ -49,9 +49,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 
 			reqBody, err := compressor.Decompress(r.Body)
 			assert.NilError(t, err)
-			rawBytes, err := io.ReadAll(reqBody)
+
+			var expected map[string]any
+			err = json.NewDecoder(reqBody).Decode(&expected)
 			assert.NilError(t, err)
-			assert.Equal(t, strings.TrimSpace(string(rawPostsBody)), strings.TrimSpace(string(rawBytes)))
+			assert.DeepEqual(t, postsBody, expected)
 
 			w.Header().Add(rest.ContentTypeHeader, "application/json")
 			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingGzip)

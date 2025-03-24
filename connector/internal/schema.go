@@ -99,3 +99,22 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, forwardHeaderConf
 		ResultType: procSendHttpRequest.ResultType,
 	}
 }
+
+// ApplyPromptQLSettingsToSchema applies settings to the connector schema to be compatible with PromptQL.
+func ApplyPromptQLSettingsToSchema(ndcSchema *schema.SchemaResponse, config configuration.PromptQLSettings) *schema.SchemaResponse {
+	if !config.Compatible {
+		return ndcSchema
+	}
+
+	// replace representations which PromptQL doesn't supported to string.
+	for key, scalar := range ndcSchema.ScalarTypes {
+		switch scalar.Representation.Interface().(type) {
+		case *schema.TypeRepresentationBytes, *schema.TypeRepresentationJSON:
+			scalar.Representation = schema.NewTypeRepresentationString().Encode()
+			ndcSchema.ScalarTypes[key] = scalar
+		default:
+		}
+	}
+
+	return ndcSchema
+}

@@ -54,6 +54,7 @@ func DecodeDataURI(input string) (*DataURI, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		dataURI.Data = string(rawDecodedBytes)
 		mediaTypes = mediaTypes[:len(mediaTypes)-1]
 	case EncodingASCII:
@@ -68,6 +69,7 @@ func DecodeDataURI(input string) (*DataURI, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w %s", err, rawMediaType)
 	}
+
 	dataURI.MediaType = mediaType
 	dataURI.Parameters = params
 
