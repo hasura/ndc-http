@@ -185,7 +185,7 @@ func (c *JSONEncoder) evalScalarType(reflectValue reflect.Value, scalarType sche
 			return err
 		}
 
-		c.writeStringValue(str)
+		c.buffer.WriteString(strconv.Quote(str))
 	case *schema.TypeRepresentationUUID:
 		str, err := utils.DecodeStringReflection(reflectValue)
 		if err != nil {
@@ -233,7 +233,6 @@ func (c *JSONEncoder) evalScalarType(reflectValue reflect.Value, scalarType sche
 		str, err := utils.DecodeStringReflection(reflectValue)
 		if err == nil {
 			jsonBytes := []byte(str)
-
 			if json.Valid(jsonBytes) {
 				c.buffer.Write(jsonBytes)
 

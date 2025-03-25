@@ -20,17 +20,24 @@ import (
 
 var errURLEncodedBodyObjectRequired = errors.New("expected object body in content type " + rest.ContentTypeFormURLEncoded)
 
+// URLParameterEncoderOptions hold decode options for the URLParameterEncoder.
+type URLParameterEncoderOptions struct {
+	StringifyJSON bool
+}
+
 // URLParameterEncoder represents a URL parameter encoder.
 type URLParameterEncoder struct {
 	schema      *rest.NDCHttpSchema
 	requestBody *rest.RequestBody
+	options     URLParameterEncoderOptions
 }
 
 // NewURLParameterEncoder creates a URLParameterEncoder instance.
-func NewURLParameterEncoder(schema *rest.NDCHttpSchema, requestBody *rest.RequestBody) *URLParameterEncoder {
+func NewURLParameterEncoder(schema *rest.NDCHttpSchema, requestBody *rest.RequestBody, options URLParameterEncoderOptions) *URLParameterEncoder {
 	return &URLParameterEncoder{
 		schema:      schema,
 		requestBody: requestBody,
+		options:     options,
 	}
 }
 
@@ -286,12 +293,14 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(reflectValue
 
 		return []ParameterItem{NewParameterItem([]Key{}, []string{rawValue})}, nil
 	case *schema.TypeRepresentationJSON:
-		// try to evaluate if the value is a json string
-		rawValue, err := utils.DecodeStringReflection(reflectValue)
-		if err == nil {
-			var anyValue any
-			if err := json.Unmarshal([]byte(rawValue), &anyValue); err == nil {
-				return c.encodeParameterReflectionValues(reflect.ValueOf(anyValue), fieldPaths)
+		if c.options.StringifyJSON {
+			// try to evaluate if the value is a json string
+			rawValue, err := utils.DecodeStringReflection(reflectValue)
+			if err == nil {
+				var anyValue any
+				if err := json.Unmarshal([]byte(rawValue), &anyValue); err == nil {
+					return c.encodeParameterReflectionValues(reflect.ValueOf(anyValue), fieldPaths)
+				}
 			}
 		}
 

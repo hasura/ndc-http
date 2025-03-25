@@ -50,6 +50,7 @@ func TestHTTPConnector(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			server := test_createServer(t, tc.Dir)
 			testServer := server.BuildTestServer()
+			defer testServer.Close()
 
 			t.Run("capabilities", func(t *testing.T) {
 				filePath := path.Join(tc.Dir, "snapshots/capabilities")
@@ -91,6 +92,21 @@ func TestHTTPConnector(t *testing.T) {
 			assertNdcOperations(t, path.Join(tc.Dir, "mutation"), fmt.Sprintf("%s/mutation", testServer.URL))
 		})
 	}
+}
+
+func TestPromptQLCompatibleSchema(t *testing.T) {
+	server := test_createServer(t, "testdata/auth")
+	testServer := server.BuildTestServer()
+	defer testServer.Close()
+
+	resp, err := http.Get(fmt.Sprintf("%s/schema", testServer.URL))
+	assert.NilError(t, err)
+	defer resp.Body.Close()
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	var response schema.SchemaResponse
+	assert.NilError(t, json.NewDecoder(resp.Body).Decode(&response))
+	assert.DeepEqual(t, response.ScalarTypes["JSON"].Representation, schema.NewTypeRepresentationString().Encode())
 }
 
 func assertNdcOperations(t *testing.T, dir string, targetURL string) {

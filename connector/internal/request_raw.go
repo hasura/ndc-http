@@ -234,7 +234,7 @@ func (rqe *RawRequestBuilder) evalRequestBody(rawBody json.RawMessage, contentTy
 		if err := json.Unmarshal(rawBody, &bodyData); err != nil {
 			return nil, "", fmt.Errorf("invalid body: %w", err)
 		}
-		r, contentType, err := contenttype.NewMultipartFormEncoder(nil, nil, nil).EncodeArbitrary(bodyData)
+		r, contentType, err := contenttype.NewMultipartFormEncoder(nil, nil, nil, contenttype.MultipartFormEncoderOptions{}).EncodeArbitrary(bodyData)
 		if err != nil {
 			return nil, "", err
 		}
@@ -252,7 +252,7 @@ func (rqe *RawRequestBuilder) evalRequestBody(rawBody json.RawMessage, contentTy
 
 		r, err := contenttype.NewURLParameterEncoder(nil, &rest.RequestBody{
 			ContentType: contentType,
-		}).EncodeArbitrary(bodyData)
+		}, contenttype.URLParameterEncoderOptions{}).EncodeArbitrary(bodyData)
 
 		return r, contentType, err
 	default:

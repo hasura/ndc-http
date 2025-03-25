@@ -81,7 +81,12 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 							"headers": map[string]any{
 								"Content-Type": string("application/json"),
 							},
-							"response": []any{map[string]any{"id": float64(1)}},
+							"response": []any{
+								map[string]any{
+									"id":           float64(1),
+									"custom_field": `[{"foo":"bar"}]`,
+								},
+							},
 						},
 					},
 				},
@@ -138,7 +143,10 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 					"headers": map[string]any{
 						"Content-Type": string("application/json"),
 					},
-					"response": map[string]any{},
+					"response": map[string]any{
+						"custom_field": string(`[{"foo":"bar"}]`),
+						"id":           float64(1),
+					},
 				}).Encode(),
 			},
 		})
@@ -542,6 +550,60 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("stringify_json", func(t *testing.T) {
+		reqBody := []byte(`{
+		"operations": [
+			{
+				"type": "procedure",
+				"name": "postPetStringifyJson",
+				"arguments": {
+					"body": {
+						"name": "dog",
+						"custom_field": [{
+							"user_id": 1,
+							"foo": "baz",
+							"active": true,
+							"object": {
+								"hello": "world"
+							}
+						}]
+					}
+				},
+				"fields": {
+					"type": "object",
+					"fields": {
+						"headers": {
+							"column": "headers",
+							"type": "column"
+						},
+						"response": {
+							"column": "response",
+							"type": "column"
+						}
+					}
+				}
+			}
+		],
+		"collection_relationships": {}
+	}`)
+
+		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
+			OperationResults: []schema.MutationOperationResults{
+				schema.NewProcedureResult(map[string]any{
+					"headers": map[string]any{
+						"Content-Type": string("application/json"),
+					},
+					"response": map[string]any{
+						"custom_field": string(`[{"foo":"bar"}]`),
+						"id":           float64(1),
+					},
+				}).Encode(),
+			},
+		})
+	})
 }
 
 func TestHTTPConnector_distribution(t *testing.T) {
@@ -889,6 +951,7 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(body))
 	}
+
 	mux.HandleFunc("/pet", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet, http.MethodPost:
@@ -898,13 +961,24 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 				return
 			}
 
+			petItemStr := `{
+				"id": "1",
+				"custom_field": [{
+					"foo": "bar"
+				}]
+			}`
+
 			if r.Method == http.MethodGet {
-				writeResponse(w, `[{"id": "1"}]`)
+				responseBody := fmt.Sprintf(`[%s]`, petItemStr)
+				writeResponse(w, responseBody)
 
 				return
 			}
 
-			writeResponse(w, `{}`)
+			var postBody any
+			err := json.NewDecoder(r.Body).Decode(&postBody)
+			assert.NilError(t, err)
+			writeResponse(w, petItemStr)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -1068,6 +1142,48 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 		}
 	})
 
+	mux.HandleFunc("/pet/stringify-json", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			if r.Header.Get("api_key") != apiKey {
+				t.Errorf("invalid api key, expected %s, got %s", apiKey, r.Header.Get("api_key"))
+				t.FailNow()
+				return
+			}
+
+			respBody := `{
+				"id": "1",
+				"custom_field": [{
+					"foo": "bar"
+				}]
+			}`
+
+			expectedBody := map[string]any{
+				"name": "dog",
+				"custom_field": []any{
+					map[string]any{
+						"user_id": float64(1),
+						"foo":     "baz",
+						"active":  true,
+						"object": map[string]any{
+							"hello": "world",
+						},
+					},
+				},
+			}
+
+			var postBody map[string]any
+			err := json.NewDecoder(r.Body).Decode(&postBody)
+			assert.NilError(t, err)
+			assert.DeepEqual(t, expectedBody, postBody)
+
+			writeResponse(w, respBody)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+	})
+
 	server := httptest.NewServer(mux)
 	state.Server = server
 
@@ -1087,6 +1203,7 @@ func (mds *mockDistributedServer) createServer(t *testing.T) *httptest.Server {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(data)
 	}
+
 	createHandler := func(name string, apiKey string) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			if r.Header.Get("api_key") != apiKey {

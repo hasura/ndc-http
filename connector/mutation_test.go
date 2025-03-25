@@ -144,56 +144,56 @@ func TestHTTPConnectorCompression(t *testing.T) {
 		})
 	})
 
-	// t.Run("deflate", func(t *testing.T) {
-	// 	rawReqBody, err := json.Marshal(schema.MutationRequest{
-	// 		CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
-	// 		Operations: []schema.MutationOperation{
-	// 			{
-	// 				Type:      schema.MutationOperationProcedure,
-	// 				Name:      "createPostDeflate",
-	// 				Arguments: rawMutationArguments,
-	// 				Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
-	// 					"id":     schema.NewColumnField("id", nil),
-	// 					"title":  schema.NewColumnField("title", nil),
-	// 					"userId": schema.NewColumnField("userId", nil),
-	// 					"body":   schema.NewColumnField("body", nil),
-	// 				}).Encode(),
-	// 			},
-	// 		},
-	// 	})
+	t.Run("deflate", func(t *testing.T) {
+		rawReqBody, err := json.Marshal(schema.MutationRequest{
+			CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
+			Operations: []schema.MutationOperation{
+				{
+					Type:      schema.MutationOperationProcedure,
+					Name:      "createPostDeflate",
+					Arguments: rawMutationArguments,
+					Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
+						"id":     schema.NewColumnField("id", nil),
+						"title":  schema.NewColumnField("title", nil),
+						"userId": schema.NewColumnField("userId", nil),
+						"body":   schema.NewColumnField("body", nil),
+					}).Encode(),
+				},
+			},
+		})
 
-	// 	res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
-	// 	assert.NilError(t, err)
-	// 	assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
-	// 		OperationResults: []schema.MutationOperationResults{
-	// 			schema.NewProcedureResult(postsBody).Encode(),
-	// 		},
-	// 	})
-	// })
+		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
+			OperationResults: []schema.MutationOperationResults{
+				schema.NewProcedureResult(postsBody).Encode(),
+			},
+		})
+	})
 
-	// t.Run("deflate_failure", func(t *testing.T) {
-	// 	rawReqBody, err := json.Marshal(schema.MutationRequest{
-	// 		CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
-	// 		Operations: []schema.MutationOperation{
-	// 			{
-	// 				Type:      schema.MutationOperationProcedure,
-	// 				Name:      "createPostDeflateFailed",
-	// 				Arguments: rawPostsBody,
-	// 				Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
-	// 					"id":     schema.NewColumnField("id", nil),
-	// 					"title":  schema.NewColumnField("title", nil),
-	// 					"userId": schema.NewColumnField("userId", nil),
-	// 					"body":   schema.NewColumnField("body", nil),
-	// 				}).Encode(),
-	// 			},
-	// 		},
-	// 	})
+	t.Run("deflate_failure", func(t *testing.T) {
+		rawReqBody, err := json.Marshal(schema.MutationRequest{
+			CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
+			Operations: []schema.MutationOperation{
+				{
+					Type:      schema.MutationOperationProcedure,
+					Name:      "createPostDeflateFailed",
+					Arguments: rawMutationArguments,
+					Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
+						"id":     schema.NewColumnField("id", nil),
+						"title":  schema.NewColumnField("title", nil),
+						"userId": schema.NewColumnField("userId", nil),
+						"body":   schema.NewColumnField("body", nil),
+					}).Encode(),
+				},
+			},
+		})
 
-	// 	res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
-	// 	assert.NilError(t, err)
-	// 	assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
-	// 		Message: "zlib: invalid header",
-	// 		Details: make(map[string]any),
-	// 	})
-	// })
+		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
+			Message: "zlib: invalid header",
+			Details: make(map[string]any),
+		})
+	})
 }

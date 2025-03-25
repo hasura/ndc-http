@@ -171,7 +171,12 @@ func (c *JSONDecoder) evalScalarType(value any, scalarType schema.ScalarType) (a
 		return StringifySimpleScalar(reflectType, reflectType.Kind())
 	case *schema.TypeRepresentationJSON:
 		if c.options.StringifyJSON {
-			return json.Marshal(value)
+			jsonBytes, err := json.Marshal(value)
+			if err != nil {
+				return nil, err
+			}
+
+			return string(jsonBytes), nil
 		}
 
 		return value, nil
