@@ -65,6 +65,7 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 		security:   runtimeSchema.Settings.Security,
 		headers:    um.getHeadersFromEnv(logger, namespace, runtimeSchema.Settings.Headers),
 		httpClient: httpClient,
+		runtime:    um.config.Runtime,
 	}
 
 	if len(runtimeSchema.Settings.ArgumentPresets) > 0 {

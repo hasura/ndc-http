@@ -20,17 +20,24 @@ import (
 
 var errURLEncodedBodyObjectRequired = errors.New("expected object body in content type " + rest.ContentTypeFormURLEncoded)
 
+// URLParameterEncoderOptions hold decode options for the URLParameterEncoder.
+type URLParameterEncoderOptions struct {
+	StringifyJSON bool
+}
+
 // URLParameterEncoder represents a URL parameter encoder.
 type URLParameterEncoder struct {
 	schema      *rest.NDCHttpSchema
 	requestBody *rest.RequestBody
+	options     URLParameterEncoderOptions
 }
 
 // NewURLParameterEncoder creates a URLParameterEncoder instance.
-func NewURLParameterEncoder(schema *rest.NDCHttpSchema, requestBody *rest.RequestBody) *URLParameterEncoder {
+func NewURLParameterEncoder(schema *rest.NDCHttpSchema, requestBody *rest.RequestBody, options URLParameterEncoderOptions) *URLParameterEncoder {
 	return &URLParameterEncoder{
 		schema:      schema,
 		requestBody: requestBody,
+		options:     options,
 	}
 }
 
@@ -145,11 +152,14 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 		if !notNull {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), errArgumentRequired)
 		}
+
 		iScalar, ok := c.schema.ScalarTypes[ty.Name]
 		if ok {
 			return c.encodeScalarParameterReflectionValues(reflectValue, &iScalar, fieldPaths)
 		}
+
 		kind := reflectValue.Kind()
+
 		objectInfo, ok := c.schema.ObjectTypes[ty.Name]
 		if !ok {
 			return nil, fmt.Errorf("%s: invalid type %s", strings.Join(fieldPaths, ""), ty.Name)
@@ -165,6 +175,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 
 			for key, fieldInfo := range objectInfo.Fields {
 				fieldVal := object[key]
+
 				output, err := c.EncodeParameterValues(&fieldInfo, reflect.ValueOf(fieldVal), append(fieldPaths, "."+key))
 				if err != nil {
 					return nil, err
@@ -179,6 +190,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 			for fieldIndex := range reflectValue.NumField() {
 				fieldVal := reflectValue.Field(fieldIndex)
 				fieldType := reflectType.Field(fieldIndex)
+
 				fieldInfo, ok := objectInfo.Fields[fieldType.Name]
 				if !ok {
 					continue
@@ -280,6 +292,19 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(reflectValue
 		}
 
 		return []ParameterItem{NewParameterItem([]Key{}, []string{rawValue})}, nil
+	case *schema.TypeRepresentationJSON:
+		if c.options.StringifyJSON {
+			// try to evaluate if the value is a json string
+			rawValue, err := utils.DecodeStringReflection(reflectValue)
+			if err == nil {
+				var anyValue any
+				if err := json.Unmarshal([]byte(rawValue), &anyValue); err == nil {
+					return c.encodeParameterReflectionValues(reflect.ValueOf(anyValue), fieldPaths)
+				}
+			}
+		}
+
+		return c.encodeParameterReflectionValues(reflectValue, fieldPaths)
 	default:
 		return c.encodeParameterReflectionValues(reflectValue, fieldPaths)
 	}

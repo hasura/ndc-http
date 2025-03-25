@@ -12,6 +12,11 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
+// MultipartFormEncoderOptions hold decode options for the MultipartFormEncoder.
+type MultipartFormEncoderOptions struct {
+	StringifyJSON bool
+}
+
 // MultipartFormEncoder implements a multipart/form encoder.
 type MultipartFormEncoder struct {
 	schema       *rest.NDCHttpSchema
@@ -20,10 +25,10 @@ type MultipartFormEncoder struct {
 	arguments    map[string]any
 }
 
-func NewMultipartFormEncoder(schema *rest.NDCHttpSchema, operation *rest.OperationInfo, arguments map[string]any) *MultipartFormEncoder {
+func NewMultipartFormEncoder(schema *rest.NDCHttpSchema, operation *rest.OperationInfo, arguments map[string]any, options MultipartFormEncoderOptions) *MultipartFormEncoder {
 	return &MultipartFormEncoder{
 		schema:       schema,
-		paramEncoder: NewURLParameterEncoder(schema, operation.Request.RequestBody),
+		paramEncoder: NewURLParameterEncoder(schema, operation.Request.RequestBody, URLParameterEncoderOptions(options)),
 		operation:    operation,
 		arguments:    arguments,
 	}

@@ -294,6 +294,25 @@ procedures:
     result_type:
       name: PetXml
       type: named
+  postPetStringifyJson:
+    request:
+      url: "/pet/stringify-json"
+      method: post
+      security: []
+      requestBody:
+        contentType: application/json
+      response:
+        contentType: application/json
+    arguments:
+      body:
+        type:
+          name: Pet
+          type: named
+        http:
+          in: body
+    result_type:
+      name: Pet
+      type: named
 object_types:
   Pet:
     fields:
@@ -307,6 +326,12 @@ object_types:
         type:
           name: String
           type: named
+      custom_field:
+        type:
+          type: nullable
+          underlying_type:
+            name: JSON
+            type: named
   PetXml:
     fields:
       category:

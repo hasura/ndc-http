@@ -14,15 +14,22 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
+// JSONDecodeOptions hold decode options for the JSONDecoder.
+type JSONDecodeOptions struct {
+	StringifyJSON bool
+}
+
 // JSONDecoder implements a dynamic JSON decoder from the HTTP schema.
 type JSONDecoder struct {
-	schema *rest.NDCHttpSchema
+	schema  *rest.NDCHttpSchema
+	options JSONDecodeOptions
 }
 
 // NewJSONDecoder creates a new JSON encoder.
-func NewJSONDecoder(httpSchema *rest.NDCHttpSchema) *JSONDecoder {
+func NewJSONDecoder(httpSchema *rest.NDCHttpSchema, options JSONDecodeOptions) *JSONDecoder {
 	return &JSONDecoder{
-		schema: httpSchema,
+		schema:  httpSchema,
+		options: options,
 	}
 }
 
@@ -152,7 +159,7 @@ func (c *JSONDecoder) evalScalarType(value any, scalarType schema.ScalarType) (a
 		return utils.DecodeBoolean(value)
 	case *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64:
 		return utils.DecodeFloat[float64](value)
-	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32:
+	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64:
 		return utils.DecodeInt[int64](value)
 	case *schema.TypeRepresentationString:
 		if s, ok := value.(string); ok {
@@ -162,6 +169,17 @@ func (c *JSONDecoder) evalScalarType(value any, scalarType schema.ScalarType) (a
 		reflectType := reflect.ValueOf(value)
 
 		return StringifySimpleScalar(reflectType, reflectType.Kind())
+	case *schema.TypeRepresentationJSON:
+		if c.options.StringifyJSON {
+			jsonBytes, err := json.Marshal(value)
+			if err != nil {
+				return nil, err
+			}
+
+			return string(jsonBytes), nil
+		}
+
+		return value, nil
 	default:
 		return value, nil
 	}

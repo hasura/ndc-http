@@ -70,8 +70,10 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 	}
 
 	var errs map[string][]string
+
 	if schemas == nil {
 		logger.Debug(fmt.Sprintf("output file at %s does not exist. Parsing files...", filepath.Join(configurationDir, config.Output)))
+
 		schemas, errs = configuration.BuildSchemaFromConfig(config, configurationDir, logger)
 		if len(errs) > 0 {
 			printSchemaValidationError(logger, errs)
@@ -82,6 +84,7 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 
 	c.config = config
 	c.upstreams = internal.NewUpstreamManager(c.httpClient, config)
+
 	if err := c.ApplyNDCHttpSchemas(ctx, config, schemas, logger); err != nil {
 		return nil, fmt.Errorf("failed to validate NDC HTTP schema: %w", err)
 	}

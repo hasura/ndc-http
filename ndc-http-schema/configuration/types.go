@@ -25,6 +25,7 @@ type Configuration struct {
 	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 	// Require strict validation
 	Strict         bool                   `json:"strict"                   yaml:"strict"`
+	Runtime        RuntimeSettings        `json:"runtime,omitempty"        yaml:"runtime,omitempty"`
 	ForwardHeaders ForwardHeadersSettings `json:"forwardHeaders,omitempty" yaml:"forwardHeaders,omitempty"`
 	Concurrency    ConcurrencySettings    `json:"concurrency,omitempty"    yaml:"concurrency,omitempty"`
 	Files          []ConfigItem           `json:"files"                    yaml:"files"`
@@ -294,4 +295,10 @@ var httpSingleOptionsArgument = rest.ArgumentInfo{
 		Description: singleObjectType.Description,
 		Type:        schema.NewNullableNamedType(rest.HTTPSingleOptionsObjectName).Encode(),
 	},
+}
+
+// RuntimeSettings hold optional runtime settings.
+type RuntimeSettings struct {
+	// Treat the JSON scalar as a json string
+	StringifyJSON bool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
 }

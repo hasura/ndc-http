@@ -13,6 +13,8 @@ concurrency:
   query: 1
   mutation: 1
   http: 0
+runtime:
+  stringifyJson: true
 files:
   - file: schema.yaml
     spec: ndc

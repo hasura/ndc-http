@@ -117,6 +117,9 @@
           "type": "boolean",
           "description": "Require strict validation"
         },
+        "runtime": {
+          "$ref": "#/$defs/RuntimeSettings"
+        },
         "forwardHeaders": {
           "$ref": "#/$defs/ForwardHeadersSettings"
         },
@@ -241,7 +244,8 @@
           "enum": [
             "merge",
             "json6902"
-          ]
+          ],
+          "default": "merge"
         }
       },
       "additionalProperties": false,
@@ -272,6 +276,17 @@
       "additionalProperties": false,
       "type": "object",
       "description": "RetryPolicySetting represents retry policy settings."
+    },
+    "RuntimeSettings": {
+      "properties": {
+        "stringifyJson": {
+          "type": "boolean",
+          "description": "Treat the JSON scalar as a json string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "RuntimeSettings hold optional runtime settings."
     },
     "SchemaSpecType": {
       "type": "string",

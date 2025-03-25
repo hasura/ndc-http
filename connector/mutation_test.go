@@ -3,10 +3,8 @@ package connector
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/hasura/ndc-http/connector/internal/compression"
@@ -49,9 +47,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 
 			reqBody, err := compressor.Decompress(r.Body)
 			assert.NilError(t, err)
-			rawBytes, err := io.ReadAll(reqBody)
+
+			var expected map[string]any
+			err = json.NewDecoder(reqBody).Decode(&expected)
 			assert.NilError(t, err)
-			assert.Equal(t, strings.TrimSpace(string(rawPostsBody)), strings.TrimSpace(string(rawBytes)))
+			assert.DeepEqual(t, postsBody, expected)
 
 			w.Header().Add(rest.ContentTypeHeader, "application/json")
 			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingGzip)
@@ -88,9 +88,10 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			compressor := compression.DeflateCompressor{}
 			reqBody, err := compressor.Decompress(r.Body)
 			assert.NilError(t, err)
-			rawBytes, err := io.ReadAll(reqBody)
+			var decodedResp any
+			err = json.NewDecoder(reqBody).Decode(&decodedResp)
 			assert.NilError(t, err)
-			assert.Equal(t, strings.TrimSpace(string(rawPostsBody)), strings.TrimSpace(string(rawBytes)))
+			assert.DeepEqual(t, postsBody, decodedResp)
 
 			w.Header().Add(rest.ContentTypeHeader, "application/json")
 			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingDeflate)
@@ -142,56 +143,56 @@ func TestHTTPConnectorCompression(t *testing.T) {
 		})
 	})
 
-	// t.Run("deflate", func(t *testing.T) {
-	// 	rawReqBody, err := json.Marshal(schema.MutationRequest{
-	// 		CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
-	// 		Operations: []schema.MutationOperation{
-	// 			{
-	// 				Type:      schema.MutationOperationProcedure,
-	// 				Name:      "createPostDeflate",
-	// 				Arguments: rawMutationArguments,
-	// 				Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
-	// 					"id":     schema.NewColumnField("id", nil),
-	// 					"title":  schema.NewColumnField("title", nil),
-	// 					"userId": schema.NewColumnField("userId", nil),
-	// 					"body":   schema.NewColumnField("body", nil),
-	// 				}).Encode(),
-	// 			},
-	// 		},
-	// 	})
+	t.Run("deflate", func(t *testing.T) {
+		rawReqBody, err := json.Marshal(schema.MutationRequest{
+			CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
+			Operations: []schema.MutationOperation{
+				{
+					Type:      schema.MutationOperationProcedure,
+					Name:      "createPostDeflate",
+					Arguments: rawMutationArguments,
+					Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
+						"id":     schema.NewColumnField("id", nil),
+						"title":  schema.NewColumnField("title", nil),
+						"userId": schema.NewColumnField("userId", nil),
+						"body":   schema.NewColumnField("body", nil),
+					}).Encode(),
+				},
+			},
+		})
 
-	// 	res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
-	// 	assert.NilError(t, err)
-	// 	assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
-	// 		OperationResults: []schema.MutationOperationResults{
-	// 			schema.NewProcedureResult(postsBody).Encode(),
-	// 		},
-	// 	})
-	// })
+		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
+			OperationResults: []schema.MutationOperationResults{
+				schema.NewProcedureResult(postsBody).Encode(),
+			},
+		})
+	})
 
-	// t.Run("deflate_failure", func(t *testing.T) {
-	// 	rawReqBody, err := json.Marshal(schema.MutationRequest{
-	// 		CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
-	// 		Operations: []schema.MutationOperation{
-	// 			{
-	// 				Type:      schema.MutationOperationProcedure,
-	// 				Name:      "createPostDeflateFailed",
-	// 				Arguments: rawPostsBody,
-	// 				Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
-	// 					"id":     schema.NewColumnField("id", nil),
-	// 					"title":  schema.NewColumnField("title", nil),
-	// 					"userId": schema.NewColumnField("userId", nil),
-	// 					"body":   schema.NewColumnField("body", nil),
-	// 				}).Encode(),
-	// 			},
-	// 		},
-	// 	})
+	t.Run("deflate_failure", func(t *testing.T) {
+		rawReqBody, err := json.Marshal(schema.MutationRequest{
+			CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
+			Operations: []schema.MutationOperation{
+				{
+					Type:      schema.MutationOperationProcedure,
+					Name:      "createPostDeflateFailed",
+					Arguments: rawMutationArguments,
+					Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
+						"id":     schema.NewColumnField("id", nil),
+						"title":  schema.NewColumnField("title", nil),
+						"userId": schema.NewColumnField("userId", nil),
+						"body":   schema.NewColumnField("body", nil),
+					}).Encode(),
+				},
+			},
+		})
 
-	// 	res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
-	// 	assert.NilError(t, err)
-	// 	assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
-	// 		Message: "zlib: invalid header",
-	// 		Details: make(map[string]any),
-	// 	})
-	// })
+		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
+			Message: "zlib: invalid header",
+			Details: make(map[string]any),
+		})
+	})
 }

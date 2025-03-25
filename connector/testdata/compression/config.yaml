@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/hasura/ndc-http/refs/heads/main/ndc-http-schema/jsonschema/configuration.schema.json
+# yaml-language-server: $schema=../../../ndc-http-schema/jsonschema/configuration.schema.json
 strict: true
 forwardHeaders:
   enabled: false
@@ -8,6 +8,8 @@ concurrency:
   query: 1
   mutation: 1
   http: 1
+runtime:
+  stringifyJson: true
 files:
   - file: swagger.json
     spec: openapi2

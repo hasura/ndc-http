@@ -83,7 +83,8 @@
           "enum": [
             "merge",
             "json6902"
-          ]
+          ],
+          "default": "merge"
         }
       },
       "additionalProperties": false,
