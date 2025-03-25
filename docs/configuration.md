@@ -75,3 +75,9 @@ files:
 ```
 
 See [the example](./ndc-http-schema/command/testdata/patch) for more context.
+
+## Runtime Settings
+
+### Stringify JSON (boolean)
+
+This setting treats the arbitrary JSON scalars as a JSON string. This setting is useful for some use case, for example, make the schema compatible with PromptQL.

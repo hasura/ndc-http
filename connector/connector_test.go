@@ -1429,26 +1429,26 @@ func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string, insecure
 		}
 	})
 
-	// load CA certificate file and add it to list of client CAs
-	caCertFile, err := os.ReadFile(filepath.Join(dir, "ca.crt"))
-	if err != nil {
-		log.Fatalf("error reading CA certificate: %v", err)
-	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCertFile)
+	var tlsConfig *tls.Config
 
-	// Create the TLS Config with the CA pool and enable Client certificate validation
-	cert, err := tls.LoadX509KeyPair(filepath.Join(dir, "server.crt"), filepath.Join(dir, "server.key"))
-	assert.NilError(t, err)
+	if !insecure {
+		// load CA certificate file and add it to list of client CAs
+		caCertFile, err := os.ReadFile(filepath.Join(dir, "ca.crt"))
+		if err != nil {
+			log.Fatalf("error reading CA certificate: %v", err)
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCertFile)
 
-	tlsConfig := &tls.Config{
-		ClientCAs:    caCertPool,
-		Certificates: []tls.Certificate{cert},
-		ClientAuth:   tls.RequireAndVerifyClientCert,
-	}
+		// Create the TLS Config with the CA pool and enable Client certificate validation
+		cert, err := tls.LoadX509KeyPair(filepath.Join(dir, "server.crt"), filepath.Join(dir, "server.key"))
+		assert.NilError(t, err)
 
-	if insecure {
-		tlsConfig.ClientAuth = tls.NoClientCert
+		tlsConfig = &tls.Config{
+			ClientCAs:    caCertPool,
+			Certificates: []tls.Certificate{cert},
+			ClientAuth:   tls.RequireAndVerifyClientCert,
+		}
 	}
 
 	server := httptest.NewUnstartedServer(mux)
