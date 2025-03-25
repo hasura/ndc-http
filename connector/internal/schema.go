@@ -101,8 +101,8 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, forwardHeaderConf
 }
 
 // ApplyPromptQLSettingsToSchema applies settings to the connector schema to be compatible with PromptQL.
-func ApplyPromptQLSettingsToSchema(ndcSchema *schema.SchemaResponse, config configuration.PromptQLSettings) *schema.SchemaResponse {
-	if !config.Compatible {
+func ApplyPromptQLSettingsToSchema(ndcSchema *schema.SchemaResponse, config configuration.RuntimeSettings) *schema.SchemaResponse {
+	if !config.StringifyJSON {
 		return ndcSchema
 	}
 

@@ -19,21 +19,21 @@ import (
 
 // RequestBuilder builds requests to the remote service.
 type RequestBuilder struct {
-	Schema    *rest.NDCHttpSchema
-	Operation *rest.OperationInfo
-	Arguments map[string]any
-	Runtime   rest.RuntimeSettings
-	PromptQL  configuration.PromptQLSettings
+	Schema        *rest.NDCHttpSchema
+	Operation     *rest.OperationInfo
+	Arguments     map[string]any
+	Runtime       rest.RuntimeSettings
+	GlobalRuntime configuration.RuntimeSettings
 }
 
 // NewRequestBuilder creates a new RequestBuilder instance.
-func NewRequestBuilder(restSchema *rest.NDCHttpSchema, operation *rest.OperationInfo, arguments map[string]any, runtime rest.RuntimeSettings, promptQL configuration.PromptQLSettings) *RequestBuilder {
+func NewRequestBuilder(restSchema *rest.NDCHttpSchema, operation *rest.OperationInfo, arguments map[string]any, runtime rest.RuntimeSettings, globalRuntime configuration.RuntimeSettings) *RequestBuilder {
 	return &RequestBuilder{
-		Schema:    restSchema,
-		Operation: operation,
-		Arguments: arguments,
-		Runtime:   runtime,
-		PromptQL:  promptQL,
+		Schema:        restSchema,
+		Operation:     operation,
+		Arguments:     arguments,
+		Runtime:       runtime,
+		GlobalRuntime: globalRuntime,
 	}
 }
 
@@ -122,7 +122,7 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 			return nil
 		case restUtils.IsContentTypeMultipartForm(contentType):
 			r, contentType, err := contenttype.NewMultipartFormEncoder(c.Schema, c.Operation, c.Arguments, contenttype.MultipartFormEncoderOptions{
-				StringifyJSON: c.PromptQL.Compatible,
+				StringifyJSON: c.GlobalRuntime.StringifyJSON,
 			}).Encode(bodyData)
 			if err != nil {
 				return err
@@ -134,7 +134,7 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 			return nil
 		case contentType == rest.ContentTypeFormURLEncoded:
 			r, err := contenttype.NewURLParameterEncoder(c.Schema, rawRequest.RequestBody, contenttype.URLParameterEncoderOptions{
-				StringifyJSON: c.PromptQL.Compatible,
+				StringifyJSON: c.GlobalRuntime.StringifyJSON,
 			}).EncodeFormBody(&bodyInfo, bodyData)
 			if err != nil {
 				return err
@@ -147,7 +147,7 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 			var bodyBytes []byte
 			var err error
 
-			if c.PromptQL.Compatible {
+			if c.GlobalRuntime.StringifyJSON {
 				bodyBytes, err = contenttype.NewJSONEncoder(c.Schema).Encode(bodyData, bodyInfo.Type)
 			} else {
 				var buf bytes.Buffer
@@ -262,7 +262,7 @@ func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(endpoint *url.URL, he
 	queryParams, err := contenttype.NewURLParameterEncoder(c.Schema, &rest.RequestBody{
 		ContentType: rest.ContentTypeFormURLEncoded,
 	}, contenttype.URLParameterEncoderOptions{
-		StringifyJSON: c.PromptQL.Compatible,
+		StringifyJSON: c.GlobalRuntime.StringifyJSON,
 	}).EncodeParameterValues(&rest.ObjectField{
 		ObjectField: schema.ObjectField{
 			Type: argumentInfo.Type,

@@ -3,10 +3,8 @@ package connector
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/hasura/ndc-http/connector/internal/compression"
@@ -90,9 +88,10 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			compressor := compression.DeflateCompressor{}
 			reqBody, err := compressor.Decompress(r.Body)
 			assert.NilError(t, err)
-			rawBytes, err := io.ReadAll(reqBody)
+			var decodedResp any
+			err = json.NewDecoder(reqBody).Decode(&decodedResp)
 			assert.NilError(t, err)
-			assert.Equal(t, strings.TrimSpace(string(rawPostsBody)), strings.TrimSpace(string(rawBytes)))
+			assert.DeepEqual(t, postsBody, decodedResp)
 
 			w.Header().Add(rest.ContentTypeHeader, "application/json")
 			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingDeflate)

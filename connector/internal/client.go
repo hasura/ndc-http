@@ -447,7 +447,7 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 			err = json.NewDecoder(resp.Body).Decode(&result)
 		} else {
 			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema, contenttype.JSONDecodeOptions{
-				StringifyJSON: client.manager.config.PromptQL.Compatible,
+				StringifyJSON: client.manager.config.Runtime.StringifyJSON,
 			}).Decode(resp.Body, resultType)
 		}
 

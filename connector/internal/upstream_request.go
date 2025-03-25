@@ -61,7 +61,7 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 
 	if strings.HasPrefix(operation.Request.URL, "http") {
 		// 4. build the request
-		req, err := NewRequestBuilder(runtimeSchema.NDCHttpSchema, operation, rawArgs, runtimeSchema.Runtime, um.config.PromptQL).Build()
+		req, err := NewRequestBuilder(runtimeSchema.NDCHttpSchema, operation, rawArgs, runtimeSchema.Runtime, um.config.Runtime).Build()
 		if err != nil {
 			return nil, err
 		}

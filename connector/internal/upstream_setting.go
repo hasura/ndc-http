@@ -32,7 +32,7 @@ type UpstreamSetting struct {
 	security        rest.AuthSecurities
 	credentials     map[string]security.Credential
 	argumentPresets *argument.ArgumentPresets
-	promptql        configuration.PromptQLSettings
+	runtime         configuration.RuntimeSettings
 }
 
 func (us *UpstreamSetting) buildRequest(runtimeSchema *configuration.NDCHttpRuntimeSchema, operationName string, operation *rest.OperationInfo, arguments map[string]any, headers map[string]string, servers []string) (*RetryableRequest, error) {
@@ -49,7 +49,7 @@ func (us *UpstreamSetting) buildRequest(runtimeSchema *configuration.NDCHttpRunt
 		}
 	}
 
-	req, err := NewRequestBuilder(runtimeSchema.NDCHttpSchema, operation, arguments, runtimeSchema.Runtime, us.promptql).Build()
+	req, err := NewRequestBuilder(runtimeSchema.NDCHttpSchema, operation, arguments, runtimeSchema.Runtime, us.runtime).Build()
 	if err != nil {
 		return nil, err
 	}

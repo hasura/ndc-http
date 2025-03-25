@@ -25,10 +25,10 @@ type Configuration struct {
 	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 	// Require strict validation
 	Strict         bool                   `json:"strict"                   yaml:"strict"`
+	Runtime        RuntimeSettings        `json:"runtime,omitempty"        yaml:"runtime,omitempty"`
 	ForwardHeaders ForwardHeadersSettings `json:"forwardHeaders,omitempty" yaml:"forwardHeaders,omitempty"`
 	Concurrency    ConcurrencySettings    `json:"concurrency,omitempty"    yaml:"concurrency,omitempty"`
 	Files          []ConfigItem           `json:"files"                    yaml:"files"`
-	PromptQL       PromptQLSettings       `json:"promptql,omitempty"       yaml:"promptql,omitempty"`
 }
 
 // ConcurrencySettings represent settings for concurrent webhook executions to remote servers.
@@ -297,7 +297,8 @@ var httpSingleOptionsArgument = rest.ArgumentInfo{
 	},
 }
 
-// PromptQLSettings hold optional PromptQL settings.
-type PromptQLSettings struct {
-	Compatible bool `json:"compatible,omitempty" yaml:"compatible,omitempty"`
+// RuntimeSettings hold optional runtime settings.
+type RuntimeSettings struct {
+	// Treat the JSON scalar as a json string
+	StringifyJSON bool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
 }

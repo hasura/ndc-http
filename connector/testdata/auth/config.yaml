@@ -13,8 +13,8 @@ concurrency:
   query: 1
   mutation: 1
   http: 0
-promptql:
-  compatible: true
+runtime:
+  stringifyJson: true
 files:
   - file: schema.yaml
     spec: ndc

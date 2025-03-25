@@ -8,8 +8,8 @@ concurrency:
   query: 1
   mutation: 1
   http: 1
-promptql:
-  compatible: true
+runtime:
+  stringifyJson: true
 files:
   - file: swagger.json
     spec: openapi2

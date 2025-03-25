@@ -117,6 +117,9 @@
           "type": "boolean",
           "description": "Require strict validation"
         },
+        "runtime": {
+          "$ref": "#/$defs/RuntimeSettings"
+        },
         "forwardHeaders": {
           "$ref": "#/$defs/ForwardHeadersSettings"
         },
@@ -128,9 +131,6 @@
             "$ref": "#/$defs/ConfigItem"
           },
           "type": "array"
-        },
-        "promptql": {
-          "$ref": "#/$defs/PromptQLSettings"
         }
       },
       "additionalProperties": false,
@@ -254,16 +254,6 @@
         "strategy"
       ]
     },
-    "PromptQLSettings": {
-      "properties": {
-        "compatible": {
-          "type": "boolean"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "description": "PromptQLSettings hold optional PromptQL settings."
-    },
     "RetryPolicySetting": {
       "properties": {
         "times": {
@@ -285,6 +275,17 @@
       "additionalProperties": false,
       "type": "object",
       "description": "RetryPolicySetting represents retry policy settings."
+    },
+    "RuntimeSettings": {
+      "properties": {
+        "stringifyJson": {
+          "type": "boolean",
+          "description": "Treat the JSON scalar as a json string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "RuntimeSettings hold optional runtime settings."
     },
     "SchemaSpecType": {
       "type": "string",
