@@ -796,10 +796,11 @@ func TestCreateFormURLEncoded(t *testing.T) {
 								"missing_payment_method": "cancel"
 							}
 						}
-					}
+					},
+					"metadata": "{\"foo\":\"bar\"}"
 				}
 			}`,
-			Expected: "automatic_tax[enabled]=false&automatic_tax[liability][type]=self&subscription_data[description]=nyxWwjZ0JY&subscription_data[invoice_settings][issuer][type]=self&subscription_data[trial_period_days]=27623&subscription_data[trial_settings][end_behavior][missing_payment_method]=cancel",
+			Expected: "automatic_tax[enabled]=false&automatic_tax[liability][type]=self&metadata[foo]=bar&subscription_data[description]=nyxWwjZ0JY&subscription_data[invoice_settings][issuer][type]=self&subscription_data[trial_period_days]=27623&subscription_data[trial_settings][end_behavior][missing_payment_method]=cancel",
 		},
 	}
 

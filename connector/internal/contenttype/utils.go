@@ -49,3 +49,24 @@ func StringifySimpleScalar(val reflect.Value, kind reflect.Kind) (string, error)
 		return string(j), nil
 	}
 }
+
+func evalObjectJSONValue(value any, stringifyJSON bool) (map[string]any, bool) {
+	object, ok := value.(map[string]any)
+	if ok || !stringifyJSON {
+		return object, ok
+	}
+
+	str, ok := value.(string)
+	if !ok || str == "" {
+		return nil, false
+	}
+
+	var obj map[string]any
+
+	err := json.Unmarshal([]byte(str), &obj)
+	if err != nil {
+		return nil, false
+	}
+
+	return obj, true
+}

@@ -78,6 +78,7 @@ func ReadConfigurationFile(configurationDir string) (*Configuration, error) {
 		if !os.IsNotExist(err) {
 			return nil, err
 		}
+
 		yamlBytes, err = os.ReadFile(configurationDir + "/config.yml")
 	}
 

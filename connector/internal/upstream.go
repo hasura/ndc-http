@@ -29,17 +29,26 @@ type UpstreamManager struct {
 	upstreams     map[string]UpstreamSetting
 	compressors   *compression.Compressors
 	propagator    propagation.TextMapPropagator
+
+	RuntimeSettings configuration.RuntimeSettings
 }
 
 // NewUpstreamManager creates a new UpstreamManager instance.
-func NewUpstreamManager(httpClient *http.Client, config *configuration.Configuration) *UpstreamManager {
+func NewUpstreamManager(httpClient *http.Client, config *configuration.Configuration) (*UpstreamManager, error) {
+	runtimeSettings, err := config.Runtime.Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	return &UpstreamManager{
 		config:        config,
 		defaultClient: httpClient,
 		upstreams:     make(map[string]UpstreamSetting),
 		compressors:   compression.NewCompressors(),
 		propagator:    otel.GetTextMapPropagator(),
-	}
+
+		RuntimeSettings: *runtimeSettings,
+	}, nil
 }
 
 // Register evaluates and registers an upstream from config.
@@ -65,7 +74,7 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 		security:   runtimeSchema.Settings.Security,
 		headers:    um.getHeadersFromEnv(logger, namespace, runtimeSchema.Settings.Headers),
 		httpClient: httpClient,
-		runtime:    um.config.Runtime,
+		runtime:    um.RuntimeSettings,
 	}
 
 	if len(runtimeSchema.Settings.ArgumentPresets) > 0 {

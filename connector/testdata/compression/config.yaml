@@ -9,7 +9,8 @@ concurrency:
   mutation: 1
   http: 1
 runtime:
-  stringifyJson: true
+  stringifyJson:
+    env: HTTP_STRINGIFY_JSON
 files:
   - file: swagger.json
     spec: openapi2

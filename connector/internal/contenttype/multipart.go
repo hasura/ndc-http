@@ -72,6 +72,7 @@ func (mfb *MultipartFormEncoder) evalMultipartForm(w *MultipartWriter, bodyInfo 
 		if !ok {
 			return fmt.Errorf("%s: %w", rest.BodyKey, errArgumentRequired)
 		}
+
 		bodyObject, ok := mfb.schema.ObjectTypes[bodyType.Name]
 		if !ok {
 			break
@@ -135,14 +136,17 @@ func (mfb *MultipartFormEncoder) evalMultipartForm(w *MultipartWriter, bodyInfo 
 func (mfb *MultipartFormEncoder) evalMultipartFieldValueRecursive(w *MultipartWriter, name string, value reflect.Value, fieldInfo *rest.ObjectField, enc *rest.EncodingObject) error {
 	underlyingValue, notNull := utils.UnwrapPointerFromReflectValue(value)
 	argTypeT, err := fieldInfo.Type.InterfaceT()
+
 	switch argType := argTypeT.(type) {
 	case *schema.ArrayType:
 		if !notNull {
 			return fmt.Errorf("%s: %w", name, errArgumentRequired)
 		}
+
 		if enc != nil && slices.Contains(enc.ContentType, rest.ContentTypeJSON) {
 			var headers http.Header
 			var err error
+
 			if len(enc.Headers) > 0 {
 				headers, err = mfb.evalEncodingHeaders(enc.Headers)
 				if err != nil {
@@ -159,6 +163,7 @@ func (mfb *MultipartFormEncoder) evalMultipartFieldValueRecursive(w *MultipartWr
 
 		for i := range value.Len() {
 			elem := value.Index(i)
+
 			err := mfb.evalMultipartFieldValueRecursive(w, name+"[]", elem, &rest.ObjectField{
 				ObjectField: schema.ObjectField{
 					Type: argType.ElementType,
@@ -186,6 +191,7 @@ func (mfb *MultipartFormEncoder) evalMultipartFieldValueRecursive(w *MultipartWr
 		if !notNull {
 			return fmt.Errorf("%s: %w", name, errArgumentRequired)
 		}
+
 		var headers http.Header
 		var err error
 		if enc != nil && len(enc.Headers) > 0 {
@@ -286,9 +292,9 @@ func (c *MultipartFormEncoder) EncodeArbitrary(bodyData any) ([]byte, string, er
 	buffer := new(bytes.Buffer)
 	writer := NewMultipartWriter(buffer)
 
-	reflectValue, ok := utils.UnwrapPointerFromReflectValue(reflect.ValueOf(bodyData))
+	reflectValue, ok := utils.UnwrapPointerFromAnyToReflectValue(bodyData)
 	if ok {
-		valueMap, ok := reflectValue.Interface().(map[string]any)
+		valueMap, ok := evalObjectJSONValue(reflectValue.Interface(), c.paramEncoder.options.StringifyJSON)
 		if !ok {
 			return nil, "", fmt.Errorf("invalid body for multipart/form, expected object, got: %s", reflectValue.Kind())
 		}
