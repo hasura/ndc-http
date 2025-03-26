@@ -23,6 +23,8 @@ func TestRawHTTPRequest(t *testing.T) {
 }
 
 func TestHTTPConnectorCompression(t *testing.T) {
+	t.Setenv("HTTP_STRINGIFY_JSON", "true")
+
 	postsBody := map[string]any{
 		"id":     float64(101),
 		"title":  "Hello world",

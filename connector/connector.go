@@ -83,9 +83,12 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 	}
 
 	c.config = config
-	c.upstreams = internal.NewUpstreamManager(c.httpClient, config)
+	c.upstreams, err = internal.NewUpstreamManager(c.httpClient, config)
+	if err != nil {
+		return nil, err
+	}
 
-	if err := c.ApplyNDCHttpSchemas(ctx, config, schemas, logger); err != nil {
+	if err := c.ApplyNDCHttpSchemas(ctx, schemas, logger); err != nil {
 		return nil, fmt.Errorf("failed to validate NDC HTTP schema: %w", err)
 	}
 

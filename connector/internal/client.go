@@ -443,11 +443,26 @@ func (client *HTTPClient) evalHTTPResponse(ctx context.Context, span trace.Span,
 
 		var result any
 		var err error
+
 		if client.requests.Schema == nil || client.requests.Schema.NDCHttpSchema == nil {
+			if client.manager.RuntimeSettings.StringifyJSON {
+				// read, validate the json string and returns the raw value
+				resultBytes, err := io.ReadAll(resp.Body)
+				if err != nil {
+					return nil, schema.NewConnectorError(http.StatusInternalServerError, err.Error(), nil)
+				}
+
+				if len(resultBytes) == 0 {
+					return nil, nil
+				}
+
+				return string(resultBytes), nil
+			}
+
 			err = json.NewDecoder(resp.Body).Decode(&result)
 		} else {
 			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema, contenttype.JSONDecodeOptions{
-				StringifyJSON: client.manager.config.Runtime.StringifyJSON,
+				StringifyJSON: client.manager.RuntimeSettings.StringifyJSON,
 			}).Decode(resp.Body, resultType)
 		}
 

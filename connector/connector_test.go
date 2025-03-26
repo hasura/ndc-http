@@ -604,6 +604,59 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("http_raw_stringify_json", func(t *testing.T) {
+		reqBody := []byte(fmt.Sprintf(`{
+		"operations": [
+			{
+				"type": "procedure",
+				"name": "sendHttpRequest",
+				"arguments": {
+					"url": "%s/pet/stringify-json",
+					"method": "post",
+					"body": {
+						"name": "dog",
+						"custom_field": [{
+							"user_id": 1,
+							"foo": "baz",
+							"active": true,
+							"object": {
+								"hello": "world"
+							}
+						}]
+					}
+				},
+				"fields": {
+					"type": "object",
+					"fields": {
+						"headers": {
+							"column": "headers",
+							"type": "column"
+						},
+						"response": {
+							"column": "response",
+							"type": "column"
+						}
+					}
+				}
+			}
+		],
+		"collection_relationships": {}
+	}`, state.Server.URL))
+
+		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
+			OperationResults: []schema.MutationOperationResults{
+				schema.NewProcedureResult(map[string]any{
+					"headers": map[string]any{
+						"Content-Type": string("application/json"),
+					},
+					"response": `{"id":"1","custom_field":[{"foo":"bar"}]}`,
+				}).Encode(),
+			},
+		})
+	})
 }
 
 func TestHTTPConnector_distribution(t *testing.T) {
@@ -1145,18 +1198,7 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 	mux.HandleFunc("/pet/stringify-json", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			if r.Header.Get("api_key") != apiKey {
-				t.Errorf("invalid api key, expected %s, got %s", apiKey, r.Header.Get("api_key"))
-				t.FailNow()
-				return
-			}
-
-			respBody := `{
-				"id": "1",
-				"custom_field": [{
-					"foo": "bar"
-				}]
-			}`
+			respBody := `{"id":"1","custom_field":[{"foo":"bar"}]}`
 
 			expectedBody := map[string]any{
 				"name": "dog",

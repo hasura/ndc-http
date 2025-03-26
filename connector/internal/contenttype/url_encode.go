@@ -425,7 +425,7 @@ func (c *URLParameterEncoder) evalRequestBody(bodyType schema.Type, bodyData ref
 			return nil, nil, fmt.Errorf("%s: %w", "body", errArgumentRequired)
 		}
 
-		object, ok := reflectValue.Interface().(map[string]any)
+		object, ok := evalObjectJSONValue(reflectValue.Interface(), c.options.StringifyJSON)
 		if !ok {
 			return nil, nil, errURLEncodedBodyObjectRequired
 		}

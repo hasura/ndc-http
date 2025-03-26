@@ -25,7 +25,7 @@ type Configuration struct {
 	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 	// Require strict validation
 	Strict         bool                   `json:"strict"                   yaml:"strict"`
-	Runtime        RuntimeSettings        `json:"runtime,omitempty"        yaml:"runtime,omitempty"`
+	Runtime        RawRuntimeSettings     `json:"runtime,omitempty"        yaml:"runtime,omitempty"`
 	ForwardHeaders ForwardHeadersSettings `json:"forwardHeaders,omitempty" yaml:"forwardHeaders,omitempty"`
 	Concurrency    ConcurrencySettings    `json:"concurrency,omitempty"    yaml:"concurrency,omitempty"`
 	Files          []ConfigItem           `json:"files"                    yaml:"files"`
@@ -297,8 +297,30 @@ var httpSingleOptionsArgument = rest.ArgumentInfo{
 	},
 }
 
+// RawRuntimeSettings hold raw runtime settings.
+type RawRuntimeSettings struct {
+	// Treat the JSON scalar as a json string
+	StringifyJSON *utils.EnvBool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
+}
+
 // RuntimeSettings hold optional runtime settings.
 type RuntimeSettings struct {
 	// Treat the JSON scalar as a json string
 	StringifyJSON bool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
+}
+
+// Validate validates and returns validated settings.
+func (rs RawRuntimeSettings) Validate() (*RuntimeSettings, error) {
+	result := RuntimeSettings{}
+
+	if rs.StringifyJSON != nil {
+		stringifyJson, err := rs.StringifyJSON.GetOrDefault(false)
+		if err != nil {
+			return nil, fmt.Errorf("stringifyJson: %w", err)
+		}
+
+		result.StringifyJSON = stringifyJson
+	}
+
+	return &result, nil
 }

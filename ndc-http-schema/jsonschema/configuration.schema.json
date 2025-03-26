@@ -118,7 +118,7 @@
           "description": "Require strict validation"
         },
         "runtime": {
-          "$ref": "#/$defs/RuntimeSettings"
+          "$ref": "#/$defs/RawRuntimeSettings"
         },
         "forwardHeaders": {
           "$ref": "#/$defs/ForwardHeadersSettings"
@@ -140,6 +140,32 @@
         "files"
       ],
       "description": "Configuration contains required settings for the connector."
+    },
+    "EnvBool": {
+      "anyOf": [
+        {
+          "required": [
+            "value"
+          ],
+          "title": "value"
+        },
+        {
+          "required": [
+            "env"
+          ],
+          "title": "env"
+        }
+      ],
+      "properties": {
+        "value": {
+          "type": "boolean"
+        },
+        "env": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
     },
     "EnvInt": {
       "anyOf": [
@@ -255,6 +281,17 @@
         "strategy"
       ]
     },
+    "RawRuntimeSettings": {
+      "properties": {
+        "stringifyJson": {
+          "$ref": "#/$defs/EnvBool",
+          "description": "Treat the JSON scalar as a json string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "RawRuntimeSettings hold raw runtime settings."
+    },
     "RetryPolicySetting": {
       "properties": {
         "times": {
@@ -276,17 +313,6 @@
       "additionalProperties": false,
       "type": "object",
       "description": "RetryPolicySetting represents retry policy settings."
-    },
-    "RuntimeSettings": {
-      "properties": {
-        "stringifyJson": {
-          "type": "boolean",
-          "description": "Treat the JSON scalar as a json string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "description": "RuntimeSettings hold optional runtime settings."
     },
     "SchemaSpecType": {
       "type": "string",
