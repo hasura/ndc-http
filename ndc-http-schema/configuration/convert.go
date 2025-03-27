@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -41,8 +40,9 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 	case schema.OpenAPIv2Spec, (schema.OAS2Spec):
 		result, errs = openapi.OpenAPIv2ToNDCSchema(rawContent, options)
 	case schema.NDCSpec:
-		if err := json.Unmarshal(rawContent, &result); err != nil {
-			return nil, err
+		result, err = openapi.BuildNDCSchema(rawContent, options)
+		if err != nil {
+			errs = append(errs, err)
 		}
 	default:
 		return nil, fmt.Errorf("invalid spec %s, expected %+v", config.Spec, []schema.SchemaSpecType{schema.OpenAPIv3Spec, schema.OpenAPIv2Spec, schema.OAS3Spec, schema.OAS2Spec, schema.NDCSpec})
