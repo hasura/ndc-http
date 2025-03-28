@@ -607,7 +607,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "UserAddress",
+              "name": "UserAddressObject",
               "type": "named"
             }
           }
@@ -616,7 +616,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "UserCompany",
+              "name": "UserCompanyObject",
               "type": "named"
             }
           }
@@ -677,7 +677,29 @@
         }
       }
     },
-    "UserAddress": {
+    "UserAddressGeoObject": {
+      "fields": {
+        "lat": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "lng": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      }
+    },
+    "UserAddressObject": {
       "fields": {
         "city": {
           "type": {
@@ -692,7 +714,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "UserAddressGeo",
+              "name": "UserAddressGeoObject",
               "type": "named"
             }
           }
@@ -726,29 +748,7 @@
         }
       }
     },
-    "UserAddressGeo": {
-      "fields": {
-        "lat": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          }
-        },
-        "lng": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          }
-        }
-      }
-    },
-    "UserCompany": {
+    "UserCompanyObject": {
       "fields": {
         "bs": {
           "type": {

@@ -150,7 +150,8 @@ func (oc *OAS2Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v2.
 	pathKey := pathItem.Key()
 	pathValue := pathItem.Value()
 
-	funcGet, funcName, err := newOAS2OperationBuilder(oc, pathKey, "get").BuildFunction(pathValue.Get, pathValue.Parameters)
+	funcGet, funcName, err := newOAS2OperationBuilder(oc, pathKey, "get").
+		BuildFunction(pathValue.Get, pathValue.Parameters)
 	if err != nil {
 		return err
 	}

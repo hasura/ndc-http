@@ -8,7 +8,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "GETBrowsersStats",
+              "name": "GETBrowsersStatsAggregatedByEnum",
               "type": "named"
             }
           }
@@ -74,7 +74,7 @@
       "name": "GET_browsers_stats",
       "result_type": {
         "element_type": {
-          "name": "GETBrowsersStatsResult",
+          "name": "GETBrowsersStatsResultObject",
           "type": "named"
         },
         "type": "array"
@@ -102,7 +102,7 @@
       "description": "GET /contactdb/lists/{list_id}/recipients",
       "name": "GET_contactdb_lists_list_id_recipients",
       "result_type": {
-        "name": "GETContactdbListsListIdRecipientsResult",
+        "name": "GETContactdbListsListIdRecipientsResultObject",
         "type": "named"
       }
     },
@@ -122,7 +122,7 @@
       "name": "GET_geo_stats",
       "result_type": {
         "element_type": {
-          "name": "GETGeoStatsResult",
+          "name": "GETGeoStatsResultObject",
           "type": "named"
         },
         "type": "array"
@@ -538,7 +538,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "ContactdbCustomFieldType",
+              "name": "ContactdbCustomFieldTypeEnum",
               "type": "named"
             }
           }
@@ -562,7 +562,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "ContactdbRecipientRecipients",
+                "name": "ContactdbRecipientRecipientsObject",
                 "type": "named"
               },
               "type": "array"
@@ -571,7 +571,7 @@
         }
       }
     },
-    "ContactdbRecipientRecipients": {
+    "ContactdbRecipientRecipientsObject": {
       "fields": {
         "custom_fields": {
           "description": "The custom fields assigned to this recipient and their values.",
@@ -624,7 +624,7 @@
         "dns": {
           "description": "The DNS records for this authenticated domain.",
           "type": {
-            "name": "DomainAuthenticationDomainSpfDns",
+            "name": "DomainAuthenticationDomainSpfDnsObject",
             "type": "named"
           }
         },
@@ -692,40 +692,7 @@
         }
       }
     },
-    "DomainAuthenticationDomainSpfDns": {
-      "description": "The DNS records for this authenticated domain.",
-      "fields": {
-        "dkim": {
-          "description": "The DKIM record for messages sent using this authenticated domain.",
-          "type": {
-            "name": "DomainAuthenticationDomainSpfDnsDkim",
-            "type": "named"
-          }
-        },
-        "domain_spf": {
-          "description": "The SPF record for the root domain.",
-          "type": {
-            "name": "DomainAuthenticationDomainSpfDnsDomainSpf",
-            "type": "named"
-          }
-        },
-        "mail_server": {
-          "description": "Designates which mail server is responsible for accepting messages from a domain.",
-          "type": {
-            "name": "DomainAuthenticationDomainSpfDnsMailServer",
-            "type": "named"
-          }
-        },
-        "subdomain_spf": {
-          "description": "The SPF record for the subdomain used to create this authenticated domain.",
-          "type": {
-            "name": "DomainAuthenticationDomainSpfDnsSubdomainSpf",
-            "type": "named"
-          }
-        }
-      }
-    },
-    "DomainAuthenticationDomainSpfDnsDkim": {
+    "DomainAuthenticationDomainSpfDnsDkimObject": {
       "description": "The DKIM record for messages sent using this authenticated domain.",
       "fields": {
         "data": {
@@ -758,7 +725,7 @@
         }
       }
     },
-    "DomainAuthenticationDomainSpfDnsDomainSpf": {
+    "DomainAuthenticationDomainSpfDnsDomainSpfObject": {
       "description": "The SPF record for the root domain.",
       "fields": {
         "data": {
@@ -791,7 +758,7 @@
         }
       }
     },
-    "DomainAuthenticationDomainSpfDnsMailServer": {
+    "DomainAuthenticationDomainSpfDnsMailServerObject": {
       "description": "Designates which mail server is responsible for accepting messages from a domain.",
       "fields": {
         "data": {
@@ -824,7 +791,40 @@
         }
       }
     },
-    "DomainAuthenticationDomainSpfDnsSubdomainSpf": {
+    "DomainAuthenticationDomainSpfDnsObject": {
+      "description": "The DNS records for this authenticated domain.",
+      "fields": {
+        "dkim": {
+          "description": "The DKIM record for messages sent using this authenticated domain.",
+          "type": {
+            "name": "DomainAuthenticationDomainSpfDnsDkimObject",
+            "type": "named"
+          }
+        },
+        "domain_spf": {
+          "description": "The SPF record for the root domain.",
+          "type": {
+            "name": "DomainAuthenticationDomainSpfDnsDomainSpfObject",
+            "type": "named"
+          }
+        },
+        "mail_server": {
+          "description": "Designates which mail server is responsible for accepting messages from a domain.",
+          "type": {
+            "name": "DomainAuthenticationDomainSpfDnsMailServerObject",
+            "type": "named"
+          }
+        },
+        "subdomain_spf": {
+          "description": "The SPF record for the subdomain used to create this authenticated domain.",
+          "type": {
+            "name": "DomainAuthenticationDomainSpfDnsSubdomainSpfObject",
+            "type": "named"
+          }
+        }
+      }
+    },
+    "DomainAuthenticationDomainSpfDnsSubdomainSpfObject": {
       "description": "The SPF record for the subdomain used to create this authenticated domain.",
       "fields": {
         "data": {
@@ -857,7 +857,7 @@
         }
       }
     },
-    "GETBrowsersStatsResult": {
+    "GETBrowsersStatsResultObject": {
       "fields": {
         "date": {
           "description": "The date that the statistics were gathered.",
@@ -875,7 +875,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "GETBrowsersStatsResultStats",
+                "name": "GETBrowsersStatsResultStatsObject",
                 "type": "named"
               },
               "type": "array"
@@ -884,7 +884,7 @@
         }
       }
     },
-    "GETBrowsersStatsResultStats": {
+    "GETBrowsersStatsResultStatsObject": {
       "fields": {
         "metrics": {
           "description": "The individual events and their stats.",
@@ -918,7 +918,7 @@
         }
       }
     },
-    "GETContactdbListsListIdRecipientsResult": {
+    "GETContactdbListsListIdRecipientsResultObject": {
       "fields": {
         "recipients": {
           "type": {
@@ -934,7 +934,7 @@
         }
       }
     },
-    "GETGeoStatsResult": {
+    "GETGeoStatsResultObject": {
       "fields": {
         "date": {
           "description": "The date that the statistics were gathered.",
@@ -952,7 +952,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "GETGeoStatsResultStats",
+                "name": "GETGeoStatsResultStatsObject",
                 "type": "named"
               },
               "type": "array"
@@ -961,7 +961,7 @@
         }
       }
     },
-    "GETGeoStatsResultStats": {
+    "GETGeoStatsResultStatsObject": {
       "fields": {
         "metrics": {
           "type": {
@@ -1154,7 +1154,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "OrderStatus",
+              "name": "OrderStatusEnum",
               "type": "named"
             }
           }
@@ -1213,7 +1213,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "OrderStatus",
+              "name": "OrderStatusEnum",
               "type": "named"
             }
           }
@@ -1270,7 +1270,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetStatus",
+              "name": "PetStatusEnum",
               "type": "named"
             }
           }
@@ -1339,7 +1339,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetStatus",
+              "name": "PetStatusEnum",
               "type": "named"
             }
           }
@@ -1879,7 +1879,7 @@
         "type": "boolean"
       }
     },
-    "ContactdbCustomFieldType": {
+    "ContactdbCustomFieldTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1898,7 +1898,7 @@
         "type": "float64"
       }
     },
-    "GETBrowsersStats": {
+    "GETBrowsersStatsAggregatedByEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1931,7 +1931,7 @@
         "type": "json"
       }
     },
-    "OrderStatus": {
+    "OrderStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1943,7 +1943,7 @@
         "type": "enum"
       }
     },
-    "PetStatus": {
+    "PetStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {

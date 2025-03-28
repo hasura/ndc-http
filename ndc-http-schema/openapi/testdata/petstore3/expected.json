@@ -76,7 +76,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "GetInvoicesCollectionMethod",
+              "name": "GetInvoicesCollectionMethodEnum",
               "type": "named"
             }
           },
@@ -242,7 +242,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "GetInvoicesStatus",
+              "name": "GetInvoicesStatusEnum",
               "type": "named"
             }
           },
@@ -281,7 +281,7 @@
       },
       "description": "You can list all invoices, or list the invoices for a specific customer. The invoices are returned sorted by creation date, with the most recently created invoices appearing first.",
       "result_type": {
-        "name": "GetInvoicesResult",
+        "name": "GetInvoicesResultObject",
         "type": "named"
       }
     },
@@ -326,7 +326,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "FindPetsByStatusStatus",
+              "name": "FindPetsByStatusStatusEnum",
               "type": "named"
             }
           },
@@ -417,7 +417,7 @@
       "arguments": {},
       "description": "List all known architectures.",
       "result_type": {
-        "name": "GetArchitecturesResult",
+        "name": "GetArchitecturesResultObject",
         "type": "named"
       }
     },
@@ -578,7 +578,7 @@
         "in": {
           "description": "Where to search and apply a XPath expression: either the list of projects or the list of packages.  Example of a result when `projects` is selected: ```                                      x86_64                        x86_64                Standard OBS instance at build.opensuse.org     This instance delivers the default build targets for OBS.     https://api.opensuse.org/public     ```  Example of a result when `packages` is selected: ```                   ```",
           "type": {
-            "name": "GetSearchXmlIn",
+            "name": "GetSearchXmlInEnum",
             "type": "named"
           },
           "http": {
@@ -648,7 +648,7 @@
       },
       "description": "Search in projects or in packages.",
       "result_type": {
-        "name": "GetSearchXmlResult",
+        "name": "GetSearchXmlResultOneOf",
         "type": "named"
       }
     },
@@ -989,7 +989,7 @@
         "object": {
           "description": "String representing the object's type. Objects of the same type share the same value.",
           "type": {
-            "name": "BillingMeterEventObject",
+            "name": "BillingMeterEventObjectEnum",
             "type": "named"
           },
           "http": {
@@ -1405,7 +1405,94 @@
         "name": "customer"
       }
     },
-    "GetArchitecturesResult": {
+    "GetArchitecturesResultEntryObject": {
+      "fields": {
+        "md5": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "mtime": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "name": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "size": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "xmlValue": {
+          "description": "Value of the xml field",
+          "type": {
+            "name": "String",
+            "type": "named"
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "text": true
+            }
+          }
+        }
+      }
+    },
+    "GetArchitecturesResultObject": {
       "fields": {
         "count": {
           "type": {
@@ -1429,7 +1516,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "GetArchitecturesResultEntry",
+                "name": "GetArchitecturesResultEntryObject",
                 "type": "named"
               },
               "type": "array"
@@ -1519,94 +1606,7 @@
         "name": "directory"
       }
     },
-    "GetArchitecturesResultEntry": {
-      "fields": {
-        "md5": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        },
-        "mtime": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        },
-        "name": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        },
-        "size": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        },
-        "xmlValue": {
-          "description": "Value of the xml field",
-          "type": {
-            "name": "String",
-            "type": "named"
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "text": true
-            }
-          }
-        }
-      }
-    },
-    "GetInvoicesResult": {
+    "GetInvoicesResultObject": {
       "fields": {
         "has_more": {
           "description": "True if this list has another page of items after this one that can be fetched.",
@@ -1623,7 +1623,7 @@
         "object": {
           "description": "String representing the object's type. Objects of the same type share the same value. Always has the value `list`.",
           "type": {
-            "name": "GetInvoicesResultObject",
+            "name": "GetInvoicesResultObjectEnum",
             "type": "named"
           },
           "http": {
@@ -1648,7 +1648,7 @@
         }
       }
     },
-    "GetSearchXmlResult": {
+    "GetSearchXmlResultOneOf": {
       "fields": {
         "matches": {
           "type": {
@@ -1672,7 +1672,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "GetSearchXmlResult1Package",
+                "name": "GetSearchXmlResultOneOf1PackageObject",
                 "type": "named"
               },
               "type": "array"
@@ -1694,7 +1694,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "GetSearchXmlResult0Project",
+                "name": "GetSearchXmlResultOneOf0ProjectObject",
                 "type": "named"
               },
               "type": "array"
@@ -1713,7 +1713,7 @@
         }
       }
     },
-    "GetSearchXmlResult0Project": {
+    "GetSearchXmlResultOneOf0ProjectObject": {
       "fields": {
         "description": {
           "type": {
@@ -1750,7 +1750,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "GetSearchXmlResult0ProjectPerson",
+              "name": "GetSearchXmlResultOneOf0ProjectPersonObject",
               "type": "named"
             }
           },
@@ -1776,7 +1776,7 @@
         }
       }
     },
-    "GetSearchXmlResult0ProjectPerson": {
+    "GetSearchXmlResultOneOf0ProjectPersonObject": {
       "fields": {
         "role": {
           "type": {
@@ -1829,7 +1829,7 @@
         }
       }
     },
-    "GetSearchXmlResult1Package": {
+    "GetSearchXmlResultOneOf1PackageObject": {
       "fields": {
         "description": {
           "type": {
@@ -1993,7 +1993,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "OrderStatus",
+              "name": "OrderStatusEnum",
               "type": "named"
             }
           },
@@ -2106,7 +2106,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "OrderStatus",
+              "name": "OrderStatusEnum",
               "type": "named"
             }
           },
@@ -2208,7 +2208,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetStatus",
+              "name": "PetStatusEnum",
               "type": "named"
             }
           },
@@ -2337,7 +2337,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PetStatus",
+              "name": "PetStatusEnum",
               "type": "named"
             }
           },
@@ -2381,7 +2381,7 @@
         "name": "pet"
       }
     },
-    "PostBillingMeterEventsBodyInput": {
+    "PostBillingMeterEventsBodyInputObject": {
       "fields": {
         "event_name": {
           "description": "The name of the meter event. Corresponds with the `event_name` field on a meter.",
@@ -2466,14 +2466,14 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyAfterExpirationInput": {
+    "PostCheckoutSessionsBodyAfterExpirationInputObject": {
       "description": "Configure actions after a Checkout Session has expired.",
       "fields": {
         "recovery": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyAfterExpirationRecoveryInput",
+              "name": "PostCheckoutSessionsBodyAfterExpirationRecoveryInputObject",
               "type": "named"
             }
           },
@@ -2485,7 +2485,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyAfterExpirationRecoveryInput": {
+    "PostCheckoutSessionsBodyAfterExpirationRecoveryInputObject": {
       "fields": {
         "allow_promotion_codes": {
           "type": {
@@ -2514,7 +2514,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyAutomaticTaxInput": {
+    "PostCheckoutSessionsBodyAutomaticTaxInputObject": {
       "description": "Settings for automatic tax lookup for this session and resulting payments, invoices, and subscriptions.",
       "fields": {
         "enabled": {
@@ -2532,7 +2532,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyAutomaticTaxLiabilityInput",
+              "name": "PostCheckoutSessionsBodyAutomaticTaxLiabilityInputObject",
               "type": "named"
             }
           },
@@ -2544,7 +2544,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyAutomaticTaxLiabilityInput": {
+    "PostCheckoutSessionsBodyAutomaticTaxLiabilityInputObject": {
       "fields": {
         "account": {
           "type": {
@@ -2562,7 +2562,7 @@
         },
         "type": {
           "type": {
-            "name": "PostCheckoutSessionsBodyAutomaticTaxLiabilityType",
+            "name": "PostCheckoutSessionsBodyAutomaticTaxLiabilityTypeEnum",
             "type": "named"
           },
           "http": {
@@ -2573,14 +2573,14 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyConsentCollectionInput": {
+    "PostCheckoutSessionsBodyConsentCollectionInputObject": {
       "description": "Configure fields for the Checkout Session to gather active consent from customers.",
       "fields": {
         "payment_method_reuse_agreement": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementInput",
+              "name": "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementInputObject",
               "type": "named"
             }
           },
@@ -2594,7 +2594,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyConsentCollectionPromotions",
+              "name": "PostCheckoutSessionsBodyConsentCollectionPromotionsEnum",
               "type": "named"
             }
           },
@@ -2608,7 +2608,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyConsentCollectionTermsOfService",
+              "name": "PostCheckoutSessionsBodyConsentCollectionTermsOfServiceEnum",
               "type": "named"
             }
           },
@@ -2620,11 +2620,11 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementInput": {
+    "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementInputObject": {
       "fields": {
         "position": {
           "type": {
-            "name": "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementPosition",
+            "name": "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementPositionEnum",
             "type": "named"
           },
           "http": {
@@ -2635,12 +2635,12 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsDropdownInput": {
+    "PostCheckoutSessionsBodyCustomFieldsDropdownInputObject": {
       "fields": {
         "options": {
           "type": {
             "element_type": {
-              "name": "PostCheckoutSessionsBodyCustomFieldsDropdownOptionsInput",
+              "name": "PostCheckoutSessionsBodyCustomFieldsDropdownOptionsInputObject",
               "type": "named"
             },
             "type": "array"
@@ -2658,7 +2658,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsDropdownOptionsInput": {
+    "PostCheckoutSessionsBodyCustomFieldsDropdownOptionsInputObject": {
       "fields": {
         "label": {
           "type": {
@@ -2686,13 +2686,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsInput": {
+    "PostCheckoutSessionsBodyCustomFieldsInputObject": {
       "fields": {
         "dropdown": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomFieldsDropdownInput",
+              "name": "PostCheckoutSessionsBodyCustomFieldsDropdownInputObject",
               "type": "named"
             }
           },
@@ -2716,7 +2716,7 @@
         },
         "label": {
           "type": {
-            "name": "PostCheckoutSessionsBodyCustomFieldsLabelInput",
+            "name": "PostCheckoutSessionsBodyCustomFieldsLabelInputObject",
             "type": "named"
           },
           "http": {
@@ -2729,7 +2729,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomFieldsNumericInput",
+              "name": "PostCheckoutSessionsBodyCustomFieldsNumericInputObject",
               "type": "named"
             }
           },
@@ -2757,7 +2757,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomFieldsTextInput",
+              "name": "PostCheckoutSessionsBodyCustomFieldsTextInputObject",
               "type": "named"
             }
           },
@@ -2769,7 +2769,7 @@
         },
         "type": {
           "type": {
-            "name": "PostCheckoutSessionsBodyCustomFieldsType",
+            "name": "PostCheckoutSessionsBodyCustomFieldsTypeEnum",
             "type": "named"
           },
           "http": {
@@ -2780,7 +2780,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsLabelInput": {
+    "PostCheckoutSessionsBodyCustomFieldsLabelInputObject": {
       "fields": {
         "custom": {
           "type": {
@@ -2796,7 +2796,7 @@
         },
         "type": {
           "type": {
-            "name": "PostCheckoutSessionsBodyCustomFieldsLabelType",
+            "name": "PostCheckoutSessionsBodyCustomFieldsLabelTypeEnum",
             "type": "named"
           },
           "http": {
@@ -2807,7 +2807,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsNumericInput": {
+    "PostCheckoutSessionsBodyCustomFieldsNumericInputObject": {
       "fields": {
         "maximum_length": {
           "type": {
@@ -2839,7 +2839,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsTextInput": {
+    "PostCheckoutSessionsBodyCustomFieldsTextInputObject": {
       "fields": {
         "maximum_length": {
           "type": {
@@ -2871,7 +2871,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomTextAfterSubmitInput": {
+    "PostCheckoutSessionsBodyCustomTextAfterSubmitAnyOfInputObject": {
       "fields": {
         "message": {
           "type": {
@@ -2887,14 +2887,14 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomTextInput": {
+    "PostCheckoutSessionsBodyCustomTextInputObject": {
       "description": "Display additional text for your customers using custom text.",
       "fields": {
         "after_submit": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomTextAfterSubmitInput",
+              "name": "PostCheckoutSessionsBodyCustomTextAfterSubmitAnyOfInputObject",
               "type": "named"
             }
           },
@@ -2908,7 +2908,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomTextShippingAddressInput",
+              "name": "PostCheckoutSessionsBodyCustomTextShippingAddressAnyOfInputObject",
               "type": "named"
             }
           },
@@ -2922,7 +2922,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomTextSubmitInput",
+              "name": "PostCheckoutSessionsBodyCustomTextSubmitAnyOfInputObject",
               "type": "named"
             }
           },
@@ -2936,7 +2936,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomTextTermsOfServiceAcceptanceInput",
+              "name": "PostCheckoutSessionsBodyCustomTextTermsOfServiceAcceptanceAnyOfInputObject",
               "type": "named"
             }
           },
@@ -2948,7 +2948,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomTextShippingAddressInput": {
+    "PostCheckoutSessionsBodyCustomTextShippingAddressAnyOfInputObject": {
       "fields": {
         "message": {
           "type": {
@@ -2964,7 +2964,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomTextSubmitInput": {
+    "PostCheckoutSessionsBodyCustomTextSubmitAnyOfInputObject": {
       "fields": {
         "message": {
           "type": {
@@ -2980,7 +2980,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomTextTermsOfServiceAcceptanceInput": {
+    "PostCheckoutSessionsBodyCustomTextTermsOfServiceAcceptanceAnyOfInputObject": {
       "fields": {
         "message": {
           "type": {
@@ -2996,14 +2996,14 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyCustomerUpdateInput": {
+    "PostCheckoutSessionsBodyCustomerUpdateInputObject": {
       "description": "Controls what fields on Customer can be updated by the Checkout Session. Can only be provided when `customer` is provided.",
       "fields": {
         "address": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomerUpdateAddress",
+              "name": "PostCheckoutSessionsBodyCustomerUpdateAddressEnum",
               "type": "named"
             }
           },
@@ -3017,7 +3017,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomerUpdateName",
+              "name": "PostCheckoutSessionsBodyCustomerUpdateNameEnum",
               "type": "named"
             }
           },
@@ -3031,7 +3031,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomerUpdateShipping",
+              "name": "PostCheckoutSessionsBodyCustomerUpdateShippingEnum",
               "type": "named"
             }
           },
@@ -3043,7 +3043,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyDiscountsInput": {
+    "PostCheckoutSessionsBodyDiscountsInputObject": {
       "fields": {
         "coupon": {
           "type": {
@@ -3077,14 +3077,14 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyInput": {
+    "PostCheckoutSessionsBodyInputObject": {
       "fields": {
         "after_expiration": {
           "description": "Configure actions after a Checkout Session has expired.",
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyAfterExpirationInput",
+              "name": "PostCheckoutSessionsBodyAfterExpirationInputObject",
               "type": "named"
             }
           },
@@ -3114,7 +3114,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyAutomaticTaxInput",
+              "name": "PostCheckoutSessionsBodyAutomaticTaxInputObject",
               "type": "named"
             }
           },
@@ -3129,7 +3129,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyBillingAddressCollection",
+              "name": "PostCheckoutSessionsBodyBillingAddressCollectionEnum",
               "type": "named"
             }
           },
@@ -3176,7 +3176,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyConsentCollectionInput",
+              "name": "PostCheckoutSessionsBodyConsentCollectionInputObject",
               "type": "named"
             }
           },
@@ -3207,7 +3207,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyCustomFieldsInput",
+                "name": "PostCheckoutSessionsBodyCustomFieldsInputObject",
                 "type": "named"
               },
               "type": "array"
@@ -3229,7 +3229,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomTextInput",
+              "name": "PostCheckoutSessionsBodyCustomTextInputObject",
               "type": "named"
             }
           },
@@ -3260,7 +3260,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomerCreation",
+              "name": "PostCheckoutSessionsBodyCustomerCreationEnum",
               "type": "named"
             }
           },
@@ -3290,7 +3290,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyCustomerUpdateInput",
+              "name": "PostCheckoutSessionsBodyCustomerUpdateInputObject",
               "type": "named"
             }
           },
@@ -3302,7 +3302,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyDiscountsInput",
+                "name": "PostCheckoutSessionsBodyDiscountsInputObject",
                 "type": "named"
               },
               "type": "array"
@@ -3364,7 +3364,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyInvoiceCreationInput",
+              "name": "PostCheckoutSessionsBodyInvoiceCreationInputObject",
               "type": "named"
             }
           },
@@ -3380,7 +3380,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyLineItemsInput",
+                "name": "PostCheckoutSessionsBodyLineItemsInputObject",
                 "type": "named"
               },
               "type": "array"
@@ -3402,7 +3402,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyLocale",
+              "name": "PostCheckoutSessionsBodyLocaleEnum",
               "type": "named"
             }
           },
@@ -3432,7 +3432,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyMode",
+              "name": "PostCheckoutSessionsBodyModeEnum",
               "type": "named"
             }
           },
@@ -3447,7 +3447,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentIntentDataInput",
+              "name": "PostCheckoutSessionsBodyPaymentIntentDataInputObject",
               "type": "named"
             }
           },
@@ -3462,7 +3462,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodCollection",
+              "name": "PostCheckoutSessionsBodyPaymentMethodCollectionEnum",
               "type": "named"
             }
           },
@@ -3493,7 +3493,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsInputObject",
               "type": "named"
             }
           },
@@ -3509,7 +3509,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyPaymentMethodTypes",
+                "name": "PostCheckoutSessionsBodyPaymentMethodTypesEnum",
                 "type": "named"
               },
               "type": "array"
@@ -3531,7 +3531,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPhoneNumberCollectionInput",
+              "name": "PostCheckoutSessionsBodyPhoneNumberCollectionInputObject",
               "type": "named"
             }
           },
@@ -3546,7 +3546,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyRedirectOnCompletion",
+              "name": "PostCheckoutSessionsBodyRedirectOnCompletionEnum",
               "type": "named"
             }
           },
@@ -3577,7 +3577,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySetupIntentDataInput",
+              "name": "PostCheckoutSessionsBodySetupIntentDataInputObject",
               "type": "named"
             }
           },
@@ -3592,7 +3592,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingAddressCollectionInput",
+              "name": "PostCheckoutSessionsBodyShippingAddressCollectionInputObject",
               "type": "named"
             }
           },
@@ -3608,7 +3608,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyShippingOptionsInput",
+                "name": "PostCheckoutSessionsBodyShippingOptionsInputObject",
                 "type": "named"
               },
               "type": "array"
@@ -3630,7 +3630,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySubmitType",
+              "name": "PostCheckoutSessionsBodySubmitTypeEnum",
               "type": "named"
             }
           },
@@ -3645,7 +3645,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySubscriptionDataInput",
+              "name": "PostCheckoutSessionsBodySubscriptionDataInputObject",
               "type": "named"
             }
           },
@@ -3676,7 +3676,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyTaxIdCollectionInput",
+              "name": "PostCheckoutSessionsBodyTaxIdCollectionInputObject",
               "type": "named"
             }
           },
@@ -3691,7 +3691,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyUiMode",
+              "name": "PostCheckoutSessionsBodyUiModeEnum",
               "type": "named"
             }
           },
@@ -3703,7 +3703,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyInvoiceCreationInput": {
+    "PostCheckoutSessionsBodyInvoiceCreationInputObject": {
       "description": "Generate a post-purchase Invoice for one-time payments.",
       "fields": {
         "enabled": {
@@ -3721,7 +3721,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataInput",
+              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataInputObject",
               "type": "named"
             }
           },
@@ -3733,7 +3733,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataCustomFieldsInput": {
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataCustomFieldsAnyOfInputObject": {
       "fields": {
         "name": {
           "type": {
@@ -3761,7 +3761,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataInput": {
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataInputObject": {
       "fields": {
         "account_tax_ids": {
           "type": {
@@ -3791,7 +3791,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataCustomFieldsInput",
+                "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataCustomFieldsAnyOfInputObject",
                 "type": "named"
               },
               "type": "array"
@@ -3842,7 +3842,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerInput",
+              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerInputObject",
               "type": "named"
             }
           },
@@ -3870,7 +3870,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsInput",
+              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAnyOfInputObject",
               "type": "named"
             }
           },
@@ -3882,7 +3882,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerInput": {
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerInputObject": {
       "fields": {
         "account": {
           "type": {
@@ -3900,7 +3900,7 @@
         },
         "type": {
           "type": {
-            "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerType",
+            "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerTypeEnum",
             "type": "named"
           },
           "http": {
@@ -3911,13 +3911,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsInput": {
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAnyOfInputObject": {
       "fields": {
         "amount_tax_display": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAmountTaxDisplay",
+              "name": "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAnyOfAmountTaxDisplayEnum",
               "type": "named"
             }
           },
@@ -3929,7 +3929,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyLineItemsAdjustableQuantityInput": {
+    "PostCheckoutSessionsBodyLineItemsAdjustableQuantityInputObject": {
       "fields": {
         "enabled": {
           "type": {
@@ -3972,13 +3972,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyLineItemsInput": {
+    "PostCheckoutSessionsBodyLineItemsInputObject": {
       "fields": {
         "adjustable_quantity": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyLineItemsAdjustableQuantityInput",
+              "name": "PostCheckoutSessionsBodyLineItemsAdjustableQuantityInputObject",
               "type": "named"
             }
           },
@@ -4030,7 +4030,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyLineItemsPriceDataInput",
+              "name": "PostCheckoutSessionsBodyLineItemsPriceDataInputObject",
               "type": "named"
             }
           },
@@ -4079,7 +4079,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyLineItemsPriceDataInput": {
+    "PostCheckoutSessionsBodyLineItemsPriceDataInputObject": {
       "fields": {
         "currency": {
           "type": {
@@ -4111,7 +4111,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyLineItemsPriceDataProductDataInput",
+              "name": "PostCheckoutSessionsBodyLineItemsPriceDataProductDataInputObject",
               "type": "named"
             }
           },
@@ -4125,7 +4125,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInput",
+              "name": "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInputObject",
               "type": "named"
             }
           },
@@ -4139,7 +4139,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyLineItemsPriceDataTaxBehavior",
+              "name": "PostCheckoutSessionsBodyLineItemsPriceDataTaxBehaviorEnum",
               "type": "named"
             }
           },
@@ -4180,7 +4180,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyLineItemsPriceDataProductDataInput": {
+    "PostCheckoutSessionsBodyLineItemsPriceDataProductDataInputObject": {
       "fields": {
         "description": {
           "type": {
@@ -4262,11 +4262,11 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInput": {
+    "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInputObject": {
       "fields": {
         "interval": {
           "type": {
-            "name": "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInterval",
+            "name": "PostCheckoutSessionsBodyLineItemsPriceDataRecurringIntervalEnum",
             "type": "named"
           },
           "http": {
@@ -4291,7 +4291,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentIntentDataInput": {
+    "PostCheckoutSessionsBodyPaymentIntentDataInputObject": {
       "description": "A subset of parameters to be passed to PaymentIntent creation for Checkout Sessions in `payment` mode.",
       "fields": {
         "application_fee_amount": {
@@ -4312,7 +4312,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentIntentDataCaptureMethod",
+              "name": "PostCheckoutSessionsBodyPaymentIntentDataCaptureMethodEnum",
               "type": "named"
             }
           },
@@ -4383,7 +4383,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentIntentDataSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentIntentDataSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4397,7 +4397,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentIntentDataShippingInput",
+              "name": "PostCheckoutSessionsBodyPaymentIntentDataShippingInputObject",
               "type": "named"
             }
           },
@@ -4441,7 +4441,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentIntentDataTransferDataInput",
+              "name": "PostCheckoutSessionsBodyPaymentIntentDataTransferDataInputObject",
               "type": "named"
             }
           },
@@ -4467,7 +4467,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentIntentDataShippingAddressInput": {
+    "PostCheckoutSessionsBodyPaymentIntentDataShippingAddressInputObject": {
       "fields": {
         "city": {
           "type": {
@@ -4558,11 +4558,11 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentIntentDataShippingInput": {
+    "PostCheckoutSessionsBodyPaymentIntentDataShippingInputObject": {
       "fields": {
         "address": {
           "type": {
-            "name": "PostCheckoutSessionsBodyPaymentIntentDataShippingAddressInput",
+            "name": "PostCheckoutSessionsBodyPaymentIntentDataShippingAddressInputObject",
             "type": "named"
           },
           "http": {
@@ -4630,7 +4630,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentIntentDataTransferDataInput": {
+    "PostCheckoutSessionsBodyPaymentIntentDataTransferDataInputObject": {
       "fields": {
         "amount": {
           "type": {
@@ -4659,7 +4659,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitInputObject": {
       "fields": {
         "affirm": {
           "type": {
@@ -4679,7 +4679,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitCurrency",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitCurrencyEnum",
               "type": "named"
             }
           },
@@ -4693,7 +4693,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsInputObject",
               "type": "named"
             }
           },
@@ -4707,7 +4707,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4721,7 +4721,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitVerificationMethod",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitVerificationMethodEnum",
               "type": "named"
             }
           },
@@ -4733,7 +4733,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsInputObject": {
       "fields": {
         "custom_mandate_url": {
           "type": {
@@ -4754,7 +4754,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsDefaultFor",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsDefaultForEnum",
                 "type": "named"
               },
               "type": "array"
@@ -4790,7 +4790,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsPaymentSchedule",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsPaymentScheduleEnum",
               "type": "named"
             }
           },
@@ -4804,7 +4804,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsTransactionType",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsTransactionTypeEnum",
               "type": "named"
             }
           },
@@ -4816,13 +4816,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4834,13 +4834,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpayInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpayInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpaySetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpaySetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4852,13 +4852,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAlipayInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAlipayInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAlipaySetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAlipaySetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4870,13 +4870,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4888,13 +4888,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4906,13 +4906,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4924,7 +4924,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoInputObject": {
       "fields": {
         "expires_after_days": {
           "type": {
@@ -4944,7 +4944,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -4956,13 +4956,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCardInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCardInputObject": {
       "fields": {
         "installments": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardInstallmentsInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardInstallmentsInputObject",
               "type": "named"
             }
           },
@@ -4976,7 +4976,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardRequestThreeDSecure",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardRequestThreeDSecureEnum",
               "type": "named"
             }
           },
@@ -4990,7 +4990,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5032,7 +5032,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCardInstallmentsInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCardInstallmentsInputObject": {
       "fields": {
         "enabled": {
           "type": {
@@ -5050,13 +5050,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCashappInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCashappInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCashappSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCashappSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5068,7 +5068,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferEuBankTransferInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferEuBankTransferInputObject": {
       "fields": {
         "country": {
           "type": {
@@ -5084,13 +5084,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferInputObject": {
       "fields": {
         "eu_bank_transfer": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferEuBankTransferInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferEuBankTransferInputObject",
               "type": "named"
             }
           },
@@ -5105,7 +5105,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferRequestedAddressTypes",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferRequestedAddressTypesEnum",
                 "type": "named"
               },
               "type": "array"
@@ -5124,7 +5124,7 @@
         },
         "type": {
           "type": {
-            "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferType",
+            "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferTypeEnum",
             "type": "named"
           },
           "http": {
@@ -5135,13 +5135,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceInputObject": {
       "fields": {
         "bank_transfer": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferInputObject",
               "type": "named"
             }
           },
@@ -5155,7 +5155,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceFundingType",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceFundingTypeEnum",
               "type": "named"
             }
           },
@@ -5169,7 +5169,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5181,13 +5181,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsEpsInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsEpsInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsEpsSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsEpsSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5199,13 +5199,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsFpxInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsFpxInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsFpxSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsFpxSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5217,13 +5217,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsGiropayInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsGiropayInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGiropaySetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGiropaySetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5235,13 +5235,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpayInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpayInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpaySetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpaySetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5253,13 +5253,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsIdealInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsIdealInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsIdealSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsIdealSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5271,14 +5271,14 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsInputObject": {
       "description": "Payment-method-specific configuration.",
       "fields": {
         "acss_debit": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitInputObject",
               "type": "named"
             }
           },
@@ -5292,7 +5292,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmInputObject",
               "type": "named"
             }
           },
@@ -5306,7 +5306,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpayInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpayInputObject",
               "type": "named"
             }
           },
@@ -5320,7 +5320,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAlipayInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAlipayInputObject",
               "type": "named"
             }
           },
@@ -5334,7 +5334,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitInputObject",
               "type": "named"
             }
           },
@@ -5348,7 +5348,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitInputObject",
               "type": "named"
             }
           },
@@ -5362,7 +5362,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactInputObject",
               "type": "named"
             }
           },
@@ -5376,7 +5376,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoInputObject",
               "type": "named"
             }
           },
@@ -5390,7 +5390,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCardInputObject",
               "type": "named"
             }
           },
@@ -5404,7 +5404,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCashappInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCashappInputObject",
               "type": "named"
             }
           },
@@ -5418,7 +5418,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceInputObject",
               "type": "named"
             }
           },
@@ -5432,7 +5432,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsEpsInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsEpsInputObject",
               "type": "named"
             }
           },
@@ -5446,7 +5446,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsFpxInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsFpxInputObject",
               "type": "named"
             }
           },
@@ -5460,7 +5460,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGiropayInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGiropayInputObject",
               "type": "named"
             }
           },
@@ -5474,7 +5474,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpayInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpayInputObject",
               "type": "named"
             }
           },
@@ -5488,7 +5488,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsIdealInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsIdealInputObject",
               "type": "named"
             }
           },
@@ -5502,7 +5502,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaInputObject",
               "type": "named"
             }
           },
@@ -5516,7 +5516,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniInputObject",
               "type": "named"
             }
           },
@@ -5530,7 +5530,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsLinkInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsLinkInputObject",
               "type": "named"
             }
           },
@@ -5544,7 +5544,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoInputObject",
               "type": "named"
             }
           },
@@ -5558,7 +5558,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsP24Input",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsP24InputObject",
               "type": "named"
             }
           },
@@ -5572,7 +5572,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowInputObject",
               "type": "named"
             }
           },
@@ -5586,7 +5586,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalInputObject",
               "type": "named"
             }
           },
@@ -5600,7 +5600,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPixInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPixInputObject",
               "type": "named"
             }
           },
@@ -5614,7 +5614,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPayInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPayInputObject",
               "type": "named"
             }
           },
@@ -5628,7 +5628,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitInputObject",
               "type": "named"
             }
           },
@@ -5642,7 +5642,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSofortInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSofortInputObject",
               "type": "named"
             }
           },
@@ -5656,7 +5656,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSwishInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSwishInputObject",
               "type": "named"
             }
           },
@@ -5670,7 +5670,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountInputObject",
               "type": "named"
             }
           },
@@ -5684,7 +5684,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayInputObject",
               "type": "named"
             }
           },
@@ -5696,13 +5696,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5714,7 +5714,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniInputObject": {
       "fields": {
         "expires_after_days": {
           "type": {
@@ -5734,7 +5734,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5746,13 +5746,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsLinkInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsLinkInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsLinkSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsLinkSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5764,7 +5764,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoInputObject": {
       "fields": {
         "expires_after_days": {
           "type": {
@@ -5784,7 +5784,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5796,13 +5796,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsP24Input": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsP24InputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsP24SetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsP24SetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5828,13 +5828,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5846,13 +5846,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalInputObject": {
       "fields": {
         "capture_method": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalCaptureMethod",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalCaptureMethodEnum",
               "type": "named"
             }
           },
@@ -5866,7 +5866,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalPreferredLocale",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalPreferredLocaleEnum",
               "type": "named"
             }
           },
@@ -5910,7 +5910,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5922,7 +5922,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsPixInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPixInputObject": {
       "fields": {
         "expires_after_seconds": {
           "type": {
@@ -5940,13 +5940,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPayInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPayInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPaySetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPaySetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5958,13 +5958,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5976,13 +5976,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsSofortInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsSofortInputObject": {
       "fields": {
         "setup_future_usage": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSofortSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsSofortSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -5994,7 +5994,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsSwishInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsSwishInputObject": {
       "fields": {
         "reference": {
           "type": {
@@ -6013,14 +6013,14 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsInputObject": {
       "fields": {
         "permissions": {
           "type": {
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPermissions",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPermissionsEnum",
                 "type": "named"
               },
               "type": "array"
@@ -6043,7 +6043,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPrefetch",
+                "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPrefetchEnum",
                 "type": "named"
               },
               "type": "array"
@@ -6062,13 +6062,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountInputObject": {
       "fields": {
         "financial_connections": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsInput",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsInputObject",
               "type": "named"
             }
           },
@@ -6082,7 +6082,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountSetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountSetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -6096,7 +6096,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountVerificationMethod",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountVerificationMethodEnum",
               "type": "named"
             }
           },
@@ -6108,7 +6108,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayInput": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayInputObject": {
       "fields": {
         "app_id": {
           "type": {
@@ -6127,7 +6127,7 @@
         },
         "client": {
           "type": {
-            "name": "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayClient",
+            "name": "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayClientEnum",
             "type": "named"
           },
           "http": {
@@ -6140,7 +6140,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPaySetupFutureUsage",
+              "name": "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPaySetupFutureUsageEnum",
               "type": "named"
             }
           },
@@ -6152,7 +6152,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyPhoneNumberCollectionInput": {
+    "PostCheckoutSessionsBodyPhoneNumberCollectionInputObject": {
       "description": "Controls phone number collection settings for the session.  We recommend that you review your privacy policy and check with your legal contacts before using this feature. Learn more about [collecting phone numbers with Checkout](https://stripe.com/docs/payments/checkout/phone-numbers).",
       "fields": {
         "enabled": {
@@ -6168,7 +6168,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodySetupIntentDataInput": {
+    "PostCheckoutSessionsBodySetupIntentDataInputObject": {
       "description": "A subset of parameters to be passed to SetupIntent creation for Checkout Sessions in `setup` mode.",
       "fields": {
         "description": {
@@ -6216,13 +6216,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyShippingAddressCollectionInput": {
+    "PostCheckoutSessionsBodyShippingAddressCollectionInputObject": {
       "description": "When set, provides configuration for Checkout to collect a shipping address from a customer.",
       "fields": {
         "allowed_countries": {
           "type": {
             "element_type": {
-              "name": "PostCheckoutSessionsBodyShippingAddressCollectionAllowedCountries",
+              "name": "PostCheckoutSessionsBodyShippingAddressCollectionAllowedCountriesEnum",
               "type": "named"
             },
             "type": "array"
@@ -6240,7 +6240,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsInput": {
+    "PostCheckoutSessionsBodyShippingOptionsInputObject": {
       "fields": {
         "shipping_rate": {
           "type": {
@@ -6261,7 +6261,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataInput",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataInputObject",
               "type": "named"
             }
           },
@@ -6273,13 +6273,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateInput": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateInputObject": {
       "fields": {
         "maximum": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumInput",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumInputObject",
               "type": "named"
             }
           },
@@ -6293,7 +6293,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumInput",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumInputObject",
               "type": "named"
             }
           },
@@ -6305,11 +6305,11 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumInput": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumInputObject": {
       "fields": {
         "unit": {
           "type": {
-            "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumUnit",
+            "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumUnitEnum",
             "type": "named"
           },
           "http": {
@@ -6331,11 +6331,11 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumInput": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumInputObject": {
       "fields": {
         "unit": {
           "type": {
-            "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumUnit",
+            "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumUnitEnum",
             "type": "named"
           },
           "http": {
@@ -6357,7 +6357,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataFixedAmountInput": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataFixedAmountInputObject": {
       "fields": {
         "amount": {
           "type": {
@@ -6397,13 +6397,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataInput": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataInputObject": {
       "fields": {
         "delivery_estimate": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateInput",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateInputObject",
               "type": "named"
             }
           },
@@ -6429,7 +6429,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataFixedAmountInput",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataFixedAmountInputObject",
               "type": "named"
             }
           },
@@ -6457,7 +6457,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTaxBehavior",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTaxBehaviorEnum",
               "type": "named"
             }
           },
@@ -6485,7 +6485,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataType",
+              "name": "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTypeEnum",
               "type": "named"
             }
           },
@@ -6497,7 +6497,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataInput": {
+    "PostCheckoutSessionsBodySubscriptionDataInputObject": {
       "description": "A subset of parameters to be passed to subscription creation for Checkout Sessions in `subscription` mode.",
       "fields": {
         "application_fee_percent": {
@@ -6571,7 +6571,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsInput",
+              "name": "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsInputObject",
               "type": "named"
             }
           },
@@ -6613,7 +6613,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySubscriptionDataProrationBehavior",
+              "name": "PostCheckoutSessionsBodySubscriptionDataProrationBehaviorEnum",
               "type": "named"
             }
           },
@@ -6627,7 +6627,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySubscriptionDataTransferDataInput",
+              "name": "PostCheckoutSessionsBodySubscriptionDataTransferDataInputObject",
               "type": "named"
             }
           },
@@ -6670,7 +6670,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySubscriptionDataTrialSettingsInput",
+              "name": "PostCheckoutSessionsBodySubscriptionDataTrialSettingsInputObject",
               "type": "named"
             }
           },
@@ -6682,13 +6682,13 @@
         }
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsInput": {
+    "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsInputObject": {
       "fields": {
         "issuer": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerInput",
+              "name": "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerInputObject",
               "type": "named"
             }
           },
@@ -6700,7 +6700,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerInput": {
+    "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerInputObject": {
       "fields": {
         "account": {
           "type": {
@@ -6718,7 +6718,7 @@
         },
         "type": {
           "type": {
-            "name": "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerType",
+            "name": "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerTypeEnum",
             "type": "named"
           },
           "http": {
@@ -6729,7 +6729,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataTransferDataInput": {
+    "PostCheckoutSessionsBodySubscriptionDataTransferDataInputObject": {
       "fields": {
         "amount_percent": {
           "type": {
@@ -6758,11 +6758,11 @@
         }
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorInput": {
+    "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorInputObject": {
       "fields": {
         "missing_payment_method": {
           "type": {
-            "name": "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorMissingPaymentMethod",
+            "name": "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorMissingPaymentMethodEnum",
             "type": "named"
           },
           "http": {
@@ -6773,11 +6773,11 @@
         }
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataTrialSettingsInput": {
+    "PostCheckoutSessionsBodySubscriptionDataTrialSettingsInputObject": {
       "fields": {
         "end_behavior": {
           "type": {
-            "name": "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorInput",
+            "name": "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorInputObject",
             "type": "named"
           },
           "http": {
@@ -6788,7 +6788,7 @@
         }
       }
     },
-    "PostCheckoutSessionsBodyTaxIdCollectionInput": {
+    "PostCheckoutSessionsBodyTaxIdCollectionInputObject": {
       "description": "Controls tax ID collection settings for the session.",
       "fields": {
         "enabled": {
@@ -6804,7 +6804,7 @@
         }
       }
     },
-    "PostFilesBodyFileLinkDataInput": {
+    "PostFilesBodyFileLinkDataInputObject": {
       "description": "Optional parameters that automatically create a [file link](https://stripe.com/docs/api#file_links) for the newly created file.",
       "fields": {
         "create": {
@@ -6845,7 +6845,7 @@
         }
       }
     },
-    "PostFilesBodyInput": {
+    "PostFilesBodyInputObject": {
       "fields": {
         "expand": {
           "description": "Specifies which fields in the response should be expanded.",
@@ -6912,7 +6912,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostFilesBodyFileLinkDataInput",
+              "name": "PostFilesBodyFileLinkDataInputObject",
               "type": "named"
             }
           },
@@ -6925,7 +6925,7 @@
         "purpose": {
           "description": "The [purpose](https://stripe.com/docs/file-upload#uploading-a-file) of the uploaded file.",
           "type": {
-            "name": "PostFilesBodyPurpose",
+            "name": "PostFilesBodyPurposeEnum",
             "type": "named"
           },
           "http": {
@@ -6936,14 +6936,14 @@
         }
       }
     },
-    "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsInput": {
+    "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsInputObject": {
       "description": "Details about a failed InboundTransfer.",
       "fields": {
         "code": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsCode",
+              "name": "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsCodeEnum",
               "type": "named"
             }
           },
@@ -6955,7 +6955,7 @@
         }
       }
     },
-    "PostTestHelpersTreasuryInboundTransfersIdFailBodyInput": {
+    "PostTestHelpersTreasuryInboundTransfersIdFailBodyInputObject": {
       "fields": {
         "expand": {
           "description": "Specifies which fields in the response should be expanded.",
@@ -6986,7 +6986,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsInput",
+              "name": "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsInputObject",
               "type": "named"
             }
           },
@@ -6998,7 +6998,7 @@
         }
       }
     },
-    "PutCommentXmlBodyCommentInput": {
+    "PutCommentXmlBodyCommentInputObject": {
       "fields": {
         "bsrequest": {
           "type": {
@@ -7136,14 +7136,14 @@
         }
       }
     },
-    "PutCommentXmlBodyInput": {
+    "PutCommentXmlBodyInputObject": {
       "fields": {
         "comment": {
           "type": {
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "PutCommentXmlBodyCommentInput",
+                "name": "PutCommentXmlBodyCommentInputObject",
                 "type": "named"
               },
               "type": "array"
@@ -7251,122 +7251,7 @@
         "name": "comments"
       }
     },
-    "PutCommentXmlResult": {
-      "fields": {
-        "comment": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "element_type": {
-                "name": "PutCommentXmlResultComment",
-                "type": "named"
-              },
-              "type": "array"
-            }
-          },
-          "http": {
-            "type": [
-              "array"
-            ],
-            "items": {
-              "type": [
-                "object"
-              ]
-            }
-          }
-        },
-        "comment_count": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "Int32",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "integer"
-            ],
-            "xml": {
-              "name": "comment",
-              "attribute": true
-            }
-          }
-        },
-        "package": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        },
-        "project": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        },
-        "request": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "Int32",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "integer"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        },
-        "user": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": [
-              "string"
-            ],
-            "xml": {
-              "attribute": true
-            }
-          }
-        }
-      },
-      "xml": {
-        "name": "comments"
-      }
-    },
-    "PutCommentXmlResultComment": {
+    "PutCommentXmlResultCommentObject": {
       "fields": {
         "bsrequest": {
           "type": {
@@ -7502,6 +7387,121 @@
             }
           }
         }
+      }
+    },
+    "PutCommentXmlResultObject": {
+      "fields": {
+        "comment": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "PutCommentXmlResultCommentObject",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          },
+          "http": {
+            "type": [
+              "array"
+            ],
+            "items": {
+              "type": [
+                "object"
+              ]
+            }
+          }
+        },
+        "comment_count": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "xml": {
+              "name": "comment",
+              "attribute": true
+            }
+          }
+        },
+        "package": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "project": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "request": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "integer"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        },
+        "user": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ],
+            "xml": {
+              "attribute": true
+            }
+          }
+        }
+      },
+      "xml": {
+        "name": "comments"
       }
     },
     "SnakeObject": {
@@ -7524,7 +7524,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "SnakeObjectId",
+              "name": "SnakeObjectIdObject",
               "type": "named"
             }
           },
@@ -7540,7 +7540,7 @@
       },
       "alias": "snake_object"
     },
-    "SnakeObjectId": {
+    "SnakeObjectIdObject": {
       "fields": {
         "complete": {
           "type": {
@@ -7621,7 +7621,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "SnakeObjectIdStatus",
+              "name": "SnakeObjectIdStatusEnum",
               "type": "named"
             }
           },
@@ -7872,7 +7872,7 @@
         "object": {
           "description": "String representing the object's type. Objects of the same type share the same value.",
           "type": {
-            "name": "TreasuryInboundTransferObject",
+            "name": "TreasuryInboundTransferObjectEnum",
             "type": "named"
           },
           "http": {
@@ -7925,7 +7925,7 @@
         "status": {
           "description": "Status of the InboundTransfer: `processing`, `succeeded`, `failed`, and `canceled`. An InboundTransfer is `processing` if it is created and pending. The status changes to `succeeded` once the funds have been \"confirmed\" and a `transaction` is created and posted. The status changes to `failed` if the transfer fails.",
           "type": {
-            "name": "TreasuryInboundTransferStatus",
+            "name": "TreasuryInboundTransferStatusEnum",
             "type": "named"
           },
           "http": {
@@ -7964,7 +7964,7 @@
         "code": {
           "description": "Reason for the failure.",
           "type": {
-            "name": "TreasuryInboundTransfersResourceFailureDetailsCode",
+            "name": "TreasuryInboundTransfersResourceFailureDetailsCodeEnum",
             "type": "named"
           },
           "http": {
@@ -8029,7 +8029,7 @@
       },
       "alias": "treasury_inbound_transfers_resource_inbound_transfer_resource_status_transitions"
     },
-    "UploadPetMultipartBodyInput": {
+    "UploadPetMultipartBodyInputObject": {
       "fields": {
         "address": {
           "type": {
@@ -8450,7 +8450,7 @@
         "body": {
           "description": "Request body of POST /v1/billing/meter_events",
           "type": {
-            "name": "PostBillingMeterEventsBodyInput",
+            "name": "PostBillingMeterEventsBodyInputObject",
             "type": "named"
           },
           "http": {
@@ -8568,7 +8568,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostCheckoutSessionsBodyInput",
+              "name": "PostCheckoutSessionsBodyInputObject",
               "type": "named"
             }
           },
@@ -8639,7 +8639,7 @@
         "body": {
           "description": "Request body of POST /v1/files",
           "type": {
-            "name": "PostFilesBodyInput",
+            "name": "PostFilesBodyInputObject",
             "type": "named"
           },
           "http": {
@@ -8700,7 +8700,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PostTestHelpersTreasuryInboundTransfersIdFailBodyInput",
+              "name": "PostTestHelpersTreasuryInboundTransfersIdFailBodyInputObject",
               "type": "named"
             }
           },
@@ -9110,7 +9110,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PutCommentXmlBodyInput",
+              "name": "PutCommentXmlBodyInputObject",
               "type": "named"
             }
           },
@@ -9129,7 +9129,7 @@
       },
       "description": "PUT /comment/xml",
       "result_type": {
-        "name": "PutCommentXmlResult",
+        "name": "PutCommentXmlResultObject",
         "type": "named"
       }
     },
@@ -9423,7 +9423,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "UploadPetMultipartBodyInput",
+              "name": "UploadPetMultipartBodyInputObject",
               "type": "named"
             }
           },
@@ -9461,7 +9461,7 @@
     }
   },
   "scalar_types": {
-    "BillingMeterEventObject": {
+    "BillingMeterEventObjectEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9485,7 +9485,7 @@
         "type": "boolean"
       }
     },
-    "FindPetsByStatusStatus": {
+    "FindPetsByStatusStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9504,7 +9504,7 @@
         "type": "float64"
       }
     },
-    "GetInvoicesCollectionMethod": {
+    "GetInvoicesCollectionMethodEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9515,7 +9515,7 @@
         "type": "enum"
       }
     },
-    "GetInvoicesResultObject": {
+    "GetInvoicesResultObjectEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9525,7 +9525,7 @@
         "type": "enum"
       }
     },
-    "GetInvoicesStatus": {
+    "GetInvoicesStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9539,7 +9539,7 @@
         "type": "enum"
       }
     },
-    "GetSearchXmlIn": {
+    "GetSearchXmlInEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9571,7 +9571,7 @@
         "type": "json"
       }
     },
-    "OrderStatus": {
+    "OrderStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9590,7 +9590,7 @@
         "type": "json"
       }
     },
-    "PetStatus": {
+    "PetStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9602,7 +9602,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyAutomaticTaxLiabilityType": {
+    "PostCheckoutSessionsBodyAutomaticTaxLiabilityTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9613,7 +9613,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyBillingAddressCollection": {
+    "PostCheckoutSessionsBodyBillingAddressCollectionEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9624,7 +9624,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementPosition": {
+    "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementPositionEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9635,7 +9635,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyConsentCollectionPromotions": {
+    "PostCheckoutSessionsBodyConsentCollectionPromotionsEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9646,7 +9646,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyConsentCollectionTermsOfService": {
+    "PostCheckoutSessionsBodyConsentCollectionTermsOfServiceEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9657,7 +9657,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsLabelType": {
+    "PostCheckoutSessionsBodyCustomFieldsLabelTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9667,7 +9667,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyCustomFieldsType": {
+    "PostCheckoutSessionsBodyCustomFieldsTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9679,7 +9679,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyCustomerCreation": {
+    "PostCheckoutSessionsBodyCustomerCreationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9690,7 +9690,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyCustomerUpdateAddress": {
+    "PostCheckoutSessionsBodyCustomerUpdateAddressEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9701,7 +9701,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyCustomerUpdateName": {
+    "PostCheckoutSessionsBodyCustomerUpdateNameEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9712,7 +9712,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyCustomerUpdateShipping": {
+    "PostCheckoutSessionsBodyCustomerUpdateShippingEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9723,7 +9723,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerType": {
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9734,7 +9734,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAmountTaxDisplay": {
+    "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAnyOfAmountTaxDisplayEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9746,7 +9746,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyLineItemsPriceDataRecurringInterval": {
+    "PostCheckoutSessionsBodyLineItemsPriceDataRecurringIntervalEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9759,7 +9759,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyLineItemsPriceDataTaxBehavior": {
+    "PostCheckoutSessionsBodyLineItemsPriceDataTaxBehaviorEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9771,7 +9771,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyLocale": {
+    "PostCheckoutSessionsBodyLocaleEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9783,7 +9783,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyMode": {
+    "PostCheckoutSessionsBodyModeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9795,7 +9795,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentIntentDataCaptureMethod": {
+    "PostCheckoutSessionsBodyPaymentIntentDataCaptureMethodEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9807,7 +9807,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentIntentDataSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentIntentDataSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9818,7 +9818,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodCollection": {
+    "PostCheckoutSessionsBodyPaymentMethodCollectionEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9829,7 +9829,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitCurrency": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitCurrencyEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9840,7 +9840,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsDefaultFor": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsDefaultForEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9851,7 +9851,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsPaymentSchedule": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsPaymentScheduleEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9863,7 +9863,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsTransactionType": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsTransactionTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9874,7 +9874,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9886,7 +9886,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitVerificationMethod": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitVerificationMethodEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9898,7 +9898,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9908,7 +9908,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpaySetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpaySetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9918,7 +9918,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAlipaySetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAlipaySetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9928,7 +9928,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9938,7 +9938,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9950,7 +9950,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9960,7 +9960,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9972,7 +9972,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCardRequestThreeDSecure": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCardRequestThreeDSecureEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9984,7 +9984,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCardSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCardSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -9995,7 +9995,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCashappSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCashappSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10007,7 +10007,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferRequestedAddressTypes": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferRequestedAddressTypesEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10018,7 +10018,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferType": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10029,7 +10029,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceFundingType": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceFundingTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10039,7 +10039,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10049,7 +10049,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsEpsSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsEpsSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10059,7 +10059,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsFpxSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsFpxSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10069,7 +10069,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsGiropaySetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsGiropaySetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10079,7 +10079,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpaySetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpaySetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10089,7 +10089,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsIdealSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsIdealSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10099,7 +10099,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10109,7 +10109,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10119,7 +10119,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsLinkSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsLinkSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10130,7 +10130,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10140,7 +10140,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsP24SetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsP24SetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10150,7 +10150,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10160,7 +10160,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalCaptureMethod": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalCaptureMethodEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10171,7 +10171,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalPreferredLocale": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalPreferredLocaleEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10182,7 +10182,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10194,7 +10194,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPaySetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPaySetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10205,7 +10205,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10217,7 +10217,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsSofortSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsSofortSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10227,7 +10227,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPermissions": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPermissionsEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10240,7 +10240,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPrefetch": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsPrefetchEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10251,7 +10251,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountSetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountSetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10263,7 +10263,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountVerificationMethod": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountVerificationMethodEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10274,7 +10274,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayClient": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayClientEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10286,7 +10286,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPaySetupFutureUsage": {
+    "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPaySetupFutureUsageEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10296,7 +10296,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyPaymentMethodTypes": {
+    "PostCheckoutSessionsBodyPaymentMethodTypesEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10307,7 +10307,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyRedirectOnCompletion": {
+    "PostCheckoutSessionsBodyRedirectOnCompletionEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10319,7 +10319,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyShippingAddressCollectionAllowedCountries": {
+    "PostCheckoutSessionsBodyShippingAddressCollectionAllowedCountriesEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10330,7 +10330,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumUnit": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumUnitEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10344,7 +10344,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumUnit": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumUnitEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10358,7 +10358,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTaxBehavior": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTaxBehaviorEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10370,7 +10370,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataType": {
+    "PostCheckoutSessionsBodyShippingOptionsShippingRateDataTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10380,7 +10380,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodySubmitType": {
+    "PostCheckoutSessionsBodySubmitTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10393,7 +10393,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerType": {
+    "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10404,7 +10404,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataProrationBehavior": {
+    "PostCheckoutSessionsBodySubscriptionDataProrationBehaviorEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10415,7 +10415,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorMissingPaymentMethod": {
+    "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorMissingPaymentMethodEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10427,7 +10427,7 @@
         "type": "enum"
       }
     },
-    "PostCheckoutSessionsBodyUiMode": {
+    "PostCheckoutSessionsBodyUiModeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10438,7 +10438,7 @@
         "type": "enum"
       }
     },
-    "PostFilesBodyPurpose": {
+    "PostFilesBodyPurposeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10458,7 +10458,7 @@
         "type": "enum"
       }
     },
-    "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsCode": {
+    "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsCodeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10480,7 +10480,7 @@
         "type": "enum"
       }
     },
-    "SnakeObjectIdStatus": {
+    "SnakeObjectIdStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10506,7 +10506,7 @@
         "type": "timestamptz"
       }
     },
-    "TreasuryInboundTransferObject": {
+    "TreasuryInboundTransferObjectEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10516,7 +10516,7 @@
         "type": "enum"
       }
     },
-    "TreasuryInboundTransferStatus": {
+    "TreasuryInboundTransferStatusEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -10529,7 +10529,7 @@
         "type": "enum"
       }
     },
-    "TreasuryInboundTransfersResourceFailureDetailsCode": {
+    "TreasuryInboundTransfersResourceFailureDetailsCodeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {

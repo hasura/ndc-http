@@ -2,6 +2,7 @@ package internal
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
@@ -49,6 +50,7 @@ func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, en
 
 func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths []string) string {
 	enums := make([]string, len(enumNodes))
+
 	for i, enum := range enumNodes {
 		if enum.Value == "null" {
 			continue
@@ -59,11 +61,11 @@ func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths 
 
 	scalarType := schema.NewScalarType()
 	scalarType.Representation = schema.NewTypeRepresentationEnum(enums).Encode()
-
 	scalarName := utils.StringSliceToPascalCase(fieldPaths)
-	if !canSetEnumToSchema(sm, scalarName, enums) {
+
+	if len(fieldPaths) > 1 || !canSetEnumToSchema(sm, scalarName, enums) {
 		// if the name exists, add enum above name with Enum suffix
-		scalarName += "Enum"
+		scalarName = evalUniqueSchemaTypeName(sm, scalarName+"Enum", 0)
 	}
 
 	sm.AddScalar(scalarName, *scalarType)
@@ -334,4 +336,26 @@ func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 	default:
 		return rest.ScalarBinary
 	}
+}
+
+func evalUniqueSchemaTypeName(sm *rest.NDCHttpSchema, name string, times int) string {
+	lowerName := strings.ToLower(name) + strconv.Itoa(times)
+
+	for key := range sm.ObjectTypes {
+		if lowerName == strings.ToLower(key) {
+			return evalUniqueSchemaTypeName(sm, name, times+1)
+		}
+	}
+
+	for key := range sm.ScalarTypes {
+		if lowerName == strings.ToLower(key) {
+			return evalUniqueSchemaTypeName(sm, name, times+1)
+		}
+	}
+
+	if times == 0 {
+		return name
+	}
+
+	return name + strconv.Itoa(times)
 }

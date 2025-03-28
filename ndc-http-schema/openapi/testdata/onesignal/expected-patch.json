@@ -182,7 +182,7 @@
       "comparison_operators": {},
       "representation": { "type": "boolean" }
     },
-    "FilterRelation": {
+    "FilterRelationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -219,12 +219,12 @@
       "comparison_operators": {},
       "representation": { "type": "json" }
     },
-    "OutcomeDataAggregation": {
+    "OutcomeDataAggregationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": { "one_of": ["sum", "count"], "type": "enum" }
     },
-    "PlayerNotificationTargetTargetChannel": {
+    "PlayerNotificationTargetTargetChannelEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": { "one_of": ["push", "email", "sms"], "type": "enum" }

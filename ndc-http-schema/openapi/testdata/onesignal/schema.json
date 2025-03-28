@@ -214,7 +214,7 @@
         "relation": {
           "description": "Operator of a filter expression.",
           "type": {
-            "name": "FilterRelation",
+            "name": "FilterRelationEnum",
             "type": "named"
           }
         },
@@ -252,7 +252,7 @@
         "relation": {
           "description": "Operator of a filter expression.",
           "type": {
-            "name": "FilterRelation",
+            "name": "FilterRelationEnum",
             "type": "named"
           }
         },
@@ -268,7 +268,7 @@
         }
       }
     },
-    "GetNotificationHistoryBodyInput": {
+    "GetNotificationHistoryBodyInputObject": {
       "fields": {
         "app_id": {
           "type": {
@@ -294,7 +294,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "GetNotificationHistoryBodyEvents",
+              "name": "GetNotificationHistoryBodyEventsEnum",
               "type": "named"
             }
           }
@@ -429,7 +429,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PlayerNotificationTargetTargetChannel",
+              "name": "PlayerNotificationTargetTargetChannelEnum",
               "type": "named"
             }
           }
@@ -669,7 +669,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PlayerNotificationTargetTargetChannel",
+              "name": "PlayerNotificationTargetTargetChannelEnum",
               "type": "named"
             }
           }
@@ -690,7 +690,7 @@
       "fields": {
         "aggregation": {
           "type": {
-            "name": "OutcomeDataAggregation",
+            "name": "OutcomeDataAggregationEnum",
             "type": "named"
           }
         },
@@ -742,7 +742,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PlatformDeliveryDataEmail",
+              "name": "PlatformDeliveryDataEmailAllOf",
               "type": "named"
             }
           }
@@ -778,14 +778,14 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "PlatformDeliveryDataSms",
+              "name": "PlatformDeliveryDataSmsAllOf",
               "type": "named"
             }
           }
         }
       }
     },
-    "PlatformDeliveryDataEmail": {
+    "PlatformDeliveryDataEmailAllOf": {
       "fields": {
         "bounced": {
           "description": "Number of recipients who registered as a hard or soft bounce and didn't receive your email.",
@@ -909,7 +909,7 @@
         }
       }
     },
-    "PlatformDeliveryDataSms": {
+    "PlatformDeliveryDataSmsAllOf": {
       "fields": {
         "converted": {
           "description": "Number of messages that were clicked.",
@@ -1091,7 +1091,7 @@
         "body": {
           "description": "Request body of POST /notifications/{notification_id}/history",
           "type": {
-            "name": "GetNotificationHistoryBodyInput",
+            "name": "GetNotificationHistoryBodyInputObject",
             "type": "named"
           }
         },
@@ -1119,7 +1119,7 @@
         "type": "boolean"
       }
     },
-    "FilterRelation": {
+    "FilterRelationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1136,7 +1136,7 @@
         "type": "enum"
       }
     },
-    "GetNotificationHistoryBodyEvents": {
+    "GetNotificationHistoryBodyEventsEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1175,7 +1175,7 @@
         "type": "json"
       }
     },
-    "OutcomeDataAggregation": {
+    "OutcomeDataAggregationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1186,7 +1186,7 @@
         "type": "enum"
       }
     },
-    "PlayerNotificationTargetTargetChannel": {
+    "PlayerNotificationTargetTargetChannelEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {

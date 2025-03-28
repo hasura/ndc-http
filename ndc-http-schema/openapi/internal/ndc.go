@@ -3,6 +3,7 @@ package internal
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"slices"
 	"strings"
 
@@ -139,12 +140,13 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 
 		if st, ok := nsc.schema.ScalarTypes[name]; ok {
 			newName := name
+
 			if !rest.IsDefaultScalar(newName) && !isBannedName {
 				newName = nsc.formatTypeName(t.Name)
 			}
 
 			newNameType := schema.NewNamedType(newName)
-			nsc.usedTypes[t.Name] = newName
+			nsc.usedTypes[name] = newName
 
 			if _, ok := nsc.newSchema.ScalarTypes[newName]; !ok {
 				nsc.newSchema.ScalarTypes[newName] = st
@@ -213,9 +215,12 @@ func (nsc *NDCBuilder) validateBannedTypes() error {
 	for key, obj := range nsc.schema.ObjectTypes {
 		lowerKey := strings.ToLower(key)
 
-		for scalarKey := range nsc.schema.ScalarTypes {
+		for scalarKey, scalarType := range nsc.schema.ScalarTypes {
 			if lowerKey == strings.ToLower(scalarKey) {
-				return fmt.Errorf("the insensitive name `%s` exists in both object and scalar types", key)
+				err := fmt.Errorf("the insensitive name `%s` exists in both object and scalar types", key)
+				nsc.Logger.Error(err.Error(), slog.Any("object_type", obj), slog.Any("scalar_type", scalarType))
+
+				return err
 			}
 		}
 

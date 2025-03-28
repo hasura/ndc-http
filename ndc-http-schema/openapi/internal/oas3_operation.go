@@ -198,14 +198,17 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 		if param == nil || (param.Deprecated && oc.builder.ConvertOptions.NoDeprecation) {
 			continue
 		}
+
 		paramName := param.Name
 		if paramName == "" {
 			return errParameterNameRequired
 		}
+
 		paramRequired := false
 		if param.Required != nil && *param.Required {
 			paramRequired = true
 		}
+
 		schemaResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.ParameterLocation(param.In)).
 			getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 		if err != nil {
@@ -221,11 +224,13 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 			AllowReserved: param.AllowReserved,
 			Explode:       param.Explode,
 		}
+
 		if param.Style != "" {
 			style, err := rest.ParseParameterEncodingStyle(param.Style)
 			if err != nil {
 				return err
 			}
+
 			encoding.Style = style
 		}
 
@@ -240,6 +245,7 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 				EncodingObject: encoding,
 			},
 		}
+
 		paramDescription := utils.StripHTMLTags(param.Description)
 		if paramDescription != "" {
 			argument.Description = &paramDescription
