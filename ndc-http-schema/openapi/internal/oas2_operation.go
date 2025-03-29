@@ -46,9 +46,11 @@ func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonPar
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
+
 	if resultType == nil {
 		return nil, "", nil
 	}
+
 	reqBody, _, err := oc.convertParameters(operation, commonParams, []string{funcName})
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
@@ -107,7 +109,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 		bodyTypes = []SchemaInfoCache{{}}
 	}
 
-	for _, bodyType := range bodyTypes {
+	for i, bodyType := range bodyTypes {
 		newProcName := procName
 		arguments := make(map[string]rest.ArgumentInfo)
 		for key, arg := range oc.Arguments {
@@ -136,8 +138,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 			}
 
 			if len(bodyTypes) > 1 {
-				bodyTypeName := getNamedType(bodyType.TypeRead, true, "")
-				newProcName = procName + "_" + strings.TrimPrefix(bodyTypeName, utils.ToPascalCase(procName))
+				newProcName = buildUnionOperationName(oc.builder.schema, newProcName, bodyType.TypeRead, i)
 			}
 		}
 
@@ -181,6 +182,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 	formData := rest.TypeSchema{
 		Type: []string{"object"},
 	}
+
 	formDataObject := rest.ObjectType{
 		Fields: map[string]rest.ObjectField{},
 	}
@@ -189,6 +191,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 		if param == nil {
 			continue
 		}
+
 		paramName := param.Name
 		if paramName == "" {
 			return nil, nil, errParameterNameRequired
@@ -204,7 +207,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 
 		switch {
 		case param.Type != "":
-			typeEncoder, err := oc.builder.getSchemaTypeFromParameter(param, fieldPaths)
+			typeEncoder, err := oc.builder.getSchemaTypeFromParameter(param, append(fieldPaths, paramName))
 			if err != nil {
 				return nil, nil, err
 			}
@@ -217,25 +220,29 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 					Pattern: param.Pattern,
 				},
 			}
+
 			if param.Maximum != nil {
 				maximum := float64(*param.Maximum)
 				schemaResult.TypeSchema.Maximum = &maximum
 			}
+
 			if param.Minimum != nil {
 				minimum := float64(*param.Minimum)
 				schemaResult.TypeSchema.Minimum = &minimum
 			}
+
 			if param.MaxLength != nil {
 				maxLength := int64(*param.MaxLength)
 				schemaResult.TypeSchema.MaxLength = &maxLength
 			}
+
 			if param.MinLength != nil {
 				minLength := int64(*param.MinLength)
 				schemaResult.TypeSchema.MinLength = &minLength
 			}
 		case param.Schema != nil:
 			schemaResult, err = newOASSchemaBuilder(oc.builder.OASBuilderState, oc.pathKey, rest.ParameterLocation(param.In)).
-				getSchemaTypeFromProxy(param.Schema, !paramRequired, fieldPaths)
+				getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 			if err != nil {
 				return nil, nil, err
 			}

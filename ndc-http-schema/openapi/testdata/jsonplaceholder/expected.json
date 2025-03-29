@@ -34,7 +34,9 @@
             "name": "id",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         },
@@ -51,7 +53,9 @@
             "name": "userId",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -84,7 +88,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -114,7 +120,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -147,7 +155,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -180,7 +190,9 @@
             "name": "id",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         },
@@ -197,7 +209,9 @@
             "name": "postId",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -230,7 +244,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -263,7 +279,9 @@
             "name": "albumId",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         },
@@ -280,7 +298,9 @@
             "name": "id",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -313,7 +333,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -346,7 +368,9 @@
             "name": "id",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         },
@@ -363,7 +387,9 @@
             "name": "userId",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -396,7 +422,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -444,7 +472,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -477,7 +507,9 @@
             "name": "id",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         },
@@ -494,7 +526,9 @@
             "name": "userId",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -527,7 +561,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -560,7 +596,9 @@
             "name": "email",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         },
@@ -577,7 +615,9 @@
             "name": "id",
             "in": "query",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -604,7 +644,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -617,7 +659,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "userId": {
@@ -629,7 +673,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         }
@@ -646,7 +692,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "email": {
@@ -658,7 +706,9 @@
             }
           },
           "http": {
-            "type": ["string"],
+            "type": [
+              "string"
+            ],
             "format": "email"
           }
         },
@@ -671,7 +721,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -684,7 +736,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "postId": {
@@ -696,7 +750,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         }
@@ -713,7 +769,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -726,7 +784,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -739,7 +799,9 @@
             }
           },
           "http": {
-            "type": ["string"],
+            "type": [
+              "string"
+            ],
             "format": "uri"
           }
         },
@@ -752,7 +814,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "url": {
@@ -764,7 +828,9 @@
             }
           },
           "http": {
-            "type": ["string"],
+            "type": [
+              "string"
+            ],
             "format": "uri"
           }
         }
@@ -781,7 +847,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "id": {
@@ -793,7 +861,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -806,7 +876,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "userId": {
@@ -818,7 +890,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         }
@@ -835,7 +909,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "id": {
@@ -847,7 +923,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -860,7 +938,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "userId": {
@@ -872,7 +952,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         }
@@ -890,7 +972,9 @@
             }
           },
           "http": {
-            "type": ["boolean"]
+            "type": [
+              "boolean"
+            ]
           }
         },
         "id": {
@@ -902,7 +986,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -915,7 +1001,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "userId": {
@@ -927,7 +1015,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         }
@@ -939,24 +1029,28 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "UserAddress",
+              "name": "UserAddressObject",
               "type": "named"
             }
           },
           "http": {
-            "type": ["object"]
+            "type": [
+              "object"
+            ]
           }
         },
         "company": {
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "UserCompany",
+              "name": "UserCompanyObject",
               "type": "named"
             }
           },
           "http": {
-            "type": ["object"]
+            "type": [
+              "object"
+            ]
           }
         },
         "email": {
@@ -968,7 +1062,9 @@
             }
           },
           "http": {
-            "type": ["string"],
+            "type": [
+              "string"
+            ],
             "format": "email"
           }
         },
@@ -981,7 +1077,9 @@
             }
           },
           "http": {
-            "type": ["integer"],
+            "type": [
+              "integer"
+            ],
             "format": "int64"
           }
         },
@@ -994,7 +1092,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "phone": {
@@ -1006,7 +1106,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "username": {
@@ -1018,7 +1120,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "website": {
@@ -1030,76 +1134,14 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         }
       }
     },
-    "UserAddress": {
-      "fields": {
-        "city": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": ["string"]
-          }
-        },
-        "geo": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "UserAddressGeo",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": ["object"]
-          }
-        },
-        "street": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": ["string"]
-          }
-        },
-        "suite": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": ["string"]
-          }
-        },
-        "zipcode": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "http": {
-            "type": ["string"]
-          }
-        }
-      }
-    },
-    "UserAddressGeo": {
+    "UserAddressGeoObject": {
       "fields": {
         "lat": {
           "type": {
@@ -1110,7 +1152,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "lng": {
@@ -1122,12 +1166,88 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         }
       }
     },
-    "UserCompany": {
+    "UserAddressObject": {
+      "fields": {
+        "city": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "geo": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "UserAddressGeoObject",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "object"
+            ]
+          }
+        },
+        "street": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "suite": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        },
+        "zipcode": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          },
+          "http": {
+            "type": [
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "UserCompanyObject": {
       "fields": {
         "bs": {
           "type": {
@@ -1138,7 +1258,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "catchPhrase": {
@@ -1150,7 +1272,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         },
         "name": {
@@ -1162,7 +1286,9 @@
             }
           },
           "http": {
-            "type": ["string"]
+            "type": [
+              "string"
+            ]
           }
         }
       }
@@ -1190,7 +1316,9 @@
           "http": {
             "in": "body",
             "schema": {
-              "type": ["object"]
+              "type": [
+                "object"
+              ]
             }
           }
         }
@@ -1220,7 +1348,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -1255,7 +1385,9 @@
           "http": {
             "in": "body",
             "schema": {
-              "type": ["object"]
+              "type": [
+                "object"
+              ]
             }
           }
         },
@@ -1269,7 +1401,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }
@@ -1301,7 +1435,9 @@
           "http": {
             "in": "body",
             "schema": {
-              "type": ["object"]
+              "type": [
+                "object"
+              ]
             }
           }
         },
@@ -1315,7 +1451,9 @@
             "name": "id",
             "in": "path",
             "schema": {
-              "type": ["integer"]
+              "type": [
+                "integer"
+              ]
             }
           }
         }

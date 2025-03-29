@@ -31,7 +31,9 @@ func BuildSchemaFromConfig(config *Configuration, configDir string, logger *slog
 		if schemaOutput == nil {
 			continue
 		}
+
 		fileID := file.File
+
 		if slices.Contains(existedFileIDs, fileID) {
 			logger.Warn(fmt.Sprintf("the file %s is duplicated. Make sure that is intended", fileID))
 			fileID += "_" + strconv.Itoa(i)
@@ -179,7 +181,9 @@ func buildSchemaFile(config *Configuration, configDir string, configItem *Config
 	if configItem.ConvertConfig.File == "" {
 		return nil, errFilePathRequired
 	}
+
 	ResolveConvertConfigArguments(&configItem.ConvertConfig, configDir, nil)
+
 	ndcSchema, err := ConvertToNDCSchema(&configItem.ConvertConfig, logger)
 	if err != nil {
 		return nil, err
@@ -257,6 +261,12 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 
 	if !conf.IsDistributed() {
 		return
+	}
+
+	if _, ok := restSchema.ScalarTypes[string(rest.ScalarBoolean)]; !ok {
+		booleanScalar := *schema.NewScalarType()
+		booleanScalar.Representation = schema.NewTypeRepresentationBoolean().Encode()
+		restSchema.ScalarTypes[string(rest.ScalarBoolean)] = booleanScalar
 	}
 
 	restSchema.ObjectTypes[rest.HTTPDistributedOptionsObjectName] = distributedObjectType

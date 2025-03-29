@@ -129,9 +129,10 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 		bodyTypes = []SchemaInfoCache{{}}
 	}
 
-	for _, bodyType := range bodyTypes {
+	for i, bodyType := range bodyTypes {
 		newProcName := procName
 		arguments := make(map[string]rest.ArgumentInfo)
+
 		for key, arg := range oc.Arguments {
 			arguments[key] = arg
 		}
@@ -141,6 +142,7 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 			if description == "" {
 				description = fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
 			}
+
 			// renaming query parameter name `body` if exist to avoid conflicts
 			if paramData, ok := arguments[rest.BodyKey]; ok {
 				arguments["paramBody"] = paramData
@@ -158,8 +160,7 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 			}
 
 			if len(bodyTypes) > 1 {
-				bodyTypeName := getNamedType(bodyType.TypeRead, true, "")
-				newProcName = procName + "_" + strings.TrimPrefix(bodyTypeName, utils.ToPascalCase(procName))
+				newProcName = buildUnionOperationName(oc.builder.schema, newProcName, bodyType.TypeRead, i)
 			}
 		}
 
@@ -198,14 +199,17 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 		if param == nil || (param.Deprecated && oc.builder.ConvertOptions.NoDeprecation) {
 			continue
 		}
+
 		paramName := param.Name
 		if paramName == "" {
 			return errParameterNameRequired
 		}
+
 		paramRequired := false
 		if param.Required != nil && *param.Required {
 			paramRequired = true
 		}
+
 		schemaResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.ParameterLocation(param.In)).
 			getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 		if err != nil {
@@ -221,11 +225,13 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 			AllowReserved: param.AllowReserved,
 			Explode:       param.Explode,
 		}
+
 		if param.Style != "" {
 			style, err := rest.ParseParameterEncodingStyle(param.Style)
 			if err != nil {
 				return err
 			}
+
 			encoding.Style = style
 		}
 
@@ -240,6 +246,7 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 				EncodingObject: encoding,
 			},
 		}
+
 		paramDescription := utils.StripHTMLTags(param.Description)
 		if paramDescription != "" {
 			argument.Description = &paramDescription
@@ -287,6 +294,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 	if contentType == rest.ContentTypeFormURLEncoded {
 		location = rest.InQuery
 	}
+
 	typeResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, location).
 		getSchemaTypeFromProxy(content.Schema, !bodyRequired, fieldPaths)
 	if err != nil {
@@ -328,6 +336,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 			if err != nil {
 				return nil, nil, err
 			}
+
 			item.Style = style
 		}
 
@@ -369,10 +378,12 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 				argument := schema.ArgumentInfo{
 					Type: headerResult.TypeWrite.Encode(),
 				}
+
 				headerDesc := utils.StripHTMLTags(header.Description)
 				if headerDesc != "" {
 					argument.Description = &headerDesc
 				}
+
 				item.Headers[key] = headerParam
 				oc.Arguments[argumentName] = rest.ArgumentInfo{
 					ArgumentInfo: argument,

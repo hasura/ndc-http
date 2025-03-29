@@ -166,7 +166,7 @@
         "relation": {
           "description": "Operator of a filter expression.",
           "type": {
-            "name": "HasuraOneSignalFilterRelation",
+            "name": "HasuraOneSignalFilterRelationEnum",
             "type": "named"
           }
         },
@@ -204,7 +204,7 @@
         "relation": {
           "description": "Operator of a filter expression.",
           "type": {
-            "name": "HasuraOneSignalFilterRelation",
+            "name": "HasuraOneSignalFilterRelationEnum",
             "type": "named"
           }
         },
@@ -338,7 +338,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraOneSignalPlayerNotificationTargetTargetChannel",
+              "name": "HasuraOneSignalPlayerNotificationTargetTargetChannelEnum",
               "type": "named"
             }
           }
@@ -590,7 +590,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraOneSignalPlayerNotificationTargetTargetChannel",
+              "name": "HasuraOneSignalPlayerNotificationTargetTargetChannelEnum",
               "type": "named"
             }
           }
@@ -611,7 +611,7 @@
       "fields": {
         "aggregation": {
           "type": {
-            "name": "HasuraOneSignalOutcomeDataAggregation",
+            "name": "HasuraOneSignalOutcomeDataAggregationEnum",
             "type": "named"
           }
         },
@@ -663,7 +663,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraOneSignalPlatformDeliveryDataEmail",
+              "name": "HasuraOneSignalPlatformDeliveryDataEmailAllOf",
               "type": "named"
             }
           }
@@ -699,14 +699,14 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraOneSignalPlatformDeliveryDataSms",
+              "name": "HasuraOneSignalPlatformDeliveryDataSmsAllOf",
               "type": "named"
             }
           }
         }
       }
     },
-    "HasuraOneSignalPlatformDeliveryDataEmail": {
+    "HasuraOneSignalPlatformDeliveryDataEmailAllOf": {
       "fields": {
         "bounced": {
           "description": "Number of recipients who registered as a hard or soft bounce and didn't receive your email.",
@@ -830,7 +830,7 @@
         }
       }
     },
-    "HasuraOneSignalPlatformDeliveryDataSms": {
+    "HasuraOneSignalPlatformDeliveryDataSmsAllOf": {
       "fields": {
         "converted": {
           "description": "Number of messages that were clicked.",
@@ -963,7 +963,7 @@
     }
   ],
   "scalar_types": {
-    "HasuraOneSignalFilterRelation": {
+    "HasuraOneSignalFilterRelationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -987,7 +987,7 @@
         "type": "json"
       }
     },
-    "HasuraOneSignalOutcomeDataAggregation": {
+    "HasuraOneSignalOutcomeDataAggregationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -998,7 +998,7 @@
         "type": "enum"
       }
     },
-    "HasuraOneSignalPlayerNotificationTargetTargetChannel": {
+    "HasuraOneSignalPlayerNotificationTargetTargetChannelEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {

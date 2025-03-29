@@ -3,6 +3,9 @@ package internal
 import (
 	"errors"
 	"fmt"
+	"log/slog"
+	"slices"
+	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -13,9 +16,10 @@ import (
 type NDCBuilder struct {
 	*ConvertOptions
 
-	schema    *rest.NDCHttpSchema
-	newSchema *rest.NDCHttpSchema
-	usedTypes map[string]string
+	schema      *rest.NDCHttpSchema
+	newSchema   *rest.NDCHttpSchema
+	usedTypes   map[string]string
+	bannedNames map[string]string
 }
 
 // NewNDCBuilder creates a new NDCBuilder instance.
@@ -28,6 +32,7 @@ func NewNDCBuilder(httpSchema *rest.NDCHttpSchema, options ConvertOptions) *NDCB
 		usedTypes:      make(map[string]string),
 		schema:         httpSchema,
 		newSchema:      newSchema,
+		bannedNames:    make(map[string]string),
 	}
 }
 
@@ -42,6 +47,10 @@ func (ndc *NDCBuilder) Build() (*rest.NDCHttpSchema, error) {
 
 // Validate checks if the schema is valid.
 func (nsc *NDCBuilder) validate() error {
+	if err := nsc.validateBannedTypes(); err != nil {
+		return err
+	}
+
 	for key, operation := range nsc.schema.Functions {
 		op, err := nsc.validateOperation(key, operation)
 		if err != nil {
@@ -72,6 +81,7 @@ func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.Op
 		Description: operation.Description,
 		Arguments:   make(map[string]rest.ArgumentInfo),
 	}
+
 	for key, field := range operation.Arguments {
 		fieldType, err := nsc.validateType(field.Type)
 		if err != nil {
@@ -119,18 +129,24 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 			return nil, errors.New("named type is empty")
 		}
 
-		if newName, ok := nsc.usedTypes[t.Name]; ok {
-			return schema.NewNamedType(newName), nil
+		name, isBannedName := nsc.bannedNames[strings.ToLower(t.Name)]
+		if !isBannedName {
+			name = t.Name
 		}
 
-		if st, ok := nsc.schema.ScalarTypes[t.Name]; ok {
-			newName := t.Name
-			if !rest.IsDefaultScalar(t.Name) {
+		if usedName, ok := nsc.usedTypes[name]; ok {
+			return schema.NewNamedType(usedName), nil
+		}
+
+		if st, ok := nsc.schema.ScalarTypes[name]; ok {
+			newName := name
+
+			if !rest.IsDefaultScalar(newName) && !isBannedName {
 				newName = nsc.formatTypeName(t.Name)
 			}
 
 			newNameType := schema.NewNamedType(newName)
-			nsc.usedTypes[t.Name] = newName
+			nsc.usedTypes[name] = newName
 
 			if _, ok := nsc.newSchema.ScalarTypes[newName]; !ok {
 				nsc.newSchema.ScalarTypes[newName] = st
@@ -139,14 +155,14 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 			return newNameType, nil
 		}
 
-		objectType, ok := nsc.schema.ObjectTypes[t.Name]
+		objectType, ok := nsc.schema.ObjectTypes[name]
 		if !ok {
-			return nil, errors.New(t.Name + ": named type does not exist")
+			return nil, errors.New(name + ": named type does not exist")
 		}
 
-		newName := nsc.formatTypeName(t.Name)
+		newName := nsc.formatTypeName(name)
 		newNameType := schema.NewNamedType(newName)
-		nsc.usedTypes[t.Name] = newName
+		nsc.usedTypes[name] = newName
 
 		newObjectType := rest.ObjectType{
 			Alias:       objectType.Alias,
@@ -170,6 +186,7 @@ func (nsc *NDCBuilder) validateType(schemaType schema.Type) (schema.TypeEncoder,
 				HTTP: field.HTTP,
 			}
 		}
+
 		nsc.newSchema.ObjectTypes[newName] = newObjectType
 
 		return newNameType, nil
@@ -192,4 +209,43 @@ func (nsc *NDCBuilder) formatOperationName(name string) string {
 	}
 
 	return utils.StringSliceToCamelCase([]string{nsc.Prefix, name})
+}
+
+func (nsc *NDCBuilder) validateBannedTypes() error {
+	for key, obj := range nsc.schema.ObjectTypes {
+		lowerKey := strings.ToLower(key)
+
+		for scalarKey, scalarType := range nsc.schema.ScalarTypes {
+			if lowerKey == strings.ToLower(scalarKey) {
+				err := fmt.Errorf("the insensitive name `%s` exists in both object and scalar types", key)
+				nsc.Logger.Error(err.Error(), slog.Any("object_type", obj), slog.Any("scalar_type", scalarType))
+
+				return err
+			}
+		}
+
+		if !slices.Contains(bannedTypeNames, lowerKey) {
+			continue
+		}
+
+		newName := key + "Object"
+		nsc.bannedNames[lowerKey] = newName
+		nsc.schema.ObjectTypes[newName] = obj
+		delete(nsc.schema.ObjectTypes, key)
+	}
+
+	for key, scalarType := range nsc.schema.ScalarTypes {
+		lowerKey := strings.ToLower(key)
+
+		if !slices.Contains(bannedTypeNames, lowerKey) {
+			continue
+		}
+
+		newName := key + "Scalar"
+		nsc.bannedNames[lowerKey] = newName
+		nsc.schema.ScalarTypes[newName] = scalarType
+		delete(nsc.schema.ScalarTypes, key)
+	}
+
+	return nil
 }

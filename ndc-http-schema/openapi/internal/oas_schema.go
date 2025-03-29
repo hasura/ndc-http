@@ -131,6 +131,7 @@ func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []
 
 	oasTypes, nullable := extractNullableFromOASTypes(baseSchema.Type)
 	nullable = nullable || (baseSchema.Nullable != nil && *baseSchema.Nullable)
+
 	if len(oasTypes) == 0 {
 		// if the OAS schema has properties or items we can consider this type as an object or array
 		if baseSchema.Properties != nil && baseSchema.Properties.Len() > 0 {
@@ -143,6 +144,7 @@ func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []
 	if len(oasTypes) != 1 || isPrimitiveScalar(oasTypes) {
 		scalarName := getScalarFromType(oc.state.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
 		var resultType schema.TypeEncoder = schema.NewNamedType(scalarName)
+
 		if nullable {
 			resultType = schema.NewNullableType(resultType)
 		}
@@ -157,6 +159,7 @@ func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []
 	var typeResult *SchemaInfoCache
 	var err error
 	typeName := oasTypes[0]
+
 	switch typeName {
 	case "object":
 		typeResult, err = oc.evalObjectType(baseSchema, fieldPaths)
@@ -241,6 +244,9 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 		if writeRefName != fieldPaths[0] {
 			writeObject.Alias = fieldPaths[0]
 		}
+	} else {
+		refName = evalUniqueSchemaTypeName(oc.state.schema, refName+"Object", 0)
+		writeRefName = evalUniqueSchemaTypeName(oc.state.schema, formatWriteObjectName(refName), 0)
 	}
 
 	if typeResult.Description != "" {
@@ -327,13 +333,20 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 
 // Support converting oneOf, allOf or anyOf to object types with merge strategy.
 func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schemaProxies []*base.SchemaProxy, unionType oasUnionType, fieldPaths []string) (*SchemaInfoCache, error) {
+	// only evaluate field paths for anonymous types
+	if len(fieldPaths) > 1 {
+		fieldPaths = append(fieldPaths, string(unionType))
+	}
+
 	proxies, mergedType, isNullable, isEmptyObject := evalSchemaProxiesSlice(schemaProxies, oc.location)
 	nullable := isNullable || (baseSchema.Nullable != nil && *baseSchema.Nullable)
+
 	if mergedType != nil {
 		result, err := oc.getSchemaType(mergedType, fieldPaths)
 		if err != nil {
 			return nil, err
 		}
+
 		if result != nil && result.TypeSchema != nil && result.TypeSchema.Description == "" && baseSchema.Description != "" {
 			result.TypeSchema.Description = utils.StripHTMLTags(baseSchema.Description)
 		}
@@ -348,6 +361,7 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 		}
 
 		oasTypes, isNullable := extractNullableFromOASTypes(baseSchema.Type)
+
 		if len(baseSchema.Type) > 1 || isPrimitiveScalar(baseSchema.Type) {
 			scalarName := getScalarFromType(oc.state.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
 			var result schema.TypeEncoder = schema.NewNamedType(scalarName)

@@ -293,7 +293,7 @@
         "relation": {
           "description": "Operator of a filter expression.",
           "type": {
-            "name": "HasuraFilterRelation",
+            "name": "HasuraFilterRelationEnum",
             "type": "named"
           },
           "http": {
@@ -351,7 +351,7 @@
         "relation": {
           "description": "Operator of a filter expression.",
           "type": {
-            "name": "HasuraFilterRelation",
+            "name": "HasuraFilterRelationEnum",
             "type": "named"
           },
           "http": {
@@ -572,7 +572,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraPlayerNotificationTargetTargetChannel",
+              "name": "HasuraPlayerNotificationTargetTargetChannelEnum",
               "type": "named"
             }
           },
@@ -977,7 +977,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraPlayerNotificationTargetTargetChannel",
+              "name": "HasuraPlayerNotificationTargetTargetChannelEnum",
               "type": "named"
             }
           },
@@ -1008,7 +1008,7 @@
       "fields": {
         "aggregation": {
           "type": {
-            "name": "HasuraOutcomeDataAggregation",
+            "name": "HasuraOutcomeDataAggregationEnum",
             "type": "named"
           },
           "http": {
@@ -1090,7 +1090,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraPlatformDeliveryDataEmail",
+              "name": "HasuraPlatformDeliveryDataEmailAllOf",
               "type": "named"
             }
           },
@@ -1146,7 +1146,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "HasuraPlatformDeliveryDataSms",
+              "name": "HasuraPlatformDeliveryDataSmsAllOf",
               "type": "named"
             }
           },
@@ -1158,7 +1158,7 @@
         }
       }
     },
-    "HasuraPlatformDeliveryDataEmail": {
+    "HasuraPlatformDeliveryDataEmailAllOf": {
       "fields": {
         "bounced": {
           "description": "Number of recipients who registered as a hard or soft bounce and didn't receive your email.",
@@ -1342,7 +1342,7 @@
         }
       }
     },
-    "HasuraPlatformDeliveryDataSms": {
+    "HasuraPlatformDeliveryDataSmsAllOf": {
       "fields": {
         "converted": {
           "description": "Number of messages that were clicked.",
@@ -1548,7 +1548,7 @@
     }
   },
   "scalar_types": {
-    "HasuraFilterRelation": {
+    "HasuraFilterRelationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1572,7 +1572,7 @@
         "type": "json"
       }
     },
-    "HasuraOutcomeDataAggregation": {
+    "HasuraOutcomeDataAggregationEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -1583,7 +1583,7 @@
         "type": "enum"
       }
     },
-    "HasuraPlayerNotificationTargetTargetChannel": {
+    "HasuraPlayerNotificationTargetTargetChannelEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {

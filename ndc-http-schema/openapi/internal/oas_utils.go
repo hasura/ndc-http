@@ -2,6 +2,7 @@ package internal
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
@@ -49,6 +50,7 @@ func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, en
 
 func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths []string) string {
 	enums := make([]string, len(enumNodes))
+
 	for i, enum := range enumNodes {
 		if enum.Value == "null" {
 			continue
@@ -59,11 +61,11 @@ func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths 
 
 	scalarType := schema.NewScalarType()
 	scalarType.Representation = schema.NewTypeRepresentationEnum(enums).Encode()
-
 	scalarName := utils.StringSliceToPascalCase(fieldPaths)
-	if !canSetEnumToSchema(sm, scalarName, enums) {
+
+	if len(fieldPaths) > 1 || !canSetEnumToSchema(sm, scalarName, enums) {
 		// if the name exists, add enum above name with Enum suffix
-		scalarName += "Enum"
+		scalarName = evalUniqueScalarEnumName(sm, scalarName+"Enum", enums, 0)
 	}
 
 	sm.AddScalar(scalarName, *scalarType)
@@ -126,17 +128,23 @@ func getScalarFromOASType(sm *rest.NDCHttpSchema, names []string, format string,
 }
 
 func canSetEnumToSchema(sm *rest.NDCHttpSchema, scalarName string, enums []string) bool {
-	existedScalar, ok := sm.ScalarTypes[scalarName]
-	if !ok {
-		return true
+	lowerName := strings.ToLower(scalarName)
+
+	for key := range sm.ObjectTypes {
+		if lowerName == strings.ToLower(key) {
+			return false
+		}
 	}
 
-	existedEnum, err := existedScalar.Representation.AsEnum()
-	if err == nil && utils.SliceUnorderedEqual(enums, existedEnum.OneOf) {
-		return true
+	for key, enumScalar := range sm.ScalarTypes {
+		if lowerName == strings.ToLower(key) {
+			existedEnum, err := enumScalar.Representation.AsEnum()
+
+			return err == nil && utils.SliceUnorderedEqual(enums, existedEnum.OneOf)
+		}
 	}
 
-	return false
+	return true
 }
 
 // remove nullable types from raw OpenAPI types.
@@ -334,4 +342,87 @@ func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 	default:
 		return rest.ScalarBinary
 	}
+}
+
+func evalUniqueSchemaTypeName(sm *rest.NDCHttpSchema, name string, times int) string {
+	newName := name
+
+	if times > 0 {
+		newName += strconv.Itoa(times)
+	}
+
+	lowerName := strings.ToLower(newName)
+
+	for key := range sm.ObjectTypes {
+		if lowerName == strings.ToLower(key) {
+			return evalUniqueSchemaTypeName(sm, name, times+1)
+		}
+	}
+
+	for key := range sm.ScalarTypes {
+		if lowerName == strings.ToLower(key) {
+			return evalUniqueSchemaTypeName(sm, name, times+1)
+		}
+	}
+
+	return newName
+}
+
+func evalUniqueScalarEnumName(sm *rest.NDCHttpSchema, name string, enums []string, times int) string {
+	newName := name
+
+	if times > 0 {
+		newName += strconv.Itoa(times)
+	}
+
+	if canSetEnumToSchema(sm, name, enums) {
+		return newName
+	}
+
+	return evalUniqueScalarEnumName(sm, name, enums, times+1)
+}
+
+func buildUnionOperationName(sm *rest.NDCHttpSchema, operationName string, typeEncoder schema.TypeEncoder, index int) string {
+	newName := operationName
+	suffix := getNamedType(typeEncoder, true, "")
+
+	if _, ok := defaultScalarTypes[rest.ScalarName(suffix)]; !ok && strings.HasPrefix(suffix, utils.ToPascalCase(operationName)) {
+		newName += strconv.Itoa(index)
+	} else {
+		newName += "_" + suffix
+	}
+
+	if _, ok := sm.Functions[newName]; ok {
+		return evalUniqueOperationName(sm, newName, 0)
+	}
+
+	if _, ok := sm.Procedures[newName]; ok {
+		return evalUniqueOperationName(sm, newName, 0)
+	}
+
+	return newName
+}
+
+func evalUniqueOperationName(sm *rest.NDCHttpSchema, name string, times int) string {
+	newName := name
+
+	if times > 0 {
+		newName += strconv.Itoa(times)
+	}
+
+	lowerName := strings.ToLower(newName)
+
+	for key := range sm.Functions {
+		if lowerName == strings.ToLower(key) {
+			return evalUniqueOperationName(sm, name, times+1)
+		}
+	}
+
+	for key := range sm.Procedures {
+		if lowerName == strings.ToLower(key) {
+			return evalUniqueOperationName(sm, name, times+1)
+		}
+	}
+
+	return newName
 }

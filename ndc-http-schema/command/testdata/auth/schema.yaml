@@ -173,6 +173,16 @@ object_types:
         type:
           name: String
           type: named
+      subscription:
+        type:
+          name: subscription
+          type: named
+  subscription:
+    fields:
+      name:
+        type:
+          name: String
+          type: named
   PetXml:
     fields:
       category:

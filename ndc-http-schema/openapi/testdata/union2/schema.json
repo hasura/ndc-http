@@ -7,7 +7,7 @@
       "name": "getPet",
       "result_type": {
         "element_type": {
-          "name": "GetPetResult",
+          "name": "GetPetResultAnyOf",
           "type": "named"
         },
         "type": "array"
@@ -43,7 +43,7 @@
         },
         "type": {
           "type": {
-            "name": "CatType",
+            "name": "CatTypeEnum",
             "type": "named"
           }
         }
@@ -74,13 +74,13 @@
         },
         "type": {
           "type": {
-            "name": "DogType",
+            "name": "DogTypeEnum",
             "type": "named"
           }
         }
       }
     },
-    "GetPetResult": {
+    "GetPetResultAnyOf": {
       "fields": {
         "age": {
           "type": {
@@ -134,7 +134,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "GetPetResultTypeEnum",
+              "name": "GetPetResultAnyOfTypeEnum",
               "type": "named"
             }
           }
@@ -244,7 +244,7 @@
     }
   ],
   "scalar_types": {
-    "CatType": {
+    "CatTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -254,7 +254,7 @@
         "type": "enum"
       }
     },
-    "DogType": {
+    "DogTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -264,7 +264,7 @@
         "type": "enum"
       }
     },
-    "GetPetResultTypeEnum": {
+    "GetPetResultAnyOfTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {

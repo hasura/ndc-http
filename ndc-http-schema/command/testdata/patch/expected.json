@@ -858,6 +858,12 @@
               "name": "String",
               "type": "named"
             }
+          },
+          "subscription": {
+            "type": {
+              "name": "subscriptionObject",
+              "type": "named"
+            }
           }
         }
       },
@@ -1192,6 +1198,16 @@
         },
         "xml": {
           "name": "tag"
+        }
+      },
+      "subscriptionObject": {
+        "fields": {
+          "name": {
+            "type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
         }
       }
     },

@@ -16,7 +16,7 @@
             "type": "nullable",
             "underlying_type": {
               "element_type": {
-                "name": "GetAllocationOptFields",
+                "name": "GetAllocationOptFieldsEnum",
                 "type": "named"
               },
               "type": "array"
@@ -37,13 +37,13 @@
       "description": "Get an allocation",
       "name": "getAllocation",
       "result_type": {
-        "name": "GetAllocationResult",
+        "name": "GetAllocationResultObject",
         "type": "named"
       }
     }
   ],
   "object_types": {
-    "AllocationBaseEffort": {
+    "AllocationBaseEffortObject": {
       "description": "The amount of time associated with the allocation, represented as a percentage or number of hours",
       "fields": {
         "type": {
@@ -51,7 +51,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "AllocationBaseEffortType",
+              "name": "AllocationBaseEffortTypeEnum",
               "type": "named"
             }
           }
@@ -74,7 +74,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "AllocationResponse1Assignee",
+              "name": "AllocationResponse1AssigneeAllOf",
               "type": "named"
             }
           }
@@ -84,7 +84,7 @@
           "type": {
             "type": "nullable",
             "underlying_type": {
-              "name": "AllocationBaseEffort",
+              "name": "AllocationBaseEffortObject",
               "type": "named"
             }
           }
@@ -131,7 +131,7 @@
         }
       }
     },
-    "AllocationResponse1Assignee": {
+    "AllocationResponse1AssigneeAllOf": {
       "fields": {
         "gid": {
           "description": "Globally unique identifier of the resource, as a string.",
@@ -165,7 +165,7 @@
         }
       }
     },
-    "GetAllocationResult": {
+    "GetAllocationResultObject": {
       "fields": {
         "data": {
           "type": {
@@ -181,7 +181,7 @@
   },
   "procedures": [],
   "scalar_types": {
-    "AllocationBaseEffortType": {
+    "AllocationBaseEffortTypeEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {
@@ -213,7 +213,7 @@
         "type": "float64"
       }
     },
-    "GetAllocationOptFields": {
+    "GetAllocationOptFieldsEnum": {
       "aggregate_functions": {},
       "comparison_operators": {},
       "representation": {

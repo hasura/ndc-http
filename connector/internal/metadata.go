@@ -18,7 +18,7 @@ func (rms MetadataCollection) GetFunction(name string) (*rest.OperationInfo, *co
 		}
 	}
 
-	return nil, nil, schema.UnprocessableContentError("unsupported query: "+name, nil)
+	return nil, nil, schema.NotSupportedError("unsupported query: "+name, nil)
 }
 
 // GetProcedure gets the NDC procedure by name.
@@ -30,5 +30,5 @@ func (rms MetadataCollection) GetProcedure(name string) (*rest.OperationInfo, *c
 		}
 	}
 
-	return nil, nil, schema.UnprocessableContentError("unsupported mutation: "+name, nil)
+	return nil, nil, schema.NotSupportedError("unsupported mutation: "+name, nil)
 }
