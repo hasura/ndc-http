@@ -465,7 +465,7 @@
       },
       "alias": "Filter"
     },
-    "GetNotificationHistoryBodyInputObject": {
+    "GetNotificationHistoryBodyObjectInput": {
       "fields": {
         "app_id": {
           "type": {
@@ -1788,7 +1788,7 @@
         "body": {
           "description": "Request body of POST /notifications/{notification_id}/history",
           "type": {
-            "name": "GetNotificationHistoryBodyInputObject",
+            "name": "GetNotificationHistoryBodyObjectInput",
             "type": "named"
           },
           "http": {

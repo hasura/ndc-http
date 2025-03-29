@@ -15,12 +15,12 @@ func TestJSONEncode(t *testing.T) {
 		ResultType schema.Type
 	}{
 		{
-			Name:       "PostCheckoutSessionsBodyInputObject",
+			Name:       "PostCheckoutSessionsBodyObjectInput",
 			Input:      `{}`,
-			ResultType: schema.NewNamedType("PostCheckoutSessionsBodyInputObject").Encode(),
+			ResultType: schema.NewNamedType("PostCheckoutSessionsBodyObjectInput").Encode(),
 		},
 		{
-			Name: "PostCheckoutSessionsBodyInputObject",
+			Name: "PostCheckoutSessionsBodyObjectInput",
 			Input: `{
 				"after_expiration": {
 				  "recovery": {
@@ -399,7 +399,7 @@ func TestJSONEncode(t *testing.T) {
 				},
 				"ui_mode": "hosted"
 			}`,
-			ResultType: schema.NewNamedType("PostCheckoutSessionsBodyInputObject").Encode(),
+			ResultType: schema.NewNamedType("PostCheckoutSessionsBodyObjectInput").Encode(),
 		},
 	}
 

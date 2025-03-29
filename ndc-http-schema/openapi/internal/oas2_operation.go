@@ -109,7 +109,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 		bodyTypes = []SchemaInfoCache{{}}
 	}
 
-	for _, bodyType := range bodyTypes {
+	for i, bodyType := range bodyTypes {
 		newProcName := procName
 		arguments := make(map[string]rest.ArgumentInfo)
 		for key, arg := range oc.Arguments {
@@ -138,8 +138,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 			}
 
 			if len(bodyTypes) > 1 {
-				bodyTypeName := getNamedType(bodyType.TypeRead, true, "")
-				newProcName = procName + "_" + strings.TrimPrefix(bodyTypeName, utils.ToPascalCase(procName))
+				newProcName = buildUnionOperationName(oc.builder.schema, newProcName, bodyType.TypeRead, i)
 			}
 		}
 
