@@ -13,9 +13,10 @@ import (
 
 // RequestBuilderResults hold the result of built requests.
 type RequestBuilderResults struct {
-	Requests  []*RetryableRequest
-	Operation *rest.OperationInfo
-	Schema    *configuration.NDCHttpRuntimeSchema
+	OperationName string
+	Requests      []*RetryableRequest
+	Operation     *rest.OperationInfo
+	Schema        *configuration.NDCHttpRuntimeSchema
 
 	*HTTPOptions
 }
@@ -53,10 +54,12 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 	}
 
 	results := &RequestBuilderResults{
-		Operation:   operation,
-		Schema:      runtimeSchema,
-		HTTPOptions: httpOptions,
+		OperationName: operationName,
+		Operation:     operation,
+		Schema:        runtimeSchema,
+		HTTPOptions:   httpOptions,
 	}
+
 	results.HTTPOptions.Concurrency = um.config.Concurrency.HTTP
 
 	if strings.HasPrefix(operation.Request.URL, "http") {

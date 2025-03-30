@@ -105,6 +105,7 @@ func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.Op
 		if err != nil {
 			return nil, fmt.Errorf("%s: arguments.%s: %w", operationName, key, err)
 		}
+
 		result.Arguments[key] = rest.ArgumentInfo{
 			HTTP: field.HTTP,
 			ArgumentInfo: schema.ArgumentInfo{
@@ -114,12 +115,18 @@ func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.Op
 		}
 	}
 
-	resultType, err := nsc.validateType(operation.ResultType)
+	resultType := operation.ResultType
+	// if the original result type exists restore the result type.
+	if len(operation.OriginalResultType) > 0 {
+		resultType = operation.OriginalResultType
+	}
+
+	resultTypeEncoder, err := nsc.validateType(resultType)
 	if err != nil {
 		return nil, fmt.Errorf("%s: result_type: %w", operationName, err)
 	}
 
-	result.ResultType = resultType.Encode()
+	result.ResultType = resultTypeEncoder.Encode()
 
 	return result, nil
 }

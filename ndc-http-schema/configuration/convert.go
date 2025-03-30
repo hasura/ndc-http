@@ -63,7 +63,7 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 		return nil, err
 	}
 
-	return ndc.BuildTransformResponseSchema(newSchema)
+	return ndc.BuildTransformResponseSchema(newSchema, logger)
 }
 
 // ResolveConvertConfigArguments resolves convert config arguments.

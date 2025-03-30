@@ -71,6 +71,7 @@ func (c *HTTPConnector) execQuerySync(ctx context.Context, state *State, request
 		if err != nil {
 			return nil, err
 		}
+
 		rowSets[i] = schema.RowSet{
 			Aggregates: schema.RowSetAggregates{},
 			Rows: []map[string]any{
@@ -97,6 +98,7 @@ func (c *HTTPConnector) execQueryAsync(ctx context.Context, state *State, reques
 				if err != nil {
 					return err
 				}
+
 				rowSets[index] = schema.RowSet{
 					Aggregates: schema.RowSetAggregates{},
 					Rows: []map[string]any{
@@ -146,7 +148,9 @@ func (c *HTTPConnector) serializeExplainResponse(ctx context.Context, requests *
 	explainResp := &schema.ExplainResponse{
 		Details: schema.ExplainResponseDetails{},
 	}
+
 	httpRequest := requests.Requests[0]
+
 	if httpRequest.Body != nil {
 		explainResp.Details["body"] = string(httpRequest.Body)
 		httpRequest.Body = nil
@@ -156,6 +160,7 @@ func (c *HTTPConnector) serializeExplainResponse(ctx context.Context, requests *
 	if err != nil {
 		return nil, err
 	}
+
 	defer cancel()
 
 	// mask sensitive forwarded headers if exists
@@ -166,8 +171,8 @@ func (c *HTTPConnector) serializeExplainResponse(ctx context.Context, requests *
 	}
 
 	c.upstreams.InjectMockRequestSettings(req, requests.Schema.Name, httpRequest.RawRequest.Security)
-
 	explainResp.Details["url"] = req.URL.String()
+
 	rawHeaders, err := json.Marshal(req.Header)
 	if err != nil {
 		return nil, schema.InternalServerError("failed to encode headers", map[string]any{

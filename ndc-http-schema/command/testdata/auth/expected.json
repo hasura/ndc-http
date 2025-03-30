@@ -65,7 +65,7 @@
           "targets": ["findPets"]
         },
         {
-          "body": "$[*].subscription[0]",
+          "body": "$[*].subscription[*].name",
           "targets": ["findPets"]
         },
         {
@@ -86,14 +86,14 @@
         "arguments": {},
         "description": "Finds Pets",
         "result_type": {
-          "element_type": {
+          "type": "nullable",
+          "underlying_type": {
             "element_type": {
-              "name": "subscriptionObject",
+              "name": "String",
               "type": "named"
             },
             "type": "array"
-          },
-          "type": "array"
+          }
         },
         "original_result_type": {
           "element_type": {

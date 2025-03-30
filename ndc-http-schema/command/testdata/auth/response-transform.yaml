@@ -5,6 +5,6 @@ settings:
       body:
         - subscription: $[*].subscription
     - targets: ["findPets"]
-      body: $[*].subscription[0]
+      body: $[*].subscription[*].name
     - targets: ["findPets"]
       body: $[0]

@@ -283,7 +283,15 @@ func (client *HTTPClient) sendSingle(ctx context.Context, request *RetryableRequ
 		return nil, nil, evalErr
 	}
 
-	return result, resp.Header, nil
+	transformedResult, err := client.transformResponse(result)
+	if err != nil {
+		span.SetStatus(codes.Error, "failed to transform the http response")
+		span.RecordError(err)
+
+		return nil, nil, schema.InternalServerError(err.Error(), nil)
+	}
+
+	return transformedResult, resp.Header, nil
 }
 
 func (client *HTTPClient) doRequest(ctx context.Context, request *RetryableRequest, port int, retryCount int) (*http.Response, []byte, context.CancelFunc, error) {

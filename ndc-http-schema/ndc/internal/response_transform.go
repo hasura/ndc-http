@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"log/slog"
 	"reflect"
 	"strings"
 
@@ -17,13 +18,19 @@ import (
 type ResponseTransformer struct {
 	schema  *rest.NDCHttpSchema
 	setting rest.ResponseTransformSetting
+	logger  *slog.Logger
 }
 
 // NewResponseTransformer create a new ResponseTransformer instance.
-func NewResponseTransformer(ndcSchema *rest.NDCHttpSchema, setting rest.ResponseTransformSetting) *ResponseTransformer {
+func NewResponseTransformer(ndcSchema *rest.NDCHttpSchema, setting rest.ResponseTransformSetting, logger *slog.Logger) *ResponseTransformer {
+	if logger == nil {
+		logger = slog.Default()
+	}
+
 	return &ResponseTransformer{
 		schema:  ndcSchema,
 		setting: setting,
+		logger:  logger,
 	}
 }
 
@@ -66,6 +73,8 @@ func (rt *ResponseTransformer) transformOperations(operationNames []string, body
 					return nil, err
 				}
 
+				rt.logger.Debug(fmt.Sprintf("failed to transform operation %s: %s", name, err.Error()))
+
 				continue
 			}
 
@@ -81,6 +90,8 @@ func (rt *ResponseTransformer) transformOperations(operationNames []string, body
 				if strict {
 					return nil, err
 				}
+
+				rt.logger.Debug(fmt.Sprintf("failed to transform operation %s: %s", name, err.Error()))
 
 				continue
 			}
@@ -226,7 +237,7 @@ func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field refl
 		}
 
 	default:
-		return nil, fmt.Errorf("unsupported reflection kind %v: %v", fieldKind, field.Interface())
+		return nil, fmt.Errorf("%s: unsupported reflection kind %v: %v", strings.Join(fieldPaths, "."), fieldKind, field.Interface())
 	}
 
 	if !notNull {
@@ -267,13 +278,20 @@ func (rt *ResponseTransformer) evalJSONPath(resultType schema.Type, segments []*
 		return restUtils.WrapNullableTypeEncoder(underlyingType), nil
 	case *schema.ArrayType:
 		switch selector.(type) {
-		case spec.WildcardSelector, spec.Index, spec.SliceSelector:
+		case spec.WildcardSelector, spec.SliceSelector:
 			newType, err := rt.evalJSONPath(t.ElementType, segments[1:], append(fieldPaths, "[]"))
 			if err != nil {
 				return nil, err
 			}
 
 			return schema.NewArrayType(newType), nil
+		case spec.Index:
+			newType, err := rt.evalJSONPath(t.ElementType, segments[1:], append(fieldPaths, "[]"))
+			if err != nil {
+				return nil, err
+			}
+
+			return schema.NewNullableType(newType), nil
 		default:
 			return nil, fmt.Errorf("invalid json path at %s. Expected array, got: %v", strings.Join(fieldPaths, "."), selector)
 		}
