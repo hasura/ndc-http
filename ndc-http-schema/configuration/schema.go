@@ -206,12 +206,12 @@ func buildSchemaFile(config *Configuration, configDir string, configItem *Config
 
 	// cache original result type to be used if header forwarding or distributed execution is enabled
 	for key, op := range ndcSchema.Functions {
-		op.OriginalResultType = op.ResultType
+		op.BackupResultType()
 		ndcSchema.Functions[key] = op
 	}
 
 	for key, op := range ndcSchema.Procedures {
-		op.OriginalResultType = op.ResultType
+		op.BackupResultType()
 		ndcSchema.Procedures[key] = op
 	}
 

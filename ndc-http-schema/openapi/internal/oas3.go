@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/hasura/ndc-http/ndc-http-schema/ndc"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/schema"
@@ -70,7 +71,10 @@ func (oc *OAS3Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v3.
 	oc.schemaCache = make(map[string]SchemaInfoCache)
 	oc.transformWriteSchema()
 
-	return NewNDCBuilder(oc.schema, *oc.ConvertOptions).Build()
+	return ndc.NewNDCBuilder(oc.schema, ndc.ConvertOptions{
+		Prefix: oc.Prefix,
+		Logger: oc.Logger,
+	}).Build()
 }
 
 func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig {

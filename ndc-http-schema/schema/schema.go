@@ -14,8 +14,8 @@ import (
 //
 // [NDC schema]: https://github.com/hasura/ndc-sdk-go/blob/1d3339db29e13a170aa8be5ff7fae8394cba0e49/schema/schema.generated.go#L887
 type NDCHttpSchema struct {
-	SchemaRef string           `json:"$schema,omitempty"  mapstructure:"$schema"  yaml:"$schema,omitempty"`
-	Settings  *NDCHttpSettings `json:"settings,omitempty" mapstructure:"settings" yaml:"settings,omitempty"`
+	SchemaRef string           `json:"$schema,omitempty" mapstructure:"$schema"  yaml:"$schema,omitempty"`
+	Settings  *NDCHttpSettings `json:"settings"          mapstructure:"settings" yaml:"settings"`
 
 	// Functions (i.e. collections which return a single column and row)
 	Functions map[string]OperationInfo `json:"functions" mapstructure:"functions" yaml:"functions"`
@@ -293,6 +293,7 @@ type OperationInfo struct {
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 	var raw map[string]json.RawMessage
+
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
@@ -300,9 +301,11 @@ func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 	rawReq, ok := raw["request"]
 	if ok {
 		var request Request
+
 		if err := json.Unmarshal(rawReq, &request); err != nil {
 			return err
 		}
+
 		j.Request = &request
 	}
 
@@ -312,6 +315,7 @@ func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawArguments, &arguments); err != nil {
 			return err
 		}
+
 		j.Arguments = arguments
 	}
 
@@ -319,26 +323,33 @@ func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 	if !ok {
 		return errors.New("field result_type in OperationInfo: required")
 	}
+
 	var resultType schema.Type
+
 	if err := json.Unmarshal(rawResultType, &resultType); err != nil {
 		return fmt.Errorf("field result_type in OperationInfo: %w", err)
 	}
+
 	j.ResultType = resultType
 
 	rawOriginalResultType, ok := raw["original_result_type"]
 	if ok {
 		var originalResultType schema.Type
+
 		if err := json.Unmarshal(rawOriginalResultType, &originalResultType); err != nil {
 			return fmt.Errorf("field original_result_type in OperationInfo: %w", err)
 		}
+
 		j.OriginalResultType = originalResultType
 	}
 
 	if rawDescription, ok := raw["description"]; ok {
 		var description string
+
 		if err := json.Unmarshal(rawDescription, &description); err != nil {
 			return fmt.Errorf("field description in OperationInfo: %w", err)
 		}
+
 		j.Description = &description
 	}
 
@@ -348,6 +359,7 @@ func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 // Schema returns the connector schema of the function.
 func (j OperationInfo) FunctionSchema(name string) schema.FunctionInfo {
 	arguments := make(schema.FunctionInfoArguments)
+
 	for key, argument := range j.Arguments {
 		arguments[key] = argument.ArgumentInfo
 	}
@@ -363,6 +375,7 @@ func (j OperationInfo) FunctionSchema(name string) schema.FunctionInfo {
 // Schema returns the connector schema of the function.
 func (j OperationInfo) ProcedureSchema(name string) schema.ProcedureInfo {
 	arguments := make(schema.ProcedureInfoArguments)
+
 	for key, argument := range j.Arguments {
 		arguments[key] = argument.ArgumentInfo
 	}
@@ -372,6 +385,13 @@ func (j OperationInfo) ProcedureSchema(name string) schema.ProcedureInfo {
 		Arguments:   arguments,
 		Description: j.Description,
 		ResultType:  j.ResultType,
+	}
+}
+
+// BackupResultType sets the result type to original result type if empty.
+func (j *OperationInfo) BackupResultType() {
+	if len(j.OriginalResultType) == 0 {
+		j.OriginalResultType = j.ResultType
 	}
 }
 

@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../jsonschema/ndc-http-schema.patch.json
+settings:
+  responseTransforms:
+    - targets: ["findPets"]
+      body:
+        - subscription: $[*].subscription
+    - targets: ["findPets"]
+      body: $[*].subscription[0]
+    - targets: ["findPets"]
+      body: $[0]

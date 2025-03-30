@@ -344,30 +344,6 @@ func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 	}
 }
 
-func evalUniqueSchemaTypeName(sm *rest.NDCHttpSchema, name string, times int) string {
-	newName := name
-
-	if times > 0 {
-		newName += strconv.Itoa(times)
-	}
-
-	lowerName := strings.ToLower(newName)
-
-	for key := range sm.ObjectTypes {
-		if lowerName == strings.ToLower(key) {
-			return evalUniqueSchemaTypeName(sm, name, times+1)
-		}
-	}
-
-	for key := range sm.ScalarTypes {
-		if lowerName == strings.ToLower(key) {
-			return evalUniqueSchemaTypeName(sm, name, times+1)
-		}
-	}
-
-	return newName
-}
-
 func evalUniqueScalarEnumName(sm *rest.NDCHttpSchema, name string, enums []string, times int) string {
 	newName := name
 

@@ -54,7 +54,25 @@
           "api_key": []
         }
       ],
-      "version": "1.0.18"
+      "version": "1.0.18",
+      "responseTransforms": [
+        {
+          "body": [
+            {
+              "subscription": "$[*].subscription"
+            }
+          ],
+          "targets": ["findPets"]
+        },
+        {
+          "body": "$[*].subscription[0]",
+          "targets": ["findPets"]
+        },
+        {
+          "body": "$[0]",
+          "targets": ["findPets"]
+        }
+      ]
     },
     "functions": {
       "findPets": {
@@ -69,8 +87,11 @@
         "description": "Finds Pets",
         "result_type": {
           "element_type": {
-            "name": "Pet",
-            "type": "named"
+            "element_type": {
+              "name": "subscriptionObject",
+              "type": "named"
+            },
+            "type": "array"
           },
           "type": "array"
         },
@@ -197,6 +218,19 @@
                 "name": "String",
                 "type": "named"
               }
+            }
+          }
+        }
+      },
+      "FindPetsTransformedResult": {
+        "fields": {
+          "subscription": {
+            "type": {
+              "element_type": {
+                "name": "subscriptionObject",
+                "type": "named"
+              },
+              "type": "array"
             }
           }
         }

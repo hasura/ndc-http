@@ -245,8 +245,8 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 			writeObject.Alias = fieldPaths[0]
 		}
 	} else {
-		refName = evalUniqueSchemaTypeName(oc.state.schema, refName+"Object", 0)
-		writeRefName = evalUniqueSchemaTypeName(oc.state.schema, formatWriteObjectName(refName), 0)
+		refName = utils.BuildUniqueSchemaTypeName(oc.state.schema, refName+"Object")
+		writeRefName = utils.BuildUniqueSchemaTypeName(oc.state.schema, formatWriteObjectName(refName))
 	}
 
 	if typeResult.Description != "" {
