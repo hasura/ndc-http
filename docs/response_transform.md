@@ -24,12 +24,12 @@ settings:
       body: $.data
 ```
 
-The `responseTransforms` accepts a list of transformation pipeline. Each element is a object with the following properties:
+The `responseTransforms` accepts a list of transformation pipelines. Each element is an object with the following properties:
 
-- `targets`: list of operations to be applied. If the targets field is empty the connector will try to evaluate all operations.
+- `targets`: list of operations to be applied. If the target field is empty the connector will try to evaluate all operations.
 - `body`: the body template will be transformed. You can use the JSON path to pick values from the original response.
 
-The transformation pipelines are executed in sequence. Therefore you can compose the transformations.
+The transformation pipelines are executed in sequence. Therefore you can compose many transformations into the same operation.
 
 ```yaml
 settings:
