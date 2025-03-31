@@ -60,6 +60,11 @@ settings:
   security:
     - api_key: []
   version: 1.0.18
+  responseTransforms:
+    - targets: []
+      body: $.category
+    - targets: ["putPetXml"]
+      body: $.name
 functions:
   findPets:
     request:

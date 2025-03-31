@@ -28,3 +28,14 @@ The `responseTransforms` accepts a list of transformation pipeline. Each element
 
 - `targets`: list of operations to be applied. If the targets field is empty the connector will try to evaluate all operations.
 - `body`: the body template will be transformed. You can use the JSON path to pick values from the original response.
+
+The transformation pipelines are executed in sequence. Therefore you can compose the transformations.
+
+```yaml
+settings:
+  responseTransforms:
+    - targets: [query1]
+      body: $.category
+    - targets: ["query1"]
+      body: $.name
+```

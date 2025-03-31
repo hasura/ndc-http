@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"reflect"
+	"regexp"
 	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
@@ -39,27 +40,63 @@ func (rt *ResponseTransformer) Transform() (*rest.NDCHttpSchema, []string, error
 	var operationNames []string
 	var err error
 
-	if len(rt.setting.Targets) == 0 {
-		operationNames, err = rt.transformAllOperations(reflect.ValueOf(rt.setting.Body))
-	} else {
-		operationNames, err = rt.transformOperations(rt.setting.Targets, reflect.ValueOf(rt.setting.Body), true)
+	targets, err := rt.validateTargets(rt.setting.Targets)
+	if err != nil {
+		return nil, nil, err
 	}
+
+	operationNames, err = rt.transformOperations(targets, reflect.ValueOf(rt.setting.Body), len(rt.setting.Targets) > 0)
 
 	return rt.schema, operationNames, err
 }
 
-func (rt *ResponseTransformer) transformAllOperations(body reflect.Value) ([]string, error) {
-	operationNames := make([]string, 0, len(rt.schema.Functions)+len(rt.schema.Procedures))
+func (rt *ResponseTransformer) validateTargets(targetInputs []string) ([]string, error) {
+	var operationNames []string
+
+	targetRegexes := make([]*regexp.Regexp, len(targetInputs))
+
+	for i, target := range targetInputs {
+		regex, err := regexp.Compile(target)
+		if err != nil {
+			return nil, fmt.Errorf("invalid target pattern at %d: %w", i, err)
+		}
+
+		targetRegexes[i] = regex
+	}
 
 	for name := range rt.schema.Functions {
-		operationNames = append(operationNames, name)
+		isValid := true
+
+		for _, regex := range targetRegexes {
+			isValid = regex.MatchString(name)
+
+			if isValid {
+				break
+			}
+		}
+
+		if isValid {
+			operationNames = append(operationNames, name)
+		}
 	}
 
 	for name := range rt.schema.Procedures {
-		operationNames = append(operationNames, name)
+		isValid := true
+
+		for _, regex := range targetRegexes {
+			isValid = regex.MatchString(name)
+
+			if isValid {
+				break
+			}
+		}
+
+		if isValid {
+			operationNames = append(operationNames, name)
+		}
 	}
 
-	return rt.transformOperations(operationNames, body, false)
+	return operationNames, nil
 }
 
 func (rt *ResponseTransformer) transformOperations(operationNames []string, body reflect.Value, strict bool) ([]string, error) {

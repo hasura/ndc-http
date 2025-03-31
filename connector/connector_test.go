@@ -451,68 +451,6 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 							},
 							"response": {
 								"column": "response",
-								"fields": {
-									"fields": {
-										"category": {
-											"column": "category",
-											"fields": {
-												"fields": {
-													"id": {
-														"column": "id",
-														"type": "column"
-													},
-													"name": {
-														"column": "name",
-														"type": "column"
-													}
-												},
-												"type": "object"
-											},
-											"type": "column"
-										},
-										"field": {
-											"column": "field",
-											"type": "column"
-										},
-										"id": {
-											"column": "id",
-											"type": "column"
-										},
-										"name": {
-											"column": "name",
-											"type": "column"
-										},
-										"photoUrls": {
-											"column": "photoUrls",
-											"type": "column"
-										},
-										"status": {
-											"column": "status",
-											"type": "column"
-										},
-										"tags": {
-											"column": "tags",
-											"fields": {
-												"fields": {
-													"fields": {
-														"id": {
-															"column": "id",
-															"type": "column"
-														},
-														"name": {
-															"column": "name",
-															"type": "column"
-														}
-													},
-													"type": "object"
-												},
-												"type": "array"
-											},
-											"type": "column"
-										}
-									},
-									"type": "object"
-								},
 								"type": "column"
 							}
 						},
@@ -528,24 +466,8 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
 				schema.NewProcedureResult(map[string]any{
-					"headers": map[string]any{"Content-Type": string("application/xml")},
-					"response": map[string]any{
-						"id":   float64(10),
-						"name": "doggie",
-						"category": map[string]any{
-							"id":   float64(1),
-							"name": "Dogs",
-						},
-						"field":     nil,
-						"photoUrls": []any{"string"},
-						"tags": []any{
-							map[string]any{
-								"id":   float64(0),
-								"name": "string",
-							},
-						},
-						"status": "available",
-					},
+					"headers":  map[string]any{"Content-Type": string("application/xml")},
+					"response": "Dogs",
 				}).Encode(),
 			},
 		})

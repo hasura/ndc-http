@@ -12,7 +12,8 @@ import (
 )
 
 func (client *HTTPClient) transformResponse(body any) (any, error) {
-	if client.requests == nil || utils.IsNil(client.requests.Schema) || client.requests.Schema.Settings == nil || len(client.requests.Schema.Settings.ResponseTransforms) == 0 {
+	if client.requests == nil || client.requests.Schema == nil || client.requests.Schema.NDCHttpSchema == nil ||
+		client.requests.Schema.Settings == nil || len(client.requests.Schema.Settings.ResponseTransforms) == 0 {
 		return body, nil
 	}
 
