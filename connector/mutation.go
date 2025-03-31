@@ -112,9 +112,15 @@ func (c *HTTPConnector) execMutationOperation(parentCtx context.Context, state *
 	var requests *internal.RequestBuilderResults
 	var err error
 	if operation.Name == internal.ProcedureSendHTTPRequest {
+		if c.procSendHttpRequest == nil {
+			span.SetStatus(codes.Error, internal.ProcedureSendHTTPRequest+" mutation is disabled")
+
+			return nil, schema.InternalServerError(internal.ProcedureSendHTTPRequest+" mutation is disabled. Set runtime.enableRawRequest=true to enable this operation", nil)
+		}
+
 		requests, err = internal.NewRawRequestBuilder(operation, c.config.ForwardHeaders).Build()
 		if err == nil {
-			requests.Operation = &c.procSendHttpRequest
+			requests.Operation = c.procSendHttpRequest
 		}
 	} else {
 		requests, err = c.explainProcedure(&operation)

@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hasura/ndc-http/connector/internal"
 	"github.com/hasura/ndc-http/connector/internal/compression"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/connector"
@@ -195,6 +196,42 @@ func TestHTTPConnectorCompression(t *testing.T) {
 		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
 			Message: "zlib: invalid header",
 			Details: make(map[string]any),
+		})
+	})
+}
+
+func TestDisableRawHTTPRequest(t *testing.T) {
+	connServer, err := connector.NewServer(NewHTTPConnector(), &connector.ServerOptions{
+		Configuration: "testdata/compression",
+	}, connector.WithoutRecovery())
+	assert.NilError(t, err)
+	testServer := connServer.BuildTestServer()
+	defer testServer.Close()
+
+	t.Run("disable_raw_http", func(t *testing.T) {
+		rawReqBody, err := json.Marshal(schema.MutationRequest{
+			CollectionRelationships: make(schema.MutationRequestCollectionRelationships),
+			Operations: []schema.MutationOperation{
+				{
+					Type: schema.MutationOperationProcedure,
+					Name: "sendHttpRequest",
+					Arguments: []byte(`{
+						"body": {},
+						"method": "post",
+						"url": "https://jsonplaceholder.typicode.com/posts"
+					}`),
+					Fields: schema.NewNestedObject(map[string]schema.FieldEncoder{
+						"id": schema.NewColumnField("id", nil),
+					}).Encode(),
+				},
+			},
+		})
+
+		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
+			Message: internal.ProcedureSendHTTPRequest + " mutation is disabled. Set runtime.enableRawRequest=true to enable this operation",
+			Details: map[string]any{},
 		})
 	})
 }
