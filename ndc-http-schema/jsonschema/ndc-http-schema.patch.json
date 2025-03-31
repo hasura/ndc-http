@@ -263,13 +263,6 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "required": [
-        "settings",
-        "functions",
-        "object_types",
-        "procedures",
-        "scalar_types"
-      ],
       "description": "NDCHttpSchema extends the [NDC SchemaResponse] with OpenAPI HTTP information"
     },
     "NDCHttpSettings": {
@@ -316,9 +309,6 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "required": [
-        "servers"
-      ],
       "description": "NDCHttpSettings represent global settings of the HTTP API, including base URL, headers, etc..."
     },
     "OAuthFlow": {

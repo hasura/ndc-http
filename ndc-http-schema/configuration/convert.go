@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/hasura/ndc-http/ndc-http-schema/ndc"
 	"github.com/hasura/ndc-http/ndc-http-schema/openapi"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -40,7 +41,10 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 	case schema.OpenAPIv2Spec, (schema.OAS2Spec):
 		result, errs = openapi.OpenAPIv2ToNDCSchema(rawContent, options)
 	case schema.NDCSpec:
-		result, err = openapi.BuildNDCSchema(rawContent, options)
+		result, err = ndc.BuildNDCSchema(rawContent, ndc.ConvertOptions{
+			Prefix: options.Prefix,
+			Logger: options.Logger,
+		})
 		if err != nil {
 			errs = append(errs, err)
 		}
@@ -54,7 +58,12 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 		logger.Error(errors.Join(errs...).Error())
 	}
 
-	return utils.ApplyPatchToHTTPSchema(result, config.PatchAfter)
+	newSchema, err := utils.ApplyPatchToHTTPSchema(result, config.PatchAfter)
+	if err != nil {
+		return nil, err
+	}
+
+	return ndc.BuildTransformResponseSchema(newSchema, logger)
 }
 
 // ResolveConvertConfigArguments resolves convert config arguments.

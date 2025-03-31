@@ -60,13 +60,28 @@ func jsonSchemaNDCHttpSchema() error {
 
 	flowSchema := r.Reflect(&schema.OAuthFlow{})
 	reflectSchema := r.Reflect(&schema.NDCHttpSchema{})
+
 	for k, def := range flowSchema.Definitions {
 		reflectSchema.Definitions[k] = def
 	}
+
 	schemaBytes, err := json.MarshalIndent(reflectSchema, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile("ndc-http-schema.schema.json", schemaBytes, 0o644)
+	if err := os.WriteFile("ndc-http-schema.schema.json", schemaBytes, 0o644); err != nil {
+		return err
+	}
+
+	// generate schema patch file. Make all properties optional.
+	reflectSchema.Definitions["NDCHttpSettings"].Required = nil
+	reflectSchema.Definitions["NDCHttpSchema"].Required = nil
+
+	schemaBytes, err = json.MarshalIndent(reflectSchema, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile("ndc-http-schema.patch.json", schemaBytes, 0o644)
 }

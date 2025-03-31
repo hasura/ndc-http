@@ -2,7 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
+	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/schema"
 )
 
@@ -42,4 +45,33 @@ func IsNullableTypeEncoder(input schema.TypeEncoder) bool {
 	_, ok := input.(*schema.NullableType)
 
 	return ok
+}
+
+// BuildUniqueSchemaTypeName builds the unique type name from schema.
+func BuildUniqueSchemaTypeName(sm *rest.NDCHttpSchema, name string) string {
+	return buildUniqueSchemaTypeName(sm, name, 0)
+}
+
+func buildUniqueSchemaTypeName(sm *rest.NDCHttpSchema, name string, times int) string {
+	newName := name
+
+	if times > 0 {
+		newName += strconv.Itoa(times)
+	}
+
+	lowerName := strings.ToLower(newName)
+
+	for key := range sm.ObjectTypes {
+		if lowerName == strings.ToLower(key) {
+			return buildUniqueSchemaTypeName(sm, name, times+1)
+		}
+	}
+
+	for key := range sm.ScalarTypes {
+		if lowerName == strings.ToLower(key) {
+			return buildUniqueSchemaTypeName(sm, name, times+1)
+		}
+	}
+
+	return newName
 }

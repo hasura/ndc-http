@@ -1,6 +1,7 @@
-package internal
+package ndc
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -11,6 +12,23 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/schema"
 )
+
+// ConvertOptions represent the common convert options for both OpenAPI v2 and v3.
+type ConvertOptions struct {
+	Prefix string
+	Logger *slog.Logger
+}
+
+// BuildNDCSchema validates and builds the NDC schema.
+func BuildNDCSchema(input []byte, options ConvertOptions) (*rest.NDCHttpSchema, error) {
+	var result *rest.NDCHttpSchema
+
+	if err := json.Unmarshal(input, &result); err != nil {
+		return nil, err
+	}
+
+	return NewNDCBuilder(result, options).Build()
+}
 
 // NDCBuilder the NDC schema builder to validate REST connector schema.
 type NDCBuilder struct {
@@ -87,6 +105,7 @@ func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.Op
 		if err != nil {
 			return nil, fmt.Errorf("%s: arguments.%s: %w", operationName, key, err)
 		}
+
 		result.Arguments[key] = rest.ArgumentInfo{
 			HTTP: field.HTTP,
 			ArgumentInfo: schema.ArgumentInfo{
@@ -96,11 +115,18 @@ func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.Op
 		}
 	}
 
-	resultType, err := nsc.validateType(operation.ResultType)
+	resultType := operation.ResultType
+	// if the original result type exists restore the result type.
+	if len(operation.OriginalResultType) > 0 {
+		resultType = operation.OriginalResultType
+	}
+
+	resultTypeEncoder, err := nsc.validateType(resultType)
 	if err != nil {
 		return nil, fmt.Errorf("%s: result_type: %w", operationName, err)
 	}
-	result.ResultType = resultType.Encode()
+
+	result.ResultType = resultTypeEncoder.Encode()
 
 	return result, nil
 }

@@ -19,13 +19,14 @@ import (
 
 // NDCHttpSettings represent global settings of the HTTP API, including base URL, headers, etc...
 type NDCHttpSettings struct {
-	Servers         []ServerConfig             `json:"servers"                   mapstructure:"servers"         yaml:"servers"`
-	Headers         map[string]utils.EnvString `json:"headers,omitempty"         mapstructure:"headers"         yaml:"headers,omitempty"`
-	ArgumentPresets []ArgumentPresetConfig     `json:"argumentPresets,omitempty" mapstructure:"argumentPresets" yaml:"argumentPresets,omitempty"`
-	SecuritySchemes map[string]SecurityScheme  `json:"securitySchemes,omitempty" mapstructure:"securitySchemes" yaml:"securitySchemes,omitempty"`
-	Security        AuthSecurities             `json:"security,omitempty"        mapstructure:"security"        yaml:"security,omitempty"`
-	Version         string                     `json:"version,omitempty"         mapstructure:"version"         yaml:"version,omitempty"`
-	TLS             *exhttp.TLSConfig          `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
+	Servers            []ServerConfig             `json:"servers"                      mapstructure:"servers"            yaml:"servers"`
+	Headers            map[string]utils.EnvString `json:"headers,omitempty"            mapstructure:"headers"            yaml:"headers,omitempty"`
+	ArgumentPresets    []ArgumentPresetConfig     `json:"argumentPresets,omitempty"    mapstructure:"argumentPresets"    yaml:"argumentPresets,omitempty"`
+	SecuritySchemes    map[string]SecurityScheme  `json:"securitySchemes,omitempty"    mapstructure:"securitySchemes"    yaml:"securitySchemes,omitempty"`
+	Security           AuthSecurities             `json:"security,omitempty"           mapstructure:"security"           yaml:"security,omitempty"`
+	Version            string                     `json:"version,omitempty"            mapstructure:"version"            yaml:"version,omitempty"`
+	TLS                *exhttp.TLSConfig          `json:"tls,omitempty"                mapstructure:"tls"                yaml:"tls,omitempty"`
+	ResponseTransforms []ResponseTransformSetting `json:"responseTransforms,omitempty" mapstructure:"responseTransforms" yaml:"responseTransforms,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -385,6 +386,14 @@ func (j ArgumentPresetValueForwardHeader) JSONSchema() *jsonschema.Schema {
 // GetType gets the type of the current argument preset value.
 func (apv ArgumentPresetValueForwardHeader) GetType() ArgumentPresetValueType {
 	return apv.Type
+}
+
+// ResponseTransformSetting represents a response transformation setting.
+type ResponseTransformSetting struct {
+	// The body template.
+	Body any `json:"body" mapstructure:"body" yaml:"body"`
+	// Target operations to be applied.
+	Targets []string `json:"targets" mapstructure:"targets" yaml:"targets"`
 }
 
 func ParseRelativeOrHttpURL(input string) (*url.URL, error) {

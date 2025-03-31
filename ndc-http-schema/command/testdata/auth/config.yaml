@@ -12,6 +12,9 @@ concurrency:
 files:
   - file: schema.yaml
     spec: ndc
+    patchAfter:
+      - path: response-transform.yaml
+        strategy: merge
     timeout:
       value: 10
     retry:

@@ -187,11 +187,3 @@ const (
 	oasAnyOf oasUnionType = "anyOf"
 	oasAllOf oasUnionType = "allOf"
 )
-
-var bannedTypeNames = []string{
-	"query",
-	"mutation",
-	"subscription",
-	"scalar",
-	"object",
-}
