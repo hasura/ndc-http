@@ -22,7 +22,7 @@ type HTTPConnector struct {
 	rawSchema           *schema.RawSchemaResponse
 	httpClient          *http.Client
 	upstreams           *internal.UpstreamManager
-	procSendHttpRequest rest.OperationInfo
+	procSendHttpRequest *rest.OperationInfo
 }
 
 // NewHTTPConnector creates a HTTP connector instance.

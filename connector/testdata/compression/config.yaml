@@ -9,6 +9,7 @@ concurrency:
   mutation: 1
   http: 1
 runtime:
+  enableRawRequest: false
   stringifyJson:
     env: HTTP_STRINGIFY_JSON
 files:

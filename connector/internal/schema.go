@@ -40,13 +40,17 @@ var defaultScalarTypes = map[rest.ScalarName]schema.ScalarType{
 }
 
 // ApplyDefaultConnectorSchema adds default connector schema to the existing schema.
-func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, forwardHeaderConfig configuration.ForwardHeadersSettings) (*schema.SchemaResponse, rest.OperationInfo) {
+func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, config *configuration.Configuration) (*schema.SchemaResponse, *rest.OperationInfo) {
 	for _, scalarName := range utils.GetKeys(defaultScalarTypes) {
 		if _, ok := input.ScalarTypes[string(scalarName)]; ok {
 			continue
 		}
 
 		input.ScalarTypes[string(scalarName)] = defaultScalarTypes[scalarName]
+	}
+
+	if config.Runtime.EnableRawRequest != nil && !*config.Runtime.EnableRawRequest {
+		return input, nil
 	}
 
 	input.ObjectTypes[objectTypeRetryPolicy] = rest.RetryPolicy{}.Schema()
@@ -82,6 +86,8 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, forwardHeaderConf
 		ResultType: schema.NewNullableNamedType(string(rest.ScalarJSON)).Encode(),
 	}
 
+	forwardHeaderConfig := config.ForwardHeaders
+
 	if forwardHeaderConfig.ArgumentField != nil && *forwardHeaderConfig.ArgumentField != "" {
 		procSendHttpRequest.Arguments[*forwardHeaderConfig.ArgumentField] = configuration.NewHeadersArgumentInfo().ArgumentInfo
 	}
@@ -95,7 +101,7 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, forwardHeaderConf
 
 	input.Procedures = append(input.Procedures, procSendHttpRequest)
 
-	return input, rest.OperationInfo{
+	return input, &rest.OperationInfo{
 		ResultType: procSendHttpRequest.ResultType,
 	}
 }

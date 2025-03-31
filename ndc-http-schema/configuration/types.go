@@ -299,19 +299,25 @@ var httpSingleOptionsArgument = rest.ArgumentInfo{
 
 // RawRuntimeSettings hold raw runtime settings.
 type RawRuntimeSettings struct {
+	// Enable the sendHttpRequest operation.
+	EnableRawRequest *bool `json:"enableRawRequest,omitempty" yaml:"enableRawRequest,omitempty"`
 	// Treat the JSON scalar as a json string
 	StringifyJSON *utils.EnvBool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
 }
 
 // RuntimeSettings hold optional runtime settings.
 type RuntimeSettings struct {
+	// Enable the sendHttpRequest operation.
+	EnableRawRequest bool `json:"enableRawRequest,omitempty" yaml:"enableRawRequest,omitempty"`
 	// Treat the JSON scalar as a json string
 	StringifyJSON bool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
 }
 
 // Validate validates and returns validated settings.
 func (rs RawRuntimeSettings) Validate() (*RuntimeSettings, error) {
-	result := RuntimeSettings{}
+	result := RuntimeSettings{
+		EnableRawRequest: rs.EnableRawRequest == nil || *rs.EnableRawRequest,
+	}
 
 	if rs.StringifyJSON != nil {
 		stringifyJson, err := rs.StringifyJSON.GetOrDefault(false)

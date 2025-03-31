@@ -283,6 +283,10 @@
     },
     "RawRuntimeSettings": {
       "properties": {
+        "enableRawRequest": {
+          "type": "boolean",
+          "description": "Enable the sendHttpRequest operation."
+        },
         "stringifyJson": {
           "$ref": "#/$defs/EnvBool",
           "description": "Treat the JSON scalar as a json string"
