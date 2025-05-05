@@ -136,7 +136,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -163,7 +167,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -190,7 +198,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
 			Message: "zlib: invalid header",
@@ -226,7 +238,11 @@ func TestDisableRawHTTPRequest(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
 			Message: internal.ProcedureSendHTTPRequest + " mutation is disabled. Set runtime.enableRawRequest=true to enable this operation",

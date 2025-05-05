@@ -49,5 +49,9 @@ func TestHTTPTransport(t *testing.T) {
 			Value: utils.ToPtr("foo.pem"),
 		},
 	}, slog.Default())
-	assert.ErrorContains(t, err, "failed to load TLS config: failed to read certificate file: open foo.pem: no such file or directory")
+	assert.ErrorContains(
+		t,
+		err,
+		"failed to load TLS config: failed to read certificate file: open foo.pem: no such file or directory",
+	)
 }

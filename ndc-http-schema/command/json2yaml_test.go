@@ -10,7 +10,6 @@ import (
 )
 
 func TestJson2Yaml(t *testing.T) {
-
 	testCases := []struct {
 		name     string
 		filePath string

@@ -39,6 +39,7 @@ func (r *RetryableRequest) CreateRequest(
 	}
 
 	ctxR, cancel := context.WithTimeout(ctx, time.Duration(timeout)*time.Second)
+
 	request, err := http.NewRequestWithContext(
 		ctxR,
 		strings.ToUpper(r.RawRequest.Method),

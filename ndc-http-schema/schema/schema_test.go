@@ -94,8 +94,10 @@ func TestDecodeHTTPFunctionInfo(t *testing.T) {
 				Arguments: map[string]ArgumentInfo{
 					"limit": {
 						ArgumentInfo: schema.ArgumentInfo{
-							Description: utils.ToPtr("How many items to return at one time (max 100)"),
-							Type:        schema.NewNullableNamedType("Int").Encode(),
+							Description: utils.ToPtr(
+								"How many items to return at one time (max 100)",
+							),
+							Type: schema.NewNullableNamedType("Int").Encode(),
 						},
 						HTTP: &RequestParameter{
 							Name: "limit",

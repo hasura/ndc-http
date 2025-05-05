@@ -88,8 +88,16 @@ func TestHTTPConnector(t *testing.T) {
 				assertHTTPResponse(t, resp, http.StatusOK, expected)
 			})
 
-			assertNdcOperations(t, path.Join(tc.Dir, "query"), fmt.Sprintf("%s/query", testServer.URL))
-			assertNdcOperations(t, path.Join(tc.Dir, "mutation"), fmt.Sprintf("%s/mutation", testServer.URL))
+			assertNdcOperations(
+				t,
+				path.Join(tc.Dir, "query"),
+				fmt.Sprintf("%s/query", testServer.URL),
+			)
+			assertNdcOperations(
+				t,
+				path.Join(tc.Dir, "mutation"),
+				fmt.Sprintf("%s/mutation", testServer.URL),
+			)
 		})
 	}
 }
@@ -106,7 +114,11 @@ func TestPromptQLCompatibleSchema(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	var response schema.SchemaResponse
 	assert.NilError(t, json.NewDecoder(resp.Body).Decode(&response))
-	assert.DeepEqual(t, response.ScalarTypes["JSON"].Representation, schema.NewTypeRepresentationString().Encode())
+	assert.DeepEqual(
+		t,
+		response.ScalarTypes["JSON"].Representation,
+		schema.NewTypeRepresentationString().Encode(),
+	)
 }
 
 func assertNdcOperations(t *testing.T, dir string, targetURL string) {
@@ -138,7 +150,10 @@ func assertNdcOperations(t *testing.T, dir string, targetURL string) {
 	}
 }
 
-func test_createServer(t *testing.T, dir string) *connector.Server[configuration.Configuration, State] {
+func test_createServer(
+	t *testing.T,
+	dir string,
+) *connector.Server[configuration.Configuration, State] {
 	t.Helper()
 	c := NewHTTPConnector()
 	server, err := connector.NewServer(c, &connector.ServerOptions{
@@ -162,7 +177,12 @@ func assertHTTPResponse[B any](t *testing.T, res *http.Response, statusCode int,
 	}
 
 	if res.StatusCode != statusCode {
-		t.Fatalf("expected status %d, got %d. Body: %s", statusCode, res.StatusCode, string(bodyBytes))
+		t.Fatalf(
+			"expected status %d, got %d. Body: %s",
+			statusCode,
+			res.StatusCode,
+			string(bodyBytes),
+		)
 	}
 
 	var body B

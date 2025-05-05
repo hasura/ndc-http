@@ -34,7 +34,10 @@ func TestConfigValidator(t *testing.T) {
 		t.Run(tc.Dir, func(t *testing.T) {
 			connectorDir := filepath.Join(tc.Dir, "connector", "http")
 			expectedBytes, err := os.ReadFile(filepath.Join(tc.Dir, "expected.tpl"))
-			config, schemas, mergedSchema, err := UpdateHTTPConfiguration(connectorDir, slog.Default())
+			config, schemas, mergedSchema, err := UpdateHTTPConfiguration(
+				connectorDir,
+				slog.Default(),
+			)
 			if tc.ErrorMsg != "" {
 				assert.ErrorContains(t, err, tc.ErrorMsg)
 
@@ -43,7 +46,14 @@ func TestConfigValidator(t *testing.T) {
 
 			assert.NilError(t, err)
 
-			validStatus, err := ValidateConfiguration(config, connectorDir, schemas, mergedSchema, slog.Default(), true)
+			validStatus, err := ValidateConfiguration(
+				config,
+				connectorDir,
+				schemas,
+				mergedSchema,
+				slog.Default(),
+				true,
+			)
 			assert.NilError(t, err)
 
 			var buf bytes.Buffer
@@ -51,7 +61,11 @@ func TestConfigValidator(t *testing.T) {
 			assert.Equal(t, tc.IsOk, validStatus.IsOk())
 			log.Println(validStatus.errors, validStatus.warnings)
 			assert.Equal(t, tc.HasError, validStatus.HasError())
-			assert.Equal(t, spacesRegex.ReplaceAllString(string(expectedBytes), "\n"), spacesRegex.ReplaceAllString(buf.String(), "\n"))
+			assert.Equal(
+				t,
+				spacesRegex.ReplaceAllString(string(expectedBytes), "\n"),
+				spacesRegex.ReplaceAllString(buf.String(), "\n"),
+			)
 		})
 	}
 }

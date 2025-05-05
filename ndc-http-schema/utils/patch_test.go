@@ -26,7 +26,6 @@ func TestPatch(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-
 			input, err := ReadFileFromPath(tc.InputPath)
 			if err != nil {
 				t.Fatalf("failed to read input file: %s", err)
@@ -51,7 +50,12 @@ func TestPatch(t *testing.T) {
 					eb, _ := json.Marshal(v)
 					rb, _ := json.Marshal(jResult[k])
 
-					t.Fatalf("field %s does not equal\nexpected: %v\ngot     : %v", k, string(eb), string(rb))
+					t.Fatalf(
+						"field %s does not equal\nexpected: %v\ngot     : %v",
+						k,
+						string(eb),
+						string(rb),
+					)
 				}
 			}
 		})

@@ -28,34 +28,45 @@ func TestDecodeXML(t *testing.T) {
 						"attributes":  map[string]string{"name": "home:Admin"},
 						"description": string(""),
 						"person": map[string]any{
-							"attributes": map[string]string{"role": "maintainer", "userid": "Admin"},
-							"content":    string(""),
+							"attributes": map[string]string{
+								"role":   "maintainer",
+								"userid": "Admin",
+							},
+							"content": string(""),
 						},
 						"repository": []any{
 							map[string]any{
 								"arch":       string("x86_64"),
 								"attributes": map[string]string{"name": "openSUSE_Tumbleweed"},
 								"path": map[string]any{
-									"attributes": map[string]string{"project": "openSUSE.org:openSUSE:Factory", "repository": "snapshot"},
-									"content":    string(""),
+									"attributes": map[string]string{
+										"project":    "openSUSE.org:openSUSE:Factory",
+										"repository": "snapshot",
+									},
+									"content": string(""),
 								},
 							},
 							map[string]any{
 								"arch":       string("x86_64"),
 								"attributes": map[string]string{"name": "15.3"},
 								"path": map[string]any{
-									"attributes": map[string]string{"project": "openSUSE.org:openSUSE:Leap:15.3", "repository": "standard"},
-									"content":    string(""),
+									"attributes": map[string]string{
+										"project":    "openSUSE.org:openSUSE:Leap:15.3",
+										"repository": "standard",
+									},
+									"content": string(""),
 								},
 							},
 						},
 						"title": string(""),
 					},
 					map[string]any{
-						"attributes":  map[string]string{"name": "openSUSE.org"},
-						"description": string("This instance delivers the default build targets for OBS."),
-						"remoteurl":   string("https://api.opensuse.org/public"),
-						"title":       string("Standard OBS instance at build.opensuse.org"),
+						"attributes": map[string]string{"name": "openSUSE.org"},
+						"description": string(
+							"This instance delivers the default build targets for OBS.",
+						),
+						"remoteurl": string("https://api.opensuse.org/public"),
+						"title":     string("Standard OBS instance at build.opensuse.org"),
 					},
 				},
 			},
@@ -74,7 +85,9 @@ func TestDecodeXML(t *testing.T) {
 
 func createMockSchema(t *testing.T) *rest.NDCHttpSchema {
 	var ndcSchema rest.NDCHttpSchema
-	rawSchemaBytes, err := os.ReadFile("../../../ndc-http-schema/openapi/testdata/petstore3/expected.json")
+	rawSchemaBytes, err := os.ReadFile(
+		"../../../ndc-http-schema/openapi/testdata/petstore3/expected.json",
+	)
 	assert.NilError(t, err)
 	assert.NilError(t, json.Unmarshal(rawSchemaBytes, &ndcSchema))
 

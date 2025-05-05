@@ -122,7 +122,11 @@ func TestOpenAPIv3ToRESTSchema(t *testing.T) {
 	})
 }
 
-func assertRESTSchemaEqual(t *testing.T, expected *schema.NDCHttpSchema, output *schema.NDCHttpSchema) {
+func assertRESTSchemaEqual(
+	t *testing.T,
+	expected *schema.NDCHttpSchema,
+	output *schema.NDCHttpSchema,
+) {
 	t.Helper()
 	assertDeepEqual(t, expected.Settings.Headers, output.Settings.Headers)
 	assertDeepEqual(t, expected.Settings.Security, output.Settings.Security)

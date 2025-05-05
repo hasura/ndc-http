@@ -202,7 +202,9 @@ func TestEvalURLAndHeaderParametersOAS2(t *testing.T) {
 
 func createMockSchema(t *testing.T) *rest.NDCHttpSchema {
 	var ndcSchema rest.NDCHttpSchema
-	rawSchemaBytes, err := os.ReadFile("../../ndc-http-schema/openapi/testdata/petstore3/expected.json")
+	rawSchemaBytes, err := os.ReadFile(
+		"../../ndc-http-schema/openapi/testdata/petstore3/expected.json",
+	)
 	assert.NilError(t, err)
 	assert.NilError(t, json.Unmarshal(rawSchemaBytes, &ndcSchema))
 
@@ -211,7 +213,9 @@ func createMockSchema(t *testing.T) *rest.NDCHttpSchema {
 
 func createMockSchemaOAS2(t *testing.T) *rest.NDCHttpSchema {
 	var ndcSchema rest.NDCHttpSchema
-	rawSchemaBytes, err := os.ReadFile("../../ndc-http-schema/openapi/testdata/petstore2/expected.json")
+	rawSchemaBytes, err := os.ReadFile(
+		"../../ndc-http-schema/openapi/testdata/petstore2/expected.json",
+	)
 	assert.NilError(t, err)
 	assert.NilError(t, json.Unmarshal(rawSchemaBytes, &ndcSchema))
 

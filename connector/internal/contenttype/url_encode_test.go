@@ -828,9 +828,13 @@ func TestCreateFormURLEncoded(t *testing.T) {
 			var arguments map[string]any
 			assert.NilError(t, json.Unmarshal([]byte(tc.RawArguments), &arguments))
 			argumentInfo := info.Arguments["body"]
-			builder := NewURLParameterEncoder(ndcSchema, info.Request.RequestBody, URLParameterEncoderOptions{
-				StringifyJSON: true,
-			})
+			builder := NewURLParameterEncoder(
+				ndcSchema,
+				info.Request.RequestBody,
+				URLParameterEncoderOptions{
+					StringifyJSON: true,
+				},
+			)
 			result, err := builder.EncodeFormBody(&argumentInfo, arguments["body"])
 			assert.NilError(t, err)
 			assert.DeepEqual(t, parseQueryAndSort(tc.Expected), parseQueryAndSort(string(result)))
@@ -1429,7 +1433,12 @@ func TestEncodePathParameters(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := EncodePathParameters("{"+tc.param.Name+"}", tc.param.Name, tc.inputs, tc.param.EncodingObject)
+			result := EncodePathParameters(
+				"{"+tc.param.Name+"}",
+				tc.param.Name,
+				tc.inputs,
+				tc.param.EncodingObject,
+			)
 			assert.Equal(t, tc.expected, result)
 		})
 	}
