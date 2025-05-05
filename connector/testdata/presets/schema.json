@@ -201,6 +201,11 @@
 		}
 	],
 	"scalar_types": {
+		"Float64": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": { "type": "float64" }
+		},
 		"Int": {
 			"aggregate_functions": {},
 			"comparison_operators": {},
