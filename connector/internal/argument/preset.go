@@ -55,6 +55,7 @@ func (ap ArgumentPreset) Evaluate(
 	}
 
 	segments := ap.Path.Query().Segments()
+
 	rootSelector, ok := segments[0].Selectors()[0].(spec.Name)
 	if !ok || rootSelector == "" {
 		return nil, errors.New("invalid json path. The root selector must be an object name")
@@ -66,6 +67,7 @@ func (ap ArgumentPreset) Evaluate(
 	}
 
 	selectorStr := string(rootSelector)
+
 	if len(segments) == 1 {
 		arguments[selectorStr] = value
 
@@ -106,6 +108,7 @@ func (ap ArgumentPreset) evalNestedField(
 		}
 
 		selectorStr := string(selector)
+
 		if segmentsLen == 1 {
 			argumentMap[selectorStr] = value
 
@@ -128,6 +131,7 @@ func (ap ArgumentPreset) evalNestedField(
 
 		for i, arg := range argumentSlice {
 			var err error
+
 			argumentSlice[i], err = ap.evalNestedField(segments[1:], arg, value, append(fieldPaths, strconv.Itoa(i)))
 			if err != nil {
 				return nil, err
@@ -153,6 +157,7 @@ func (ap ArgumentPreset) evalNestedField(
 
 		for i := selector.Start(); i <= end; i += step {
 			var err error
+
 			argumentSlice[i], err = ap.evalNestedField(segments[1:], argumentSlice[i], value, append(fieldPaths, strconv.Itoa(i)))
 			if err != nil {
 				return nil, err
@@ -163,6 +168,7 @@ func (ap ArgumentPreset) evalNestedField(
 	case spec.Index:
 		index := int(selector)
 		argumentSlice, sok := argument.([]any)
+
 		if !sok || len(argumentSlice) <= index {
 			return argument, nil
 		}

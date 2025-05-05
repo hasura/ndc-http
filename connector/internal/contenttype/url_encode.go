@@ -83,6 +83,7 @@ func (c *URLParameterEncoder) EncodeFormBody(
 		}
 
 		fieldEncoding := bodyInfo.HTTP.EncodingObject
+
 		if c.requestBody != nil && len(c.requestBody.Encoding) > 0 {
 			if enc, ok := c.requestBody.Encoding[key]; ok {
 				fieldEncoding = enc
@@ -189,6 +190,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(
 		case reflect.Map, reflect.Interface:
 			anyValue := reflectValue.Interface()
 			object, ok := anyValue.(map[string]any)
+
 			if !ok {
 				return nil, fmt.Errorf("%s: failed to evaluate object, got <%s> %v", strings.Join(fieldPaths, ""), kind, anyValue)
 			}
@@ -207,6 +209,7 @@ func (c *URLParameterEncoder) EncodeParameterValues(
 			}
 		case reflect.Struct:
 			reflectType := reflectValue.Type()
+
 			for fieldIndex := range reflectValue.NumField() {
 				fieldVal := reflectValue.Field(fieldIndex)
 				fieldType := reflectType.Field(fieldIndex)
@@ -379,9 +382,11 @@ func (c *URLParameterEncoder) encodeParameterReflectionSlice(
 	fieldPaths []string,
 ) (ParameterItems, error) {
 	results := ParameterItems{}
+
 	valueLen := reflectValue.Len()
 	for i := range valueLen {
 		elem := reflectValue.Index(i)
+
 		outputs, err := c.encodeParameterReflectionValues(
 			elem,
 			append(fieldPaths, fmt.Sprintf("[%d]", i)),
@@ -404,9 +409,11 @@ func (c *URLParameterEncoder) encodeParameterReflectionStruct(
 ) (ParameterItems, error) {
 	results := ParameterItems{}
 	reflectType := reflectValue.Type()
+
 	for fieldIndex := range reflectValue.NumField() {
 		fieldVal := reflectValue.Field(fieldIndex)
 		fieldType := reflectType.Field(fieldIndex)
+
 		output, err := c.encodeParameterReflectionValues(
 			fieldVal,
 			append(fieldPaths, "."+fieldType.Name),
@@ -430,11 +437,13 @@ func (c *URLParameterEncoder) encodeParameterReflectionMap(
 	results := ParameterItems{}
 	anyValue := reflectValue.Interface()
 	object, ok := anyValue.(map[string]any)
+
 	if !ok {
 		b, err := json.Marshal(anyValue)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), err)
 		}
+
 		values := []string{strings.Trim(string(b), `"`)}
 
 		return []ParameterItem{NewParameterItem([]Key{}, values)}, nil
@@ -607,16 +616,20 @@ func EncodeQueryValues(qValues url.Values, allowReserved bool) string {
 	}
 
 	var builder strings.Builder
+
 	index := 0
+
 	for key, values := range qValues {
 		for i, value := range values {
 			if index > 0 || i > 0 {
 				builder.WriteRune('&')
 			}
+
 			builder.WriteString(key)
 			builder.WriteRune('=')
 			builder.WriteString(value)
 		}
+
 		index++
 	}
 
@@ -738,6 +751,7 @@ func transformParameterItemStrings(queryParams ParameterItems, explode bool) []s
 
 	for _, pair := range queryParams {
 		key := pair.Keys().Format(false)
+
 		for _, value := range pair.Values() {
 			if explode {
 				// R=100,G=200,B=150

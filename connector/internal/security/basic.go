@@ -66,6 +66,7 @@ func (bc BasicCredential) InjectMock(req *http.Request) bool {
 	if bc.UserInfo == nil {
 		return false
 	}
+
 	_, _ = bc.inject(req, *url.UserPassword("xxx", "xxx"))
 
 	return true

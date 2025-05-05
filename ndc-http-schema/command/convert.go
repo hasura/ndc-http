@@ -20,6 +20,7 @@ func CommandConvertToNDCSchema(
 	logger *slog.Logger,
 ) error {
 	start := time.Now()
+
 	if args.File == "" && args.Config == "" {
 		err := errors.New("--config or --file argument is required")
 		logger.Error(err.Error())
@@ -35,6 +36,7 @@ func CommandConvertToNDCSchema(
 	}
 
 	var config configuration.ConvertConfig
+
 	if args.Config != "" {
 		rawConfig, err := utils.ReadFileFromPath(args.Config)
 		if err != nil {
@@ -42,11 +44,13 @@ func CommandConvertToNDCSchema(
 
 			return err
 		}
+
 		if err := yaml.Unmarshal(rawConfig, &config); err != nil {
 			logger.Error(err.Error())
 
 			return err
 		}
+
 		configDir = filepath.Dir(args.Config)
 	}
 
@@ -81,6 +85,7 @@ func CommandConvertToNDCSchema(
 		} else {
 			err = utils.WriteSchemaFile(config.Output, result)
 		}
+
 		if err != nil {
 			logger.Error("failed to write schema file", slog.String("error", err.Error()))
 

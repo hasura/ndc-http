@@ -85,6 +85,7 @@ func (um *UpstreamManager) BuildRequests(
 		if err != nil {
 			return nil, err
 		}
+
 		req.Namespace = runtimeSchema.Name
 		evalForwardedHeaders(req, headers)
 		results.Requests = []*RetryableRequest{req}
@@ -104,6 +105,7 @@ func (um *UpstreamManager) BuildRequests(
 		if err != nil {
 			return nil, err
 		}
+
 		results.Requests = []*RetryableRequest{req}
 
 		return results, nil
@@ -126,6 +128,7 @@ func (um *UpstreamManager) BuildRequests(
 		if err != nil {
 			return nil, err
 		}
+
 		results.Requests = append(results.Requests, req)
 	}
 
@@ -137,16 +140,19 @@ func (um *UpstreamManager) parseHTTPOptionsFromArguments(
 	rawArgs map[string]any,
 ) (*HTTPOptions, error) {
 	var result HTTPOptions
+
 	argInfo, ok := argumentsInfo[rest.HTTPOptionsArgumentName]
 	if !ok {
 		return &result, nil
 	}
+
 	rawHttpOptions, ok := rawArgs[rest.HTTPOptionsArgumentName]
 	if ok {
 		if err := result.FromValue(rawHttpOptions); err != nil {
 			return nil, err
 		}
 	}
+
 	httpOptionsNamedType := schema.GetUnderlyingNamedType(argInfo.Type)
 	result.Distributed = httpOptionsNamedType != nil &&
 		httpOptionsNamedType.Name == rest.HTTPDistributedOptionsObjectName
@@ -160,6 +166,7 @@ func (um *UpstreamManager) getArgumentHeaders(rawArgs map[string]any) (map[strin
 		*um.config.ForwardHeaders.ArgumentField == "" {
 		return headers, nil
 	}
+
 	rawHeaders, ok := rawArgs[*um.config.ForwardHeaders.ArgumentField]
 	if !ok {
 		return headers, nil

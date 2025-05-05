@@ -137,10 +137,12 @@ func (c *RequestBuilder) buildRequestBody(
 			if err != nil {
 				return err
 			}
+
 			dataURI, err := contenttype.DecodeDataURI(b64)
 			if err != nil {
 				return err
 			}
+
 			request.Body = []byte(dataURI.Data)
 
 			return nil
@@ -149,6 +151,7 @@ func (c *RequestBuilder) buildRequestBody(
 			if err != nil {
 				return err
 			}
+
 			request.Body = []byte(bodyStr)
 
 			return nil
@@ -179,6 +182,7 @@ func (c *RequestBuilder) buildRequestBody(
 			return nil
 		case contentType == "" || restUtils.IsContentTypeJSON(contentType):
 			var bodyBytes []byte
+
 			var err error
 
 			if c.GlobalRuntime.StringifyJSON {
@@ -188,6 +192,7 @@ func (c *RequestBuilder) buildRequestBody(
 				var buf bytes.Buffer
 				enc := json.NewEncoder(&buf)
 				enc.SetEscapeHTML(false)
+
 				err = enc.Encode(bodyData)
 				if err == nil {
 					bodyBytes = buf.Bytes()
@@ -218,6 +223,7 @@ func (c *RequestBuilder) buildRequestBody(
 		if err != nil {
 			return err
 		}
+
 		if ty != schema.TypeNullable {
 			return errRequestBodyRequired
 		}
@@ -233,6 +239,7 @@ func (c *RequestBuilder) getRequestUploadBody(
 	if rawRequest.RequestBody == nil || bodyInfo == nil {
 		return nil
 	}
+
 	if rawRequest.RequestBody.ContentType == rest.ContentTypeOctetStream {
 		return rawRequest.RequestBody
 	}
@@ -241,14 +248,17 @@ func (c *RequestBuilder) getRequestUploadBody(
 	if err != nil || !ok {
 		return nil
 	}
+
 	namedType, ok := bi.(*schema.NamedType)
 	if !ok {
 		return nil
 	}
+
 	iScalar, ok := c.Schema.ScalarTypes[namedType.Name]
 	if !ok {
 		return nil
 	}
+
 	_, err = iScalar.Representation.AsBytes()
 	if err != nil {
 		return nil
@@ -265,6 +275,7 @@ func (c *RequestBuilder) evalURLAndHeaderParameters() (*url.URL, http.Header, er
 	}
 
 	headers := http.Header{}
+
 	for k, h := range c.Operation.Request.Headers {
 		v, err := h.Get()
 		if err != nil {
@@ -336,6 +347,7 @@ func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(
 			queryParams,
 			argumentInfo.HTTP.EncodingObject,
 		)
+
 		endpoint.RawQuery = contenttype.EncodeQueryValues(q, argumentInfo.HTTP.AllowReserved)
 	case rest.InPath:
 		endpoint.Path = contenttype.EncodePathParameters(

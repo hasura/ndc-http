@@ -25,6 +25,7 @@ func (c *HTTPConnector) Query(
 	if err != nil {
 		return nil, schema.UnprocessableContentError(err.Error(), nil)
 	}
+
 	requestVars := request.Variables
 	if len(requestVars) == 0 {
 		requestVars = []schema.QueryRequestVariablesElem{make(schema.QueryRequestVariablesElem)}
@@ -168,6 +169,7 @@ func (c *HTTPConnector) execQuery(
 	}
 
 	client := c.upstreams.CreateHTTPClient(requests)
+
 	result, _, err := client.Send(ctx, queryFields)
 	if err != nil {
 		span.SetStatus(codes.Error, "failed to execute the http request")
@@ -213,6 +215,7 @@ func (c *HTTPConnector) serializeExplainResponse(
 		requests.Schema.Name,
 		httpRequest.RawRequest.Security,
 	)
+
 	explainResp.Details["url"] = req.URL.String()
 
 	rawHeaders, err := json.Marshal(req.Header)
@@ -221,6 +224,7 @@ func (c *HTTPConnector) serializeExplainResponse(
 			"cause": err.Error(),
 		})
 	}
+
 	explainResp.Details["headers"] = string(rawHeaders)
 
 	return explainResp, nil

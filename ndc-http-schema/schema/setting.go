@@ -100,6 +100,7 @@ func (ss ServerConfig) GetURL() (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	urlValue, err := exhttp.ParseHttpURL(rawURL)
 	if err != nil {
 		return nil, fmt.Errorf("server url: %w", err)
@@ -156,6 +157,7 @@ func (apc ArgumentPresetConfig) Validate() (*jsonpath.Path, []regexp.Regexp, err
 	}
 
 	targets := make([]regexp.Regexp, len(apc.Targets))
+
 	for i, target := range apc.Targets {
 		rg, err := regexp.Compile(target)
 		if err != nil {
@@ -165,6 +167,7 @@ func (apc ArgumentPresetConfig) Validate() (*jsonpath.Path, []regexp.Regexp, err
 				err,
 			)
 		}
+
 		targets[i] = *rg
 	}
 

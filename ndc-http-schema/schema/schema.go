@@ -48,6 +48,7 @@ func NewNDCHttpSchema() *NDCHttpSchema {
 func (ndc NDCHttpSchema) ToSchemaResponse() *schema.SchemaResponse {
 	functionKeys := utils.GetSortedKeys(ndc.Functions)
 	functions := make([]schema.FunctionInfo, len(functionKeys))
+
 	for i, key := range functionKeys {
 		fn := ndc.Functions[key]
 		functions[i] = fn.FunctionSchema(key)
@@ -55,10 +56,12 @@ func (ndc NDCHttpSchema) ToSchemaResponse() *schema.SchemaResponse {
 
 	procedureKeys := utils.GetSortedKeys(ndc.Procedures)
 	procedures := make([]schema.ProcedureInfo, len(procedureKeys))
+
 	for i, key := range procedureKeys {
 		proc := ndc.Procedures[key]
 		procedures[i] = proc.ProcedureSchema(key)
 	}
+
 	objectTypes := make(schema.SchemaResponseObjectTypes)
 	for key, object := range ndc.ObjectTypes {
 		objectTypes[key] = object.Schema()
@@ -410,6 +413,7 @@ func (j *ObjectField) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
+
 	rawType, ok := raw["type"]
 	if !ok || len(rawType) == 0 {
 		return errors.New("field type in ObjectField: required")
@@ -424,13 +428,16 @@ func (j *ObjectField) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawDesc, &desc); err != nil {
 			return fmt.Errorf("field description in ObjectField: %w", err)
 		}
+
 		j.Description = &desc
 	}
+
 	if rawArguments, ok := raw["arguments"]; ok {
 		var arguments schema.ObjectFieldArguments
 		if err := json.Unmarshal(rawArguments, &arguments); err != nil {
 			return fmt.Errorf("field arguments in ObjectField: %w", err)
 		}
+
 		j.Arguments = arguments
 	}
 
@@ -439,6 +446,7 @@ func (j *ObjectField) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawType, &ty); err != nil {
 			return fmt.Errorf("field http in ObjectField: %w", err)
 		}
+
 		j.HTTP = &ty
 	}
 
@@ -459,6 +467,7 @@ func (j *ArgumentInfo) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
+
 	rawType, ok := raw["type"]
 	if !ok || len(rawType) == 0 {
 		return errors.New("field type in ArgumentInfo: required")
@@ -473,6 +482,7 @@ func (j *ArgumentInfo) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawDesc, &desc); err != nil {
 			return fmt.Errorf("field description in ArgumentInfo: %w", err)
 		}
+
 		j.Description = &desc
 	}
 
@@ -481,6 +491,7 @@ func (j *ArgumentInfo) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawParameter, &param); err != nil {
 			return fmt.Errorf("field http in ArgumentInfo: %w", err)
 		}
+
 		j.HTTP = &param
 	}
 

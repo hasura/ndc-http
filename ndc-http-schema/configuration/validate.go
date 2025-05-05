@@ -84,9 +84,11 @@ func (cv *ConfigValidator) HasError() bool {
 func (cv *ConfigValidator) Render(w io.Writer) {
 	if len(cv.errors) > 0 {
 		writeErrorIf(w, ":", cv.noColor)
+
 		for ns, errs := range cv.errors {
 			_, _ = w.Write([]byte("\n\n"))
 			_, _ = w.Write([]byte(ns))
+
 			for _, err := range errs {
 				_, _ = w.Write([]byte("\n  * "))
 				_, _ = w.Write([]byte(err))
@@ -96,6 +98,7 @@ func (cv *ConfigValidator) Render(w io.Writer) {
 
 	if len(cv.warnings) > 0 || len(cv.requiredHeadersForwarding) > 0 {
 		writeWarningIf(w, ":\n", cv.noColor)
+
 		if len(cv.requiredHeadersForwarding) > 0 &&
 			(!cv.config.ForwardHeaders.Enabled || cv.config.ForwardHeaders.ArgumentField == nil || *cv.config.ForwardHeaders.ArgumentField == "") {
 			_, _ = fmt.Fprintf(
@@ -114,6 +117,7 @@ func (cv *ConfigValidator) Render(w io.Writer) {
 			_, _ = w.Write([]byte("\n\n  "))
 			_, _ = w.Write([]byte(ns))
 			_, _ = w.Write([]byte("\n"))
+
 			for _, err := range errs {
 				_, _ = w.Write([]byte("\n    * "))
 				_, _ = w.Write([]byte(err))
@@ -125,10 +129,12 @@ func (cv *ConfigValidator) Render(w io.Writer) {
 		writeColorTextIf(w, "\n\nEnvironment Variables:\n", ansiBrightYellow, cv.noColor)
 
 		var prefix string
+
 		serviceName := cv.getServiceName()
 		if serviceName != "" {
 			prefix = strings.ToUpper(serviceName) + "_"
 		}
+
 		variables := make([][]string, 0, len(cv.requiredVariables))
 		for _, key := range utils.GetSortedKeys(cv.requiredVariables) {
 			variables = append(variables, []string{key, prefix + key})
@@ -199,6 +205,7 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 
 	for i, server := range ndcSchema.Settings.Servers {
 		serverPath := fmt.Sprintf("settings.server[%d]", i)
+
 		if server.URL.Value == nil {
 			_, err := server.URL.Get()
 			if err == nil {
@@ -265,80 +272,108 @@ func (cv *ConfigValidator) validateArgumentPresets(
 }
 
 func (cv *ConfigValidator) validateTLS(namespace string, key string, tlsConfig *exhttp.TLSConfig) {
-	if tlsConfig.CAPem != nil || tlsConfig.CAFile != nil {
-		var err error
-		if tlsConfig.CAPem != nil {
-			_, err = tlsConfig.CAPem.Get()
-		}
+	cv.validateTLSCert(tlsConfig)
+	cv.validateTLSCA(tlsConfig)
+	cv.validateTLSKey(tlsConfig)
+	cv.validateInsecureSkipVerify(namespace, key, tlsConfig)
+}
 
-		if tlsConfig.CAPem == nil || err != nil {
-			if tlsConfig.CAFile != nil {
-				_, err = tlsConfig.CAFile.Get()
-			}
-
-			if tlsConfig.CAFile == nil || err != nil {
-				if tlsConfig.CAPem != nil && tlsConfig.CAPem.Variable != nil {
-					cv.requiredVariables[*tlsConfig.CAPem.Variable] = true
-				} else if tlsConfig.CAFile != nil && tlsConfig.CAFile.Variable != nil {
-					cv.requiredVariables[*tlsConfig.CAFile.Variable] = true
-				}
-			}
-		}
+func (cv *ConfigValidator) validateTLSCert(tlsConfig *exhttp.TLSConfig) {
+	if tlsConfig.CertPem == nil && tlsConfig.CertFile == nil {
+		return
 	}
 
-	if tlsConfig.CertPem != nil || tlsConfig.CertFile != nil {
-		var err error
-		if tlsConfig.CertPem != nil {
-			_, err = tlsConfig.CertPem.Get()
-		}
-
-		if tlsConfig.CertPem == nil || err != nil {
-			if tlsConfig.CertFile != nil {
-				_, err = tlsConfig.CertFile.Get()
-			}
-
-			if tlsConfig.CertFile == nil || err != nil {
-				if tlsConfig.CertPem != nil && tlsConfig.CertPem.Variable != nil {
-					cv.requiredVariables[*tlsConfig.CertPem.Variable] = true
-				} else if tlsConfig.CertFile != nil && tlsConfig.CertFile.Variable != nil {
-					cv.requiredVariables[*tlsConfig.CertFile.Variable] = true
-				}
-			}
-		}
-	}
-
-	if tlsConfig.KeyPem != nil || tlsConfig.KeyFile != nil {
-		var err error
-		if tlsConfig.KeyPem != nil {
-			_, err = tlsConfig.KeyPem.Get()
-		}
-
-		if tlsConfig.KeyPem == nil || err != nil {
-			if tlsConfig.KeyFile != nil {
-				_, err = tlsConfig.KeyFile.Get()
-			}
-
-			if tlsConfig.KeyFile == nil || err != nil {
-				if tlsConfig.KeyPem != nil && tlsConfig.KeyPem.Variable != nil {
-					cv.requiredVariables[*tlsConfig.KeyPem.Variable] = true
-				} else if tlsConfig.KeyFile != nil && tlsConfig.KeyFile.Variable != nil {
-					cv.requiredVariables[*tlsConfig.KeyFile.Variable] = true
-				}
-			}
-		}
-	}
-
-	if tlsConfig.InsecureSkipVerify != nil {
-		_, err := tlsConfig.InsecureSkipVerify.Get()
+	if tlsConfig.CertPem != nil {
+		_, err := tlsConfig.CertPem.Get()
 		if err == nil {
 			return
 		}
+	}
 
-		if tlsConfig.InsecureSkipVerify.Variable != nil {
-			cv.requiredVariables[*tlsConfig.InsecureSkipVerify.Variable] = true
-		} else {
-			cv.addError(namespace, fmt.Sprintf("%s: %s", key, err))
+	if tlsConfig.CertFile != nil {
+		_, err := tlsConfig.CertFile.Get()
+		if err == nil {
+			return
 		}
+	}
+
+	if tlsConfig.CertPem != nil && tlsConfig.CertPem.Variable != nil {
+		cv.requiredVariables[*tlsConfig.CertPem.Variable] = true
+	} else if tlsConfig.CertFile != nil && tlsConfig.CertFile.Variable != nil {
+		cv.requiredVariables[*tlsConfig.CertFile.Variable] = true
+	}
+}
+
+func (cv *ConfigValidator) validateTLSCA(tlsConfig *exhttp.TLSConfig) {
+	if tlsConfig.CAPem == nil && tlsConfig.CAFile == nil {
+		return
+	}
+
+	if tlsConfig.CAPem != nil {
+		_, err := tlsConfig.CAPem.Get()
+		if err == nil {
+			return
+		}
+	}
+
+	if tlsConfig.CAFile != nil {
+		_, err := tlsConfig.CAFile.Get()
+		if err == nil {
+			return
+		}
+	}
+
+	if tlsConfig.CAPem != nil && tlsConfig.CAPem.Variable != nil {
+		cv.requiredVariables[*tlsConfig.CAPem.Variable] = true
+	} else if tlsConfig.CAFile != nil && tlsConfig.CAFile.Variable != nil {
+		cv.requiredVariables[*tlsConfig.CAFile.Variable] = true
+	}
+}
+
+func (cv *ConfigValidator) validateTLSKey(tlsConfig *exhttp.TLSConfig) {
+	if tlsConfig.KeyPem == nil && tlsConfig.KeyFile == nil {
+		return
+	}
+
+	if tlsConfig.KeyPem != nil {
+		_, err := tlsConfig.KeyPem.Get()
+		if err == nil {
+			return
+		}
+	}
+
+	if tlsConfig.KeyFile != nil {
+		_, err := tlsConfig.KeyFile.Get()
+		if err == nil {
+			return
+		}
+	}
+
+	if tlsConfig.KeyPem != nil && tlsConfig.KeyPem.Variable != nil {
+		cv.requiredVariables[*tlsConfig.KeyPem.Variable] = true
+	} else if tlsConfig.KeyFile != nil && tlsConfig.KeyFile.Variable != nil {
+		cv.requiredVariables[*tlsConfig.KeyFile.Variable] = true
+	}
+}
+
+func (cv *ConfigValidator) validateInsecureSkipVerify(
+	namespace string,
+	key string,
+	tlsConfig *exhttp.TLSConfig,
+) {
+	if tlsConfig.InsecureSkipVerify == nil {
+		return
+	}
+
+	_, err := tlsConfig.InsecureSkipVerify.Get()
+	if err == nil {
+		return
+	}
+
+	if tlsConfig.InsecureSkipVerify.Variable != nil {
+		cv.requiredVariables[*tlsConfig.InsecureSkipVerify.Variable] = true
+	} else {
+		cv.addError(namespace, fmt.Sprintf("%s: %s", key, err))
 	}
 }
 
@@ -376,54 +411,65 @@ func (cv *ConfigValidator) validateSecurityScheme(
 		}
 	case *schema.MutualTLSAuthConfig:
 	case *schema.OAuth2Config:
-		for flowType, flow := range schemer.Flows {
-			if flowType != schema.ClientCredentialsFlow {
-				cv.requiredHeadersForwarding[schemer.GetType()] = true
-
-				continue
-			}
-
-			defaultMessage := ""
-			if cv.config != nil {
-				defaultMessage = ". You should add configuration for OAuth2 security scheme or enable header forwarding"
-			}
-
-			if flow.TokenURL == nil {
-				cv.addWarning(namespace, fmt.Sprintf("%s.flow.tokenUrl is null%s", key, defaultMessage))
-			} else {
-				_, err := flow.TokenURL.Get()
-				if err != nil && flow.TokenURL.Variable != nil {
-					cv.requiredVariables[*flow.TokenURL.Variable] = true
-				}
-			}
-
-			if flow.ClientID == nil {
-				cv.addWarning(namespace, fmt.Sprintf("%s.flow.clientId is null%s", key, defaultMessage))
-			} else {
-				_, err := flow.ClientID.Get()
-				if err != nil && flow.ClientID.Variable != nil {
-					cv.requiredVariables[*flow.ClientID.Variable] = true
-				}
-			}
-
-			if flow.ClientSecret == nil {
-				cv.addWarning(namespace, fmt.Sprintf("%s.flow.clientSecret is null%s", key, defaultMessage))
-			} else {
-				_, err := flow.ClientSecret.Get()
-				if err != nil && flow.ClientSecret.Variable != nil {
-					cv.requiredVariables[*flow.ClientSecret.Variable] = true
-				}
-			}
-
-			for _, param := range flow.EndpointParams {
-				_, err := param.Get()
-				if err != nil && param.Variable != nil {
-					cv.requiredVariables[*param.Variable] = true
-				}
-			}
-		}
+		cv.validateOAuth2Config(namespace, key, schemer)
 	default:
 		cv.requiredHeadersForwarding[schemer.GetType()] = true
+	}
+}
+
+func (cv *ConfigValidator) validateOAuth2Config(
+	namespace string,
+	key string,
+	schemer *schema.OAuth2Config,
+) {
+	for flowType, flow := range schemer.Flows {
+		if flowType != schema.ClientCredentialsFlow {
+			cv.requiredHeadersForwarding[schemer.GetType()] = true
+
+			continue
+		}
+
+		defaultMessage := ""
+		if cv.config != nil {
+			defaultMessage = ". You should add configuration for OAuth2 security scheme or enable header forwarding"
+		}
+
+		if flow.TokenURL == nil {
+			cv.addWarning(namespace, fmt.Sprintf("%s.flow.tokenUrl is null%s", key, defaultMessage))
+		} else {
+			_, err := flow.TokenURL.Get()
+			if err != nil && flow.TokenURL.Variable != nil {
+				cv.requiredVariables[*flow.TokenURL.Variable] = true
+			}
+		}
+
+		if flow.ClientID == nil {
+			cv.addWarning(namespace, fmt.Sprintf("%s.flow.clientId is null%s", key, defaultMessage))
+		} else {
+			_, err := flow.ClientID.Get()
+			if err != nil && flow.ClientID.Variable != nil {
+				cv.requiredVariables[*flow.ClientID.Variable] = true
+			}
+		}
+
+		if flow.ClientSecret == nil {
+			cv.addWarning(
+				namespace,
+				fmt.Sprintf("%s.flow.clientSecret is null%s", key, defaultMessage),
+			)
+		} else {
+			_, err := flow.ClientSecret.Get()
+			if err != nil && flow.ClientSecret.Variable != nil {
+				cv.requiredVariables[*flow.ClientSecret.Variable] = true
+			}
+		}
+
+		for _, param := range flow.EndpointParams {
+			_, err := param.Get()
+			if err != nil && param.Variable != nil {
+				cv.requiredVariables[*param.Variable] = true
+			}
+		}
 	}
 }
 
@@ -439,6 +485,7 @@ func (cv *ConfigValidator) findConnectorName() string {
 	}
 
 	connectorPath := filepath.Join(cv.contextPath, "connector.yaml")
+
 	rawBytes, err := os.ReadFile(connectorPath)
 	if err != nil {
 		cv.logger.Error(fmt.Sprintf("failed to read the connector manifest: %s", err))
@@ -462,6 +509,7 @@ func (cv *ConfigValidator) findSubgraphName() string {
 	}
 
 	connectorPath := filepath.Join(cv.contextPath, "..", "..", "subgraph.yaml")
+
 	rawBytes, err := os.ReadFile(connectorPath)
 	if err != nil {
 		cv.logger.Error(fmt.Sprintf("failed to read the subgraph manifest: %s", err))

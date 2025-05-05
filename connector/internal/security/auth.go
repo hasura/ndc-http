@@ -45,6 +45,7 @@ func NewCredential(
 		return cred, err != nil, err
 	case *schema.OAuth2Config:
 		var headerForwardingRequired bool
+
 		for flowType, flow := range ss.Flows {
 			if flowType != schema.ClientCredentialsFlow {
 				headerForwardingRequired = true

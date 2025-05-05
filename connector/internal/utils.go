@@ -38,6 +38,7 @@ func evalForwardedHeaders(req *RetryableRequest, headers map[string]string) {
 		if req.Headers.Get(key) != "" {
 			continue
 		}
+
 		req.Headers.Set(key, value)
 	}
 }

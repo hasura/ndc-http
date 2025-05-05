@@ -43,6 +43,7 @@ func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 	switch t := underlyingType.(type) {
 	case *schema.ArrayType:
 		var rawResult []any
+
 		err := json.NewDecoder(r).Decode(&rawResult)
 		if err != nil {
 			return nil, err
@@ -55,6 +56,7 @@ func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 		return c.evalArrayType(rawResult, t, []string{})
 	case *schema.NamedType:
 		var result any
+
 		err := json.NewDecoder(r).Decode(&result)
 		if err != nil {
 			return nil, err
@@ -105,6 +107,7 @@ func (c *JSONDecoder) evalArrayType(
 	}
 
 	results := make([]any, len(arrayValue))
+
 	for i, item := range arrayValue {
 		result, err := c.evalSchemaType(
 			item,
@@ -114,6 +117,7 @@ func (c *JSONDecoder) evalArrayType(
 		if err != nil {
 			return nil, err
 		}
+
 		results[i] = result
 	}
 
@@ -146,6 +150,7 @@ func (c *JSONDecoder) evalNamedType(
 	}
 
 	results := make(map[string]any)
+
 	for key, field := range objectType.Fields {
 		fieldValue, ok := objectValue[key]
 		if !ok {

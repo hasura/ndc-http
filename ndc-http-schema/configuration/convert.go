@@ -24,7 +24,9 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 	}
 
 	var result *schema.NDCHttpSchema
+
 	var errs []error
+
 	options := openapi.ConvertOptions{
 		MethodAlias:         config.MethodAlias,
 		Prefix:              config.Prefix,
@@ -86,18 +88,23 @@ func ResolveConvertConfigArguments(
 		if args.Spec != "" {
 			config.Spec = schema.SchemaSpecType(args.Spec)
 		}
+
 		if len(args.MethodAlias) > 0 {
 			config.MethodAlias = args.MethodAlias
 		}
+
 		if args.Prefix != "" {
 			config.Prefix = args.Prefix
 		}
+
 		if args.TrimPrefix != "" {
 			config.TrimPrefix = args.TrimPrefix
 		}
+
 		if args.EnvPrefix != "" {
 			config.EnvPrefix = args.EnvPrefix
 		}
+
 		if args.Pure {
 			config.Pure = args.Pure
 		}
@@ -105,10 +112,12 @@ func ResolveConvertConfigArguments(
 		if args.NoDeprecation {
 			config.NoDeprecation = args.NoDeprecation
 		}
+
 		if len(args.AllowedContentTypes) > 0 {
 			config.AllowedContentTypes = args.AllowedContentTypes
 		}
 	}
+
 	if config.Spec == "" {
 		config.Spec = schema.OAS3Spec
 	}

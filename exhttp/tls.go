@@ -90,6 +90,7 @@ func (tc TLSConfig) Validate() error {
 	if err != nil {
 		return fmt.Errorf("TLSConfig.minVersion: %w", err)
 	}
+
 	maxTLS, err := tc.GetMaxVersion()
 	if err != nil {
 		return fmt.Errorf("TLSConfig.maxVersion: %w", err)
@@ -106,6 +107,7 @@ func (tc TLSConfig) Validate() error {
 		if err != nil {
 			return fmt.Errorf("TLSConfig.caFile: %w", err)
 		}
+
 		caPem, err := tc.CAFile.GetOrDefault("")
 		if err != nil {
 			return fmt.Errorf("TLSConfig.caPem: %w", err)
@@ -123,6 +125,7 @@ func (tc TLSConfig) Validate() error {
 		if err != nil {
 			return fmt.Errorf("TLSConfig.certFile: %w", err)
 		}
+
 		certPem, err := tc.CertPem.GetOrDefault("")
 		if err != nil {
 			return fmt.Errorf("TLSConfig.caPem: %w", err)
@@ -140,6 +143,7 @@ func (tc TLSConfig) Validate() error {
 		if err != nil {
 			return fmt.Errorf("TLSConfig.keyFile: %w", err)
 		}
+
 		keyPem, err := tc.KeyPem.GetOrDefault("")
 		if err != nil {
 			return fmt.Errorf("TLSConfig.keyPem: %w", err)
@@ -184,6 +188,7 @@ func (tc TLSConfig) convertTLSVersion(v string, defaultVersion uint16) (uint16, 
 	if v == "" {
 		return defaultVersion, nil
 	}
+
 	val, ok := tlsVersions[v]
 	if !ok {
 		return 0, fmt.Errorf("unsupported TLS version: %q", v)
@@ -204,10 +209,12 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 	if err != nil {
 		return nil, fmt.Errorf("invalid TLS min_version: %w", err)
 	}
+
 	maxTLS, err := tlsConfig.GetMaxVersion()
 	if err != nil {
 		return nil, fmt.Errorf("invalid TLS max_version: %w", err)
 	}
+
 	cipherSuites, err := convertCipherSuites(tlsConfig.CipherSuites)
 	if err != nil {
 		return nil, err
@@ -222,6 +229,7 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 	}
 
 	var insecureSkipVerify bool
+
 	if tlsConfig.InsecureSkipVerify != nil {
 		insecureSkipVerify, err = tlsConfig.InsecureSkipVerify.GetOrDefault(false)
 		if err != nil {
@@ -235,6 +243,7 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 	}
 
 	var certificates []tls.Certificate
+
 	if cert != nil {
 		certificates = append(certificates, *cert)
 	} else if !insecureSkipVerify {
@@ -248,7 +257,7 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 		MaxVersion:         maxTLS,
 		CipherSuites:       cipherSuites,
 		ServerName:         serverName,
-		InsecureSkipVerify: insecureSkipVerify,
+		InsecureSkipVerify: insecureSkipVerify, //nolint:gosec
 	}
 
 	return result, nil
@@ -258,7 +267,9 @@ func loadCACertPool(tlsConfig *TLSConfig) (*x509.CertPool, error) {
 	// There is no need to load the System Certs for RootCAs because
 	// if the value is nil, it will default to checking against th System Certs.
 	var err error
+
 	var certPool *x509.CertPool
+
 	var includeSystemCACertsPool bool
 
 	if tlsConfig.IncludeSystemCACertsPool != nil {
@@ -309,15 +320,18 @@ func loadCertFile(certPath string, includeSystemCACertsPool bool) (*x509.CertPoo
 
 func loadCertPem(certPem []byte, includeSystemCACertsPool bool) (*x509.CertPool, error) {
 	certPool := x509.NewCertPool()
+
 	if includeSystemCACertsPool {
 		scp, err := systemCertPool()
 		if err != nil {
 			return nil, err
 		}
+
 		if scp != nil {
 			certPool = scp
 		}
 	}
+
 	if !certPool.AppendCertsFromPEM(certPem) {
 		return nil, errors.New("failed to parse cert")
 	}
@@ -331,7 +345,9 @@ func loadCertificate(
 	logger *slog.Logger,
 ) (*tls.Certificate, error) {
 	var certData, keyData []byte
+
 	var certPem, keyPem string
+
 	var err error
 
 	if tlsConfig.CertPem != nil {
@@ -412,9 +428,12 @@ func loadCertificate(
 
 func convertCipherSuites(cipherSuites []string) ([]uint16, error) {
 	var result []uint16
+
 	var errs []error
+
 	for _, suite := range cipherSuites {
 		found := false
+
 		for _, supported := range tls.CipherSuites() {
 			if suite == supported.Name {
 				result = append(result, supported.ID)
@@ -423,6 +442,7 @@ func convertCipherSuites(cipherSuites []string) ([]uint16, error) {
 				break
 			}
 		}
+
 		if !found {
 			errs = append(errs, fmt.Errorf("invalid TLS cipher suite: %q", suite))
 		}

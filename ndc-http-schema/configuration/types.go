@@ -55,6 +55,7 @@ type ForwardHeadersSettings struct {
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *ForwardHeadersSettings) UnmarshalJSON(b []byte) error {
 	type Plain ForwardHeadersSettings
+
 	var rawResult Plain
 	if err := json.Unmarshal(b, &rawResult); err != nil {
 		return err
@@ -126,9 +127,12 @@ func (ci ConfigItem) IsDistributed() bool {
 // GetRuntimeSettings validate and get runtime settings.
 func (ci ConfigItem) GetRuntimeSettings() (*rest.RuntimeSettings, error) {
 	result := &rest.RuntimeSettings{}
+
 	var errs []error
+
 	if ci.Timeout != nil {
 		timeout, err := ci.Timeout.Get()
+
 		switch {
 		case err != nil:
 			errs = append(errs, fmt.Errorf("timeout: %w", err))

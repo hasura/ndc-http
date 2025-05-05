@@ -42,6 +42,7 @@ func NewResponseTransformer(
 // Transform evaluates new result types of operations after being transformed.
 func (rt *ResponseTransformer) Transform() (*rest.NDCHttpSchema, []string, error) {
 	var operationNames []string
+
 	var err error
 
 	targets, err := rt.validateTargets(rt.setting.Targets)
@@ -130,6 +131,7 @@ func (rt *ResponseTransformer) transformOperations(
 			}
 
 			rt.schema.Functions[name] = *newOp
+
 			appliedNames = append(appliedNames, name)
 
 			continue
@@ -150,6 +152,7 @@ func (rt *ResponseTransformer) transformOperations(
 			}
 
 			rt.schema.Procedures[name] = *newOp
+
 			appliedNames = append(appliedNames, name)
 
 			continue
@@ -208,6 +211,7 @@ func (rt *ResponseTransformer) evalResultType(
 		resultType = schema.NewNamedType(string(rest.ScalarFloat64))
 	case reflect.String:
 		var err error
+
 		resultType, err = rt.evalStringValue(schemaType, field.String(), fieldPaths)
 		if err != nil {
 			return nil, err
@@ -249,6 +253,7 @@ func (rt *ResponseTransformer) evalResultType(
 			}
 
 			rValue := field.MapIndex(rKey)
+
 			newFieldType, err := rt.evalResultType(schemaType, rValue, append(fieldPaths, keyStr))
 			if err != nil {
 				return nil, err
@@ -269,6 +274,7 @@ func (rt *ResponseTransformer) evalResultType(
 		resultType = schema.NewNamedType(newObjectTypeName)
 	case reflect.Interface:
 		var err error
+
 		value := field.Interface()
 
 		if str, ok := value.(string); ok {

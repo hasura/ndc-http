@@ -73,7 +73,9 @@ func (c *XMLEncoder) evalXMLField(
 	fieldPaths []string,
 ) error {
 	rawType, err := field.Type.InterfaceT()
+
 	var innerValue reflect.Value
+
 	var notNull bool
 
 	if value != nil {
@@ -119,14 +121,18 @@ func (c *XMLEncoder) evalXMLFieldArray(
 ) error {
 	vi := value.Interface()
 	values, ok := vi.([]any)
+
 	if !ok {
 		return fmt.Errorf("%s: expect an array, got %v", strings.Join(fieldPaths, "."), vi)
 	}
 
 	var wrapped bool
+
 	xmlName := name
+
 	if field.HTTP.XML != nil {
 		wrapped = field.HTTP.XML.Wrapped
+
 		if field.HTTP.XML.Name != "" {
 			xmlName = field.HTTP.XML.Name
 		}
@@ -195,6 +201,7 @@ func (c *XMLEncoder) evalXMLFieldNamed(
 	}
 
 	iv := innerValue.Interface()
+
 	values, ok := iv.(map[string]any)
 	if !ok {
 		return fmt.Errorf(
@@ -215,6 +222,7 @@ func (c *XMLEncoder) evalXMLFieldNamed(
 	}
 
 	xmlName := getXMLName(objectType.XML, name, objectType.Alias, t.Name)
+
 	if objectType.XML != nil && objectType.XML.Namespace != "" {
 		attributes = append(attributes, objectType.XML.GetNamespaceAttribute())
 	}
@@ -232,6 +240,7 @@ func (c *XMLEncoder) evalXMLFieldNamed(
 		objectType.Fields[fieldKeys[0]].HTTP.XML.Text {
 		objectField := objectType.Fields[fieldKeys[0]]
 		fieldValue, ok := values[fieldKeys[0]]
+
 		if ok && fieldValue != nil {
 			textValue, err := c.encodeXMLText(
 				objectField.Type,
@@ -253,6 +262,7 @@ func (c *XMLEncoder) evalXMLFieldNamed(
 		for _, key := range fieldKeys {
 			objectField := objectType.Fields[key]
 			fieldValue := values[key]
+
 			if err := c.evalXMLField(enc, key, objectField, fieldValue, append(fieldPaths, key)); err != nil {
 				return err
 			}
@@ -277,9 +287,11 @@ func (c *XMLEncoder) evalAttributes(
 ) ([]xml.Attr, []string, error) {
 	attrs := []xml.Attr{}
 	remainKeys := make([]string, 0)
+
 	for _, key := range keys {
 		objectField := objectType.Fields[key]
 		isNullXML := objectField.HTTP == nil || objectField.HTTP.XML == nil
+
 		if isNullXML || !objectField.HTTP.XML.Attribute {
 			remainKeys = append(remainKeys, key)
 
@@ -418,6 +430,7 @@ func (c *XMLEncoder) encodeSimpleScalar(
 	case reflect.Map:
 		ri := reflectValue.Interface()
 		valueMap, ok := ri.(map[string]any)
+
 		if !ok {
 			return fmt.Errorf(
 				"%s: expected map[string]any, got: %v",
@@ -429,6 +442,7 @@ func (c *XMLEncoder) encodeSimpleScalar(
 		return c.encodeScalarMap(enc, name, valueMap, attributes, fieldPaths)
 	case reflect.Interface:
 		ri := reflectValue.Interface()
+
 		valueMap, ok := ri.(map[string]any)
 		if ok {
 			return c.encodeScalarMap(enc, name, valueMap, attributes, fieldPaths)

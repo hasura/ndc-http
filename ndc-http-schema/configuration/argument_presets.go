@@ -27,6 +27,7 @@ func ValidateArgumentPreset(
 
 	exprLen := len(targetExpressions)
 	targets := make(map[string]schema.TypeRepresentation)
+
 	for key, op := range httpSchema.Functions {
 		if exprLen > 0 && !slices.ContainsFunc(targetExpressions, func(expr regexp.Regexp) bool {
 			return expr.MatchString(key)
@@ -86,12 +87,14 @@ func evalTypeRepresentationFromJSONPath(
 	}
 
 	segments := jsonPath.Query().Segments()
+
 	rootSelectorName, ok := segments[0].Selectors()[0].(spec.Name)
 	if !ok || rootSelectorName == "" {
 		return nil, errors.New("invalid json path. The root selector must be an object name")
 	}
 
 	rootSelector := string(rootSelectorName)
+
 	argument, ok := operation.Arguments[rootSelector]
 	if !ok {
 		return nil, nil
@@ -185,6 +188,7 @@ func evalArgumentFromJSONPath(
 		}
 
 		selector := string(selectorName)
+
 		field, ok := objectType.Fields[selector]
 		if !ok {
 			return nil, nil, nil

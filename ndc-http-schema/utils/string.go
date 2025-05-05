@@ -39,12 +39,15 @@ func ToPascalCase(input string) string {
 	if input == "" {
 		return input
 	}
+
 	input = nonAlphaDigitRegex.ReplaceAllString(input, "_")
+
 	parts := strings.Split(input, "_")
 	for i := range parts {
 		if parts[i] == "" {
 			continue
 		}
+
 		parts[i] = strings.ToUpper(parts[i][:1]) + parts[i][1:]
 	}
 
@@ -58,11 +61,13 @@ func stringSliceToCase(inputs []string, convert func(string) string, sep string)
 	}
 
 	results := []string{}
+
 	for _, item := range inputs {
 		trimmed := strings.TrimSpace(item)
 		if trimmed == "" {
 			continue
 		}
+
 		results = append(results, convert(trimmed))
 	}
 
@@ -77,6 +82,7 @@ func StringSliceToPascalCase(inputs []string) string {
 // ToSnakeCase converts string to snake_case.
 func ToSnakeCase(input string) string {
 	var sb strings.Builder
+
 	inputLen := len(input)
 	for i := range inputLen {
 		char := rune(input[i])
@@ -85,6 +91,7 @@ func ToSnakeCase(input string) string {
 
 			continue
 		}
+
 		if unicode.IsDigit(char) || unicode.IsLower(char) {
 			sb.WriteRune(char)
 
@@ -97,6 +104,7 @@ func ToSnakeCase(input string) string {
 
 				continue
 			}
+
 			prevChar := rune(input[i-1])
 			if unicode.IsDigit(prevChar) || unicode.IsLower(prevChar) {
 				sb.WriteRune('_')
@@ -104,6 +112,7 @@ func ToSnakeCase(input string) string {
 
 				continue
 			}
+
 			if i < inputLen-1 {
 				nextChar := rune(input[i+1])
 				if unicode.IsUpper(prevChar) && unicode.IsLetter(nextChar) &&
@@ -140,12 +149,14 @@ func StringSliceToConstantCase(inputs []string) string {
 // SplitStrings wrap strings.Split with all leading and trailing white space removed.
 func SplitStringsAndTrimSpaces(input string, sep string) []string {
 	results := []string{}
+
 	items := strings.Split(input, sep)
 	for _, item := range items {
 		trimmed := strings.TrimSpace(item)
 		if trimmed == "" {
 			continue
 		}
+
 		results = append(results, trimmed)
 	}
 
@@ -164,6 +175,7 @@ func StripHTMLTags(str string) string {
 
 	// Setup a string builder and allocate enough memory for the new string.
 	var builder strings.Builder
+
 	builder.Grow(len(str) + utf8.UTFMax)
 
 	in := false // True if we are inside an HTML tag.
@@ -190,6 +202,7 @@ func StripHTMLTags(str string) string {
 				// Write the valid string between the close and start of the two tags.
 				builder.WriteString(str[end:start])
 			}
+
 			in = true
 
 			continue
@@ -209,10 +222,12 @@ func RemoveYAMLSpecialCharacters(input []byte) string {
 	}
 
 	var sb strings.Builder
+
 	inputLength := len(input)
 	for i := 0; i < inputLength; i++ {
 		c := input[i]
 		r := rune(c)
+
 		switch {
 		case unicode.IsSpace(r):
 			sb.WriteRune(' ')
@@ -220,21 +235,25 @@ func RemoveYAMLSpecialCharacters(input []byte) string {
 			switch input[i+1] {
 			case 'b', 'n', 'r', 't', 'f':
 				sb.WriteRune(' ')
+
 				i++
 			case 'u':
 				u := getu4(input[i:])
 				if u > -1 {
 					i += 5
+
 					if slices.Contains([]rune{'<', '>', '&'}, u) {
 						sb.WriteRune(u)
 					}
 				} else {
 					sb.WriteRune(r)
+
 					i++
 				}
 			case '\\':
 				sb.WriteRune(r)
 				sb.WriteRune(r)
+
 				i++
 			default:
 				sb.WriteByte(c)
@@ -255,7 +274,9 @@ func getu4(s []byte) rune {
 	if len(s) < 6 || s[0] != '\\' || s[1] != 'u' {
 		return -1
 	}
+
 	var r rune
+
 	for _, c := range s[2:6] {
 		switch {
 		case '0' <= c && c <= '9':
@@ -267,6 +288,7 @@ func getu4(s []byte) rune {
 		default:
 			return -1
 		}
+
 		r = r*16 + rune(c)
 	}
 
@@ -276,6 +298,7 @@ func getu4(s []byte) rune {
 // MaskString masks the string value for security.
 func MaskString(input string) string {
 	inputLength := len(input)
+
 	switch {
 	case inputLength < 6:
 		return strings.Repeat("*", inputLength)

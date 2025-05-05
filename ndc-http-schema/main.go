@@ -24,6 +24,7 @@ var cli struct {
 
 func main() {
 	cmd := kong.Parse(&cli, kong.UsageOnError())
+
 	logger, err := initLogger(cli.LogLevel, cli.NoColor)
 	if err != nil {
 		slog.Error(err.Error())
@@ -53,6 +54,7 @@ func main() {
 
 func initLogger(logLevel string, noColor bool) (*slog.Logger, error) {
 	var level slog.Level
+
 	err := level.UnmarshalText([]byte(strings.ToUpper(logLevel)))
 	if err != nil {
 		return nil, err

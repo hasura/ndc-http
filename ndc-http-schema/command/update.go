@@ -17,6 +17,7 @@ type UpdateCommandArguments struct {
 // UpdateConfiguration updates the configuration for the HTTP connector.
 func UpdateConfiguration(args *UpdateCommandArguments, logger *slog.Logger, noColor bool) error {
 	start := time.Now()
+
 	config, schemas, mergedSchema, err := configuration.UpdateHTTPConfiguration(args.Dir, logger)
 	if err != nil {
 		return err
@@ -39,6 +40,7 @@ func UpdateConfiguration(args *UpdateCommandArguments, logger *slog.Logger, noCo
 	}
 
 	validStatus.Render(os.Stderr)
+
 	if validStatus.HasError() {
 		return errors.New("detected configuration errors. Update your configuration and try again")
 	}

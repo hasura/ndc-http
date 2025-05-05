@@ -23,6 +23,7 @@ func getSchemaRefTypeName(name string) string {
 
 func extractNullableFromOASTypes(names []string) ([]string, bool) {
 	var typeNames []string
+
 	var nullable bool
 
 	for _, name := range names {
@@ -44,6 +45,7 @@ func getScalarFromType(
 	fieldPaths []string,
 ) string {
 	namesLen := len(names)
+
 	switch {
 	case namesLen == 0 && len(enumNodes) > 0:
 		return buildEnumScalar(sm, enumNodes, fieldPaths)
@@ -162,6 +164,7 @@ func canSetEnumToSchema(sm *rest.NDCHttpSchema, scalarName string, enums []strin
 // remove nullable types from raw OpenAPI types.
 func evaluateOpenAPITypes(input []string) []string {
 	var typeNames []string
+
 	for _, t := range input {
 		if t != "null" {
 			typeNames = append(typeNames, t)
@@ -178,6 +181,7 @@ func createSchemaFromOpenAPISchema(input *base.Schema) *rest.TypeSchema {
 	if input == nil {
 		return ps
 	}
+
 	ps.Type = evaluateOpenAPITypes(input.Type)
 	ps.Format = input.Format
 	ps.Pattern = utils.RemoveYAMLSpecialCharacters([]byte(input.Pattern))
@@ -226,6 +230,7 @@ func mergeUnionObjects(
 	fieldPaths []string,
 ) {
 	mergedObjectFields := make(map[string][]rest.ObjectField)
+
 	for _, object := range srcObjects {
 		for key, field := range object.Fields {
 			mergedObjectFields[key] = append(mergedObjectFields[key], field)
@@ -256,6 +261,7 @@ func mergeUnionObjects(
 		}
 
 		var unionField rest.ObjectField
+
 		for i, field := range fields {
 			if i == 0 {
 				unionField = field
@@ -270,6 +276,7 @@ func mergeUnionObjects(
 				append(fieldPaths, key),
 			)
 			unionField.Type = unionType.Encode()
+
 			if !ok {
 				break
 			}
@@ -302,12 +309,14 @@ func evalSchemaProxiesSlice(
 ) ([]*base.SchemaProxy, *base.Schema, bool, bool) {
 	results := []*base.SchemaProxy{}
 	typeNames := []string{}
+
 	var nullable, isEmptyObject bool
 
 	for _, proxy := range schemaProxies {
 		if proxy == nil {
 			continue
 		}
+
 		sc := proxy.Schema()
 		if sc == nil ||
 			(len(sc.Type) == 0 && len(sc.AllOf) == 0 && len(sc.AnyOf) == 0 && len(sc.OneOf) == 0 &&
@@ -352,6 +361,7 @@ func evalSchemaProxiesSlice(
 // guess the result type from content type.
 func getResultTypeFromContentType(contentType string) schema.TypeEncoder {
 	var scalarName rest.ScalarName
+
 	switch {
 	case strings.HasPrefix(contentType, "text/"):
 		scalarName = rest.ScalarString
@@ -366,6 +376,7 @@ func getResultTypeFromContentType(contentType string) schema.TypeEncoder {
 
 func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 	ct := strings.TrimSpace(strings.Split(contentType, ";")[0])
+
 	switch {
 	case utils.IsContentTypeJSON(ct) || utils.IsContentTypeXML(ct) || ct == rest.ContentTypeNdJSON:
 		return rest.ScalarJSON

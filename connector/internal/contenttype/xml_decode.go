@@ -34,6 +34,7 @@ func (c *XMLDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		if token == nil {
 			break
 		}
@@ -120,17 +121,20 @@ func (c *XMLDecoder) evalArrayField(
 	if block.Fields == nil {
 		return nil, nil
 	}
+
 	if len(block.Fields) == 0 {
 		return []any{}, nil
 	}
 
 	var elements []xmlBlock
+
 	itemTokenName := fieldName
 	wrapped := len(fieldPaths) == 0
 	fieldItem := c.getArrayItemObjectField(field, t)
 
 	if field.HTTP != nil {
 		wrapped = wrapped || (field.HTTP.XML != nil && field.HTTP.XML.Wrapped)
+
 		if field.HTTP.Items != nil && field.HTTP.Items.XML != nil &&
 			field.HTTP.Items.XML.Name != "" {
 			itemTokenName = field.HTTP.Items.XML.Name
@@ -163,6 +167,7 @@ func (c *XMLDecoder) evalArrayElements(
 	}
 
 	results := make([]any, len(elements))
+
 	for i, elem := range elements {
 		result, err := c.evalXMLField(
 			&elem,
@@ -173,6 +178,7 @@ func (c *XMLDecoder) evalArrayElements(
 		if err != nil {
 			return nil, err
 		}
+
 		results[i] = result
 	}
 
@@ -206,6 +212,7 @@ func (c *XMLDecoder) evalNamedField(
 			if objectField.HTTP.XML.Name != "" {
 				xmlKey = objectField.HTTP.XML.Name
 			}
+
 			if attr.Name.Local != xmlKey {
 				continue
 			}
@@ -238,77 +245,100 @@ func (c *XMLDecoder) evalNamedField(
 	}
 
 	for key, objectField := range objectType.Fields {
-		if objectField.HTTP == nil {
-			continue
-		}
-		xmlKey := key
-		if objectField.HTTP.XML != nil {
-			if objectField.HTTP.XML.Attribute {
-				continue
-			}
-
-			xmlKey = getXMLName(objectField.HTTP.XML, key)
+		fieldValue, ok, err := c.evalObjectField(block, fieldPaths, key, objectField)
+		if err != nil {
+			return nil, err
 		}
 
-		fieldElems, ok := block.Fields[xmlKey]
-		if !ok || fieldElems == nil {
+		if !ok {
 			continue
 		}
 
-		switch len(fieldElems) {
-		case 0:
-			result[key] = []any{}
-		case 1:
-			propPaths := append(fieldPaths, key)
-			if objectField.HTTP.XML != nil && objectField.HTTP.XML.Wrapped {
-				// this can be a wrapped array
-				fieldResult, err := c.evalXMLField(&fieldElems[0], xmlKey, objectField, propPaths)
-				if err != nil {
-					return nil, err
-				}
-
-				result[key] = fieldResult
-
-				continue
-			}
-
-			at, nt, err := getArrayOrNamedType(objectField.Type)
-			if err != nil {
-				return nil, fmt.Errorf("%s: %w", strings.Join(propPaths, "."), err)
-			}
-
-			if at != nil {
-				fieldItem := c.getArrayItemObjectField(objectField, at)
-				fieldResult, err := c.evalArrayElements(fieldElems, xmlKey, fieldItem, propPaths)
-				if err != nil {
-					return nil, err
-				}
-
-				result[key] = fieldResult
-			} else if nt != nil {
-				fieldResult, err := c.evalNamedField(&fieldElems[0], nt, propPaths)
-				if err != nil {
-					return nil, err
-				}
-
-				result[key] = fieldResult
-			}
-		default:
-			fieldResult, err := c.evalXMLField(&xmlBlock{
-				Start: fieldElems[0].Start,
-				Fields: map[string][]xmlBlock{
-					xmlKey: fieldElems,
-				},
-			}, xmlKey, objectField, append(fieldPaths, key))
-			if err != nil {
-				return nil, err
-			}
-
-			result[key] = fieldResult
-		}
+		result[key] = fieldValue
 	}
 
 	return result, nil
+}
+
+func (c *XMLDecoder) evalObjectField(
+	block *xmlBlock,
+	fieldPaths []string,
+	key string,
+	objectField rest.ObjectField,
+) (any, bool, error) {
+	if objectField.HTTP == nil {
+		return nil, false, nil
+	}
+
+	xmlKey := key
+
+	if objectField.HTTP.XML != nil {
+		if objectField.HTTP.XML.Attribute {
+			return nil, false, nil
+		}
+
+		xmlKey = getXMLName(objectField.HTTP.XML, key)
+	}
+
+	fieldElems, ok := block.Fields[xmlKey]
+	if !ok || fieldElems == nil {
+		return nil, false, nil
+	}
+
+	switch len(fieldElems) {
+	case 0:
+		return []any{}, true, nil
+	case 1:
+		propPaths := append(fieldPaths, key)
+		if objectField.HTTP.XML != nil && objectField.HTTP.XML.Wrapped {
+			// this can be a wrapped array
+			fieldResult, err := c.evalXMLField(&fieldElems[0], xmlKey, objectField, propPaths)
+			if err != nil {
+				return nil, false, err
+			}
+
+			return fieldResult, true, nil
+		}
+
+		at, nt, err := getArrayOrNamedType(objectField.Type)
+		if err != nil {
+			return nil, false, fmt.Errorf("%s: %w", strings.Join(propPaths, "."), err)
+		}
+
+		if at != nil {
+			fieldItem := c.getArrayItemObjectField(objectField, at)
+
+			fieldResult, err := c.evalArrayElements(fieldElems, xmlKey, fieldItem, propPaths)
+			if err != nil {
+				return nil, false, err
+			}
+
+			return fieldResult, true, nil
+		}
+
+		if nt != nil {
+			fieldResult, err := c.evalNamedField(&fieldElems[0], nt, propPaths)
+			if err != nil {
+				return nil, false, err
+			}
+
+			return fieldResult, true, nil
+		}
+
+		return nil, false, nil
+	default:
+		fieldResult, err := c.evalXMLField(&xmlBlock{
+			Start: fieldElems[0].Start,
+			Fields: map[string][]xmlBlock{
+				xmlKey: fieldElems,
+			},
+		}, xmlKey, objectField, append(fieldPaths, key))
+		if err != nil {
+			return nil, false, err
+		}
+
+		return fieldResult, true, nil
+	}
 }
 
 func (c *XMLDecoder) evalAttribute(
@@ -407,11 +437,13 @@ func decodeArbitraryXMLBlock(block *xmlBlock) any {
 	}
 
 	result := make(map[string]any)
+
 	if len(block.Start.Attr) > 0 {
 		attributes := make(map[string]string)
 		for _, attr := range block.Start.Attr {
 			attributes[attr.Name.Local] = attr.Value
 		}
+
 		result["attributes"] = attributes
 	}
 
@@ -432,6 +464,7 @@ func decodeArbitraryXMLBlock(block *xmlBlock) any {
 			for i, f := range field {
 				items[i] = decodeArbitraryXMLBlock(&f)
 			}
+
 			result[key] = items
 		}
 	}
@@ -490,6 +523,7 @@ func DecodeArbitraryXML(r io.Reader) (any, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		if token == nil {
 			break
 		}
@@ -511,11 +545,14 @@ func DecodeArbitraryXML(r io.Reader) (any, error) {
 
 func findXMLLeafObjectField(objectType rest.ObjectType) (*rest.ObjectField, string, bool) {
 	var f *rest.ObjectField
+
 	var fieldName string
+
 	for key, field := range objectType.Fields {
 		if field.HTTP == nil || field.HTTP.XML == nil {
 			return nil, "", false
 		}
+
 		if field.HTTP.XML.Text {
 			f = &field
 			fieldName = key

@@ -52,10 +52,12 @@ func NewOAuth2Client(
 	if tokenURL.Host == "" {
 		tu := utils.CloneURL(baseServerURL)
 		tu.Path = path.Join(tu.Path, tokenURL.Path)
+
 		q := tu.Query()
 		for k, v := range tokenURL.Query() {
 			q[k] = v
 		}
+
 		tu.RawQuery = q.Encode()
 		tu.RawFragment = tokenURL.RawFragment
 
@@ -78,11 +80,13 @@ func NewOAuth2Client(
 	}
 
 	var endpointParams url.Values
+
 	for key, envValue := range config.EndpointParams {
 		value, err := envValue.GetOrDefault("")
 		if err != nil {
 			return nil, fmt.Errorf("endpointParams[%s]: %w", key, err)
 		}
+
 		if value != "" {
 			endpointParams.Set(key, value)
 		}

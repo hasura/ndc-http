@@ -28,6 +28,7 @@ func (w *MultipartWriter) WriteDataURI(name string, value any, headers http.Head
 	if err != nil {
 		return fmt.Errorf("%s: %w", name, err)
 	}
+
 	dataURI, err := DecodeDataURI(b64)
 	if err != nil {
 		return fmt.Errorf("%s: %w", name, err)
@@ -37,6 +38,7 @@ func (w *MultipartWriter) WriteDataURI(name string, value any, headers http.Head
 	for key, header := range headers {
 		h[key] = header
 	}
+
 	h.Set("Content-Disposition",
 		fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
 			escapeQuotes(name), escapeQuotes(name)))
@@ -66,6 +68,7 @@ func (w *MultipartWriter) WriteJSON(fieldName string, value any, headers http.He
 
 	h := createFieldMIMEHeader(fieldName, headers)
 	h.Set(schema.ContentTypeHeader, schema.ContentTypeJSON)
+
 	p, err := w.CreatePart(h)
 	if err != nil {
 		return err
@@ -87,6 +90,7 @@ func (w *MultipartWriter) WriteField(fieldName, value string, headers http.Heade
 	if err != nil {
 		return err
 	}
+
 	_, err = p.Write([]byte(value))
 
 	return err
@@ -97,6 +101,7 @@ func createFieldMIMEHeader(fieldName string, headers http.Header) textproto.MIME
 	for key, header := range headers {
 		h[key] = header
 	}
+
 	h.Set("Content-Disposition",
 		fmt.Sprintf(`form-data; name="%s"`, escapeQuotes(fieldName)))
 

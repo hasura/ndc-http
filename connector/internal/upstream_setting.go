@@ -83,6 +83,7 @@ func (us *UpstreamSetting) getBaseURLFromServers(
 ) (*url.URL, string, error) {
 	results := []*url.URL{}
 	selectedServerIDs := []string{}
+
 	for key, server := range us.servers {
 		if len(serverIDs) > 0 && !slices.Contains(serverIDs, key) {
 			continue

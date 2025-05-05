@@ -30,6 +30,7 @@ func (c *HTTPConnector) ApplyNDCHttpSchemas(
 	httpSchema, metadata, errs := configuration.MergeNDCHttpSchemas(config, schemas)
 	if len(errs) > 0 {
 		printSchemaValidationError(logger, errs)
+
 		if httpSchema == nil || config.Strict {
 			return errBuildSchemaFailed
 		}
@@ -45,6 +46,7 @@ func (c *HTTPConnector) ApplyNDCHttpSchemas(
 		httpSchema.ToSchemaResponse(),
 		config,
 	)
+
 	schemaBytes, err := json.Marshal(
 		internal.ApplyPromptQLSettingsToSchema(ndcSchema, c.upstreams.RuntimeSettings),
 	)

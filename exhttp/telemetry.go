@@ -56,6 +56,7 @@ func (tt TelemetryConfig) do(
 
 	urlAttr := *req.URL
 	password, hasPassword := urlAttr.User.Password()
+
 	if urlAttr.User.String() != "" || hasPassword {
 		maskedUser := strings.Repeat("x", len(urlAttr.User.Username()))
 		if hasPassword {
@@ -140,6 +141,7 @@ func (tt TelemetryConfig) do(
 		if err != nil {
 			span.SetStatus(codes.Error, err.Error())
 			span.RecordError(err)
+
 			logAttrs = append(logAttrs, slog.Any("response", respLogAttrs))
 
 			tt.printLog(

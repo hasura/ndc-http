@@ -79,6 +79,7 @@ func (um *UpstreamManager) Register(
 	}
 
 	var defaultServerURL *url.URL
+
 	settings := UpstreamSetting{
 		servers:    make(map[string]Server),
 		security:   runtimeSchema.Settings.Security,
@@ -96,6 +97,7 @@ func (um *UpstreamManager) Register(
 		if err != nil {
 			return fmt.Errorf("%s: %w", namespace, err)
 		}
+
 		settings.argumentPresets = argumentPresets
 	}
 
@@ -121,6 +123,7 @@ func (um *UpstreamManager) Register(
 		}
 
 		serverClient := httpClient
+
 		if server.TLS != nil {
 			tlsClient, err := security.NewHTTPClientTLS(um.defaultClient, server.TLS, logger)
 			if err != nil {
@@ -158,6 +161,7 @@ func (um *UpstreamManager) Register(
 			if err != nil {
 				return fmt.Errorf("%s.server[%s]: %w", namespace, serverID, err)
 			}
+
 			newServer.ArgumentPresets = argumentPresets
 		}
 
@@ -243,6 +247,7 @@ func (um *UpstreamManager) evalRequestSettings(
 	namespace string,
 ) (*http.Client, error) {
 	httpClient := um.defaultClient
+
 	settings, ok := um.upstreams[namespace]
 	if !ok {
 		return um.defaultClient, nil
@@ -265,6 +270,7 @@ func (um *UpstreamManager) evalRequestSettings(
 	securityOptional := securities.IsOptional()
 
 	var err error
+
 	server, ok := settings.servers[request.ServerID]
 	if ok {
 		if server.HTTPClient != nil {
@@ -279,6 +285,7 @@ func (um *UpstreamManager) evalRequestSettings(
 
 		if !securityOptional && len(server.Credentials) > 0 {
 			var hc *http.Client
+
 			hc, err = um.evalSecuritySchemes(req, securities, server.Credentials)
 			if err != nil {
 				logger.Error(
@@ -365,6 +372,7 @@ func (um *UpstreamManager) InjectMockRequestSettings(
 		if !ok {
 			continue
 		}
+
 		hasAuth := sc.InjectMock(req)
 		if hasAuth {
 			return
@@ -378,6 +386,7 @@ func (um *UpstreamManager) getHeadersFromEnv(
 	headers map[string]utils.EnvString,
 ) map[string]string {
 	results := make(map[string]string)
+
 	for key, header := range headers {
 		value, err := header.Get()
 		if err != nil {
@@ -422,6 +431,7 @@ func (um *UpstreamManager) registerSecurityCredentials(
 		}
 
 		credentials[key] = cred
+
 		if headerForwardRequired &&
 			(!um.config.ForwardHeaders.Enabled || um.config.ForwardHeaders.ArgumentField == nil || *um.config.ForwardHeaders.ArgumentField == "") {
 			logger.Warn(

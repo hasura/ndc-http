@@ -31,8 +31,6 @@ spec: oas3
 # -- Return the pure NDC schema only
 pure: false
 
-# -- Require strict validation on empty types
-strict: false
 # -- Alias names for HTTP method. Used for prefix renaming, e.g. getUsers, postUser
 # methodAlias:
 #   get: get

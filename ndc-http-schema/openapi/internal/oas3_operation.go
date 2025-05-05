@@ -85,6 +85,7 @@ func (oc *oas3OperationBuilder) BuildFunction(
 	}
 
 	description := oc.getOperationDescription(itemGet)
+
 	requestURL, arguments, err := evalOperationPath(oc.pathKey, oc.Arguments)
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
@@ -206,6 +207,7 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 		}
 
 		description := oc.getOperationDescription(operation)
+
 		requestURL, arguments, err := evalOperationPath(oc.pathKey, arguments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", procName, err)
@@ -311,11 +313,14 @@ func (oc *oas3OperationBuilder) getContentType(
 	contents *orderedmap.Map[string, *v3.MediaType],
 ) (string, *v3.MediaType) {
 	var contentType string
+
 	var media *v3.MediaType
+
 	for _, ct := range preferredContentTypes {
 		for iter := contents.First(); iter != nil; iter = iter.Next() {
 			key := iter.Key()
 			value := iter.Value()
+
 			if strings.HasPrefix(key, ct) && value != nil {
 				return key, value
 			}
@@ -373,6 +378,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(
 	}
 
 	bodyResult.Encoding = make(map[string]rest.EncodingObject)
+
 	for iter := content.Encoding.First(); iter != nil; iter = iter.Next() {
 		encodingValue := iter.Value()
 		if encodingValue == nil {
@@ -396,9 +402,11 @@ func (oc *oas3OperationBuilder) convertRequestBody(
 
 		if encodingValue.Headers != nil && encodingValue.Headers.Len() > 0 {
 			item.Headers = make(map[string]rest.RequestParameter)
+
 			for encodingHeader := encodingValue.Headers.First(); encodingHeader != nil; encodingHeader = encodingHeader.Next() {
 				key := strings.TrimSpace(encodingHeader.Key())
 				header := encodingHeader.Value()
+
 				if key == "" || header == nil {
 					continue
 				}
@@ -423,6 +431,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(
 					if err != nil {
 						return nil, nil, err
 					}
+
 					headerEncoding.Style = style
 				}
 
@@ -449,6 +458,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(
 				}
 			}
 		}
+
 		bodyResult.Encoding[iter.Key()] = item
 	}
 
@@ -465,12 +475,15 @@ func (oc *oas3OperationBuilder) convertResponse(
 	}
 
 	var resp *v3.Response
+
 	var statusCode int64
+
 	if responses.Codes != nil && !responses.Codes.IsZero() {
 		for r := responses.Codes.First(); r != nil; r = r.Next() {
 			if r.Key() == "" {
 				continue
 			}
+
 			code, err := strconv.ParseInt(r.Key(), 10, 32)
 			if err != nil {
 				continue
@@ -548,6 +561,7 @@ func (oc *oas3OperationBuilder) getOperationDescription(operation *v3.Operation)
 	if operation.Summary != "" {
 		return utils.StripHTMLTags(operation.Summary)
 	}
+
 	if operation.Description != "" {
 		return utils.StripHTMLTags(operation.Description)
 	}

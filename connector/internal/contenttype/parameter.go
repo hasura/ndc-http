@@ -12,14 +12,17 @@ type ParameterItems []ParameterItem
 // String implements fmt.Stringer interface.
 func (ssp ParameterItems) String() string {
 	results := []string{}
+
 	sortedPairs := append([]ParameterItem{}, ssp...)
 	slices.SortFunc(sortedPairs, func(a, b ParameterItem) int {
 		return strings.Compare(a.keys.String(), b.keys.String())
 	})
+
 	for _, item := range sortedPairs {
 		if len(item.Values()) == 0 {
 			continue
 		}
+
 		str := item.String()
 		results = append(results, str)
 	}
@@ -34,6 +37,7 @@ func (ssp *ParameterItems) Add(keys []Key, values []string) {
 
 		return
 	}
+
 	(*ssp)[index].AddValues(values)
 }
 
@@ -125,16 +129,19 @@ func (ks Keys) String() string {
 	}
 
 	var sb strings.Builder
+
 	for i, k := range ks {
 		if k.index != nil {
 			sb.WriteString(fmt.Sprintf("[%d]", *k.index))
 
 			continue
 		}
+
 		if k.key != "" {
 			if i > 0 {
 				sb.WriteRune('.')
 			}
+
 			sb.WriteString(k.key)
 		}
 	}
@@ -200,6 +207,7 @@ func NewParameterItem(keys Keys, values []string) ParameterItem {
 func (ssp ParameterItem) String() string {
 	key := ssp.keys.String()
 	value := strings.Join(ssp.values, ",")
+
 	if key == "" {
 		return value
 	}

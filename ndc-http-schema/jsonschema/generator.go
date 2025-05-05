@@ -14,9 +14,11 @@ func main() {
 	if err := jsonSchemaConvertConfig(); err != nil {
 		panic(fmt.Errorf("failed to write jsonschema for ConvertConfig: %w", err))
 	}
+
 	if err := jsonSchemaNDCHttpSchema(); err != nil {
 		panic(fmt.Errorf("failed to write jsonschema for NDCHttpSchema: %w", err))
 	}
+
 	if err := jsonSchemaConnectorConfiguration(); err != nil {
 		panic(fmt.Errorf("failed to write jsonschema for Configuration: %w", err))
 	}

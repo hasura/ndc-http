@@ -56,12 +56,14 @@ func (rqe *RawRequestBuilder) Explain() (*schema.ExplainResponse, error) {
 	}
 
 	explainResp.Details["url"] = httpRequest.URL.String()
+
 	rawHeaders, err := json.Marshal(httpRequest.Headers)
 	if err != nil {
 		return nil, schema.InternalServerError("failed to encode headers", map[string]any{
 			"cause": err.Error(),
 		})
 	}
+
 	explainResp.Details["headers"] = string(rawHeaders)
 
 	return explainResp, nil
@@ -96,6 +98,32 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 		return nil, err
 	}
 
+	request, err := rqe.requestFromArguments(rawArguments)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.RawRequest.Method == http.MethodGet ||
+		request.RawRequest.Method == http.MethodDelete {
+		return request, nil
+	}
+
+	if rawBody, ok := rawArguments["body"]; ok && len(rawBody) > 0 {
+		bodyBytes, contentType, err := rqe.evalRequestBody(rawBody, request.ContentType)
+		if err != nil {
+			return nil, fmt.Errorf("body: %w", err)
+		}
+
+		request.ContentType = contentType
+		request.Body = bodyBytes
+	}
+
+	return request, nil
+}
+
+func (rqe *RawRequestBuilder) requestFromArguments(
+	rawArguments map[string]json.RawMessage,
+) (*RetryableRequest, error) {
 	rawURL, ok := rawArguments["url"]
 	if !ok || len(rawURL) == 0 {
 		return nil, errors.New("url is required")
@@ -105,6 +133,7 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 	if err := json.Unmarshal(rawURL, &urlString); err != nil {
 		return nil, fmt.Errorf("url: %w", err)
 	}
+
 	requestURL, err := exhttp.ParseHttpURL(urlString)
 	if err != nil {
 		return nil, fmt.Errorf("url: %w", err)
@@ -144,6 +173,7 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 
 	headers := http.Header{}
 	contentType := rest.ContentTypeJSON
+
 	if rqe.forwardHeaders.Enabled && rqe.forwardHeaders.ArgumentField != nil &&
 		*rqe.forwardHeaders.ArgumentField != "" {
 		if rawHeaders, ok := rawArguments[*rqe.forwardHeaders.ArgumentField]; ok {
@@ -168,11 +198,12 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 			if strings.ToLower(key) == "content-type" && value != "" {
 				contentType = value
 			}
+
 			headers.Set(key, value)
 		}
 	}
 
-	request := &RetryableRequest{
+	return &RetryableRequest{
 		URL:         *requestURL,
 		Headers:     headers,
 		ContentType: contentType,
@@ -184,22 +215,7 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 			Timeout: uint(timeout),
 			Retry:   retryPolicy,
 		},
-	}
-
-	if method == "get" || method == "delete" {
-		return request, nil
-	}
-
-	if rawBody, ok := rawArguments["body"]; ok && len(rawBody) > 0 {
-		bodyBytes, contentType, err := rqe.evalRequestBody(rawBody, contentType)
-		if err != nil {
-			return nil, fmt.Errorf("body: %w", err)
-		}
-		request.ContentType = contentType
-		request.Body = bodyBytes
-	}
-
-	return request, nil
+	}, nil
 }
 
 func (rqe *RawRequestBuilder) evalRequestBody(
@@ -241,6 +257,7 @@ func (rqe *RawRequestBuilder) evalRequestBody(
 		if err := json.Unmarshal(rawBody, &bodyData); err != nil {
 			return nil, "", fmt.Errorf("invalid body: %w", err)
 		}
+
 		r, contentType, err := contenttype.NewMultipartFormEncoder(nil, nil, nil, contenttype.MultipartFormEncoderOptions{}).
 			EncodeArbitrary(bodyData)
 		if err != nil {
@@ -268,6 +285,7 @@ func (rqe *RawRequestBuilder) evalRequestBody(
 		if err := json.Unmarshal(rawBody, &bodyData); err != nil {
 			return nil, "", fmt.Errorf("invalid body: %w", err)
 		}
+
 		dataURI, err := contenttype.DecodeDataURI(bodyData)
 		if err != nil {
 			return nil, "", err

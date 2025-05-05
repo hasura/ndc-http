@@ -73,7 +73,7 @@ func (r *Client) Get(url string) (*http.Response, error) {
 
 // Post issues a POST to the specified URL.
 func (r *Client) Post(url string, bodyType string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPost, url, body)
+	req, err := http.NewRequest(http.MethodPost, url, body) //nolint:noctx
 	if err != nil {
 		return nil, err
 	}

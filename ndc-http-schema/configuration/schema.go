@@ -42,6 +42,7 @@ func BuildSchemaFromConfig(
 			logger.Warn(
 				fmt.Sprintf("the file %s is duplicated. Make sure that is intended", fileID),
 			)
+
 			fileID += "_" + strconv.Itoa(i)
 		}
 
@@ -75,6 +76,7 @@ func ReadSchemaOutputFile(
 	}
 
 	outputFilePath := filepath.Join(configDir, filePath)
+
 	rawBytes, err := os.ReadFile(outputFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -115,6 +117,7 @@ func MergeNDCHttpSchemas(
 
 			return nil, nil, errors
 		}
+
 		settings := item.Settings
 		if settings == nil {
 			settings = &rest.NDCHttpSettings{}
@@ -131,6 +134,7 @@ func MergeNDCHttpSchemas(
 				ScalarTypes: item.ScalarTypes,
 			},
 		}
+
 		var errs []string
 
 		for name, scalar := range item.ScalarTypes {
@@ -186,6 +190,7 @@ func MergeNDCHttpSchemas(
 
 			continue
 		}
+
 		appliedSchemas[i] = meta
 	}
 
@@ -214,6 +219,7 @@ func buildSchemaFile(
 		if err != nil {
 			return nil, err
 		}
+
 		if err := templates.ExecuteTemplate(os.Stderr, templateEmptySettings, map[string]any{
 			"ContextPath": configDir,
 			"Namespace":   configItem.File,
@@ -255,6 +261,7 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 	}
 
 	var serverIDs []string
+
 	for i, server := range restSchema.Settings.Servers {
 		if server.ID != "" {
 			serverIDs = append(serverIDs, server.ID)
@@ -376,6 +383,7 @@ func buildHeadersForwardingResponse(config *Configuration, restSchema *rest.NDCH
 		)
 		restSchema.Functions[name] = op
 	}
+
 	for name, op := range restSchema.Procedures {
 		op.ResultType = createHeaderForwardingResponseTypes(
 			restSchema,
@@ -397,11 +405,13 @@ func cloneDistributedArguments(
 	arguments map[string]rest.ArgumentInfo,
 ) map[string]rest.ArgumentInfo {
 	result := map[string]rest.ArgumentInfo{}
+
 	for k, v := range arguments {
 		if k != rest.HTTPOptionsArgumentName {
 			result[k] = v
 		}
 	}
+
 	result[rest.HTTPOptionsArgumentName] = rest.ArgumentInfo{
 		ArgumentInfo: schema.ArgumentInfo{
 			Description: distributedObjectType.Description,
@@ -471,6 +481,7 @@ func validateRequestSchema(req *rest.Request, defaultMethod string) (*rest.Reque
 		if defaultMethod == "" {
 			return nil, errHTTPMethodRequired
 		}
+
 		req.Method = defaultMethod
 	}
 

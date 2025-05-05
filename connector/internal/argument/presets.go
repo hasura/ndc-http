@@ -22,6 +22,7 @@ func NewArgumentPresets(
 		httpSchema: httpSchema,
 		presets:    nil,
 	}
+
 	for i, item := range presets {
 		preset, err := NewArgumentPreset(httpSchema, item, isGlobal)
 		if err != nil {
@@ -46,6 +47,7 @@ func (ap ArgumentPresets) Apply(
 		}
 
 		var err error
+
 		arguments, err = preset.Evaluate(operationName, arguments, headers)
 		if err != nil {
 			return nil, fmt.Errorf("failed to apply argument preset: %w", err)

@@ -82,11 +82,13 @@ func (c *HTTPConnector) execMutationSync(
 	request *schema.MutationRequest,
 ) (*schema.MutationResponse, error) {
 	operationResults := make([]schema.MutationOperationResults, len(request.Operations))
+
 	for i, operation := range request.Operations {
 		result, err := c.execMutationOperation(ctx, state, operation, i)
 		if err != nil {
 			return nil, err
 		}
+
 		operationResults[i] = result
 	}
 
@@ -112,6 +114,7 @@ func (c *HTTPConnector) execMutationAsync(
 				if err != nil {
 					return err
 				}
+
 				operationResults[index] = result
 
 				return nil
@@ -138,7 +141,9 @@ func (c *HTTPConnector) execMutationOperation(
 	defer span.End()
 
 	var requests *internal.RequestBuilderResults
+
 	var err error
+
 	if operation.Name == internal.ProcedureSendHTTPRequest {
 		if c.procSendHttpRequest == nil {
 			span.SetStatus(codes.Error, internal.ProcedureSendHTTPRequest+" mutation is disabled")
@@ -165,6 +170,7 @@ func (c *HTTPConnector) execMutationOperation(
 	}
 
 	client := c.upstreams.CreateHTTPClient(requests)
+
 	result, _, err := client.Send(ctx, operation.Fields)
 	if err != nil {
 		span.SetStatus(codes.Error, "failed to execute mutation")

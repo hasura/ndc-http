@@ -52,6 +52,7 @@ func (oc *OAS3Builder) BuildDocumentModel(
 			}
 		}
 	}
+
 	for iterPath := docModel.Model.Paths.PathItems.First(); iterPath != nil; iterPath = iterPath.Next() {
 		if err := oc.pathToNDCOperations(iterPath); err != nil {
 			return nil, err
@@ -67,6 +68,7 @@ func (oc *OAS3Builder) BuildDocumentModel(
 			}
 		}
 	}
+
 	oc.schema.Settings.Security = convertSecurities(docModel.Model.Security)
 
 	// reevaluate write argument types
@@ -85,10 +87,12 @@ func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig 
 	for i, server := range servers {
 		if server.URL != "" {
 			var serverID, envName string
+
 			idExtension := server.Extensions.GetOrZero("x-server-id")
 			if idExtension != nil {
 				serverID = idExtension.Value
 			}
+
 			if serverID != "" {
 				envName = utils.StringSliceToConstantCase(
 					[]string{oc.EnvPrefix, serverID, "SERVER_URL"},
@@ -101,11 +105,13 @@ func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig 
 			}
 
 			serverURL := server.URL
+
 			for variable := server.Variables.First(); variable != nil; variable = variable.Next() {
 				value := variable.Value()
 				if value == nil || value.Default == "" {
 					continue
 				}
+
 				key := variable.Key()
 				serverURL = strings.ReplaceAll(serverURL, fmt.Sprintf("{%s}", key), value.Default)
 			}
@@ -125,15 +131,19 @@ func (oc *OAS3Builder) convertSecuritySchemes(
 	scheme orderedmap.Pair[string, *v3.SecurityScheme],
 ) error {
 	key := scheme.Key()
+
 	security := scheme.Value()
 	if security == nil {
 		return nil
 	}
+
 	securityType, err := rest.ParseSecuritySchemeType(security.Type)
 	if err != nil {
 		return err
 	}
+
 	result := rest.SecurityScheme{}
+
 	switch securityType {
 	case rest.APIKeyScheme:
 		inLocation, err := rest.ParseAPIKeyLocation(security.In)
@@ -176,12 +186,14 @@ func (oc *OAS3Builder) convertSecuritySchemes(
 		if security.Flows.Implicit != nil {
 			flows[rest.ImplicitFlow] = oc.convertV3OAuthFLow(key, security.Flows.Implicit)
 		}
+
 		if security.Flows.AuthorizationCode != nil {
 			flows[rest.AuthorizationCodeFlow] = oc.convertV3OAuthFLow(
 				key,
 				security.Flows.AuthorizationCode,
 			)
 		}
+
 		if security.Flows.ClientCredentials != nil {
 			clientID := sdkUtils.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_ID"}),
@@ -205,6 +217,7 @@ func (oc *OAS3Builder) convertSecuritySchemes(
 		result.SecuritySchemer = rest.NewOpenIDConnectConfig(security.OpenIdConnectUrl)
 	case rest.MutualTLSScheme:
 		result.SecuritySchemer = rest.NewMutualTLSAuthConfig()
+
 		if oc.schema.Settings.TLS == nil {
 			oc.schema.Settings.TLS = createTLSConfig([]string{oc.EnvPrefix, key})
 		}
@@ -231,6 +244,7 @@ func (oc *OAS3Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v3.
 		if err != nil {
 			return err
 		}
+
 		if funcGet != nil {
 			oc.schema.Functions[funcName] = *funcGet
 		}
@@ -291,9 +305,11 @@ func (oc *OAS3Builder) convertComponentSchemas(
 
 	typeKey := schemaItem.Key()
 	oc.Logger.Debug("component schema", slog.String("name", typeKey))
+
 	if _, ok := oc.schema.ObjectTypes[typeKey]; ok {
 		return nil
 	}
+
 	if _, ok := oc.schema.ScalarTypes[typeKey]; ok {
 		return nil
 	}
@@ -350,12 +366,14 @@ func (oc *OAS3Builder) transformWriteSchema() {
 			}
 		}
 	}
+
 	for _, proc := range oc.schema.Procedures {
 		for key, arg := range proc.Arguments {
 			ty, name, _ := oc.populateWriteSchemaType(arg.Type)
 			if name == "" {
 				continue
 			}
+
 			arg.Type = ty
 			proc.Arguments[key] = arg
 		}
@@ -388,24 +406,30 @@ func (oc *OAS3Builder) populateWriteSchemaType(schemaType schema.Type) (schema.T
 		if _, ok := oc.schema.ObjectTypes[writeName]; ok {
 			return schema.NewNamedType(writeName).Encode(), writeName, true
 		}
+
 		if evaluated {
 			return schemaType, ty.Name, false
 		}
+
 		objectType, ok := oc.schema.ObjectTypes[ty.Name]
 		if !ok {
 			return schemaType, ty.Name, false
 		}
+
 		writeObject := rest.ObjectType{
 			Description: objectType.Description,
 			XML:         objectType.XML,
 			Fields:      make(map[string]rest.ObjectField),
 		}
+
 		var hasWriteField bool
+
 		for key, field := range objectType.Fields {
 			ut, name, isInput := oc.populateWriteSchemaType(field.Type)
 			if name == "" {
 				continue
 			}
+
 			writeObject.Fields[key] = rest.ObjectField{
 				ObjectField: schema.ObjectField{
 					Description: field.Description,
@@ -413,10 +437,12 @@ func (oc *OAS3Builder) populateWriteSchemaType(schemaType schema.Type) (schema.T
 				},
 				HTTP: field.HTTP,
 			}
+
 			if isInput {
 				hasWriteField = true
 			}
 		}
+
 		if hasWriteField {
 			oc.schema.ObjectTypes[writeName] = writeObject
 
@@ -441,6 +467,7 @@ func (oc *OAS3Builder) convertV3OAuthFLow(key string, input *v3.OAuthFlow) rest.
 	if input.TokenUrl != "" {
 		tokenURL.Value = &input.TokenUrl
 	}
+
 	result.TokenURL = &tokenURL
 
 	if input.Scopes != nil {

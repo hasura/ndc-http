@@ -39,12 +39,15 @@ func (client *HTTPClient) Send(
 	selection schema.NestedField,
 ) (any, http.Header, error) {
 	httpOptions := client.requests.HTTPOptions
+
 	var result any
+
 	var headers http.Header
 
 	switch {
 	case !httpOptions.Distributed:
 		var err *schema.ConnectorError
+
 		result, headers, err = client.sendSingle(ctx, client.requests.Requests[0], "single")
 		if err != nil {
 			return nil, nil, err
@@ -63,6 +66,7 @@ func (client *HTTPClient) Send(
 
 	if len(selection) > 0 {
 		var err error
+
 		result, err = utils.EvalNestedColumnFields(selection, result)
 		if err != nil {
 			return nil, nil, schema.InternalServerError(err.Error(), nil)
@@ -78,7 +82,9 @@ func (client *HTTPClient) sendSequence(
 	requests []*RetryableRequest,
 ) (*DistributedResponse[any], http.Header) {
 	results := NewDistributedResponse[any]()
+
 	var firstHeaders http.Header
+
 	for _, req := range requests {
 		result, headers, err := client.sendSingle(ctx, req, "sequence")
 		if err != nil {
@@ -107,6 +113,7 @@ func (client *HTTPClient) sendParallel(
 	requests []*RetryableRequest,
 ) (*DistributedResponse[any], http.Header) {
 	var firstHeaders http.Header
+
 	httpOptions := client.requests.HTTPOptions
 	results := make([]*DistributedResult[any], len(requests))
 	errs := make([]*DistributedError, len(requests))
@@ -129,6 +136,7 @@ func (client *HTTPClient) sendParallel(
 					Server: req.ServerID,
 					Data:   result,
 				}
+
 				if firstHeaders == nil {
 					firstHeaders = headers
 				}
@@ -145,6 +153,7 @@ func (client *HTTPClient) sendParallel(
 	_ = eg.Wait()
 
 	r := NewDistributedResponse[any]()
+
 	for _, item := range results {
 		if item != nil {
 			r.Results = append(r.Results, *item)
@@ -174,6 +183,7 @@ func (client *HTTPClient) sendSingle(
 	span.SetAttributes(attribute.String("execution.mode", mode))
 
 	var namespace string
+
 	var httpError *exhttp.HTTPError
 
 	if client.requests.Schema != nil && client.requests.Schema.Name != "" {
@@ -193,12 +203,15 @@ func (client *HTTPClient) sendSingle(
 
 	defer func() {
 		cancel()
+
 		_ = resp.Body.Close()
 	}()
 
 	contentType := parseContentType(resp.Header.Get(rest.ContentTypeHeader))
+
 	if httpError != nil {
 		details := make(map[string]any)
+
 		switch contentType {
 		case rest.ContentTypeJSON:
 			if json.Valid(httpError.Body) {
@@ -302,6 +315,7 @@ func (client *HTTPClient) evalHTTPResponse(
 		return string(respBody), nil
 	case restUtils.IsContentTypeXML(contentType):
 		var err error
+
 		result, err := contenttype.NewXMLDecoder(client.requests.Schema.NDCHttpSchema).
 			Decode(resp.Body, resultType)
 		if err != nil {
@@ -335,6 +349,7 @@ func (client *HTTPClient) evalHTTPResponse(
 		}
 
 		var result any
+
 		var err error
 
 		if client.requests.Schema == nil || client.requests.Schema.NDCHttpSchema == nil {
@@ -370,9 +385,11 @@ func (client *HTTPClient) evalHTTPResponse(
 		return result, nil
 	case contentType == rest.ContentTypeNdJSON:
 		var results []any
+
 		decoder := json.NewDecoder(resp.Body)
 		for decoder.More() {
 			var r any
+
 			err := decoder.Decode(&r)
 			if err != nil {
 				return nil, schema.NewConnectorError(
@@ -381,6 +398,7 @@ func (client *HTTPClient) evalHTTPResponse(
 					nil,
 				)
 			}
+
 			results = append(results, r)
 		}
 
@@ -410,11 +428,13 @@ func (client *HTTPClient) createHeaderForwardingResponse(result any, rawHeaders 
 	}
 
 	headers := make(map[string]string)
+
 	for key, values := range rawHeaders {
 		if len(forwardHeaders.ResponseHeaders.ForwardHeaders) > 0 &&
 			!slices.Contains(forwardHeaders.ResponseHeaders.ForwardHeaders, key) {
 			continue
 		}
+
 		if len(values) > 0 && values[0] != "" {
 			headers[key] = values[0]
 		}
@@ -430,6 +450,7 @@ func parseContentType(input string) string {
 	if input == "" {
 		return ""
 	}
+
 	parts := strings.Split(input, ";")
 	contentTypeParts := strings.Split(parts[0], ",")
 

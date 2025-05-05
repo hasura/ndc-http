@@ -84,6 +84,7 @@ func (c *JSONEncoder) evalArrayType(
 	}
 
 	c.buffer.WriteRune('[')
+
 	valueLen := reflectValue.Len()
 
 	for i := range valueLen {
@@ -138,6 +139,7 @@ func (c *JSONEncoder) evalNamedType(
 	}
 
 	var started bool
+
 	c.buffer.WriteRune('{')
 
 	for key, field := range objectType.Fields {

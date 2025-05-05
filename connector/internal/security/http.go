@@ -69,6 +69,7 @@ func (hc HTTPCredential) inject(req *http.Request, value string) {
 	if headerName == "" {
 		headerName = schema.AuthorizationHeader
 	}
+
 	scheme := hc.Scheme
 	if scheme == "bearer" {
 		scheme = "Bearer"

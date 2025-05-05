@@ -55,6 +55,7 @@ type ArgumentPresetValueEnv struct {
 // NewArgumentPresetValueEnv creates a new ArgumentPresetValueEnv instance.
 func NewArgumentPresetValueEnv(name string) *ArgumentPresetValueEnv {
 	var value *string
+
 	rawValue, ok := os.LookupEnv(name)
 	if ok {
 		value = &rawValue

@@ -36,6 +36,7 @@ func Json2Yaml(args *Json2YamlCommandArguments, logger *slog.Logger) error {
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)
 	encoder.SetIndent(2)
+
 	if err := encoder.Encode(jsonContent); err != nil {
 		slog.Error(err.Error())
 
@@ -48,6 +49,7 @@ func Json2Yaml(args *Json2YamlCommandArguments, logger *slog.Logger) error {
 
 			return err
 		}
+
 		logger.Info("generated successfully to " + args.Output)
 
 		return nil

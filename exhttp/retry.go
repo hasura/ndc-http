@@ -44,6 +44,7 @@ type RetryPolicySetting struct {
 // Validate if the current instance is valid.
 func (rs RetryPolicySetting) Validate() (*RetryPolicy, error) {
 	var errs []error
+
 	times, err := rs.Times.Get()
 	if err != nil {
 		errs = append(errs, err)
@@ -233,6 +234,7 @@ func (r *retryMiddleware) Do(req *http.Request) (*http.Response, error) {
 	}
 
 	var reqBody io.ReadSeeker
+
 	if req.Body != nil {
 		if bodySeeker, ok := req.Body.(io.ReadSeeker); !ok {
 			rawBytes, err := io.ReadAll(req.Body)

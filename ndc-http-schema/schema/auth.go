@@ -263,6 +263,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case BasicAuthScheme:
@@ -270,6 +271,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case HTTPAuthScheme:
@@ -277,6 +279,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case OAuth2Scheme:
@@ -284,6 +287,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case OpenIDConnectScheme:
@@ -291,6 +295,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case CookieAuthScheme:
@@ -363,6 +368,7 @@ func (ss *APIKeyAuthConfig) Validate() error {
 	if ss.Name == "" {
 		return errors.New("name is required for apiKey security")
 	}
+
 	if _, err := ParseAPIKeyLocation(string(ss.In)); err != nil {
 		return err
 	}

@@ -70,10 +70,12 @@ func (oc *oas2OperationBuilder) BuildFunction(
 	}
 
 	description := oc.getOperationDescription(operation)
+
 	requestURL, arguments, err := evalOperationPath(oc.pathKey, oc.Arguments)
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
 	}
+
 	function := rest.OperationInfo{
 		Request: &rest.Request{
 			URL:         requestURL,
@@ -133,6 +135,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(
 
 	for i, bodyType := range bodyTypes {
 		newProcName := procName
+
 		arguments := make(map[string]rest.ArgumentInfo)
 		for key, arg := range oc.Arguments {
 			arguments[key] = arg
@@ -174,6 +177,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(
 		}
 
 		description := oc.getOperationDescription(operation)
+
 		requestURL, arguments, err := evalOperationPath(oc.pathKey, arguments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", procName, err)
@@ -213,7 +217,9 @@ func (oc *oas2OperationBuilder) convertParameters(
 	}
 
 	var requestBody *rest.RequestBody
+
 	var bodyTypes []SchemaInfoCache
+
 	formData := rest.TypeSchema{
 		Type: []string{"object"},
 	}
@@ -233,6 +239,7 @@ func (oc *oas2OperationBuilder) convertParameters(
 		}
 
 		var schemaResult *SchemaInfoCache
+
 		var err error
 
 		paramRequired := false
@@ -310,6 +317,7 @@ func (oc *oas2OperationBuilder) convertParameters(
 				Type: schemaType,
 			},
 		}
+
 		if param.Description != "" {
 			description := utils.StripHTMLTags(param.Description)
 			if description != "" {
@@ -343,6 +351,7 @@ func (oc *oas2OperationBuilder) convertParameters(
 						param.Description = &desc
 					}
 				}
+
 				formDataObject.Fields[paramName] = param
 			}
 		default:
@@ -400,7 +409,9 @@ func (oc *oas2OperationBuilder) convertResponse(
 	}
 
 	var resp *v2.Response
+
 	var statusCode int64
+
 	if operation.Responses.Codes == nil || operation.Responses.Codes.IsZero() {
 		// the response is always successful
 		resp = operation.Responses.Default
@@ -478,6 +489,7 @@ func (oc *oas2OperationBuilder) getOperationDescription(operation *v2.Operation)
 	if operation.Summary != "" {
 		return utils.StripHTMLTags(operation.Summary)
 	}
+
 	if operation.Description != "" {
 		return utils.StripHTMLTags(operation.Description)
 	}

@@ -71,6 +71,7 @@ func (c *HTTPConnector) ParseConfiguration(
 	}
 
 	logger := connector.GetLogger(ctx)
+
 	schemas, err := configuration.ReadSchemaOutputFile(configurationDir, config.Output, logger)
 	if err != nil {
 		return nil, err
@@ -103,6 +104,7 @@ func (c *HTTPConnector) ParseConfiguration(
 	)
 
 	c.config = config
+
 	c.upstreams, err = internal.NewUpstreamManager(c.httpClient, config)
 	if err != nil {
 		return nil, err
