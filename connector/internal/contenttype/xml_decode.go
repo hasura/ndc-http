@@ -65,7 +65,12 @@ func (c *XMLDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 	return nil, nil
 }
 
-func (c *XMLDecoder) evalXMLField(block *xmlBlock, fieldName string, field rest.ObjectField, fieldPaths []string) (any, error) {
+func (c *XMLDecoder) evalXMLField(
+	block *xmlBlock,
+	fieldName string,
+	field rest.ObjectField,
+	fieldPaths []string,
+) (any, error) {
 	rawType, err := field.Type.InterfaceT()
 	if err != nil {
 		return nil, err
@@ -88,7 +93,10 @@ func (c *XMLDecoder) evalXMLField(block *xmlBlock, fieldName string, field rest.
 	}
 }
 
-func (c *XMLDecoder) getArrayItemObjectField(field rest.ObjectField, t *schema.ArrayType) rest.ObjectField {
+func (c *XMLDecoder) getArrayItemObjectField(
+	field rest.ObjectField,
+	t *schema.ArrayType,
+) rest.ObjectField {
 	fieldItem := rest.ObjectField{
 		ObjectField: schema.ObjectField{
 			Type: t.ElementType,
@@ -102,7 +110,13 @@ func (c *XMLDecoder) getArrayItemObjectField(field rest.ObjectField, t *schema.A
 	return fieldItem
 }
 
-func (c *XMLDecoder) evalArrayField(block *xmlBlock, fieldName string, field rest.ObjectField, t *schema.ArrayType, fieldPaths []string) (any, error) {
+func (c *XMLDecoder) evalArrayField(
+	block *xmlBlock,
+	fieldName string,
+	field rest.ObjectField,
+	t *schema.ArrayType,
+	fieldPaths []string,
+) (any, error) {
 	if block.Fields == nil {
 		return nil, nil
 	}
@@ -117,7 +131,8 @@ func (c *XMLDecoder) evalArrayField(block *xmlBlock, fieldName string, field res
 
 	if field.HTTP != nil {
 		wrapped = wrapped || (field.HTTP.XML != nil && field.HTTP.XML.Wrapped)
-		if field.HTTP.Items != nil && field.HTTP.Items.XML != nil && field.HTTP.Items.XML.Name != "" {
+		if field.HTTP.Items != nil && field.HTTP.Items.XML != nil &&
+			field.HTTP.Items.XML.Name != "" {
 			itemTokenName = field.HTTP.Items.XML.Name
 		}
 	}
@@ -137,14 +152,24 @@ func (c *XMLDecoder) evalArrayField(block *xmlBlock, fieldName string, field res
 	return c.evalArrayElements(elements, itemTokenName, fieldItem, fieldPaths)
 }
 
-func (c *XMLDecoder) evalArrayElements(elements []xmlBlock, itemTokenName string, fieldItem rest.ObjectField, fieldPaths []string) ([]any, error) {
+func (c *XMLDecoder) evalArrayElements(
+	elements []xmlBlock,
+	itemTokenName string,
+	fieldItem rest.ObjectField,
+	fieldPaths []string,
+) ([]any, error) {
 	if len(elements) == 0 {
 		return []any{}, nil
 	}
 
 	results := make([]any, len(elements))
 	for i, elem := range elements {
-		result, err := c.evalXMLField(&elem, itemTokenName, fieldItem, append(fieldPaths, strconv.Itoa(i)))
+		result, err := c.evalXMLField(
+			&elem,
+			itemTokenName,
+			fieldItem,
+			append(fieldPaths, strconv.Itoa(i)),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -154,7 +179,11 @@ func (c *XMLDecoder) evalArrayElements(elements []xmlBlock, itemTokenName string
 	return results, nil
 }
 
-func (c *XMLDecoder) evalNamedField(block *xmlBlock, t *schema.NamedType, fieldPaths []string) (any, error) {
+func (c *XMLDecoder) evalNamedField(
+	block *xmlBlock,
+	t *schema.NamedType,
+	fieldPaths []string,
+) (any, error) {
 	if scalarType, ok := c.schema.ScalarTypes[t.Name]; ok {
 		return c.decodeSimpleScalarValue(block, scalarType, fieldPaths)
 	}
@@ -168,7 +197,8 @@ func (c *XMLDecoder) evalNamedField(block *xmlBlock, t *schema.NamedType, fieldP
 
 	for _, attr := range block.Start.Attr {
 		for key, objectField := range objectType.Fields {
-			if objectField.HTTP == nil || objectField.HTTP.XML == nil || !objectField.HTTP.XML.Attribute {
+			if objectField.HTTP == nil || objectField.HTTP.XML == nil ||
+				!objectField.HTTP.XML.Attribute {
 				continue
 			}
 
@@ -193,7 +223,11 @@ func (c *XMLDecoder) evalNamedField(block *xmlBlock, t *schema.NamedType, fieldP
 
 	_, textFieldName, isLeaf := findXMLLeafObjectField(objectType)
 	if isLeaf {
-		textValue, err := c.decodeSimpleScalarValue(block, c.schema.ScalarTypes[string(rest.ScalarString)], fieldPaths)
+		textValue, err := c.decodeSimpleScalarValue(
+			block,
+			c.schema.ScalarTypes[string(rest.ScalarString)],
+			fieldPaths,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -277,7 +311,11 @@ func (c *XMLDecoder) evalNamedField(block *xmlBlock, t *schema.NamedType, fieldP
 	return result, nil
 }
 
-func (c *XMLDecoder) evalAttribute(schemaType schema.Type, attr xml.Attr, fieldPaths []string) (any, error) {
+func (c *XMLDecoder) evalAttribute(
+	schemaType schema.Type,
+	attr xml.Attr,
+	fieldPaths []string,
+) (any, error) {
 	rawType, err := schemaType.InterfaceT()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
@@ -311,7 +349,11 @@ func (c *XMLDecoder) evalAttribute(schemaType schema.Type, attr xml.Attr, fieldP
 	}
 }
 
-func (c *XMLDecoder) decodeSimpleScalarValue(block *xmlBlock, scalarType schema.ScalarType, fieldPaths []string) (any, error) {
+func (c *XMLDecoder) decodeSimpleScalarValue(
+	block *xmlBlock,
+	scalarType schema.ScalarType,
+	fieldPaths []string,
+) (any, error) {
 	respType, err := scalarType.Representation.InterfaceT()
 
 	var result any = nil

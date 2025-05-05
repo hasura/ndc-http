@@ -73,7 +73,11 @@ func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 	}
 }
 
-func (c *JSONDecoder) evalSchemaType(value any, schemaType schema.Type, fieldPaths []string) (any, error) {
+func (c *JSONDecoder) evalSchemaType(
+	value any,
+	schemaType schema.Type,
+	fieldPaths []string,
+) (any, error) {
 	if utils.IsNil(value) {
 		return nil, nil
 	}
@@ -90,7 +94,11 @@ func (c *JSONDecoder) evalSchemaType(value any, schemaType schema.Type, fieldPat
 	}
 }
 
-func (c *JSONDecoder) evalArrayType(value any, arrayType *schema.ArrayType, fieldPaths []string) (any, error) {
+func (c *JSONDecoder) evalArrayType(
+	value any,
+	arrayType *schema.ArrayType,
+	fieldPaths []string,
+) (any, error) {
 	arrayValue, ok := value.([]any)
 	if !ok {
 		return value, nil
@@ -98,7 +106,11 @@ func (c *JSONDecoder) evalArrayType(value any, arrayType *schema.ArrayType, fiel
 
 	results := make([]any, len(arrayValue))
 	for i, item := range arrayValue {
-		result, err := c.evalSchemaType(item, arrayType.ElementType, append(fieldPaths, strconv.Itoa(i)))
+		result, err := c.evalSchemaType(
+			item,
+			arrayType.ElementType,
+			append(fieldPaths, strconv.Itoa(i)),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +120,11 @@ func (c *JSONDecoder) evalArrayType(value any, arrayType *schema.ArrayType, fiel
 	return results, nil
 }
 
-func (c *JSONDecoder) evalNamedType(value any, schemaType *schema.NamedType, fieldPaths []string) (any, error) {
+func (c *JSONDecoder) evalNamedType(
+	value any,
+	schemaType *schema.NamedType,
+	fieldPaths []string,
+) (any, error) {
 	scalarType, ok := c.schema.ScalarTypes[schemaType.Name]
 	if ok {
 		result, err := c.evalScalarType(value, scalarType)

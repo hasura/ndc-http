@@ -49,7 +49,17 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 			errs = append(errs, err)
 		}
 	default:
-		return nil, fmt.Errorf("invalid spec %s, expected %+v", config.Spec, []schema.SchemaSpecType{schema.OpenAPIv3Spec, schema.OpenAPIv2Spec, schema.OAS3Spec, schema.OAS2Spec, schema.NDCSpec})
+		return nil, fmt.Errorf(
+			"invalid spec %s, expected %+v",
+			config.Spec,
+			[]schema.SchemaSpecType{
+				schema.OpenAPIv3Spec,
+				schema.OpenAPIv2Spec,
+				schema.OAS3Spec,
+				schema.OAS2Spec,
+				schema.NDCSpec,
+			},
+		)
 	}
 
 	if result == nil {
@@ -67,7 +77,11 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 }
 
 // ResolveConvertConfigArguments resolves convert config arguments.
-func ResolveConvertConfigArguments(config *ConvertConfig, configDir string, args *ConvertCommandArguments) {
+func ResolveConvertConfigArguments(
+	config *ConvertConfig,
+	configDir string,
+	args *ConvertCommandArguments,
+) {
 	if args != nil {
 		if args.Spec != "" {
 			config.Spec = schema.SchemaSpecType(args.Spec)

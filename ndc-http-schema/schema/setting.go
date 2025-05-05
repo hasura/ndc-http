@@ -111,9 +111,9 @@ func (ss ServerConfig) GetURL() (*url.URL, error) {
 // ArgumentPresetConfig represents an argument preset configuration.
 type ArgumentPresetConfig struct {
 	// The JSON path of the argument field.
-	Path string `json:"path" mapstructure:"path" yaml:"path"`
+	Path string `json:"path"    mapstructure:"path"    yaml:"path"`
 	// The value to be set.
-	Value ArgumentPresetValue `json:"value" mapstructure:"value" yaml:"value"`
+	Value ArgumentPresetValue `json:"value"   mapstructure:"value"   yaml:"value"`
 	// Target operations to be applied.
 	Targets []string `json:"targets" mapstructure:"targets" yaml:"targets"`
 }
@@ -159,7 +159,11 @@ func (apc ArgumentPresetConfig) Validate() (*jsonpath.Path, []regexp.Regexp, err
 	for i, target := range apc.Targets {
 		rg, err := regexp.Compile(target)
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to compile argument preset target expression %s: %w", target, err)
+			return nil, nil, fmt.Errorf(
+				"failed to compile argument preset target expression %s: %w",
+				target,
+				err,
+			)
 		}
 		targets[i] = *rg
 	}
@@ -211,7 +215,11 @@ func (j *ArgumentPresetValueType) UnmarshalJSON(b []byte) error {
 func ParseArgumentPresetValueType(value string) (ArgumentPresetValueType, error) {
 	result := ArgumentPresetValueType(value)
 	if !slices.Contains(argumentPresetValueType_enums, result) {
-		return result, fmt.Errorf("invalid ArgumentPresetValueType. Expected %+v, got <%s>", argumentPresetValueType_enums, value)
+		return result, fmt.Errorf(
+			"invalid ArgumentPresetValueType. Expected %+v, got <%s>",
+			argumentPresetValueType_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -391,7 +399,7 @@ func (apv ArgumentPresetValueForwardHeader) GetType() ArgumentPresetValueType {
 // ResponseTransformSetting represents a response transformation setting.
 type ResponseTransformSetting struct {
 	// The body template.
-	Body any `json:"body" mapstructure:"body" yaml:"body"`
+	Body any `json:"body"    mapstructure:"body"    yaml:"body"`
 	// Target operations to be applied.
 	Targets []string `json:"targets" mapstructure:"targets" yaml:"targets"`
 }

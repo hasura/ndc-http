@@ -22,7 +22,14 @@ func UpdateConfiguration(args *UpdateCommandArguments, logger *slog.Logger, noCo
 		return err
 	}
 
-	validStatus, err := configuration.ValidateConfiguration(config, args.Dir, schemas, mergedSchema, logger, noColor)
+	validStatus, err := configuration.ValidateConfiguration(
+		config,
+		args.Dir,
+		schemas,
+		mergedSchema,
+		logger,
+		noColor,
+	)
 	if err != nil {
 		return err
 	}
@@ -33,7 +40,7 @@ func UpdateConfiguration(args *UpdateCommandArguments, logger *slog.Logger, noCo
 
 	validStatus.Render(os.Stderr)
 	if validStatus.HasError() {
-		return errors.New("Detected configuration errors. Update your configuration and try again.")
+		return errors.New("detected configuration errors. Update your configuration and try again")
 	}
 
 	logger.Info("Updated successfully", slog.Duration("exec_time", time.Since(start)))

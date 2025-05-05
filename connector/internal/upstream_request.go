@@ -21,7 +21,12 @@ type RequestBuilderResults struct {
 	*HTTPOptions
 }
 
-func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRuntimeSchema, operationName string, operation *rest.OperationInfo, rawArgs map[string]any) (*RequestBuilderResults, error) {
+func (um *UpstreamManager) BuildRequests(
+	runtimeSchema *configuration.NDCHttpRuntimeSchema,
+	operationName string,
+	operation *rest.OperationInfo,
+	rawArgs map[string]any,
+) (*RequestBuilderResults, error) {
 	// 1. parse http options from arguments
 	httpOptions, err := um.parseHTTPOptionsFromArguments(operation.Arguments, rawArgs)
 	if err != nil {
@@ -32,11 +37,17 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 
 	upstream, ok := um.upstreams[runtimeSchema.Name]
 	if !ok {
-		return nil, schema.InternalServerError(fmt.Sprintf("upstream with namespace %s does not exist", runtimeSchema.Name), nil)
+		return nil, schema.InternalServerError(
+			fmt.Sprintf("upstream with namespace %s does not exist", runtimeSchema.Name),
+			nil,
+		)
 	}
 
 	if len(upstream.servers) == 0 {
-		return nil, schema.InternalServerError("no available server in the upstream with namespace "+runtimeSchema.Name, nil)
+		return nil, schema.InternalServerError(
+			"no available server in the upstream with namespace "+runtimeSchema.Name,
+			nil,
+		)
 	}
 
 	// 2. get headers in argument if exists
@@ -60,11 +71,17 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 		HTTPOptions:   httpOptions,
 	}
 
-	results.HTTPOptions.Concurrency = um.config.Concurrency.HTTP
+	results.Concurrency = um.config.Concurrency.HTTP
 
 	if strings.HasPrefix(operation.Request.URL, "http") {
 		// 4. build the request
-		req, err := NewRequestBuilder(runtimeSchema.NDCHttpSchema, operation, rawArgs, runtimeSchema.Runtime, um.RuntimeSettings).Build()
+		req, err := NewRequestBuilder(
+			runtimeSchema.NDCHttpSchema,
+			operation,
+			rawArgs,
+			runtimeSchema.Runtime,
+			um.RuntimeSettings,
+		).Build()
 		if err != nil {
 			return nil, err
 		}
@@ -76,7 +93,14 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 	}
 
 	if !httpOptions.Distributed || len(upstream.servers) == 1 {
-		req, err := upstream.buildRequest(runtimeSchema, operationName, operation, rawArgs, headers, httpOptions.Servers)
+		req, err := upstream.buildRequest(
+			runtimeSchema,
+			operationName,
+			operation,
+			rawArgs,
+			headers,
+			httpOptions.Servers,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +115,14 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 	}
 
 	for _, serverID := range serverIDs {
-		req, err := upstream.buildRequest(runtimeSchema, operationName, operation, rawArgs, headers, []string{serverID})
+		req, err := upstream.buildRequest(
+			runtimeSchema,
+			operationName,
+			operation,
+			rawArgs,
+			headers,
+			[]string{serverID},
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +132,10 @@ func (um *UpstreamManager) BuildRequests(runtimeSchema *configuration.NDCHttpRun
 	return results, nil
 }
 
-func (um *UpstreamManager) parseHTTPOptionsFromArguments(argumentsInfo map[string]rest.ArgumentInfo, rawArgs map[string]any) (*HTTPOptions, error) {
+func (um *UpstreamManager) parseHTTPOptionsFromArguments(
+	argumentsInfo map[string]rest.ArgumentInfo,
+	rawArgs map[string]any,
+) (*HTTPOptions, error) {
 	var result HTTPOptions
 	argInfo, ok := argumentsInfo[rest.HTTPOptionsArgumentName]
 	if !ok {
@@ -114,14 +148,16 @@ func (um *UpstreamManager) parseHTTPOptionsFromArguments(argumentsInfo map[strin
 		}
 	}
 	httpOptionsNamedType := schema.GetUnderlyingNamedType(argInfo.Type)
-	result.Distributed = httpOptionsNamedType != nil && httpOptionsNamedType.Name == rest.HTTPDistributedOptionsObjectName
+	result.Distributed = httpOptionsNamedType != nil &&
+		httpOptionsNamedType.Name == rest.HTTPDistributedOptionsObjectName
 
 	return &result, nil
 }
 
 func (um *UpstreamManager) getArgumentHeaders(rawArgs map[string]any) (map[string]string, error) {
 	headers := make(map[string]string)
-	if !um.config.ForwardHeaders.Enabled || um.config.ForwardHeaders.ArgumentField == nil || *um.config.ForwardHeaders.ArgumentField == "" {
+	if !um.config.ForwardHeaders.Enabled || um.config.ForwardHeaders.ArgumentField == nil ||
+		*um.config.ForwardHeaders.ArgumentField == "" {
 		return headers, nil
 	}
 	rawHeaders, ok := rawArgs[*um.config.ForwardHeaders.ArgumentField]
@@ -130,7 +166,10 @@ func (um *UpstreamManager) getArgumentHeaders(rawArgs map[string]any) (map[strin
 	}
 
 	if err := mapstructure.Decode(rawHeaders, &headers); err != nil {
-		return nil, schema.UnprocessableContentError(fmt.Sprintf("arguments.%s: %s", *um.config.ForwardHeaders.ArgumentField, err), nil)
+		return nil, schema.UnprocessableContentError(
+			fmt.Sprintf("arguments.%s: %s", *um.config.ForwardHeaders.ArgumentField, err),
+			nil,
+		)
 	}
 
 	return headers, nil

@@ -13,7 +13,11 @@ type ArgumentPresets struct {
 }
 
 // NewArgumentPresets create a new ArgumentPresets instance.
-func NewArgumentPresets(httpSchema *rest.NDCHttpSchema, presets []rest.ArgumentPresetConfig, isGlobal bool) (*ArgumentPresets, error) {
+func NewArgumentPresets(
+	httpSchema *rest.NDCHttpSchema,
+	presets []rest.ArgumentPresetConfig,
+	isGlobal bool,
+) (*ArgumentPresets, error) {
 	result := &ArgumentPresets{
 		httpSchema: httpSchema,
 		presets:    nil,
@@ -31,7 +35,11 @@ func NewArgumentPresets(httpSchema *rest.NDCHttpSchema, presets []rest.ArgumentP
 }
 
 // ApplyArgumentPresents replace argument preset values into request arguments.
-func (ap ArgumentPresets) Apply(operationName string, arguments map[string]any, headers map[string]string) (map[string]any, error) {
+func (ap ArgumentPresets) Apply(
+	operationName string,
+	arguments map[string]any,
+	headers map[string]string,
+) (map[string]any, error) {
 	for _, preset := range ap.presets {
 		if len(preset.Targets) == 0 {
 			continue

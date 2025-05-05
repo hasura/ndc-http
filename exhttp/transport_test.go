@@ -34,7 +34,7 @@ func TestHTTPTransport(t *testing.T) {
 		InsecureSkipVerify: utils.ToPtr(utils.NewEnvBoolValue(true)),
 	}
 
-	_ = baseConfig.ToTransport()
+	_ = NewTelemetryTransport(baseConfig.ToTransport(), TelemetryConfig{})
 	_, err := HTTPTransportTLSConfig{
 		HTTPTransportConfig: baseConfig,
 		TLS:                 tlsConfig,

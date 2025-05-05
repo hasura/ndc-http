@@ -70,7 +70,11 @@ func (j *SecuritySchemeType) UnmarshalJSON(b []byte) error {
 func ParseSecuritySchemeType(value string) (SecuritySchemeType, error) {
 	result := SecuritySchemeType(value)
 	if !slices.Contains(securityScheme_enums, result) {
-		return result, fmt.Errorf("invalid SecuritySchemeType. Expected %+v, got <%s>", securityScheme_enums, value)
+		return result, fmt.Errorf(
+			"invalid SecuritySchemeType. Expected %+v, got <%s>",
+			securityScheme_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -116,7 +120,11 @@ func (j *APIKeyLocation) UnmarshalJSON(b []byte) error {
 func ParseAPIKeyLocation(value string) (APIKeyLocation, error) {
 	result := APIKeyLocation(value)
 	if !slices.Contains(apiKeyLocation_enums, result) {
-		return result, fmt.Errorf("invalid APIKeyLocation. Expected %+v, got <%s>", apiKeyLocation_enums, value)
+		return result, fmt.Errorf(
+			"invalid APIKeyLocation. Expected %+v, got <%s>",
+			apiKeyLocation_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -471,7 +479,11 @@ func (j *OAuthFlowType) UnmarshalJSON(b []byte) error {
 func ParseOAuthFlowType(value string) (OAuthFlowType, error) {
 	result := OAuthFlowType(value)
 	if !slices.Contains(oauthFlow_enums, result) {
-		return result, fmt.Errorf("invalid OAuthFlowType. Expected %+v, got <%s>", oauthFlow_enums, value)
+		return result, fmt.Errorf(
+			"invalid OAuthFlowType. Expected %+v, got <%s>",
+			oauthFlow_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -493,7 +505,10 @@ type OAuthFlow struct {
 // Validate if the current instance is valid.
 func (ss OAuthFlow) Validate(flowType OAuthFlowType) error {
 	if ss.TokenURL == nil {
-		if slices.Contains([]OAuthFlowType{PasswordFlow, ClientCredentialsFlow, AuthorizationCodeFlow}, flowType) {
+		if slices.Contains(
+			[]OAuthFlowType{PasswordFlow, ClientCredentialsFlow, AuthorizationCodeFlow},
+			flowType,
+		) {
 			return fmt.Errorf("tokenUrl is required for oauth2 %s security", flowType)
 		}
 	} else if ss.TokenURL.Value == nil && ss.TokenURL.Variable == nil {

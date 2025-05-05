@@ -78,12 +78,14 @@ func ReadFileFromPath(filePath string) ([]byte, error) {
 		}
 
 		if resp.Body != nil {
-			defer resp.Body.Close()
 			result, err = io.ReadAll(resp.Body)
+			_ = resp.Body.Close()
+
 			if err != nil {
 				return nil, fmt.Errorf("failed to read content from %s: %w", filePath, err)
 			}
 		}
+
 		if resp.StatusCode != http.StatusOK {
 			errorMsg := string(result)
 			if errorMsg == "" {
@@ -116,9 +118,11 @@ func WalkFiles(filePath string, callback func(data []byte) error) error {
 		}
 
 		var result []byte
+
 		if resp.Body != nil {
-			defer resp.Body.Close()
 			result, err = io.ReadAll(resp.Body)
+			_ = resp.Body.Close()
+
 			if err != nil {
 				return fmt.Errorf("failed to read content from %s: %w", filePath, err)
 			}
@@ -175,7 +179,8 @@ func WalkFiles(filePath string, callback func(data []byte) error) error {
 
 // ResolveFilePath resolves file path with directory.
 func ResolveFilePath(dir string, filePath string) string {
-	if !strings.HasPrefix(filePath, "/") && !strings.HasPrefix(filePath, "\\") && !strings.HasPrefix(filePath, "http") {
+	if !strings.HasPrefix(filePath, "/") && !strings.HasPrefix(filePath, "\\") &&
+		!strings.HasPrefix(filePath, "http") {
 		return path.Join(dir, filePath)
 	}
 

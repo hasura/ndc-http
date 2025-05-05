@@ -21,7 +21,13 @@ const (
 	NDCSpec       SchemaSpecType = "ndc"
 )
 
-var schemaSpecType_enums = []SchemaSpecType{OAS3Spec, OAS2Spec, OpenAPIv3Spec, OpenAPIv2Spec, NDCSpec}
+var schemaSpecType_enums = []SchemaSpecType{
+	OAS3Spec,
+	OAS2Spec,
+	OpenAPIv3Spec,
+	OpenAPIv2Spec,
+	NDCSpec,
+}
 
 // JSONSchema is used to generate a custom jsonschema.
 func (j SchemaSpecType) JSONSchema() *jsonschema.Schema {
@@ -52,7 +58,11 @@ func (j *SchemaSpecType) UnmarshalJSON(b []byte) error {
 func ParseSchemaSpecType(value string) (SchemaSpecType, error) {
 	result := SchemaSpecType(value)
 	if !slices.Contains(schemaSpecType_enums, result) {
-		return result, fmt.Errorf("invalid SchemaSpecType. Expected %+v, got <%s>", schemaSpecType_enums, value)
+		return result, fmt.Errorf(
+			"invalid SchemaSpecType. Expected %+v, got <%s>",
+			schemaSpecType_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -102,7 +112,11 @@ func (j SchemaFileFormat) IsValid() bool {
 func ParseSchemaFileFormat(extension string) (SchemaFileFormat, error) {
 	result := SchemaFileFormat(extension)
 	if !result.IsValid() {
-		return result, fmt.Errorf("invalid SchemaFileFormat. Expected %+v, got <%s>", schemaFileFormat_enums, extension)
+		return result, fmt.Errorf(
+			"invalid SchemaFileFormat. Expected %+v, got <%s>",
+			schemaFileFormat_enums,
+			extension,
+		)
 	}
 
 	return result, nil
@@ -123,7 +137,14 @@ const (
 	InFormData ParameterLocation = "formData"
 )
 
-var parameterLocation_enums = []ParameterLocation{InQuery, InHeader, InPath, InCookie, InBody, InFormData}
+var parameterLocation_enums = []ParameterLocation{
+	InQuery,
+	InHeader,
+	InPath,
+	InCookie,
+	InBody,
+	InFormData,
+}
 
 // JSONSchema is used to generate a custom jsonschema.
 func (j ParameterLocation) JSONSchema() *jsonschema.Schema {
@@ -159,7 +180,11 @@ func (j ParameterLocation) IsValid() bool {
 func ParseParameterLocation(input string) (ParameterLocation, error) {
 	result := ParameterLocation(input)
 	if !result.IsValid() {
-		return result, fmt.Errorf("invalid ParameterLocation. Expected %+v, got <%s>", parameterLocation_enums, input)
+		return result, fmt.Errorf(
+			"invalid ParameterLocation. Expected %+v, got <%s>",
+			parameterLocation_enums,
+			input,
+		)
 	}
 
 	return result, nil
@@ -296,7 +321,11 @@ func (j ParameterEncodingStyle) IsValid() bool {
 func ParseParameterEncodingStyle(input string) (ParameterEncodingStyle, error) {
 	result := ParameterEncodingStyle(input)
 	if !result.IsValid() {
-		return result, fmt.Errorf("invalid ParameterEncodingStyle. Expected %+v, got <%s>", parameterEncodingStyle_enums, input)
+		return result, fmt.Errorf(
+			"invalid ParameterEncodingStyle. Expected %+v, got <%s>",
+			parameterEncodingStyle_enums,
+			input,
+		)
 	}
 
 	return result, nil

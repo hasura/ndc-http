@@ -9,7 +9,9 @@ import (
 )
 
 // NewArgumentPresetValueGetter creates an ArgumentPresetValueGetter from config.
-func NewArgumentPresetValueGetter(presetValue rest.ArgumentPresetValue) (ArgumentPresetValueGetter, error) {
+func NewArgumentPresetValueGetter(
+	presetValue rest.ArgumentPresetValue,
+) (ArgumentPresetValueGetter, error) {
 	switch t := presetValue.Interface().(type) {
 	case *rest.ArgumentPresetValueLiteral:
 		return NewArgumentPresetValueLiteral(t.Value), nil
@@ -38,7 +40,10 @@ func NewArgumentPresetValueLiteral(value any) *ArgumentPresetValueLiteral {
 }
 
 // GetValue gets and parses the argument preset value.
-func (apv ArgumentPresetValueLiteral) GetValue(_ map[string]string, typeRep schema.TypeRepresentation) (any, error) {
+func (apv ArgumentPresetValueLiteral) GetValue(
+	_ map[string]string,
+	typeRep schema.TypeRepresentation,
+) (any, error) {
 	return apv.value, nil
 }
 
@@ -61,7 +66,10 @@ func NewArgumentPresetValueEnv(name string) *ArgumentPresetValueEnv {
 }
 
 // GetValue gets and parses the argument preset value.
-func (apv ArgumentPresetValueEnv) GetValue(_ map[string]string, typeRep schema.TypeRepresentation) (any, error) {
+func (apv ArgumentPresetValueEnv) GetValue(
+	_ map[string]string,
+	typeRep schema.TypeRepresentation,
+) (any, error) {
 	if apv.rawValue == nil || typeRep == nil {
 		return apv.rawValue, nil
 	}
@@ -82,7 +90,10 @@ func NewArgumentPresetValueForwardHeader(name string) *ArgumentPresetValueForwar
 }
 
 // GetValue gets and parses the argument preset value.
-func (apv ArgumentPresetValueForwardHeader) GetValue(headers map[string]string, typeRep schema.TypeRepresentation) (any, error) {
+func (apv ArgumentPresetValueForwardHeader) GetValue(
+	headers map[string]string,
+	typeRep schema.TypeRepresentation,
+) (any, error) {
 	if len(headers) == 0 {
 		return nil, nil
 	}

@@ -33,11 +33,14 @@ const (
 // PatchConfig the configuration for JSON patch.
 type PatchConfig struct {
 	Path     string        `json:"path"     yaml:"path"`
-	Strategy PatchStrategy `json:"strategy" jsonschema:"enum=merge,enum=json6902,default=merge" yaml:"strategy"`
+	Strategy PatchStrategy `json:"strategy" yaml:"strategy" jsonschema:"enum=merge,enum=json6902,default=merge"`
 }
 
 // ApplyPatchToHTTPSchema applies JSON patches to NDC HTTP schema and validate the output.
-func ApplyPatchToHTTPSchema(input *schema.NDCHttpSchema, patchFiles []PatchConfig) (*schema.NDCHttpSchema, error) {
+func ApplyPatchToHTTPSchema(
+	input *schema.NDCHttpSchema,
+	patchFiles []PatchConfig,
+) (*schema.NDCHttpSchema, error) {
 	if len(patchFiles) == 0 {
 		return input, nil
 	}
@@ -123,7 +126,8 @@ func convertMaybeYAMLToJSONBytes(input []byte) ([]byte, error) {
 		return nil, errEmptyInput
 	}
 
-	if (runes[0] == '{' && runes[len(runes)-1] == '}') || (runes[0] == '[' && runes[len(runes)-1] == ']') {
+	if (runes[0] == '{' && runes[len(runes)-1] == '}') ||
+		(runes[0] == '[' && runes[len(runes)-1] == ']') {
 		return runes, nil
 	}
 

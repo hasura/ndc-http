@@ -36,7 +36,9 @@ func NewOAS3Builder(options ConvertOptions) *OAS3Builder {
 	}
 }
 
-func (oc *OAS3Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v3.Document]) (*rest.NDCHttpSchema, error) {
+func (oc *OAS3Builder) BuildDocumentModel(
+	docModel *libopenapi.DocumentModel[v3.Document],
+) (*rest.NDCHttpSchema, error) {
 	if docModel.Model.Info != nil {
 		oc.schema.Settings.Version = docModel.Model.Info.Version
 	}
@@ -88,9 +90,11 @@ func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig 
 				serverID = idExtension.Value
 			}
 			if serverID != "" {
-				envName = utils.StringSliceToConstantCase([]string{oc.ConvertOptions.EnvPrefix, serverID, "SERVER_URL"})
+				envName = utils.StringSliceToConstantCase(
+					[]string{oc.EnvPrefix, serverID, "SERVER_URL"},
+				)
 			} else {
-				envName = utils.StringSliceToConstantCase([]string{oc.ConvertOptions.EnvPrefix, "SERVER_URL"})
+				envName = utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"})
 				if i > 0 {
 					envName = fmt.Sprintf("%s_%d", envName, i+1)
 				}
@@ -117,7 +121,9 @@ func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig 
 	return results
 }
 
-func (oc *OAS3Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v3.SecurityScheme]) error {
+func (oc *OAS3Builder) convertSecuritySchemes(
+	scheme orderedmap.Pair[string, *v3.SecurityScheme],
+) error {
 	key := scheme.Key()
 	security := scheme.Value()
 	if security == nil {
@@ -144,12 +150,22 @@ func (oc *OAS3Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v3
 	case rest.HTTPAuthScheme:
 		switch security.Scheme {
 		case string(rest.BasicAuthScheme):
-			user := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "USERNAME"}))
-			password := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "PASSWORD"}))
+			user := sdkUtils.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "USERNAME"}),
+			)
+			password := sdkUtils.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "PASSWORD"}),
+			)
 			result.SecuritySchemer = rest.NewBasicAuthConfig(user, password)
 		default:
-			valueEnv := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN"}))
-			result.SecuritySchemer = rest.NewHTTPAuthConfig(security.Scheme, rest.AuthorizationHeader, valueEnv)
+			valueEnv := sdkUtils.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN"}),
+			)
+			result.SecuritySchemer = rest.NewHTTPAuthConfig(
+				security.Scheme,
+				rest.AuthorizationHeader,
+				valueEnv,
+			)
 		}
 	case rest.OAuth2Scheme:
 		if security.Flows == nil {
@@ -161,11 +177,18 @@ func (oc *OAS3Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v3
 			flows[rest.ImplicitFlow] = oc.convertV3OAuthFLow(key, security.Flows.Implicit)
 		}
 		if security.Flows.AuthorizationCode != nil {
-			flows[rest.AuthorizationCodeFlow] = oc.convertV3OAuthFLow(key, security.Flows.AuthorizationCode)
+			flows[rest.AuthorizationCodeFlow] = oc.convertV3OAuthFLow(
+				key,
+				security.Flows.AuthorizationCode,
+			)
 		}
 		if security.Flows.ClientCredentials != nil {
-			clientID := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_ID"}))
-			clientSecret := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_SECRET"}))
+			clientID := sdkUtils.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_ID"}),
+			)
+			clientSecret := sdkUtils.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_SECRET"}),
+			)
 			flow := oc.convertV3OAuthFLow(key, security.Flows.ClientCredentials)
 			flow.ClientID = &clientID
 			flow.ClientSecret = &clientSecret
@@ -199,7 +222,12 @@ func (oc *OAS3Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v3.
 	pathValue := pathItem.Value()
 
 	if pathValue.Get != nil {
-		funcGet, funcName, err := newOAS3OperationBuilder(oc, pathKey, "get", pathValue.Parameters).BuildFunction(pathValue.Get)
+		funcGet, funcName, err := newOAS3OperationBuilder(
+			oc,
+			pathKey,
+			"get",
+			pathValue.Parameters,
+		).BuildFunction(pathValue.Get)
 		if err != nil {
 			return err
 		}
@@ -208,22 +236,42 @@ func (oc *OAS3Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v3.
 		}
 	}
 
-	err := newOAS3OperationBuilder(oc, pathKey, "post", pathValue.Parameters).BuildProcedure(pathValue.Post)
+	err := newOAS3OperationBuilder(
+		oc,
+		pathKey,
+		"post",
+		pathValue.Parameters,
+	).BuildProcedure(pathValue.Post)
 	if err != nil {
 		return err
 	}
 
-	err = newOAS3OperationBuilder(oc, pathKey, "put", pathValue.Parameters).BuildProcedure(pathValue.Put)
+	err = newOAS3OperationBuilder(
+		oc,
+		pathKey,
+		"put",
+		pathValue.Parameters,
+	).BuildProcedure(pathValue.Put)
 	if err != nil {
 		return err
 	}
 
-	err = newOAS3OperationBuilder(oc, pathKey, "patch", pathValue.Parameters).BuildProcedure(pathValue.Patch)
+	err = newOAS3OperationBuilder(
+		oc,
+		pathKey,
+		"patch",
+		pathValue.Parameters,
+	).BuildProcedure(pathValue.Patch)
 	if err != nil {
 		return err
 	}
 
-	err = newOAS3OperationBuilder(oc, pathKey, "delete", pathValue.Parameters).BuildProcedure(pathValue.Delete)
+	err = newOAS3OperationBuilder(
+		oc,
+		pathKey,
+		"delete",
+		pathValue.Parameters,
+	).BuildProcedure(pathValue.Delete)
 	if err != nil {
 		return err
 	}
@@ -231,7 +279,9 @@ func (oc *OAS3Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v3.
 	return nil
 }
 
-func (oc *OAS3Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string, *base.SchemaProxy]) error {
+func (oc *OAS3Builder) convertComponentSchemas(
+	schemaItem orderedmap.Pair[string, *base.SchemaProxy],
+) error {
 	typeValue := schemaItem.Value()
 	typeSchema := typeValue.Schema()
 
@@ -385,7 +435,9 @@ func (oc *OAS3Builder) convertV3OAuthFLow(key string, input *v3.OAuthFlow) rest.
 		RefreshURL:       input.RefreshUrl,
 	}
 
-	tokenURL := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN_URL"}))
+	tokenURL := sdkUtils.NewEnvStringVariable(
+		utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN_URL"}),
+	)
 	if input.TokenUrl != "" {
 		tokenURL.Value = &input.TokenUrl
 	}

@@ -29,7 +29,9 @@ func buildPathMethodName(apiPath string, method string, options *ConvertOptions)
 	if options.TrimPrefix != "" {
 		apiPath = strings.TrimPrefix(apiPath, options.TrimPrefix)
 	}
-	encodedPath := utils.ToPascalCase(bracketRegexp.ReplaceAllString(strings.TrimLeft(apiPath, "/"), ""))
+	encodedPath := utils.ToPascalCase(
+		bracketRegexp.ReplaceAllString(strings.TrimLeft(apiPath, "/"), ""),
+	)
 	if alias, ok := options.MethodAlias[method]; ok {
 		method = alias
 	}
@@ -120,8 +122,20 @@ func unwrapNullableUnionTypeSchemas(inputs []SchemaInfoCache) ([]SchemaInfoCache
 	return results, readNullable, writeNullable
 }
 
-func mergeUnionTypeSchemas(httpSchema *rest.NDCHttpSchema, baseSchema *base.Schema, inputs []SchemaInfoCache, unionType oasUnionType, fieldPaths []string) *SchemaInfoCache {
-	result, ok := mergeUnionTypeSchemasRecursive(httpSchema, baseSchema, inputs, unionType, fieldPaths)
+func mergeUnionTypeSchemas(
+	httpSchema *rest.NDCHttpSchema,
+	baseSchema *base.Schema,
+	inputs []SchemaInfoCache,
+	unionType oasUnionType,
+	fieldPaths []string,
+) *SchemaInfoCache {
+	result, ok := mergeUnionTypeSchemasRecursive(
+		httpSchema,
+		baseSchema,
+		inputs,
+		unionType,
+		fieldPaths,
+	)
 	if ok {
 		return result
 	}
@@ -141,7 +155,13 @@ func mergeUnionTypeSchemas(httpSchema *rest.NDCHttpSchema, baseSchema *base.Sche
 	}
 }
 
-func mergeUnionTypeSchemasRecursive(httpSchema *rest.NDCHttpSchema, baseSchema *base.Schema, inputs []SchemaInfoCache, unionType oasUnionType, fieldPaths []string) (*SchemaInfoCache, bool) {
+func mergeUnionTypeSchemasRecursive(
+	httpSchema *rest.NDCHttpSchema,
+	baseSchema *base.Schema,
+	inputs []SchemaInfoCache,
+	unionType oasUnionType,
+	fieldPaths []string,
+) (*SchemaInfoCache, bool) {
 	newInputs, readNullable, writeNullable := unwrapNullableUnionTypeSchemas(inputs)
 	var result *SchemaInfoCache
 	var ok bool
@@ -285,7 +305,12 @@ func mergeUnionTypeSchemasRecursive(httpSchema *rest.NDCHttpSchema, baseSchema *
 	return result, ok
 }
 
-func mergeUnionTypes(httpSchema *rest.NDCHttpSchema, a schema.Type, b schema.Type, fieldPaths []string) (schema.TypeEncoder, bool) {
+func mergeUnionTypes(
+	httpSchema *rest.NDCHttpSchema,
+	a schema.Type,
+	b schema.Type,
+	fieldPaths []string,
+) (schema.TypeEncoder, bool) {
 	bn, bNullErr := b.AsNullable()
 	bType := b
 	if bNullErr == nil {
@@ -437,7 +462,11 @@ func formatOperationName(input string) string {
 	return sb.String()
 }
 
-func buildUniqueOperationName(httpSchema *rest.NDCHttpSchema, operationId, pathKey, method string, options *ConvertOptions) string {
+func buildUniqueOperationName(
+	httpSchema *rest.NDCHttpSchema,
+	operationId, pathKey, method string,
+	options *ConvertOptions,
+) string {
 	opName := formatOperationName(operationId)
 	exists := opName == ""
 	if !exists {
@@ -467,14 +496,32 @@ func isXMLLeafObject(objectType rest.ObjectType) bool {
 
 func createTLSConfig(keys []string) *exhttp.TLSConfig {
 	caPem := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CA_PEM")))
-	caFile := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CA_FILE")))
-	certPem := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CERT_PEM")))
-	certFile := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CERT_FILE")))
-	keyPem := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "KEY_PEM")))
-	keyFile := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "KEY_FILE")))
-	serverName := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "SERVER_NAME")))
-	insecureSkipVerify := sdkUtils.NewEnvBool(utils.StringSliceToConstantCase(append(keys, "INSECURE_SKIP_VERIFY")), false)
-	includeSystemCACertsPool := sdkUtils.NewEnvBool(utils.StringSliceToConstantCase(append(keys, "INCLUDE_SYSTEM_CA_CERTS_POOL")), false)
+	caFile := sdkUtils.NewEnvStringVariable(
+		utils.StringSliceToConstantCase(append(keys, "CA_FILE")),
+	)
+	certPem := sdkUtils.NewEnvStringVariable(
+		utils.StringSliceToConstantCase(append(keys, "CERT_PEM")),
+	)
+	certFile := sdkUtils.NewEnvStringVariable(
+		utils.StringSliceToConstantCase(append(keys, "CERT_FILE")),
+	)
+	keyPem := sdkUtils.NewEnvStringVariable(
+		utils.StringSliceToConstantCase(append(keys, "KEY_PEM")),
+	)
+	keyFile := sdkUtils.NewEnvStringVariable(
+		utils.StringSliceToConstantCase(append(keys, "KEY_FILE")),
+	)
+	serverName := sdkUtils.NewEnvStringVariable(
+		utils.StringSliceToConstantCase(append(keys, "SERVER_NAME")),
+	)
+	insecureSkipVerify := sdkUtils.NewEnvBool(
+		utils.StringSliceToConstantCase(append(keys, "INSECURE_SKIP_VERIFY")),
+		false,
+	)
+	includeSystemCACertsPool := sdkUtils.NewEnvBool(
+		utils.StringSliceToConstantCase(append(keys, "INCLUDE_SYSTEM_CA_CERTS_POOL")),
+		false,
+	)
 
 	return &exhttp.TLSConfig{
 		CAFile:                   &caFile,
@@ -489,7 +536,10 @@ func createTLSConfig(keys []string) *exhttp.TLSConfig {
 	}
 }
 
-func evalOperationPath(rawPath string, arguments map[string]rest.ArgumentInfo) (string, map[string]rest.ArgumentInfo, error) {
+func evalOperationPath(
+	rawPath string,
+	arguments map[string]rest.ArgumentInfo,
+) (string, map[string]rest.ArgumentInfo, error) {
 	var pathURL *url.URL
 	var isAbsolute bool
 	var err error
@@ -560,7 +610,11 @@ func evalOperationPath(rawPath string, arguments map[string]rest.ArgumentInfo) (
 	return pathURL.Path + queryString + fragment, arguments, nil
 }
 
-func transformNullableObjectProperties(httpSchema *rest.NDCHttpSchema, input schema.Type, newName string) (schema.TypeEncoder, bool) {
+func transformNullableObjectProperties(
+	httpSchema *rest.NDCHttpSchema,
+	input schema.Type,
+	newName string,
+) (schema.TypeEncoder, bool) {
 	switch t := input.Interface().(type) {
 	case *schema.NullableType:
 		result, isObject := transformNullableObjectProperties(httpSchema, t.UnderlyingType, newName)
@@ -600,17 +654,30 @@ func transformNullableObjectProperties(httpSchema *rest.NDCHttpSchema, input sch
 	}
 }
 
-func transformNullableObjectPropertiesSchema(httpSchema *rest.NDCHttpSchema, result *SchemaInfoCache, nullable bool, fieldPaths []string) *SchemaInfoCache {
+func transformNullableObjectPropertiesSchema(
+	httpSchema *rest.NDCHttpSchema,
+	result *SchemaInfoCache,
+	nullable bool,
+	fieldPaths []string,
+) *SchemaInfoCache {
 	readSchemaName := utils.StringSliceToPascalCase(fieldPaths)
 	writeSchemaName := formatWriteObjectName(readSchemaName)
 
 	var ok bool
-	result.TypeRead, ok = transformNullableObjectProperties(httpSchema, result.TypeRead.Encode(), readSchemaName)
+	result.TypeRead, ok = transformNullableObjectProperties(
+		httpSchema,
+		result.TypeRead.Encode(),
+		readSchemaName,
+	)
 	if !ok {
 		return createSchemaInfoJSONScalar(nullable)
 	}
 
-	result.TypeWrite, ok = transformNullableObjectProperties(httpSchema, result.TypeWrite.Encode(), writeSchemaName)
+	result.TypeWrite, ok = transformNullableObjectProperties(
+		httpSchema,
+		result.TypeWrite.Encode(),
+		writeSchemaName,
+	)
 	if !ok {
 		return createSchemaInfoJSONScalar(nullable)
 	}

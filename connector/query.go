@@ -15,7 +15,12 @@ import (
 )
 
 // Query executes a query.
-func (c *HTTPConnector) Query(ctx context.Context, configuration *configuration.Configuration, state *State, request *schema.QueryRequest) (schema.QueryResponse, error) {
+func (c *HTTPConnector) Query(
+	ctx context.Context,
+	configuration *configuration.Configuration,
+	state *State,
+	request *schema.QueryRequest,
+) (schema.QueryResponse, error) {
 	valueField, err := utils.EvalFunctionSelectionFieldValue(request)
 	if err != nil {
 		return nil, schema.UnprocessableContentError(err.Error(), nil)
@@ -33,7 +38,12 @@ func (c *HTTPConnector) Query(ctx context.Context, configuration *configuration.
 }
 
 // QueryExplain explains a query by creating an execution plan.
-func (c *HTTPConnector) QueryExplain(ctx context.Context, configuration *configuration.Configuration, state *State, request *schema.QueryRequest) (*schema.ExplainResponse, error) {
+func (c *HTTPConnector) QueryExplain(
+	ctx context.Context,
+	configuration *configuration.Configuration,
+	state *State,
+	request *schema.QueryRequest,
+) (*schema.ExplainResponse, error) {
 	requestVars := request.Variables
 	if len(requestVars) == 0 {
 		requestVars = []schema.QueryRequestVariablesElem{make(schema.QueryRequestVariablesElem)}
@@ -47,7 +57,10 @@ func (c *HTTPConnector) QueryExplain(ctx context.Context, configuration *configu
 	return c.serializeExplainResponse(ctx, requests)
 }
 
-func (c *HTTPConnector) explainQuery(request *schema.QueryRequest, variables map[string]any) (*internal.RequestBuilderResults, error) {
+func (c *HTTPConnector) explainQuery(
+	request *schema.QueryRequest,
+	variables map[string]any,
+) (*internal.RequestBuilderResults, error) {
 	function, metadata, err := c.metadata.GetFunction(request.Collection)
 	if err != nil {
 		return nil, err
@@ -55,15 +68,24 @@ func (c *HTTPConnector) explainQuery(request *schema.QueryRequest, variables map
 
 	rawArgs, err := utils.ResolveArgumentVariables(request.Arguments, variables)
 	if err != nil {
-		return nil, schema.UnprocessableContentError("failed to resolve argument variables", map[string]any{
-			"cause": err.Error(),
-		})
+		return nil, schema.UnprocessableContentError(
+			"failed to resolve argument variables",
+			map[string]any{
+				"cause": err.Error(),
+			},
+		)
 	}
 
 	return c.upstreams.BuildRequests(metadata, request.Collection, function, rawArgs)
 }
 
-func (c *HTTPConnector) execQuerySync(ctx context.Context, state *State, request *schema.QueryRequest, valueField schema.NestedField, requestVars []schema.QueryRequestVariablesElem) ([]schema.RowSet, error) {
+func (c *HTTPConnector) execQuerySync(
+	ctx context.Context,
+	state *State,
+	request *schema.QueryRequest,
+	valueField schema.NestedField,
+	requestVars []schema.QueryRequestVariablesElem,
+) ([]schema.RowSet, error) {
 	rowSets := make([]schema.RowSet, len(requestVars))
 
 	for i, requestVar := range requestVars {
@@ -85,7 +107,13 @@ func (c *HTTPConnector) execQuerySync(ctx context.Context, state *State, request
 	return rowSets, nil
 }
 
-func (c *HTTPConnector) execQueryAsync(ctx context.Context, state *State, request *schema.QueryRequest, valueField schema.NestedField, requestVars []schema.QueryRequestVariablesElem) ([]schema.RowSet, error) {
+func (c *HTTPConnector) execQueryAsync(
+	ctx context.Context,
+	state *State,
+	request *schema.QueryRequest,
+	valueField schema.NestedField,
+	requestVars []schema.QueryRequestVariablesElem,
+) ([]schema.RowSet, error) {
 	rowSets := make([]schema.RowSet, len(requestVars))
 
 	eg, ctx := errgroup.WithContext(ctx)
@@ -120,7 +148,14 @@ func (c *HTTPConnector) execQueryAsync(ctx context.Context, state *State, reques
 	return rowSets, nil
 }
 
-func (c *HTTPConnector) execQuery(ctx context.Context, state *State, request *schema.QueryRequest, queryFields schema.NestedField, variables map[string]any, index int) (any, error) {
+func (c *HTTPConnector) execQuery(
+	ctx context.Context,
+	state *State,
+	request *schema.QueryRequest,
+	queryFields schema.NestedField,
+	variables map[string]any,
+	index int,
+) (any, error) {
 	ctx, span := state.Tracer.Start(ctx, fmt.Sprintf("Execute Query %d", index))
 	defer span.End()
 
@@ -144,7 +179,10 @@ func (c *HTTPConnector) execQuery(ctx context.Context, state *State, request *sc
 	return result, nil
 }
 
-func (c *HTTPConnector) serializeExplainResponse(ctx context.Context, requests *internal.RequestBuilderResults) (*schema.ExplainResponse, error) {
+func (c *HTTPConnector) serializeExplainResponse(
+	ctx context.Context,
+	requests *internal.RequestBuilderResults,
+) (*schema.ExplainResponse, error) {
 	explainResp := &schema.ExplainResponse{
 		Details: schema.ExplainResponseDetails{},
 	}
@@ -170,7 +208,11 @@ func (c *HTTPConnector) serializeExplainResponse(ctx context.Context, requests *
 		}
 	}
 
-	c.upstreams.InjectMockRequestSettings(req, requests.Schema.Name, httpRequest.RawRequest.Security)
+	c.upstreams.InjectMockRequestSettings(
+		req,
+		requests.Schema.Name,
+		httpRequest.RawRequest.Security,
+	)
 	explainResp.Details["url"] = req.URL.String()
 
 	rawHeaders, err := json.Marshal(req.Header)

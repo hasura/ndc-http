@@ -18,7 +18,9 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
-var errURLEncodedBodyObjectRequired = errors.New("expected object body in content type " + rest.ContentTypeFormURLEncoded)
+var errURLEncodedBodyObjectRequired = errors.New(
+	"expected object body in content type " + rest.ContentTypeFormURLEncoded,
+)
 
 // URLParameterEncoderOptions hold decode options for the URLParameterEncoder.
 type URLParameterEncoderOptions struct {
@@ -33,7 +35,11 @@ type URLParameterEncoder struct {
 }
 
 // NewURLParameterEncoder creates a URLParameterEncoder instance.
-func NewURLParameterEncoder(schema *rest.NDCHttpSchema, requestBody *rest.RequestBody, options URLParameterEncoderOptions) *URLParameterEncoder {
+func NewURLParameterEncoder(
+	schema *rest.NDCHttpSchema,
+	requestBody *rest.RequestBody,
+	options URLParameterEncoderOptions,
+) *URLParameterEncoder {
 	return &URLParameterEncoder{
 		schema:      schema,
 		requestBody: requestBody,
@@ -42,7 +48,10 @@ func NewURLParameterEncoder(schema *rest.NDCHttpSchema, requestBody *rest.Reques
 }
 
 // Encode URL parameters.
-func (c *URLParameterEncoder) EncodeFormBody(bodyInfo *rest.ArgumentInfo, bodyData any) ([]byte, error) {
+func (c *URLParameterEncoder) EncodeFormBody(
+	bodyInfo *rest.ArgumentInfo,
+	bodyData any,
+) ([]byte, error) {
 	objectType, bodyObject, err := c.evalRequestBody(bodyInfo.Type, reflect.ValueOf(bodyData))
 	if err != nil {
 		return nil, err
@@ -60,7 +69,11 @@ func (c *URLParameterEncoder) EncodeFormBody(bodyInfo *rest.ArgumentInfo, bodyDa
 			continue
 		}
 
-		queryParams, err := c.EncodeParameterValues(&objectField, reflect.ValueOf(value), []string{"body", key})
+		queryParams, err := c.EncodeParameterValues(
+			&objectField,
+			reflect.ValueOf(value),
+			[]string{"body", key},
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -86,7 +99,10 @@ func (c *URLParameterEncoder) EncodeFormBody(bodyInfo *rest.ArgumentInfo, bodyDa
 
 // Encode marshals the arbitrary body to xml bytes.
 func (c *URLParameterEncoder) EncodeArbitrary(bodyData any) ([]byte, error) {
-	queryParams, err := c.encodeParameterReflectionValues(reflect.ValueOf(bodyData), []string{"body"})
+	queryParams, err := c.encodeParameterReflectionValues(
+		reflect.ValueOf(bodyData),
+		[]string{"body"},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +119,11 @@ func (c *URLParameterEncoder) EncodeArbitrary(bodyData any) ([]byte, error) {
 	return []byte(rawQuery), nil
 }
 
-func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectField, reflectValue reflect.Value, fieldPaths []string) (ParameterItems, error) {
+func (c *URLParameterEncoder) EncodeParameterValues(
+	objectField *rest.ObjectField,
+	reflectValue reflect.Value,
+	fieldPaths []string,
+) (ParameterItems, error) {
 	results := ParameterItems{}
 
 	typeSchema := objectField.HTTP
@@ -215,7 +235,11 @@ func (c *URLParameterEncoder) EncodeParameterValues(objectField *rest.ObjectFiel
 	return nil, fmt.Errorf("%s: invalid type %v", strings.Join(fieldPaths, ""), objectField.Type)
 }
 
-func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(reflectValue reflect.Value, scalar *schema.ScalarType, fieldPaths []string) (ParameterItems, error) {
+func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(
+	reflectValue reflect.Value,
+	scalar *schema.ScalarType,
+	fieldPaths []string,
+) (ParameterItems, error) {
 	switch sl := scalar.Representation.Interface().(type) {
 	case *schema.TypeRepresentationBoolean:
 		value, err := utils.DecodeBooleanReflection(reflectValue)
@@ -310,7 +334,10 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(reflectValue
 	}
 }
 
-func (c *URLParameterEncoder) encodeParameterReflectionValues(reflectValue reflect.Value, fieldPaths []string) (ParameterItems, error) {
+func (c *URLParameterEncoder) encodeParameterReflectionValues(
+	reflectValue reflect.Value,
+	fieldPaths []string,
+) (ParameterItems, error) {
 	reflectValue, ok := utils.UnwrapPointerFromReflectValue(reflectValue)
 	if !ok {
 		return ParameterItems{}, nil
@@ -339,16 +366,26 @@ func (c *URLParameterEncoder) encodeParameterReflectionValues(reflectValue refle
 			}, nil
 		}
 
-		return nil, fmt.Errorf("%s: failed to encode parameter, got %s", strings.Join(fieldPaths, ""), kind)
+		return nil, fmt.Errorf(
+			"%s: failed to encode parameter, got %s",
+			strings.Join(fieldPaths, ""),
+			kind,
+		)
 	}
 }
 
-func (c *URLParameterEncoder) encodeParameterReflectionSlice(reflectValue reflect.Value, fieldPaths []string) (ParameterItems, error) {
+func (c *URLParameterEncoder) encodeParameterReflectionSlice(
+	reflectValue reflect.Value,
+	fieldPaths []string,
+) (ParameterItems, error) {
 	results := ParameterItems{}
 	valueLen := reflectValue.Len()
 	for i := range valueLen {
 		elem := reflectValue.Index(i)
-		outputs, err := c.encodeParameterReflectionValues(elem, append(fieldPaths, fmt.Sprintf("[%d]", i)))
+		outputs, err := c.encodeParameterReflectionValues(
+			elem,
+			append(fieldPaths, fmt.Sprintf("[%d]", i)),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -361,13 +398,19 @@ func (c *URLParameterEncoder) encodeParameterReflectionSlice(reflectValue reflec
 	return results, nil
 }
 
-func (c *URLParameterEncoder) encodeParameterReflectionStruct(reflectValue reflect.Value, fieldPaths []string) (ParameterItems, error) {
+func (c *URLParameterEncoder) encodeParameterReflectionStruct(
+	reflectValue reflect.Value,
+	fieldPaths []string,
+) (ParameterItems, error) {
 	results := ParameterItems{}
 	reflectType := reflectValue.Type()
 	for fieldIndex := range reflectValue.NumField() {
 		fieldVal := reflectValue.Field(fieldIndex)
 		fieldType := reflectType.Field(fieldIndex)
-		output, err := c.encodeParameterReflectionValues(fieldVal, append(fieldPaths, "."+fieldType.Name))
+		output, err := c.encodeParameterReflectionValues(
+			fieldVal,
+			append(fieldPaths, "."+fieldType.Name),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -380,7 +423,10 @@ func (c *URLParameterEncoder) encodeParameterReflectionStruct(reflectValue refle
 	return results, nil
 }
 
-func (c *URLParameterEncoder) encodeParameterReflectionMap(reflectValue reflect.Value, fieldPaths []string) (ParameterItems, error) {
+func (c *URLParameterEncoder) encodeParameterReflectionMap(
+	reflectValue reflect.Value,
+	fieldPaths []string,
+) (ParameterItems, error) {
 	results := ParameterItems{}
 	anyValue := reflectValue.Interface()
 	object, ok := anyValue.(map[string]any)
@@ -395,7 +441,10 @@ func (c *URLParameterEncoder) encodeParameterReflectionMap(reflectValue reflect.
 	}
 
 	for key, fieldValue := range object {
-		output, err := c.encodeParameterReflectionValues(reflect.ValueOf(fieldValue), append(fieldPaths, "."+key))
+		output, err := c.encodeParameterReflectionValues(
+			reflect.ValueOf(fieldValue),
+			append(fieldPaths, "."+key),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -408,7 +457,10 @@ func (c *URLParameterEncoder) encodeParameterReflectionMap(reflectValue reflect.
 	return results, nil
 }
 
-func (c *URLParameterEncoder) evalRequestBody(bodyType schema.Type, bodyData reflect.Value) (*rest.ObjectType, map[string]any, error) {
+func (c *URLParameterEncoder) evalRequestBody(
+	bodyType schema.Type,
+	bodyData reflect.Value,
+) (*rest.ObjectType, map[string]any, error) {
 	reflectValue, notNull := utils.UnwrapPointerFromReflectValue(bodyData)
 
 	switch ty := bodyType.Interface().(type) {
@@ -447,7 +499,12 @@ func (c *URLParameterEncoder) evalRequestBody(bodyType schema.Type, bodyData ref
 }
 
 // EvalQueryParameters evaluate the query parameter URL.
-func EvalQueryParameters(q *url.Values, name string, queryParams ParameterItems, encObject rest.EncodingObject) {
+func EvalQueryParameters(
+	q *url.Values,
+	name string,
+	queryParams ParameterItems,
+	encObject rest.EncodingObject,
+) {
 	explode := encObject.GetExplode(rest.InQuery)
 
 	for _, qp := range queryParams {
@@ -496,7 +553,12 @@ func EvalQueryParameters(q *url.Values, name string, queryParams ParameterItems,
 	}
 }
 
-func buildURLQueryKeyValues(name string, keys Keys, values []string, encObject rest.EncodingObject) (string, []string) {
+func buildURLQueryKeyValues(
+	name string,
+	keys Keys,
+	values []string,
+	encObject rest.EncodingObject,
+) (string, []string) {
 	if name != "" {
 		keys = append(Keys{NewKey(name)}, keys...)
 	}
@@ -562,7 +624,11 @@ func EncodeQueryValues(qValues url.Values, allowReserved bool) string {
 }
 
 // SetHeaderParameters encode and set parameters to request headers.
-func SetHeaderParameters(header *http.Header, param *rest.RequestParameter, queryParams ParameterItems) {
+func SetHeaderParameters(
+	header *http.Header,
+	param *rest.RequestParameter,
+	queryParams ParameterItems,
+) {
 	defaultParam := queryParams.FindDefault()
 	// the param is an array
 	if defaultParam != nil {
@@ -577,13 +643,22 @@ func SetHeaderParameters(header *http.Header, param *rest.RequestParameter, quer
 }
 
 // EncodePathParameters encode parameters to the request path.
-func EncodePathParameters(rawPath string, name string, queryParams ParameterItems, enc rest.EncodingObject) string {
+func EncodePathParameters(
+	rawPath string,
+	name string,
+	queryParams ParameterItems,
+	enc rest.EncodingObject,
+) string {
 	value := encodePathParameterValue(name, queryParams, enc)
 
 	return strings.ReplaceAll(rawPath, "{"+name+"}", value)
 }
 
-func encodePathParameterValue(name string, queryParams ParameterItems, enc rest.EncodingObject) string {
+func encodePathParameterValue(
+	name string,
+	queryParams ParameterItems,
+	enc rest.EncodingObject,
+) string {
 	style := enc.GetStyle(rest.InPath)
 	explode := enc.GetExplode(rest.InPath)
 

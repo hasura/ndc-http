@@ -21,7 +21,11 @@ type ArgumentPreset struct {
 }
 
 // NewArgumentPreset create a new ArgumentPreset instance.
-func NewArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.ArgumentPresetConfig, isGlobal bool) (*ArgumentPreset, error) {
+func NewArgumentPreset(
+	httpSchema *rest.NDCHttpSchema,
+	preset rest.ArgumentPresetConfig,
+	isGlobal bool,
+) (*ArgumentPreset, error) {
 	jsonPath, targets, err := configuration.ValidateArgumentPreset(httpSchema, preset, isGlobal)
 	if err != nil {
 		return nil, err
@@ -40,7 +44,11 @@ func NewArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.ArgumentPrese
 }
 
 // Evaluate iterates and inject values into request arguments recursively.
-func (ap ArgumentPreset) Evaluate(operationName string, arguments map[string]any, headers map[string]string) (map[string]any, error) {
+func (ap ArgumentPreset) Evaluate(
+	operationName string,
+	arguments map[string]any,
+	headers map[string]string,
+) (map[string]any, error) {
 	key := configuration.BuildArgumentPresetJSONPathKey(operationName, ap.Path)
 	if _, ok := ap.Targets[key]; !ok {
 		return arguments, nil
@@ -64,7 +72,12 @@ func (ap ArgumentPreset) Evaluate(operationName string, arguments map[string]any
 		return arguments, nil
 	}
 
-	nestedValue, err := ap.evalNestedField(segments[1:], arguments[string(rootSelector)], value, []string{selectorStr})
+	nestedValue, err := ap.evalNestedField(
+		segments[1:],
+		arguments[string(rootSelector)],
+		value,
+		[]string{selectorStr},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +87,12 @@ func (ap ArgumentPreset) Evaluate(operationName string, arguments map[string]any
 	return arguments, nil
 }
 
-func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any, value any, fieldPaths []string) (any, error) {
+func (ap ArgumentPreset) evalNestedField(
+	segments []*spec.Segment,
+	argument any,
+	value any,
+	fieldPaths []string,
+) (any, error) {
 	segmentsLen := len(segments)
 	if segmentsLen == 0 || len(segments[0].Selectors()) == 0 {
 		return value, nil

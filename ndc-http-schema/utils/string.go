@@ -106,7 +106,8 @@ func ToSnakeCase(input string) string {
 			}
 			if i < inputLen-1 {
 				nextChar := rune(input[i+1])
-				if unicode.IsUpper(prevChar) && unicode.IsLetter(nextChar) && !unicode.IsUpper(nextChar) {
+				if unicode.IsUpper(prevChar) && unicode.IsLetter(nextChar) &&
+					!unicode.IsUpper(nextChar) {
 					sb.WriteRune('_')
 					sb.WriteRune(unicode.ToLower(char))
 

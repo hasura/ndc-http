@@ -15,7 +15,11 @@ import (
 )
 
 // ValidateArgumentPreset validates the argument preset.
-func ValidateArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.ArgumentPresetConfig, isGlobal bool) (*jsonpath.Path, map[string]schema.TypeRepresentation, error) {
+func ValidateArgumentPreset(
+	httpSchema *rest.NDCHttpSchema,
+	preset rest.ArgumentPresetConfig,
+	isGlobal bool,
+) (*jsonpath.Path, map[string]schema.TypeRepresentation, error) {
 	jsonPath, targetExpressions, err := preset.Validate()
 	if err != nil {
 		return nil, nil, err
@@ -71,7 +75,12 @@ func BuildArgumentPresetJSONPathKey(operationName string, jsonPath *jsonpath.Pat
 	return fmt.Sprintf("%s:%s", operationName, jsonPath.String())
 }
 
-func evalTypeRepresentationFromJSONPath(httpSchema *rest.NDCHttpSchema, jsonPath *jsonpath.Path, operation *rest.OperationInfo, isGlobal bool) (schema.TypeRepresentation, error) {
+func evalTypeRepresentationFromJSONPath(
+	httpSchema *rest.NDCHttpSchema,
+	jsonPath *jsonpath.Path,
+	operation *rest.OperationInfo,
+	isGlobal bool,
+) (schema.TypeRepresentation, error) {
 	if len(operation.Arguments) == 0 {
 		return nil, nil
 	}
@@ -88,7 +97,12 @@ func evalTypeRepresentationFromJSONPath(httpSchema *rest.NDCHttpSchema, jsonPath
 		return nil, nil
 	}
 
-	argumentType, typeRep, err := evalArgumentFromJSONPath(httpSchema, argument.Type, segments[1:], []string{rootSelector})
+	argumentType, typeRep, err := evalArgumentFromJSONPath(
+		httpSchema,
+		argument.Type,
+		segments[1:],
+		[]string{rootSelector},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +122,12 @@ func evalTypeRepresentationFromJSONPath(httpSchema *rest.NDCHttpSchema, jsonPath
 	return typeRep, nil
 }
 
-func evalArgumentFromJSONPath(httpSchema *rest.NDCHttpSchema, typeSchema schema.Type, segments []*spec.Segment, fieldPaths []string) (schema.TypeEncoder, schema.TypeRepresentation, error) {
+func evalArgumentFromJSONPath(
+	httpSchema *rest.NDCHttpSchema,
+	typeSchema schema.Type,
+	segments []*spec.Segment,
+	fieldPaths []string,
+) (schema.TypeEncoder, schema.TypeRepresentation, error) {
 	rawType, err := typeSchema.InterfaceT()
 	if err != nil {
 		return nil, nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)

@@ -46,7 +46,11 @@ type oasSchemaBuilder struct {
 	location rest.ParameterLocation
 }
 
-func newOASSchemaBuilder(state *OASBuilderState, apiPath string, location rest.ParameterLocation) *oasSchemaBuilder {
+func newOASSchemaBuilder(
+	state *OASBuilderState,
+	apiPath string,
+	location rest.ParameterLocation,
+) *oasSchemaBuilder {
 	return &oasSchemaBuilder{
 		state:    state,
 		apiPath:  apiPath,
@@ -55,14 +59,22 @@ func newOASSchemaBuilder(state *OASBuilderState, apiPath string, location rest.P
 }
 
 // get and convert an OpenAPI data type to a NDC type.
-func (oc *oasSchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProxy, nullable bool, fieldPaths []string) (*SchemaInfoCache, error) {
+func (oc *oasSchemaBuilder) getSchemaTypeFromProxy(
+	schemaProxy *base.SchemaProxy,
+	nullable bool,
+	fieldPaths []string,
+) (*SchemaInfoCache, error) {
 	if schemaProxy == nil {
 		return nil, errParameterSchemaEmpty(fieldPaths)
 	}
 
 	innerSchema := schemaProxy.Schema()
 	if innerSchema == nil {
-		return nil, fmt.Errorf("cannot get schema of $.%s from proxy: %s", strings.Join(fieldPaths, "."), schemaProxy.GetReference())
+		return nil, fmt.Errorf(
+			"cannot get schema of $.%s from proxy: %s",
+			strings.Join(fieldPaths, "."),
+			schemaProxy.GetReference(),
+		)
 	}
 
 	var result *SchemaInfoCache
@@ -108,12 +120,15 @@ func (oc *oasSchemaBuilder) getSchemaTypeFromProxy(schemaProxy *base.SchemaProxy
 }
 
 // get and convert an OpenAPI data type to a NDC type.
-func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []string) (*SchemaInfoCache, error) {
+func (oc *oasSchemaBuilder) getSchemaType(
+	baseSchema *base.Schema,
+	fieldPaths []string,
+) (*SchemaInfoCache, error) {
 	if baseSchema == nil {
 		return nil, errParameterSchemaEmpty(fieldPaths)
 	}
 
-	if oc.state.ConvertOptions.NoDeprecation && baseSchema.Deprecated != nil && *baseSchema.Deprecated {
+	if oc.state.NoDeprecation && baseSchema.Deprecated != nil && *baseSchema.Deprecated {
 		return nil, nil
 	}
 
@@ -142,7 +157,13 @@ func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []
 	}
 
 	if len(oasTypes) != 1 || isPrimitiveScalar(oasTypes) {
-		scalarName := getScalarFromType(oc.state.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
+		scalarName := getScalarFromType(
+			oc.state.schema,
+			oasTypes,
+			baseSchema.Format,
+			baseSchema.Enum,
+			fieldPaths,
+		)
 		var resultType schema.TypeEncoder = schema.NewNamedType(scalarName)
 
 		if nullable {
@@ -204,12 +225,16 @@ func (oc *oasSchemaBuilder) getSchemaType(baseSchema *base.Schema, fieldPaths []
 	return typeResult, nil
 }
 
-func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths []string) (*SchemaInfoCache, error) {
+func (oc *oasSchemaBuilder) evalObjectType(
+	baseSchema *base.Schema,
+	fieldPaths []string,
+) (*SchemaInfoCache, error) {
 	typeResult := createSchemaFromOpenAPISchema(baseSchema)
 	refName := utils.StringSliceToPascalCase(fieldPaths)
 	writeRefName := formatWriteObjectName(refName)
 
-	if baseSchema.Properties == nil || baseSchema.Properties.IsZero() || (baseSchema.AdditionalProperties != nil && (baseSchema.AdditionalProperties.B || baseSchema.AdditionalProperties.A != nil)) {
+	if baseSchema.Properties == nil || baseSchema.Properties.IsZero() ||
+		(baseSchema.AdditionalProperties != nil && (baseSchema.AdditionalProperties.B || baseSchema.AdditionalProperties.A != nil)) {
 		// treat no-property objects as a JSON scalar
 		var scalarType schema.TypeEncoder = schema.NewNamedType(string(rest.ScalarJSON))
 		if baseSchema.Nullable != nil && *baseSchema.Nullable {
@@ -261,7 +286,11 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 			slog.String("name", propName),
 			slog.Any("field", fieldPaths))
 		nullable := !slices.Contains(baseSchema.Required, propName)
-		propResult, err := oc.getSchemaTypeFromProxy(prop.Value(), nullable, append(fieldPaths, propName))
+		propResult, err := oc.getSchemaTypeFromProxy(
+			prop.Value(),
+			nullable,
+			append(fieldPaths, propName),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -332,13 +361,21 @@ func (oc *oasSchemaBuilder) evalObjectType(baseSchema *base.Schema, fieldPaths [
 }
 
 // Support converting oneOf, allOf or anyOf to object types with merge strategy.
-func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schemaProxies []*base.SchemaProxy, unionType oasUnionType, fieldPaths []string) (*SchemaInfoCache, error) {
+func (oc *oasSchemaBuilder) buildUnionSchemaType(
+	baseSchema *base.Schema,
+	schemaProxies []*base.SchemaProxy,
+	unionType oasUnionType,
+	fieldPaths []string,
+) (*SchemaInfoCache, error) {
 	// only evaluate field paths for anonymous types
 	if len(fieldPaths) > 1 {
 		fieldPaths = append(fieldPaths, string(unionType))
 	}
 
-	proxies, mergedType, isNullable, isEmptyObject := evalSchemaProxiesSlice(schemaProxies, oc.location)
+	proxies, mergedType, isNullable, isEmptyObject := evalSchemaProxiesSlice(
+		schemaProxies,
+		oc.location,
+	)
 	nullable := isNullable || (baseSchema.Nullable != nil && *baseSchema.Nullable)
 
 	if mergedType != nil {
@@ -347,7 +384,8 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 			return nil, err
 		}
 
-		if result != nil && result.TypeSchema != nil && result.TypeSchema.Description == "" && baseSchema.Description != "" {
+		if result != nil && result.TypeSchema != nil && result.TypeSchema.Description == "" &&
+			baseSchema.Description != "" {
 			result.TypeSchema.Description = utils.StripHTMLTags(baseSchema.Description)
 		}
 
@@ -363,7 +401,13 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 		oasTypes, isNullable := extractNullableFromOASTypes(baseSchema.Type)
 
 		if len(baseSchema.Type) > 1 || isPrimitiveScalar(baseSchema.Type) {
-			scalarName := getScalarFromType(oc.state.schema, oasTypes, baseSchema.Format, baseSchema.Enum, fieldPaths)
+			scalarName := getScalarFromType(
+				oc.state.schema,
+				oasTypes,
+				baseSchema.Format,
+				baseSchema.Enum,
+				fieldPaths,
+			)
 			var result schema.TypeEncoder = schema.NewNamedType(scalarName)
 			if nullable || isNullable {
 				result = schema.NewNullableType(result)
@@ -376,7 +420,8 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 			}, nil
 		}
 
-		if len(oasTypes) == 1 && (baseSchema.Type[0] == "object" || (baseSchema.Properties != nil && baseSchema.Properties.Len() > 0)) {
+		if len(oasTypes) == 1 &&
+			(baseSchema.Type[0] == "object" || (baseSchema.Properties != nil && baseSchema.Properties.Len() > 0)) {
 			schemaResult, err := oc.evalObjectType(baseSchema, fieldPaths)
 			if err != nil {
 				return nil, err
@@ -410,12 +455,18 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 			return nil, nil
 		}
 
-		if result.TypeSchema != nil && result.TypeSchema.Description == "" && baseSchema.Description != "" {
+		if result.TypeSchema != nil && result.TypeSchema.Description == "" &&
+			baseSchema.Description != "" {
 			result.TypeSchema.Description = utils.StripHTMLTags(baseSchema.Description)
 		}
 
 		if isEmptyObject {
-			result = transformNullableObjectPropertiesSchema(oc.state.schema, result, nullable, fieldPaths)
+			result = transformNullableObjectPropertiesSchema(
+				oc.state.schema,
+				result,
+				nullable,
+				fieldPaths,
+			)
 		}
 
 		return result, nil
@@ -437,9 +488,20 @@ func (oc *oasSchemaBuilder) buildUnionSchemaType(baseSchema *base.Schema, schema
 		}
 	}
 
-	result := mergeUnionTypeSchemas(oc.state.schema, baseSchema, unionSchemas, unionType, fieldPaths)
+	result := mergeUnionTypeSchemas(
+		oc.state.schema,
+		baseSchema,
+		unionSchemas,
+		unionType,
+		fieldPaths,
+	)
 	if isEmptyObject {
-		result = transformNullableObjectPropertiesSchema(oc.state.schema, result, nullable, fieldPaths)
+		result = transformNullableObjectPropertiesSchema(
+			oc.state.schema,
+			result,
+			nullable,
+			fieldPaths,
+		)
 	}
 
 	result.OneOf = oneOfInfos

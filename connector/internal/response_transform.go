@@ -12,15 +12,18 @@ import (
 )
 
 func (client *HTTPClient) transformResponse(body any) (any, error) {
-	if client.requests == nil || client.requests.Schema == nil || client.requests.Schema.NDCHttpSchema == nil ||
-		client.requests.Schema.Settings == nil || len(client.requests.Schema.Settings.ResponseTransforms) == 0 {
+	if client.requests == nil || client.requests.Schema == nil ||
+		client.requests.Schema.NDCHttpSchema == nil ||
+		client.requests.Schema.Settings == nil ||
+		len(client.requests.Schema.Settings.ResponseTransforms) == 0 {
 		return body, nil
 	}
 
 	var err error
 
 	for _, setting := range client.requests.Schema.Settings.ResponseTransforms {
-		if len(setting.Targets) > 0 && !slices.Contains(setting.Targets, client.requests.OperationName) {
+		if len(setting.Targets) > 0 &&
+			!slices.Contains(setting.Targets, client.requests.OperationName) {
 			continue
 		}
 
@@ -40,7 +43,10 @@ type ResponseTransformer struct {
 }
 
 // NewResponseTransformer creates a ResponseTransformer instance.
-func NewResponseTransformer(setting rest.ResponseTransformSetting, strict bool) *ResponseTransformer {
+func NewResponseTransformer(
+	setting rest.ResponseTransformSetting,
+	strict bool,
+) *ResponseTransformer {
 	return &ResponseTransformer{
 		setting: setting,
 		strict:  strict,
@@ -52,7 +58,11 @@ func (rt *ResponseTransformer) Transform(responseBody any) (any, error) {
 	return rt.evalResultType(rt.setting.Body, responseBody, []string{})
 }
 
-func (rt *ResponseTransformer) evalResultType(transformValue any, responseBody any, fieldPaths []string) (any, error) {
+func (rt *ResponseTransformer) evalResultType(
+	transformValue any,
+	responseBody any,
+	fieldPaths []string,
+) (any, error) {
 	switch value := transformValue.(type) {
 	case bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, *bool, *int, *int8, *int16, *int32, *int64, *uint, *uint8, *uint16, *uint32, *uint64, *float32, *float64:
 		return value, nil
@@ -102,7 +112,11 @@ func (rt *ResponseTransformer) evalResultType(transformValue any, responseBody a
 	}
 }
 
-func (rt *ResponseTransformer) evalStringValue(transformValue string, responseBody any, fieldPaths []string) (any, error) {
+func (rt *ResponseTransformer) evalStringValue(
+	transformValue string,
+	responseBody any,
+	fieldPaths []string,
+) (any, error) {
 	selector, err := jsonpath.Parse(transformValue)
 	if err != nil {
 		return transformValue, nil //nolint:nilerr
@@ -111,7 +125,11 @@ func (rt *ResponseTransformer) evalStringValue(transformValue string, responseBo
 	return rt.evalJSONPath(responseBody, selector.Query().Segments(), fieldPaths)
 }
 
-func (rt *ResponseTransformer) evalJSONPath(value any, segments []*spec.Segment, fieldPaths []string) (any, error) {
+func (rt *ResponseTransformer) evalJSONPath(
+	value any,
+	segments []*spec.Segment,
+	fieldPaths []string,
+) (any, error) {
 	if len(segments) == 0 || len(segments[0].Selectors()) == 0 {
 		return value, nil
 	}

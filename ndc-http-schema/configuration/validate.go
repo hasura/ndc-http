@@ -32,7 +32,14 @@ type ConfigValidator struct {
 }
 
 // ValidateConfiguration evaluates, validates the configuration and suggests required actions to make the connector working.
-func ValidateConfiguration(config *Configuration, contextPath string, schemas []NDCHttpRuntimeSchema, mergedSchema *schema.NDCHttpSchema, logger *slog.Logger, noColor bool) (*ConfigValidator, error) {
+func ValidateConfiguration(
+	config *Configuration,
+	contextPath string,
+	schemas []NDCHttpRuntimeSchema,
+	mergedSchema *schema.NDCHttpSchema,
+	logger *slog.Logger,
+	noColor bool,
+) (*ConfigValidator, error) {
 	templates, err := getTemplates()
 	if err != nil {
 		return nil, err
@@ -89,9 +96,18 @@ func (cv *ConfigValidator) Render(w io.Writer) {
 
 	if len(cv.warnings) > 0 || len(cv.requiredHeadersForwarding) > 0 {
 		writeWarningIf(w, ":\n", cv.noColor)
-		if len(cv.requiredHeadersForwarding) > 0 && (!cv.config.ForwardHeaders.Enabled || cv.config.ForwardHeaders.ArgumentField == nil || *cv.config.ForwardHeaders.ArgumentField == "") {
-			_, _ = w.Write([]byte(fmt.Sprintf("\n  * Authorization header must be forwarded for the following authentication schemes: %v", utils.GetSortedKeys(cv.requiredHeadersForwarding))))
-			_, _ = w.Write([]byte("\n    See https://github.com/hasura/ndc-http/blob/main/docs/authentication.md#headers-forwarding for more information."))
+		if len(cv.requiredHeadersForwarding) > 0 &&
+			(!cv.config.ForwardHeaders.Enabled || cv.config.ForwardHeaders.ArgumentField == nil || *cv.config.ForwardHeaders.ArgumentField == "") {
+			_, _ = fmt.Fprintf(
+				w,
+				"\n  * Authorization header must be forwarded for the following authentication schemes: %v",
+				utils.GetSortedKeys(cv.requiredHeadersForwarding),
+			)
+			_, _ = w.Write(
+				[]byte(
+					"\n    See https://github.com/hasura/ndc-http/blob/main/docs/authentication.md#headers-forwarding for more information.",
+				),
+			)
 		}
 
 		for ns, errs := range cv.warnings {
@@ -174,7 +190,12 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 		cv.validateTLS(ndcSchema.Name, "settings.tls", ndcSchema.Settings.TLS)
 	}
 
-	cv.validateArgumentPresets(ndcSchema.Name, "settings.argumentPresets", ndcSchema.Settings.ArgumentPresets, true)
+	cv.validateArgumentPresets(
+		ndcSchema.Name,
+		"settings.argumentPresets",
+		ndcSchema.Settings.ArgumentPresets,
+		true,
+	)
 
 	for i, server := range ndcSchema.Settings.Servers {
 		serverPath := fmt.Sprintf("settings.server[%d]", i)
@@ -207,13 +228,23 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 			cv.validateTLS(ndcSchema.Name, serverPath+".tls", server.TLS)
 		}
 
-		cv.validateArgumentPresets(ndcSchema.Name, serverPath+".argumentPresets", server.ArgumentPresets, false)
+		cv.validateArgumentPresets(
+			ndcSchema.Name,
+			serverPath+".argumentPresets",
+			server.ArgumentPresets,
+			false,
+		)
 	}
 
 	return nil
 }
 
-func (cv *ConfigValidator) validateArgumentPresets(namespace string, key string, argumentPresets []schema.ArgumentPresetConfig, isGlobal bool) {
+func (cv *ConfigValidator) validateArgumentPresets(
+	namespace string,
+	key string,
+	argumentPresets []schema.ArgumentPresetConfig,
+	isGlobal bool,
+) {
 	for i, preset := range argumentPresets {
 		_, _, err := ValidateArgumentPreset(cv.mergedSchema, preset, isGlobal)
 		if err != nil {
@@ -311,7 +342,11 @@ func (cv *ConfigValidator) validateTLS(namespace string, key string, tlsConfig *
 	}
 }
 
-func (cv *ConfigValidator) validateSecurityScheme(namespace string, key string, ss schema.SecurityScheme) {
+func (cv *ConfigValidator) validateSecurityScheme(
+	namespace string,
+	key string,
+	ss schema.SecurityScheme,
+) {
 	if err := ss.Validate(); err != nil {
 		cv.addError(namespace, fmt.Sprintf("%s: %s", key, err))
 

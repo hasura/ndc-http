@@ -13,7 +13,6 @@ import (
 
 const (
 	acceptHeader               = "Accept"
-	acceptEncodingHeader       = "Accept-Encoding"
 	defaultTimeoutSeconds uint = 30
 	defaultRetryDelays    uint = 1000
 )

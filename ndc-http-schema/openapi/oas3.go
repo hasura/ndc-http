@@ -25,7 +25,8 @@ func OpenAPIv3ToNDCSchema(input []byte, options ConvertOptions) (*rest.NDCHttpSc
 		return nil, errs
 	}
 
-	if docModel.Model.Paths == nil || docModel.Model.Paths.PathItems == nil || docModel.Model.Paths.PathItems.IsZero() {
+	if docModel.Model.Paths == nil || docModel.Model.Paths.PathItems == nil ||
+		docModel.Model.Paths.PathItems.IsZero() {
 		return nil, append(errs, errors.New("there is no API to be converted"))
 	}
 

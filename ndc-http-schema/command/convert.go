@@ -15,7 +15,10 @@ import (
 )
 
 // ConvertToNDCSchema converts to NDC HTTP schema from file.
-func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logger *slog.Logger) error {
+func CommandConvertToNDCSchema(
+	args *configuration.ConvertCommandArguments,
+	logger *slog.Logger,
+) error {
 	start := time.Now()
 	if args.File == "" && args.Config == "" {
 		err := errors.New("--config or --file argument is required")
@@ -112,7 +115,7 @@ func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logg
 		return err
 	}
 
-	fmt.Fprint(os.Stdout, string(resultBytes))
+	_, _ = fmt.Fprint(os.Stdout, string(resultBytes))
 
 	return nil
 }

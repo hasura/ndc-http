@@ -27,7 +27,13 @@ type RequestBuilder struct {
 }
 
 // NewRequestBuilder creates a new RequestBuilder instance.
-func NewRequestBuilder(restSchema *rest.NDCHttpSchema, operation *rest.OperationInfo, arguments map[string]any, runtime rest.RuntimeSettings, globalRuntime configuration.RuntimeSettings) *RequestBuilder {
+func NewRequestBuilder(
+	restSchema *rest.NDCHttpSchema,
+	operation *rest.OperationInfo,
+	arguments map[string]any,
+	runtime rest.RuntimeSettings,
+	globalRuntime configuration.RuntimeSettings,
+) *RequestBuilder {
 	return &RequestBuilder{
 		Schema:        restSchema,
 		Operation:     operation,
@@ -41,9 +47,12 @@ func NewRequestBuilder(restSchema *rest.NDCHttpSchema, operation *rest.Operation
 func (c *RequestBuilder) Build() (*RetryableRequest, error) {
 	endpoint, headers, err := c.evalURLAndHeaderParameters()
 	if err != nil {
-		return nil, schema.UnprocessableContentError("failed to evaluate URL and Headers from parameters", map[string]any{
-			"cause": err.Error(),
-		})
+		return nil, schema.UnprocessableContentError(
+			"failed to evaluate URL and Headers from parameters",
+			map[string]any{
+				"cause": err.Error(),
+			},
+		)
 	}
 
 	rawRequest := c.Operation.Request
@@ -64,27 +73,54 @@ func (c *RequestBuilder) Build() (*RetryableRequest, error) {
 	}
 
 	if rawRequest.RuntimeSettings != nil {
-		if rawRequest.RuntimeSettings.Timeout > 0 {
-			request.Runtime.Timeout = rawRequest.RuntimeSettings.Timeout
+		if rawRequest.Timeout > 0 {
+			request.Runtime.Timeout = rawRequest.Timeout
 		}
-		if rawRequest.RuntimeSettings.Retry.Times > 0 {
-			request.Runtime.Retry.Times = rawRequest.RuntimeSettings.Retry.Times
+
+		if rawRequest.Retry.Times > 0 {
+			request.Runtime.Retry.Times = rawRequest.Retry.Times
 		}
-		if rawRequest.RuntimeSettings.Retry.Delay > 0 {
-			request.Runtime.Retry.Delay = rawRequest.RuntimeSettings.Retry.Delay
+
+		if rawRequest.Retry.Delay > 0 {
+			request.Runtime.Retry.Delay = rawRequest.Retry.Delay
 		}
-		if rawRequest.RuntimeSettings.Retry.HTTPStatus != nil {
-			request.Runtime.Retry.HTTPStatus = rawRequest.RuntimeSettings.Retry.HTTPStatus
+
+		if rawRequest.Retry.HTTPStatus != nil {
+			request.Runtime.Retry.HTTPStatus = rawRequest.Retry.HTTPStatus
+		}
+
+		if rawRequest.Retry.Jitter != nil {
+			request.Runtime.Retry.Jitter = rawRequest.Retry.Jitter
+		}
+
+		if rawRequest.Retry.Multiplier > 0 {
+			request.Runtime.Retry.Multiplier = rawRequest.Retry.Multiplier
+		}
+
+		if rawRequest.Retry.MaxIntervalSeconds > 0 {
+			request.Runtime.Retry.MaxIntervalSeconds = rawRequest.Retry.MaxIntervalSeconds
+		}
+
+		if rawRequest.Retry.MaxElapsedTimeSeconds > 0 {
+			request.Runtime.Retry.MaxElapsedTimeSeconds = rawRequest.Retry.MaxElapsedTimeSeconds
 		}
 	}
+
 	if request.Runtime.Retry.HTTPStatus == nil {
 		request.Runtime.Retry.HTTPStatus = defaultRetryHTTPStatus
+	}
+
+	if request.Runtime.Retry.MaxElapsedTimeSeconds <= 0 && request.Runtime.Timeout > 0 {
+		request.Runtime.Retry.MaxElapsedTimeSeconds = request.Runtime.Timeout
 	}
 
 	return request, nil
 }
 
-func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest *rest.Request) error {
+func (c *RequestBuilder) buildRequestBody(
+	request *RetryableRequest,
+	rawRequest *rest.Request,
+) error {
 	if rawRequest.RequestBody == nil {
 		request.ContentType = rest.ContentTypeJSON
 
@@ -123,7 +159,8 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 		case restUtils.IsContentTypeMultipartForm(contentType):
 			r, contentType, err := contenttype.NewMultipartFormEncoder(c.Schema, c.Operation, c.Arguments, contenttype.MultipartFormEncoderOptions{
 				StringifyJSON: c.GlobalRuntime.StringifyJSON,
-			}).Encode(bodyData)
+			}).
+				Encode(bodyData)
 			if err != nil {
 				return err
 			}
@@ -135,7 +172,8 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 		case contentType == rest.ContentTypeFormURLEncoded:
 			r, err := contenttype.NewURLParameterEncoder(c.Schema, rawRequest.RequestBody, contenttype.URLParameterEncoderOptions{
 				StringifyJSON: c.GlobalRuntime.StringifyJSON,
-			}).EncodeFormBody(&bodyInfo, bodyData)
+			}).
+				EncodeFormBody(&bodyInfo, bodyData)
 			if err != nil {
 				return err
 			}
@@ -148,7 +186,8 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 			var err error
 
 			if c.GlobalRuntime.StringifyJSON {
-				bodyBytes, err = contenttype.NewJSONEncoder(c.Schema).Encode(bodyData, bodyInfo.Type)
+				bodyBytes, err = contenttype.NewJSONEncoder(c.Schema).
+					Encode(bodyData, bodyInfo.Type)
 			} else {
 				var buf bytes.Buffer
 				enc := json.NewEncoder(&buf)
@@ -191,7 +230,10 @@ func (c *RequestBuilder) buildRequestBody(request *RetryableRequest, rawRequest 
 	return nil
 }
 
-func (c *RequestBuilder) getRequestUploadBody(rawRequest *rest.Request, bodyInfo *rest.ArgumentInfo) *rest.RequestBody {
+func (c *RequestBuilder) getRequestUploadBody(
+	rawRequest *rest.Request,
+	bodyInfo *rest.ArgumentInfo,
+) *rest.RequestBody {
 	if rawRequest.RequestBody == nil || bodyInfo == nil {
 		return nil
 	}
@@ -239,7 +281,8 @@ func (c *RequestBuilder) evalURLAndHeaderParameters() (*url.URL, http.Header, er
 	}
 
 	for argumentKey, argumentInfo := range c.Operation.Arguments {
-		if argumentInfo.HTTP == nil || !slices.Contains(urlAndHeaderLocations, argumentInfo.HTTP.In) {
+		if argumentInfo.HTTP == nil ||
+			!slices.Contains(urlAndHeaderLocations, argumentInfo.HTTP.In) {
 			continue
 		}
 
@@ -254,7 +297,13 @@ func (c *RequestBuilder) evalURLAndHeaderParameters() (*url.URL, http.Header, er
 // the query parameters serialization follows [OAS 3.1 spec]
 //
 // [OAS 3.1 spec]: https://swagger.io/docs/specification/serialization/
-func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(endpoint *url.URL, header *http.Header, argumentKey string, argumentInfo *rest.ArgumentInfo, value any) error {
+func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(
+	endpoint *url.URL,
+	header *http.Header,
+	argumentKey string,
+	argumentInfo *rest.ArgumentInfo,
+	value any,
+) error {
 	if argumentInfo.HTTP.Name != "" {
 		argumentKey = argumentInfo.HTTP.Name
 	}
@@ -285,10 +334,20 @@ func (c *RequestBuilder) evalURLAndHeaderParameterBySchema(endpoint *url.URL, he
 		contenttype.SetHeaderParameters(header, argumentInfo.HTTP, queryParams)
 	case rest.InQuery:
 		q := endpoint.Query()
-		contenttype.EvalQueryParameters(&q, argumentKey, queryParams, argumentInfo.HTTP.EncodingObject)
+		contenttype.EvalQueryParameters(
+			&q,
+			argumentKey,
+			queryParams,
+			argumentInfo.HTTP.EncodingObject,
+		)
 		endpoint.RawQuery = contenttype.EncodeQueryValues(q, argumentInfo.HTTP.AllowReserved)
 	case rest.InPath:
-		endpoint.Path = contenttype.EncodePathParameters(endpoint.Path, argumentKey, queryParams, argumentInfo.HTTP.EncodingObject)
+		endpoint.Path = contenttype.EncodePathParameters(
+			endpoint.Path,
+			argumentKey,
+			queryParams,
+			argumentInfo.HTTP.EncodingObject,
+		)
 	}
 
 	return nil

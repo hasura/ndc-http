@@ -25,12 +25,21 @@ type MultipartFormEncoder struct {
 	arguments    map[string]any
 }
 
-func NewMultipartFormEncoder(schema *rest.NDCHttpSchema, operation *rest.OperationInfo, arguments map[string]any, options MultipartFormEncoderOptions) *MultipartFormEncoder {
+func NewMultipartFormEncoder(
+	schema *rest.NDCHttpSchema,
+	operation *rest.OperationInfo,
+	arguments map[string]any,
+	options MultipartFormEncoderOptions,
+) *MultipartFormEncoder {
 	return &MultipartFormEncoder{
-		schema:       schema,
-		paramEncoder: NewURLParameterEncoder(schema, operation.Request.RequestBody, URLParameterEncoderOptions(options)),
-		operation:    operation,
-		arguments:    arguments,
+		schema: schema,
+		paramEncoder: NewURLParameterEncoder(
+			schema,
+			operation.Request.RequestBody,
+			URLParameterEncoderOptions(options),
+		),
+		operation: operation,
+		arguments: arguments,
 	}
 }
 
@@ -54,7 +63,11 @@ func (c *MultipartFormEncoder) Encode(bodyData any) ([]byte, string, error) {
 	return buffer.Bytes(), writer.FormDataContentType(), nil
 }
 
-func (mfb *MultipartFormEncoder) evalMultipartForm(w *MultipartWriter, bodyInfo *rest.ArgumentInfo, bodyData reflect.Value) error {
+func (mfb *MultipartFormEncoder) evalMultipartForm(
+	w *MultipartWriter,
+	bodyInfo *rest.ArgumentInfo,
+	bodyData reflect.Value,
+) error {
 	bodyData, ok := utils.UnwrapPointerFromReflectValue(bodyData)
 	if !ok {
 		return nil
@@ -133,7 +146,13 @@ func (mfb *MultipartFormEncoder) evalMultipartForm(w *MultipartWriter, bodyInfo 
 	return fmt.Errorf("invalid multipart form body, expected object, got %v", bodyInfo.Type)
 }
 
-func (mfb *MultipartFormEncoder) evalMultipartFieldValueRecursive(w *MultipartWriter, name string, value reflect.Value, fieldInfo *rest.ObjectField, enc *rest.EncodingObject) error {
+func (mfb *MultipartFormEncoder) evalMultipartFieldValueRecursive(
+	w *MultipartWriter,
+	name string,
+	value reflect.Value,
+	fieldInfo *rest.ObjectField,
+	enc *rest.EncodingObject,
+) error {
 	underlyingValue, notNull := utils.UnwrapPointerFromReflectValue(value)
 	argTypeT, err := fieldInfo.Type.InterfaceT()
 
@@ -254,7 +273,9 @@ func (mfb *MultipartFormEncoder) evalMultipartFieldValueRecursive(w *MultipartWr
 	}
 }
 
-func (mfb *MultipartFormEncoder) evalEncodingHeaders(encHeaders map[string]rest.RequestParameter) (http.Header, error) {
+func (mfb *MultipartFormEncoder) evalEncodingHeaders(
+	encHeaders map[string]rest.RequestParameter,
+) (http.Header, error) {
 	results := http.Header{}
 	for key, param := range encHeaders {
 		argumentName := param.ArgumentName
@@ -294,9 +315,15 @@ func (c *MultipartFormEncoder) EncodeArbitrary(bodyData any) ([]byte, string, er
 
 	reflectValue, ok := utils.UnwrapPointerFromAnyToReflectValue(bodyData)
 	if ok {
-		valueMap, ok := evalObjectJSONValue(reflectValue.Interface(), c.paramEncoder.options.StringifyJSON)
+		valueMap, ok := evalObjectJSONValue(
+			reflectValue.Interface(),
+			c.paramEncoder.options.StringifyJSON,
+		)
 		if !ok {
-			return nil, "", fmt.Errorf("invalid body for multipart/form, expected object, got: %s", reflectValue.Kind())
+			return nil, "", fmt.Errorf(
+				"invalid body for multipart/form, expected object, got: %s",
+				reflectValue.Kind(),
+			)
 		}
 
 		for key, value := range valueMap {
@@ -313,7 +340,11 @@ func (c *MultipartFormEncoder) EncodeArbitrary(bodyData any) ([]byte, string, er
 	return buffer.Bytes(), writer.FormDataContentType(), nil
 }
 
-func (c *MultipartFormEncoder) evalFormDataReflection(w *MultipartWriter, key string, reflectValue reflect.Value) error {
+func (c *MultipartFormEncoder) evalFormDataReflection(
+	w *MultipartWriter,
+	key string,
+	reflectValue reflect.Value,
+) error {
 	reflectValue, ok := utils.UnwrapPointerFromReflectValue(reflectValue)
 	if !ok {
 		return nil

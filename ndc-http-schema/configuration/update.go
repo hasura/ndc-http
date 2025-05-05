@@ -14,7 +14,10 @@ import (
 )
 
 // UpdateHTTPConfiguration validates and updates the HTTP configuration.
-func UpdateHTTPConfiguration(configurationDir string, logger *slog.Logger) (*Configuration, []NDCHttpRuntimeSchema, *schema.NDCHttpSchema, error) {
+func UpdateHTTPConfiguration(
+	configurationDir string,
+	logger *slog.Logger,
+) (*Configuration, []NDCHttpRuntimeSchema, *schema.NDCHttpSchema, error) {
 	config, err := ReadConfigurationFile(configurationDir)
 	if err != nil {
 		return nil, nil, nil, err
@@ -84,7 +87,10 @@ func ReadConfigurationFile(configurationDir string) (*Configuration, error) {
 
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("the config.{json,yaml,yml} file does not exist at %s", configurationDir)
+			return nil, fmt.Errorf(
+				"the config.{json,yaml,yml} file does not exist at %s",
+				configurationDir,
+			)
 		} else {
 			return nil, err
 		}

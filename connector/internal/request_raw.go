@@ -23,7 +23,10 @@ type RawRequestBuilder struct {
 }
 
 // NewRawRequestBuilder create a new RawRequestBuilder instance.
-func NewRawRequestBuilder(operation schema.MutationOperation, forwardHeaders configuration.ForwardHeadersSettings) *RawRequestBuilder {
+func NewRawRequestBuilder(
+	operation schema.MutationOperation,
+	forwardHeaders configuration.ForwardHeadersSettings,
+) *RawRequestBuilder {
 	return &RawRequestBuilder{
 		operation:      operation,
 		forwardHeaders: forwardHeaders,
@@ -132,7 +135,7 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 		}
 	}
 
-	var retryPolicy rest.RetryPolicy
+	var retryPolicy exhttp.RetryPolicy
 	if rawRetry, ok := rawArguments["retry"]; ok {
 		if err := json.Unmarshal(rawRetry, &retryPolicy); err != nil {
 			return nil, fmt.Errorf("retry: %w", err)
@@ -141,7 +144,8 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 
 	headers := http.Header{}
 	contentType := rest.ContentTypeJSON
-	if rqe.forwardHeaders.Enabled && rqe.forwardHeaders.ArgumentField != nil && *rqe.forwardHeaders.ArgumentField != "" {
+	if rqe.forwardHeaders.Enabled && rqe.forwardHeaders.ArgumentField != nil &&
+		*rqe.forwardHeaders.ArgumentField != "" {
 		if rawHeaders, ok := rawArguments[*rqe.forwardHeaders.ArgumentField]; ok {
 			var fwHeaders map[string]string
 			if err := json.Unmarshal(rawHeaders, &fwHeaders); err != nil {
@@ -198,7 +202,10 @@ func (rqe *RawRequestBuilder) decodeArguments() (*RetryableRequest, error) {
 	return request, nil
 }
 
-func (rqe *RawRequestBuilder) evalRequestBody(rawBody json.RawMessage, contentType string) ([]byte, string, error) {
+func (rqe *RawRequestBuilder) evalRequestBody(
+	rawBody json.RawMessage,
+	contentType string,
+) ([]byte, string, error) {
 	switch {
 	case restUtils.IsContentTypeJSON(contentType):
 		if !json.Valid(rawBody) {
@@ -234,7 +241,8 @@ func (rqe *RawRequestBuilder) evalRequestBody(rawBody json.RawMessage, contentTy
 		if err := json.Unmarshal(rawBody, &bodyData); err != nil {
 			return nil, "", fmt.Errorf("invalid body: %w", err)
 		}
-		r, contentType, err := contenttype.NewMultipartFormEncoder(nil, nil, nil, contenttype.MultipartFormEncoderOptions{}).EncodeArbitrary(bodyData)
+		r, contentType, err := contenttype.NewMultipartFormEncoder(nil, nil, nil, contenttype.MultipartFormEncoderOptions{}).
+			EncodeArbitrary(bodyData)
 		if err != nil {
 			return nil, "", err
 		}

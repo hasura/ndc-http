@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -40,7 +41,10 @@ var defaultScalarTypes = map[rest.ScalarName]schema.ScalarType{
 }
 
 // ApplyDefaultConnectorSchema adds default connector schema to the existing schema.
-func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, config *configuration.Configuration) (*schema.SchemaResponse, *rest.OperationInfo) {
+func ApplyDefaultConnectorSchema(
+	input *schema.SchemaResponse,
+	config *configuration.Configuration,
+) (*schema.SchemaResponse, *rest.OperationInfo) {
 	for _, scalarName := range utils.GetKeys(defaultScalarTypes) {
 		if _, ok := input.ScalarTypes[string(scalarName)]; ok {
 			continue
@@ -53,7 +57,7 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, config *configura
 		return input, nil
 	}
 
-	input.ObjectTypes[objectTypeRetryPolicy] = rest.RetryPolicy{}.Schema()
+	input.ObjectTypes[objectTypeRetryPolicy] = exhttp.RetryPolicy{}.Schema()
 	procSendHttpRequest := schema.ProcedureInfo{
 		Name:        ProcedureSendHTTPRequest,
 		Description: utils.ToPtr("Send an HTTP request"),
@@ -64,23 +68,28 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, config *configura
 			},
 			"method": {
 				Description: utils.ToPtr("Request method"),
-				Type:        schema.NewNullableType(schema.NewNamedType(string(ScalarRawHTTPMethod))).Encode(),
+				Type: schema.NewNullableType(schema.NewNamedType(string(ScalarRawHTTPMethod))).
+					Encode(),
 			},
 			"additionalHeaders": {
 				Description: utils.ToPtr("Additional request headers"),
-				Type:        schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).Encode(),
+				Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).
+					Encode(),
 			},
 			"body": {
 				Description: utils.ToPtr("Request body"),
-				Type:        schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).Encode(),
+				Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).
+					Encode(),
 			},
 			"timeout": {
 				Description: utils.ToPtr("Request timeout in seconds"),
-				Type:        schema.NewNullableType(schema.NewNamedType(string(rest.ScalarInt32))).Encode(),
+				Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarInt32))).
+					Encode(),
 			},
 			"retry": {
 				Description: utils.ToPtr("Retry policy"),
-				Type:        schema.NewNullableType(schema.NewNamedType(objectTypeRetryPolicy)).Encode(),
+				Type: schema.NewNullableType(schema.NewNamedType(objectTypeRetryPolicy)).
+					Encode(),
 			},
 		},
 		ResultType: schema.NewNullableNamedType(string(rest.ScalarJSON)).Encode(),
@@ -94,7 +103,8 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, config *configura
 
 	if forwardHeaderConfig.ResponseHeaders != nil {
 		objectTypeName := restUtils.ToPascalCase(procSendHttpRequest.Name) + "HeadersResponse"
-		input.ObjectTypes[objectTypeName] = configuration.NewHeaderForwardingResponseObjectType(procSendHttpRequest.ResultType, forwardHeaderConfig.ResponseHeaders).Schema()
+		input.ObjectTypes[objectTypeName] = configuration.NewHeaderForwardingResponseObjectType(procSendHttpRequest.ResultType, forwardHeaderConfig.ResponseHeaders).
+			Schema()
 
 		procSendHttpRequest.ResultType = schema.NewNamedType(objectTypeName).Encode()
 	}
@@ -107,7 +117,10 @@ func ApplyDefaultConnectorSchema(input *schema.SchemaResponse, config *configura
 }
 
 // ApplyPromptQLSettingsToSchema applies settings to the connector schema to be compatible with PromptQL.
-func ApplyPromptQLSettingsToSchema(ndcSchema *schema.SchemaResponse, config configuration.RuntimeSettings) *schema.SchemaResponse {
+func ApplyPromptQLSettingsToSchema(
+	ndcSchema *schema.SchemaResponse,
+	config configuration.RuntimeSettings,
+) *schema.SchemaResponse {
 	if !config.StringifyJSON {
 		return ndcSchema
 	}
