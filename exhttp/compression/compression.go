@@ -64,8 +64,6 @@ func (c Compressors) Decompress(reader io.ReadCloser, encoding string) (io.ReadC
 		return reader, nil
 	}
 
-	defer reader.Close()
-
 	return compressor.Decompress(reader)
 }
 

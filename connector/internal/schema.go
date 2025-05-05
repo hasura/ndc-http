@@ -28,6 +28,11 @@ var defaultScalarTypes = map[rest.ScalarName]schema.ScalarType{
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
 		Representation:      schema.NewTypeRepresentationString().Encode(),
 	},
+	rest.ScalarFloat64: {
+		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
+		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		Representation:      schema.NewTypeRepresentationFloat64().Encode(),
+	},
 	rest.ScalarJSON: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},

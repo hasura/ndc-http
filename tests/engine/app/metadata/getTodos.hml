@@ -6,10 +6,10 @@ definition:
   outputType: "[Todo!]!"
   arguments:
     - name: id
-      type: Int32
+      type: int32
       description: Filter by todo ID
     - name: userId
-      type: Int32
+      type: int32
       description: Filter by user ID
   source:
     dataConnectorName: myapi

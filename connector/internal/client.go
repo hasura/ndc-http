@@ -14,7 +14,6 @@ import (
 
 	"github.com/hasura/ndc-http/connector/internal/contenttype"
 	"github.com/hasura/ndc-http/exhttp"
-	"github.com/hasura/ndc-http/exhttp/compression"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/connector"
@@ -174,28 +173,6 @@ func (client *HTTPClient) sendSingle(
 
 	span.SetAttributes(attribute.String("execution.mode", mode))
 
-	contentEncoding := request.Headers.Get(rest.ContentEncodingHeader)
-	if len(request.Body) > 0 && compression.DefaultCompressor.IsEncodingSupported(contentEncoding) {
-		var buf bytes.Buffer
-		_, err := compression.DefaultCompressor.Compress(
-			&buf,
-			contentEncoding,
-			bytes.NewReader(request.Body),
-		)
-		if err != nil {
-			span.SetStatus(codes.Error, "failed to execute the request")
-			span.RecordError(err)
-
-			return nil, nil, schema.NewConnectorError(
-				http.StatusInternalServerError,
-				err.Error(),
-				nil,
-			)
-		}
-
-		request.Body = buf.Bytes()
-	}
-
 	var namespace string
 	var httpError *exhttp.HTTPError
 
@@ -214,8 +191,8 @@ func (client *HTTPClient) sendSingle(
 		}
 	}
 
-	defer cancel()
 	defer func() {
+		cancel()
 		_ = resp.Body.Close()
 	}()
 

@@ -27,6 +27,11 @@ func jsonSchemaConvertConfig() error {
 	if err := r.AddGoComments("github.com/hasura/ndc-http/ndc-http-schema/configuration", "../configuration"); err != nil {
 		return err
 	}
+
+	if err := r.AddGoComments("github.com/hasura/ndc-http/exhttp", "../../exhttp"); err != nil {
+		return err
+	}
+
 	reflectSchema := r.Reflect(&configuration.ConvertConfig{})
 
 	schemaBytes, err := json.MarshalIndent(reflectSchema, "", "  ")
@@ -39,9 +44,15 @@ func jsonSchemaConvertConfig() error {
 
 func jsonSchemaConnectorConfiguration() error {
 	r := new(jsonschema.Reflector)
+
 	if err := r.AddGoComments("github.com/hasura/ndc-http/ndc-http-schema/configuration", "../configuration"); err != nil {
 		return err
 	}
+
+	if err := r.AddGoComments("github.com/hasura/ndc-http/exhttp", "../../exhttp"); err != nil {
+		return err
+	}
+
 	reflectSchema := r.Reflect(&configuration.Configuration{})
 
 	schemaBytes, err := json.MarshalIndent(reflectSchema, "", "  ")
@@ -55,6 +66,10 @@ func jsonSchemaConnectorConfiguration() error {
 func jsonSchemaNDCHttpSchema() error {
 	r := new(jsonschema.Reflector)
 	if err := r.AddGoComments("github.com/hasura/ndc-http/ndc-http-schema/schema", "../schema"); err != nil {
+		return err
+	}
+
+	if err := r.AddGoComments("github.com/hasura/ndc-http/exhttp", "../../exhttp"); err != nil {
 		return err
 	}
 

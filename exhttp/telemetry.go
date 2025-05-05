@@ -38,8 +38,15 @@ func (tc *TelemetryConfig) Validate() {
 	}
 }
 
-func (tt TelemetryConfig) do(fn func(req *http.Request) (*http.Response, error), req *http.Request) (*http.Response, error) {
-	ctx, span := tt.Tracer.Start(req.Context(), tt.getRequestSpanName(req), trace.WithSpanKind(trace.SpanKindClient))
+func (tt TelemetryConfig) do(
+	fn func(req *http.Request) (*http.Response, error),
+	req *http.Request,
+) (*http.Response, error) {
+	ctx, span := tt.Tracer.Start(
+		req.Context(),
+		tt.getRequestSpanName(req),
+		trace.WithSpanKind(trace.SpanKindClient),
+	)
 	defer span.End()
 
 	port := tt.Port
@@ -92,7 +99,7 @@ func (tt TelemetryConfig) do(fn func(req *http.Request) (*http.Response, error),
 
 		requestLogAttrs["body"] = string(rawBody)
 
-		req.Body.Close()
+		_ = req.Body.Close()
 		req.Body = io.NopCloser(bytes.NewBuffer(rawBody))
 	}
 
@@ -105,7 +112,11 @@ func (tt TelemetryConfig) do(fn func(req *http.Request) (*http.Response, error),
 	if err != nil {
 		span.SetStatus(codes.Error, err.Error())
 		span.RecordError(err)
-		tt.printLog(ctx, slog.LevelDebug, "failed to execute the request: "+err.Error(), logAttrs...)
+		tt.printLog(
+			ctx,
+			slog.LevelDebug,
+			"failed to execute the request: "+err.Error(),
+			logAttrs...)
 
 		return resp, err
 	}
@@ -124,26 +135,29 @@ func (tt TelemetryConfig) do(fn func(req *http.Request) (*http.Response, error),
 
 	if isDebug && resp.ContentLength > 0 && resp.ContentLength < 1024*1024 && resp.Body != nil {
 		respBody, err := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
+
 		if err != nil {
 			span.SetStatus(codes.Error, err.Error())
 			span.RecordError(err)
 			logAttrs = append(logAttrs, slog.Any("response", respLogAttrs))
 
-			tt.printLog(ctx, slog.LevelDebug, "failed to read response body: "+err.Error(), logAttrs...)
-			resp.Body.Close()
+			tt.printLog(
+				ctx,
+				slog.LevelDebug,
+				"failed to read response body: "+err.Error(),
+				logAttrs...)
 
 			return resp, err
 		}
 
 		respLogAttrs["body"] = string(respBody)
-		logAttrs = append(logAttrs, slog.Any("response", respLogAttrs))
-
-		resp.Body.Close()
 		resp.Body = io.NopCloser(bytes.NewBuffer(respBody))
 
 		span.SetAttributes(attribute.Int("http.response.size", len(respBody)))
 	}
 
+	logAttrs = append(logAttrs, slog.Any("response", respLogAttrs))
 	tt.printLog(ctx, slog.LevelDebug, resp.Status, logAttrs...)
 
 	if resp.StatusCode >= http.StatusBadRequest {
@@ -166,7 +180,12 @@ func (tt TelemetryConfig) isDebug(ctx context.Context) bool {
 	return tt.Logger != nil && tt.Logger.Enabled(ctx, slog.LevelDebug)
 }
 
-func (tt TelemetryConfig) printLog(ctx context.Context, level slog.Level, msg string, attrs ...slog.Attr) {
+func (tt TelemetryConfig) printLog(
+	ctx context.Context,
+	level slog.Level,
+	msg string,
+	attrs ...slog.Attr,
+) {
 	if tt.Logger == nil {
 		return
 	}
@@ -195,7 +214,7 @@ func NewTelemetryTransport(transport http.RoundTripper, config TelemetryConfig) 
 
 // RoundTrip wraps the base RoundTripper with telemetry.
 func (tt telemetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	return tt.TelemetryConfig.do(tt.transport.RoundTrip, req)
+	return tt.do(tt.transport.RoundTrip, req)
 }
 
 // TelemetryMiddleware wraps the client with logging and tracing.
@@ -218,5 +237,5 @@ func NewTelemetryMiddleware(config TelemetryConfig) Middleware {
 
 // Do wraps the base Doer with telemetry.
 func (tm TelemetryMiddleware) Do(req *http.Request) (*http.Response, error) {
-	return tm.TelemetryConfig.do(tm.doer.Do, req)
+	return tm.do(tm.doer.Do, req)
 }

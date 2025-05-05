@@ -9,11 +9,11 @@ definition:
     - name: email
       type: String
     - name: id
-      type: Int64
+      type: int64
     - name: name
       type: String
     - name: postId
-      type: Int64
+      type: int64
   graphql:
     typeName: Comment
     inputTypeName: Comment_input
@@ -44,7 +44,7 @@ definition:
   outputType: Comment!
   arguments:
     - name: id
-      type: Int32!
+      type: int32!
       description: The ID of the comment to retrieve
   source:
     dataConnectorName: myapi

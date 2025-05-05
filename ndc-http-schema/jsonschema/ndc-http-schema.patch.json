@@ -607,24 +607,32 @@
     "RetryPolicy": {
       "properties": {
         "times": {
-          "type": "integer",
-          "description": "Number of retry times"
+          "type": "integer"
         },
         "delay": {
-          "type": "integer",
-          "description": "Delay retry delay in milliseconds"
+          "type": "integer"
         },
         "httpStatus": {
           "items": {
             "type": "integer"
           },
-          "type": "array",
-          "description": "HTTPStatus retries if the remote service returns one of these http status"
+          "type": "array"
+        },
+        "jitter": {
+          "type": "number"
+        },
+        "multiplier": {
+          "type": "number"
+        },
+        "maxIntervalSeconds": {
+          "type": "integer"
+        },
+        "maxElapsedTimeSeconds": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "description": "RetryPolicy represents the retry policy of request."
+      "type": "object"
     },
     "ScalarType": {
       "properties": {

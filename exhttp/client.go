@@ -47,7 +47,15 @@ func (r *Client) Do(req *http.Request) (*http.Response, error) {
 
 	resp, err := client.Do(req)
 	if resp != nil && resp.Body != nil {
-		resp.Body, err = compression.DefaultCompressor.Decompress(resp.Body, resp.Header.Get(contentEncodingHeader))
+		respBody, dcErr := compression.DefaultCompressor.Decompress(
+			resp.Body,
+			resp.Header.Get(contentEncodingHeader),
+		)
+		if dcErr != nil && err == nil {
+			return resp, dcErr
+		}
+
+		resp.Body = respBody
 	}
 
 	return resp, err

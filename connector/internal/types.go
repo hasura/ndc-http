@@ -20,9 +20,8 @@ const (
 var errRequestBodyRequired = errors.New("request body is required")
 
 var (
-	defaultRetryHTTPStatus = []int{429, 500, 502, 503}
-	sensitiveHeaderRegex   = regexp.MustCompile(`auth|key|secret|token`)
-	urlAndHeaderLocations  = []rest.ParameterLocation{rest.InPath, rest.InQuery, rest.InHeader}
+	sensitiveHeaderRegex  = regexp.MustCompile(`auth|key|secret|token`)
+	urlAndHeaderLocations = []rest.ParameterLocation{rest.InPath, rest.InQuery, rest.InHeader}
 )
 
 // HTTPOptions represent execution options for HTTP requests.

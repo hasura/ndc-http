@@ -6,10 +6,10 @@ definition:
   outputType: "[Comment!]!"
   arguments:
     - name: id
-      type: Int32
+      type: int32
       description: Filter by comment ID
     - name: postId
-      type: Int32
+      type: int32
       description: Filter by post ID
   source:
     dataConnectorName: myapi

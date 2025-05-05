@@ -6,13 +6,24 @@ definition:
   description: Retry policy of request
   fields:
     - name: delay
-      type: Int32
-      description: Delay retry delay in milliseconds
+      type: int32
+      description: The initial wait time in milliseconds before a retry is attempted.
     - name: httpStatus
-      type: "[Int32!]"
+      type: "[int32!]"
       description: List of HTTP status the connector will retry on
+    - name: jitter
+      type: float64
+      description: How much does the reconnection time vary relative to the base
+        value. Must be in range (0, 1)
+    - name: maxIntervalSeconds
+      type: float64
+      description: How much can the wait time grow. Defaults to 60 seconds
+    - name: multiplier
+      type: float64
+      description: How much should the reconnection time grow on subsequent attempts.
+        Must be >=1; 1 = constant interval
     - name: times
-      type: Int32!
+      type: int32!
       description: Number of retry times
   graphql:
     typeName: RetryPolicy
@@ -32,6 +43,9 @@ definition:
         allowedFields:
           - delay
           - httpStatus
+          - jitter
+          - maxIntervalSeconds
+          - multiplier
           - times
 
 ---
@@ -39,22 +53,22 @@ kind: Command
 version: v1
 definition:
   name: sendHttpRequest
-  outputType: JSON
+  outputType: json
   arguments:
     - name: additionalHeaders
-      type: JSON
+      type: json
       description: Additional request headers
     - name: body
-      type: JSON
+      type: json
       description: Request body
     - name: method
-      type: RawHttpMethod
+      type: enum
       description: Request method
     - name: retry
       type: RetryPolicy
       description: Retry policy
     - name: timeout
-      type: Int32
+      type: int32
       description: Request timeout in seconds
     - name: url
       type: String!

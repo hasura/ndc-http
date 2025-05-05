@@ -6,10 +6,10 @@ definition:
   outputType: "[User!]!"
   arguments:
     - name: email
-      type: Int32
+      type: int32
       description: Filter by user email address
     - name: id
-      type: Int32
+      type: int32
       description: Filter by user ID
   source:
     dataConnectorName: myapi

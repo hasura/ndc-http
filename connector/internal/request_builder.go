@@ -106,10 +106,6 @@ func (c *RequestBuilder) Build() (*RetryableRequest, error) {
 		}
 	}
 
-	if request.Runtime.Retry.HTTPStatus == nil {
-		request.Runtime.Retry.HTTPStatus = defaultRetryHTTPStatus
-	}
-
 	if request.Runtime.Retry.MaxElapsedTimeSeconds <= 0 && request.Runtime.Timeout > 0 {
 		request.Runtime.Retry.MaxElapsedTimeSeconds = request.Runtime.Timeout
 	}

@@ -16,6 +16,7 @@ test:
 .PHONY: lint
 lint:
 	golangci-lint run --fix
+	cd exhttp && golangci-lint run --fix
 	cd ndc-http-schema && golangci-lint run --fix
 
 # clean the output directory

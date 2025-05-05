@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log/slog"
@@ -11,12 +12,15 @@ import (
 	"github.com/hasura/ndc-http/connector/internal/argument"
 	"github.com/hasura/ndc-http/connector/internal/security"
 	"github.com/hasura/ndc-http/exhttp"
+	"github.com/hasura/ndc-http/exhttp/compression"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/version"
 	"github.com/hasura/ndc-sdk-go/connector"
+	"github.com/hasura/ndc-sdk-go/schema"
 	"github.com/hasura/ndc-sdk-go/utils"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -188,6 +192,29 @@ func (um *UpstreamManager) ExecuteRequest(
 	request *RetryableRequest,
 	namespace string,
 ) (*http.Response, context.CancelFunc, error) {
+	contentEncoding := request.Headers.Get(rest.ContentEncodingHeader)
+	if len(request.Body) > 0 && compression.DefaultCompressor.IsEncodingSupported(contentEncoding) {
+		var buf bytes.Buffer
+
+		_, err := compression.DefaultCompressor.Compress(
+			&buf,
+			contentEncoding,
+			bytes.NewReader(request.Body),
+		)
+		if err != nil {
+			span.SetStatus(codes.Error, "failed to execute the request")
+			span.RecordError(err)
+
+			return nil, nil, schema.NewConnectorError(
+				http.StatusInternalServerError,
+				err.Error(),
+				nil,
+			)
+		}
+
+		request.Body = buf.Bytes()
+	}
+
 	req, cancel, err := request.CreateRequest(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -205,13 +232,8 @@ func (um *UpstreamManager) ExecuteRequest(
 	clientWrapper := exhttp.NewClient(httpClient, exhttp.NewRetryMiddleware(request.Runtime.Retry))
 
 	resp, err := clientWrapper.Do(req)
-	if err != nil {
-		cancel()
 
-		return nil, nil, err
-	}
-
-	return resp, cancel, nil
+	return resp, cancel, err
 }
 
 func (um *UpstreamManager) evalRequestSettings(
