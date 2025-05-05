@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"unicode"
 
 	"github.com/hasura/ndc-http/connector/internal/contenttype"
 	"github.com/hasura/ndc-http/exhttp"
@@ -447,12 +448,13 @@ func (client *HTTPClient) createHeaderForwardingResponse(result any, rawHeaders 
 }
 
 func parseContentType(input string) string {
-	if input == "" {
+	cts := strings.FieldsFunc(input, func(r rune) bool {
+		return unicode.IsSpace(r) || r == ';' || r == ','
+	})
+
+	if len(cts) == 0 {
 		return ""
 	}
 
-	parts := strings.Split(input, ";")
-	contentTypeParts := strings.Split(parts[0], ",")
-
-	return strings.TrimSpace(contentTypeParts[0])
+	return strings.ToLower(cts[0])
 }

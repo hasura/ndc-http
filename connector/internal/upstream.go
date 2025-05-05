@@ -67,13 +67,15 @@ func (um *UpstreamManager) Register(
 		}
 
 		if tlsClient != nil {
+			transport := tlsClient.Transport
 			tlsClient.Transport = exhttp.NewTelemetryTransport(
-				httpClient.Transport,
+				transport,
 				exhttp.TelemetryConfig{
 					Logger:     logger,
 					Attributes: []attribute.KeyValue{attribute.String("db.system", "http")},
 				},
 			)
+
 			httpClient = tlsClient
 		}
 	}

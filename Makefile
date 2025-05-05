@@ -3,8 +3,7 @@ OUTPUT_DIR := _output
 
 .PHONY: format
 format:
-	gofmt -w -s .
-	cd ndc-http-schema && gofmt -w -s .
+	golangci-lint fmt
 
 .PHONY: test
 test:

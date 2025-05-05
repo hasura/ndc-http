@@ -6,18 +6,20 @@ pushd `dirname $0` > /dev/null
 SCRIPT_PATH=`pwd -P`
 popd > /dev/null
 
-DAYS=36500
+DAYS=720
+SUB="/C=DE/ST=NRW/L=Earth/O=Random Company/OU=IT/CN=localhost/emailAddress=hasura@localhost"
+ADDEXT="subjectAltName = DNS:localhost,IP:127.0.0.1" 
 
 function generate_client() {
   CLIENT=$1
-  O=$2
-  OU=$3
   openssl genrsa -out ${CLIENT}.key 2048
+  openssl ecparam -genkey -name secp384r1 -out ${CLIENT}.key
+
   openssl req -new -key ${CLIENT}.key -days ${DAYS} -out ${CLIENT}.csr \
-    -addext "subjectAltName = DNS:localhost,IP:127.0.0.1" \
-    -subj "/C=SO/ST=Earth/L=Mountain/O=$O/OU=$OU/CN=localhost/emailAddress=hasura@localhost"
+    -subj "$SUB" \
+    -addext "$ADDEXT"
   openssl x509  -req -in ${CLIENT}.csr \
-    -extfile <(printf "subjectAltName=DNS:localhost,IP:127.0.0.1") \
+    -extfile <(printf "$ADDEXT") \
     -CA ca.crt -CAkey ca.key -out ${CLIENT}.crt -days ${DAYS} -sha256 -CAcreateserial
   cat ${CLIENT}.crt ${CLIENT}.key > ${CLIENT}.pem
 }
@@ -35,27 +37,27 @@ function generate_cert() {
     -days ${DAYS} \
     -out ca.crt \
     -keyout ca.key \
-    -subj "/C=SO/ST=Earth/L=Mountain/O=MegaEase/OU=MegaCloud/CN=localhost/emailAddress=hasura@localhost"
+    -subj "$SUB"
 
   # create a key for server
   openssl genrsa -out server.key 2048
 
   #generate the Certificate Signing Request
   openssl req -new -key server.key -days ${DAYS} -out server.csr \
-    -addext "subjectAltName = DNS:localhost,IP:127.0.0.1" \
-    -subj "/C=SO/ST=Earth/L=Mountain/O=MegaEase/OU=MegaCloud/CN=localhost/emailAddress=hasura@localhost"
+    -addext "$ADDEXT" \
+    -subj "$SUB"
 
   # sign it with Root CA
   # https://stackoverflow.com/questions/64814173/how-do-i-use-sans-with-openssl-instead-of-common-name
   openssl x509  -req -in server.csr \
-    -extfile <(printf "subjectAltName=DNS:localhost,IP:127.0.0.1") \
+    -extfile <(printf "$ADDEXT") \
     -CA ca.crt -CAkey ca.key  \
     -days ${DAYS} -sha256 -CAcreateserial \
     -out server.crt
 
   cat server.crt server.key > server.pem
 
-  generate_client client Client Client-OU
+  generate_client client
 
   popd
 }
