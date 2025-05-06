@@ -1,4 +1,39 @@
 ---
+kind: ObjectType
+version: v1
+definition:
+  name: PostInput
+  fields:
+    - name: body
+      type: String
+    - name: id
+      type: int64
+    - name: title
+      type: String
+    - name: userId
+      type: int64
+  graphql:
+    typeName: PostInput
+    inputTypeName: PostInput_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: myapi
+      dataConnectorObjectType: PostInput
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: PostInput
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - body
+          - id
+          - title
+          - userId
+
+---
 kind: Command
 version: v1
 definition:
@@ -6,7 +41,7 @@ definition:
   outputType: Post!
   arguments:
     - name: body
-      type: Post!
+      type: PostInput!
       description: Post object that needs to be added
   source:
     dataConnectorName: myapi

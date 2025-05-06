@@ -93,7 +93,10 @@ func (nsc *NDCBuilder) validate() error {
 }
 
 // recursively validate and clean unused objects as well as their inner properties.
-func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.OperationInfo) (*rest.OperationInfo, error) {
+func (nsc *NDCBuilder) validateOperation(
+	operationName string,
+	operation rest.OperationInfo,
+) (*rest.OperationInfo, error) {
 	result := &rest.OperationInfo{
 		Request:     operation.Request,
 		Description: operation.Description,
@@ -109,7 +112,7 @@ func (nsc *NDCBuilder) validateOperation(operationName string, operation rest.Op
 		result.Arguments[key] = rest.ArgumentInfo{
 			HTTP: field.HTTP,
 			ArgumentInfo: schema.ArgumentInfo{
-				Description: field.ArgumentInfo.Description,
+				Description: field.Description,
 				Type:        fieldType.Encode(),
 			},
 		}
@@ -243,8 +246,15 @@ func (nsc *NDCBuilder) validateBannedTypes() error {
 
 		for scalarKey, scalarType := range nsc.schema.ScalarTypes {
 			if lowerKey == strings.ToLower(scalarKey) {
-				err := fmt.Errorf("the insensitive name `%s` exists in both object and scalar types", key)
-				nsc.Logger.Error(err.Error(), slog.Any("object_type", obj), slog.Any("scalar_type", scalarType))
+				err := fmt.Errorf(
+					"the insensitive name `%s` exists in both object and scalar types",
+					key,
+				)
+				nsc.Logger.Error(
+					err.Error(),
+					slog.Any("object_type", obj),
+					slog.Any("scalar_type", scalarType),
+				)
 
 				return err
 			}

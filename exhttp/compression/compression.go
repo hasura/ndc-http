@@ -7,12 +7,16 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
+// DefaultCompressor the default compressors.
+var DefaultCompressor = NewCompressors()
+
 // Compressor abstracts the interface for a compression handler.
 type Compressor interface {
-	Compress(w io.Writer, data []byte) (int, error)
+	Compress(w io.Writer, src io.Reader) (int64, error)
 	Decompress(reader io.ReadCloser) (io.ReadCloser, error)
 }
 
+// Compressors is a general helper for web compression.
 type Compressors struct {
 	acceptEncoding string
 	compressors    map[string]Compressor
@@ -44,10 +48,10 @@ func (c Compressors) IsEncodingSupported(encoding string) bool {
 }
 
 // Compress writes compressed data.
-func (c Compressors) Compress(w io.Writer, encoding string, data []byte) (int, error) {
+func (c Compressors) Compress(w io.Writer, encoding string, data io.Reader) (int64, error) {
 	compressor, ok := c.compressors[strings.ToLower(strings.TrimSpace(encoding))]
 	if !ok {
-		return w.Write(data)
+		return io.Copy(w, data)
 	}
 
 	return compressor.Compress(w, data)

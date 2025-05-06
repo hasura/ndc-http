@@ -23,7 +23,11 @@ type ResponseTransformer struct {
 }
 
 // NewResponseTransformer create a new ResponseTransformer instance.
-func NewResponseTransformer(ndcSchema *rest.NDCHttpSchema, setting rest.ResponseTransformSetting, logger *slog.Logger) *ResponseTransformer {
+func NewResponseTransformer(
+	ndcSchema *rest.NDCHttpSchema,
+	setting rest.ResponseTransformSetting,
+	logger *slog.Logger,
+) *ResponseTransformer {
 	if logger == nil {
 		logger = slog.Default()
 	}
@@ -38,6 +42,7 @@ func NewResponseTransformer(ndcSchema *rest.NDCHttpSchema, setting rest.Response
 // Transform evaluates new result types of operations after being transformed.
 func (rt *ResponseTransformer) Transform() (*rest.NDCHttpSchema, []string, error) {
 	var operationNames []string
+
 	var err error
 
 	targets, err := rt.validateTargets(rt.setting.Targets)
@@ -45,7 +50,11 @@ func (rt *ResponseTransformer) Transform() (*rest.NDCHttpSchema, []string, error
 		return nil, nil, err
 	}
 
-	operationNames, err = rt.transformOperations(targets, reflect.ValueOf(rt.setting.Body), len(rt.setting.Targets) > 0)
+	operationNames, err = rt.transformOperations(
+		targets,
+		reflect.ValueOf(rt.setting.Body),
+		len(rt.setting.Targets) > 0,
+	)
 
 	return rt.schema, operationNames, err
 }
@@ -99,7 +108,11 @@ func (rt *ResponseTransformer) validateTargets(targetInputs []string) ([]string,
 	return operationNames, nil
 }
 
-func (rt *ResponseTransformer) transformOperations(operationNames []string, body reflect.Value, strict bool) ([]string, error) {
+func (rt *ResponseTransformer) transformOperations(
+	operationNames []string,
+	body reflect.Value,
+	strict bool,
+) ([]string, error) {
 	appliedNames := []string{}
 
 	for _, name := range operationNames {
@@ -110,12 +123,15 @@ func (rt *ResponseTransformer) transformOperations(operationNames []string, body
 					return nil, err
 				}
 
-				rt.logger.Debug(fmt.Sprintf("failed to transform operation %s: %s", name, err.Error()))
+				rt.logger.Debug(
+					fmt.Sprintf("failed to transform operation %s: %s", name, err.Error()),
+				)
 
 				continue
 			}
 
 			rt.schema.Functions[name] = *newOp
+
 			appliedNames = append(appliedNames, name)
 
 			continue
@@ -128,12 +144,15 @@ func (rt *ResponseTransformer) transformOperations(operationNames []string, body
 					return nil, err
 				}
 
-				rt.logger.Debug(fmt.Sprintf("failed to transform operation %s: %s", name, err.Error()))
+				rt.logger.Debug(
+					fmt.Sprintf("failed to transform operation %s: %s", name, err.Error()),
+				)
 
 				continue
 			}
 
 			rt.schema.Procedures[name] = *newOp
+
 			appliedNames = append(appliedNames, name)
 
 			continue
@@ -145,7 +164,11 @@ func (rt *ResponseTransformer) transformOperations(operationNames []string, body
 	return appliedNames, nil
 }
 
-func (rt *ResponseTransformer) transformOperation(opName string, op rest.OperationInfo, body reflect.Value) (*rest.OperationInfo, error) {
+func (rt *ResponseTransformer) transformOperation(
+	opName string,
+	op rest.OperationInfo,
+	body reflect.Value,
+) (*rest.OperationInfo, error) {
 	op.BackupResultType()
 
 	newResultType, err := rt.evalResultType(op.ResultType, body, []string{opName})
@@ -158,7 +181,11 @@ func (rt *ResponseTransformer) transformOperation(opName string, op rest.Operati
 	return &op, nil
 }
 
-func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field reflect.Value, fieldPaths []string) (schema.TypeEncoder, error) {
+func (rt *ResponseTransformer) evalResultType(
+	schemaType schema.Type,
+	field reflect.Value,
+	fieldPaths []string,
+) (schema.TypeEncoder, error) {
 	field, notNull := utils.UnwrapPointerFromReflectValue(field)
 	fieldKind := field.Kind()
 
@@ -167,7 +194,14 @@ func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field refl
 	switch fieldKind {
 	case reflect.Bool:
 		resultType = schema.NewNamedType(string(rest.ScalarBoolean))
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32:
 		resultType = schema.NewNamedType(string(rest.ScalarInt32))
 	case reflect.Int64, reflect.Uint64:
 		resultType = schema.NewNamedType(string(rest.ScalarInt64))
@@ -177,6 +211,7 @@ func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field refl
 		resultType = schema.NewNamedType(string(rest.ScalarFloat64))
 	case reflect.String:
 		var err error
+
 		resultType, err = rt.evalStringValue(schemaType, field.String(), fieldPaths)
 		if err != nil {
 			return nil, err
@@ -218,6 +253,7 @@ func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field refl
 			}
 
 			rValue := field.MapIndex(rKey)
+
 			newFieldType, err := rt.evalResultType(schemaType, rValue, append(fieldPaths, keyStr))
 			if err != nil {
 				return nil, err
@@ -230,12 +266,15 @@ func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field refl
 			}
 		}
 
-		newObjectTypeName := restUtils.StringSliceToPascalCase(append(fieldPaths, "TransformedResult"))
+		newObjectTypeName := restUtils.StringSliceToPascalCase(
+			append(fieldPaths, "TransformedResult"),
+		)
 		rt.schema.ObjectTypes[newObjectTypeName] = newObjectType
 
 		resultType = schema.NewNamedType(newObjectTypeName)
 	case reflect.Interface:
 		var err error
+
 		value := field.Interface()
 
 		if str, ok := value.(string); ok {
@@ -274,7 +313,12 @@ func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field refl
 		}
 
 	default:
-		return nil, fmt.Errorf("%s: unsupported reflection kind %v: %v", strings.Join(fieldPaths, "."), fieldKind, field.Interface())
+		return nil, fmt.Errorf(
+			"%s: unsupported reflection kind %v: %v",
+			strings.Join(fieldPaths, "."),
+			fieldKind,
+			field.Interface(),
+		)
 	}
 
 	if !notNull {
@@ -284,7 +328,11 @@ func (rt *ResponseTransformer) evalResultType(schemaType schema.Type, field refl
 	return resultType, nil
 }
 
-func (rt *ResponseTransformer) evalStringValue(schemaType schema.Type, value string, fieldPaths []string) (schema.TypeEncoder, error) {
+func (rt *ResponseTransformer) evalStringValue(
+	schemaType schema.Type,
+	value string,
+	fieldPaths []string,
+) (schema.TypeEncoder, error) {
 	selector, err := jsonpath.Parse(value)
 	if err != nil {
 		return schema.NewNamedType(string(rest.ScalarString)), nil //nolint:nilerr
@@ -293,7 +341,11 @@ func (rt *ResponseTransformer) evalStringValue(schemaType schema.Type, value str
 	return rt.evalJSONPath(schemaType, selector.Query().Segments(), fieldPaths)
 }
 
-func (rt *ResponseTransformer) evalJSONPath(resultType schema.Type, segments []*spec.Segment, fieldPaths []string) (schema.TypeEncoder, error) {
+func (rt *ResponseTransformer) evalJSONPath(
+	resultType schema.Type,
+	segments []*spec.Segment,
+	fieldPaths []string,
+) (schema.TypeEncoder, error) {
 	rawType, err := resultType.InterfaceT()
 	if err != nil {
 		return nil, err

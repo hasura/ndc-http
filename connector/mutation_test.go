@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/hasura/ndc-http/connector/internal"
-	"github.com/hasura/ndc-http/connector/internal/compression"
+	"github.com/hasura/ndc-http/exhttp/compression"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/connector"
 	"github.com/hasura/ndc-sdk-go/ndctest"
@@ -47,7 +47,6 @@ func TestHTTPConnectorCompression(t *testing.T) {
 		case http.MethodPost:
 			compressor := compression.GzipCompressor{}
 			assert.Equal(t, "gzip", r.Header.Get(rest.ContentEncodingHeader))
-
 			reqBody, err := compressor.Decompress(r.Body)
 			assert.NilError(t, err)
 
@@ -60,7 +59,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingGzip)
 			w.WriteHeader(http.StatusOK)
 
-			_, err = compressor.Compress(w, rawPostsBody)
+			_, err = compressor.Compress(w, bytes.NewReader(rawPostsBody))
 			assert.NilError(t, err)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -76,7 +75,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingDeflate)
 			w.WriteHeader(http.StatusOK)
 
-			_, err = compressor.Compress(w, rawPostsBody)
+			_, err = compressor.Compress(w, bytes.NewReader(rawPostsBody))
 			assert.NilError(t, err)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -100,7 +99,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingDeflate)
 			w.WriteHeader(http.StatusOK)
 
-			_, err = compressor.Compress(w, rawPostsBody)
+			_, err = compressor.Compress(w, bytes.NewReader(rawPostsBody))
 			assert.NilError(t, err)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -137,7 +136,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -164,7 +167,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -191,7 +198,11 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
 			Message: "zlib: invalid header",
@@ -227,7 +238,11 @@ func TestDisableRawHTTPRequest(t *testing.T) {
 			},
 		})
 
-		res, err := http.Post(testServer.URL+"/mutation", "application/json", bytes.NewBuffer(rawReqBody))
+		res, err := http.Post(
+			testServer.URL+"/mutation",
+			"application/json",
+			bytes.NewBuffer(rawReqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
 			Message: internal.ProcedureSendHTTPRequest + " mutation is disabled. Set runtime.enableRawRequest=true to enable this operation",

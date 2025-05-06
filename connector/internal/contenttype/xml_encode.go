@@ -65,9 +65,17 @@ func (c *XMLEncoder) EncodeArbitrary(bodyData any) ([]byte, error) {
 	return append([]byte(xml.Header), buf.Bytes()...), nil
 }
 
-func (c *XMLEncoder) evalXMLField(enc *xml.Encoder, name string, field rest.ObjectField, value any, fieldPaths []string) error {
+func (c *XMLEncoder) evalXMLField(
+	enc *xml.Encoder,
+	name string,
+	field rest.ObjectField,
+	value any,
+	fieldPaths []string,
+) error {
 	rawType, err := field.Type.InterfaceT()
+
 	var innerValue reflect.Value
+
 	var notNull bool
 
 	if value != nil {
@@ -103,17 +111,28 @@ func (c *XMLEncoder) evalXMLField(enc *xml.Encoder, name string, field rest.Obje
 	}
 }
 
-func (c *XMLEncoder) evalXMLFieldArray(enc *xml.Encoder, name string, field rest.ObjectField, t *schema.ArrayType, value reflect.Value, fieldPaths []string) error {
+func (c *XMLEncoder) evalXMLFieldArray(
+	enc *xml.Encoder,
+	name string,
+	field rest.ObjectField,
+	t *schema.ArrayType,
+	value reflect.Value,
+	fieldPaths []string,
+) error {
 	vi := value.Interface()
 	values, ok := vi.([]any)
+
 	if !ok {
 		return fmt.Errorf("%s: expect an array, got %v", strings.Join(fieldPaths, "."), vi)
 	}
 
 	var wrapped bool
+
 	xmlName := name
+
 	if field.HTTP.XML != nil {
 		wrapped = field.HTTP.XML.Wrapped
+
 		if field.HTTP.XML.Name != "" {
 			xmlName = field.HTTP.XML.Name
 		}
@@ -152,7 +171,14 @@ func (c *XMLEncoder) evalXMLFieldArray(enc *xml.Encoder, name string, field rest
 	return nil
 }
 
-func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest.ObjectField, t *schema.NamedType, innerValue reflect.Value, fieldPaths []string) error {
+func (c *XMLEncoder) evalXMLFieldNamed(
+	enc *xml.Encoder,
+	name string,
+	field rest.ObjectField,
+	t *schema.NamedType,
+	innerValue reflect.Value,
+	fieldPaths []string,
+) error {
 	var attributes []xml.Attr
 	if field.HTTP != nil && field.HTTP.XML != nil && field.HTTP.XML.Namespace != "" {
 		attributes = append(attributes, field.HTTP.XML.GetNamespaceAttribute())
@@ -175,17 +201,28 @@ func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest
 	}
 
 	iv := innerValue.Interface()
+
 	values, ok := iv.(map[string]any)
 	if !ok {
-		return fmt.Errorf("%s: expected a map, got %s", strings.Join(fieldPaths, "."), innerValue.Kind())
+		return fmt.Errorf(
+			"%s: expected a map, got %s",
+			strings.Join(fieldPaths, "."),
+			innerValue.Kind(),
+		)
 	}
 
-	attributes, fieldKeys, err := c.evalAttributes(objectType, utils.GetSortedKeys(objectType.Fields), values, fieldPaths)
+	attributes, fieldKeys, err := c.evalAttributes(
+		objectType,
+		utils.GetSortedKeys(objectType.Fields),
+		values,
+		fieldPaths,
+	)
 	if err != nil {
 		return err
 	}
 
 	xmlName := getXMLName(objectType.XML, name, objectType.Alias, t.Name)
+
 	if objectType.XML != nil && objectType.XML.Namespace != "" {
 		attributes = append(attributes, objectType.XML.GetNamespaceAttribute())
 	}
@@ -198,11 +235,18 @@ func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest
 		return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 	}
 
-	if len(fieldKeys) == 1 && objectType.Fields[fieldKeys[0]].HTTP != nil && objectType.Fields[fieldKeys[0]].HTTP.XML != nil && objectType.Fields[fieldKeys[0]].HTTP.XML.Text {
+	if len(fieldKeys) == 1 && objectType.Fields[fieldKeys[0]].HTTP != nil &&
+		objectType.Fields[fieldKeys[0]].HTTP.XML != nil &&
+		objectType.Fields[fieldKeys[0]].HTTP.XML.Text {
 		objectField := objectType.Fields[fieldKeys[0]]
 		fieldValue, ok := values[fieldKeys[0]]
+
 		if ok && fieldValue != nil {
-			textValue, err := c.encodeXMLText(objectField.Type, reflect.ValueOf(fieldValue), fieldPaths)
+			textValue, err := c.encodeXMLText(
+				objectField.Type,
+				reflect.ValueOf(fieldValue),
+				fieldPaths,
+			)
 			if err != nil {
 				return err
 			}
@@ -218,6 +262,7 @@ func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest
 		for _, key := range fieldKeys {
 			objectField := objectType.Fields[key]
 			fieldValue := values[key]
+
 			if err := c.evalXMLField(enc, key, objectField, fieldValue, append(fieldPaths, key)); err != nil {
 				return err
 			}
@@ -234,12 +279,19 @@ func (c *XMLEncoder) evalXMLFieldNamed(enc *xml.Encoder, name string, field rest
 	return nil
 }
 
-func (c *XMLEncoder) evalAttributes(objectType rest.ObjectType, keys []string, values map[string]any, fieldPaths []string) ([]xml.Attr, []string, error) {
+func (c *XMLEncoder) evalAttributes(
+	objectType rest.ObjectType,
+	keys []string,
+	values map[string]any,
+	fieldPaths []string,
+) ([]xml.Attr, []string, error) {
 	attrs := []xml.Attr{}
 	remainKeys := make([]string, 0)
+
 	for _, key := range keys {
 		objectField := objectType.Fields[key]
 		isNullXML := objectField.HTTP == nil || objectField.HTTP.XML == nil
+
 		if isNullXML || !objectField.HTTP.XML.Attribute {
 			remainKeys = append(remainKeys, key)
 
@@ -253,7 +305,11 @@ func (c *XMLEncoder) evalAttributes(objectType rest.ObjectType, keys []string, v
 
 		// the attribute value is usually a primitive scalar,
 		// otherwise just encode the value as json string
-		str, err := c.encodeXMLText(objectField.Type, reflect.ValueOf(value), append(fieldPaths, key))
+		str, err := c.encodeXMLText(
+			objectField.Type,
+			reflect.ValueOf(value),
+			append(fieldPaths, key),
+		)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -271,7 +327,11 @@ func (c *XMLEncoder) evalAttributes(objectType rest.ObjectType, keys []string, v
 	return attrs, remainKeys, nil
 }
 
-func (c *XMLEncoder) encodeXMLText(schemaType schema.Type, value reflect.Value, fieldPaths []string) (*string, error) {
+func (c *XMLEncoder) encodeXMLText(
+	schemaType schema.Type,
+	value reflect.Value,
+	fieldPaths []string,
+) (*string, error) {
 	rawType, err := schemaType.InterfaceT()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
@@ -326,7 +386,13 @@ func (c *XMLEncoder) encodeXMLText(schemaType schema.Type, value reflect.Value, 
 	}
 }
 
-func (c *XMLEncoder) encodeSimpleScalar(enc *xml.Encoder, name string, reflectValue reflect.Value, attributes []xml.Attr, fieldPaths []string) error {
+func (c *XMLEncoder) encodeSimpleScalar(
+	enc *xml.Encoder,
+	name string,
+	reflectValue reflect.Value,
+	attributes []xml.Attr,
+	fieldPaths []string,
+) error {
 	reflectValue, ok := utils.UnwrapPointerFromReflectValue(reflectValue)
 	if !ok {
 		return nil
@@ -364,13 +430,19 @@ func (c *XMLEncoder) encodeSimpleScalar(enc *xml.Encoder, name string, reflectVa
 	case reflect.Map:
 		ri := reflectValue.Interface()
 		valueMap, ok := ri.(map[string]any)
+
 		if !ok {
-			return fmt.Errorf("%s: expected map[string]any, got: %v", strings.Join(fieldPaths, "."), ri)
+			return fmt.Errorf(
+				"%s: expected map[string]any, got: %v",
+				strings.Join(fieldPaths, "."),
+				ri,
+			)
 		}
 
 		return c.encodeScalarMap(enc, name, valueMap, attributes, fieldPaths)
 	case reflect.Interface:
 		ri := reflectValue.Interface()
+
 		valueMap, ok := ri.(map[string]any)
 		if ok {
 			return c.encodeScalarMap(enc, name, valueMap, attributes, fieldPaths)
@@ -382,7 +454,13 @@ func (c *XMLEncoder) encodeSimpleScalar(enc *xml.Encoder, name string, reflectVa
 	}
 }
 
-func (c *XMLEncoder) encodeScalarMap(enc *xml.Encoder, name string, valueMap map[string]any, attributes []xml.Attr, fieldPaths []string) error {
+func (c *XMLEncoder) encodeScalarMap(
+	enc *xml.Encoder,
+	name string,
+	valueMap map[string]any,
+	attributes []xml.Attr,
+	fieldPaths []string,
+) error {
 	err := enc.EncodeToken(xml.StartElement{
 		Name: xml.Name{Local: name},
 		Attr: attributes,
@@ -409,7 +487,14 @@ func (c *XMLEncoder) encodeScalarMap(enc *xml.Encoder, name string, valueMap map
 	return nil
 }
 
-func (c *XMLEncoder) encodeScalarString(enc *xml.Encoder, name string, reflectValue reflect.Value, kind reflect.Kind, attributes []xml.Attr, fieldPaths []string) error {
+func (c *XMLEncoder) encodeScalarString(
+	enc *xml.Encoder,
+	name string,
+	reflectValue reflect.Value,
+	kind reflect.Kind,
+	attributes []xml.Attr,
+	fieldPaths []string,
+) error {
 	str, err := StringifySimpleScalar(reflectValue, kind)
 	if err != nil {
 		return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)

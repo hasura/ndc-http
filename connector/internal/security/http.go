@@ -20,7 +20,10 @@ type HTTPCredential struct {
 var _ Credential = &HTTPCredential{}
 
 // NewHTTPCredential creates a new HTTPCredential instance.
-func NewHTTPCredential(client *http.Client, config *schema.HTTPAuthConfig) (*HTTPCredential, error) {
+func NewHTTPCredential(
+	client *http.Client,
+	config *schema.HTTPAuthConfig,
+) (*HTTPCredential, error) {
 	value, err := config.Value.Get()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create ApiKeyCredential: %w", err)
@@ -66,6 +69,7 @@ func (hc HTTPCredential) inject(req *http.Request, value string) {
 	if headerName == "" {
 		headerName = schema.AuthorizationHeader
 	}
+
 	scheme := hc.Scheme
 	if scheme == "bearer" {
 		scheme = "Bearer"

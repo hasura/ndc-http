@@ -35,7 +35,14 @@ type UpstreamSetting struct {
 	runtime         configuration.RuntimeSettings
 }
 
-func (us *UpstreamSetting) buildRequest(runtimeSchema *configuration.NDCHttpRuntimeSchema, operationName string, operation *rest.OperationInfo, arguments map[string]any, headers map[string]string, servers []string) (*RetryableRequest, error) {
+func (us *UpstreamSetting) buildRequest(
+	runtimeSchema *configuration.NDCHttpRuntimeSchema,
+	operationName string,
+	operation *rest.OperationInfo,
+	arguments map[string]any,
+	headers map[string]string,
+	servers []string,
+) (*RetryableRequest, error) {
 	baseURL, serverID, err := us.getBaseURLFromServers(runtimeSchema.Name, servers)
 	if err != nil {
 		return nil, err
@@ -49,7 +56,13 @@ func (us *UpstreamSetting) buildRequest(runtimeSchema *configuration.NDCHttpRunt
 		}
 	}
 
-	req, err := NewRequestBuilder(runtimeSchema.NDCHttpSchema, operation, arguments, runtimeSchema.Runtime, us.runtime).Build()
+	req, err := NewRequestBuilder(
+		runtimeSchema.NDCHttpSchema,
+		operation,
+		arguments,
+		runtimeSchema.Runtime,
+		us.runtime,
+	).Build()
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +77,13 @@ func (us *UpstreamSetting) buildRequest(runtimeSchema *configuration.NDCHttpRunt
 	return req, nil
 }
 
-func (us *UpstreamSetting) getBaseURLFromServers(namespace string, serverIDs []string) (*url.URL, string, error) {
+func (us *UpstreamSetting) getBaseURLFromServers(
+	namespace string,
+	serverIDs []string,
+) (*url.URL, string, error) {
 	results := []*url.URL{}
 	selectedServerIDs := []string{}
+
 	for key, server := range us.servers {
 		if len(serverIDs) > 0 && !slices.Contains(serverIDs, key) {
 			continue
@@ -79,7 +96,11 @@ func (us *UpstreamSetting) getBaseURLFromServers(namespace string, serverIDs []s
 
 	switch len(results) {
 	case 0:
-		return nil, "", fmt.Errorf("requested servers %v in the upstream with namespace %s do not exist", serverIDs, namespace)
+		return nil, "", fmt.Errorf(
+			"requested servers %v in the upstream with namespace %s do not exist",
+			serverIDs,
+			namespace,
+		)
 	case 1:
 		result := results[0]
 

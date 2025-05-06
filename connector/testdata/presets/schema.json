@@ -1,268 +1,243 @@
 {
-  "collections": [],
-  "functions": [
-    {
-      "arguments": {
-        "headers": {
-          "description": "Headers forwarded from the Hasura engine",
-          "type": {
-            "type": "nullable",
-            "underlying_type": { "name": "JSON", "type": "named" }
-          }
-        },
-        "kind": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "String",
-              "type": "named"
-            }
-          }
-        }
-      },
-      "description": "Finds Pets by status",
-      "name": "findPetsByStatus",
-      "result_type": {
-        "element_type": { "name": "Pet", "type": "named" },
-        "type": "array"
-      }
-    }
-  ],
-  "object_types": {
-    "Pet": {
-      "fields": {
-        "id": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": { "name": "Int", "type": "named" }
-          }
-        },
-        "name": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": { "name": "String", "type": "named" }
-          }
-        },
-        "categories": {
-          "type": {
-            "element_type": { "name": "Category", "type": "named" },
-            "type": "array"
-          }
-        }
-      }
-    },
-    "Category": {
-      "fields": {
-        "id": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "name": "Int64",
-              "type": "named"
-            }
-          }
-        },
-        "name": {
-          "type": {
-            "name": "String",
-            "type": "named"
-          }
-        },
-        "addresses": {
-          "type": {
-            "element_type": { "name": "Address", "type": "named" },
-            "type": "array"
-          }
-        }
-      }
-    },
-    "Address": {
-      "fields": {
-        "id": {
-          "type": {
-            "name": "Int64",
-            "type": "named"
-          }
-        },
-        "name": {
-          "type": {
-            "type": "nullable",
-            "underlying_type": { "name": "String", "type": "named" }
-          }
-        }
-      }
-    },
-    "RetryPolicy": {
-      "description": "Retry policy of request",
-      "fields": {
-        "delay": {
-          "description": "Delay retry delay in milliseconds",
-          "type": {
-            "type": "nullable",
-            "underlying_type": { "name": "Int32", "type": "named" }
-          }
-        },
-        "httpStatus": {
-          "description": "List of HTTP status the connector will retry on",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "element_type": { "name": "Int32", "type": "named" },
-              "type": "array"
-            }
-          }
-        },
-        "times": {
-          "description": "Number of retry times",
-          "type": {
-            "name": "Int32",
-            "type": "named"
-          }
-        }
-      }
-    }
-  },
-  "procedures": [
-    {
-      "arguments": {
-        "body": {
-          "description": "Request body of /pet",
-          "type": { "name": "Pet", "type": "named" }
-        },
-        "headers": {
-          "description": "Headers forwarded from the Hasura engine",
-          "type": {
-            "type": "nullable",
-            "underlying_type": { "name": "JSON", "type": "named" }
-          }
-        }
-      },
-      "description": "Add a new pet to the store",
-      "name": "addPet",
-      "result_type": { "name": "Pet", "type": "named" }
-    },
-    {
-      "name": "sendHttpRequest",
-      "description": "Send an HTTP request",
-      "arguments": {
-        "additionalHeaders": {
-          "description": "Additional request headers",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "JSON"
-            }
-          }
-        },
-        "body": {
-          "description": "Request body",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "JSON"
-            }
-          }
-        },
-        "headers": {
-          "description": "Headers forwarded from the Hasura engine",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "JSON"
-            }
-          }
-        },
-        "method": {
-          "description": "Request method",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "RawHttpMethod"
-            }
-          }
-        },
-        "retry": {
-          "description": "Retry policy",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "RetryPolicy"
-            }
-          }
-        },
-        "timeout": {
-          "description": "Request timeout in seconds",
-          "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Int32"
-            }
-          }
-        },
-        "url": {
-          "description": "Request URL",
-          "type": {
-            "type": "named",
-            "name": "String"
-          }
-        }
-      },
-      "result_type": {
-        "type": "nullable",
-        "underlying_type": {
-          "type": "named",
-          "name": "JSON"
-        }
-      }
-    }
-  ],
-  "scalar_types": {
-    "Int": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": { "type": "int32" }
-    },
-    "Int32": {
-      "representation": {
-        "type": "int32"
-      },
-      "aggregate_functions": {},
-      "comparison_operators": {}
-    },
-    "Int64": {
-      "aggregate_functions": {},
-      "comparison_operators": {},
-      "representation": {
-        "type": "int64"
-      }
-    },
-    "JSON": {
-      "representation": {
-        "type": "json"
-      },
-      "aggregate_functions": {},
-      "comparison_operators": {}
-    },
-    "RawHttpMethod": {
-      "representation": {
-        "type": "enum",
-        "one_of": ["get", "post", "put", "patch", "delete"]
-      },
-      "aggregate_functions": {},
-      "comparison_operators": {}
-    },
-    "String": {
-      "representation": {
-        "type": "string"
-      },
-      "aggregate_functions": {},
-      "comparison_operators": {}
-    }
-  }
+	"collections": [],
+	"functions": [
+		{
+			"arguments": {
+				"headers": {
+					"description": "Headers forwarded from the Hasura engine",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "JSON", "type": "named" }
+					}
+				},
+				"kind": {
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "String", "type": "named" }
+					}
+				}
+			},
+			"description": "Finds Pets by status",
+			"name": "findPetsByStatus",
+			"result_type": {
+				"element_type": { "name": "Pet", "type": "named" },
+				"type": "array"
+			}
+		}
+	],
+	"object_types": {
+		"Address": {
+			"fields": {
+				"id": { "type": { "name": "Int64", "type": "named" } },
+				"name": {
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "String", "type": "named" }
+					}
+				}
+			}
+		},
+		"Category": {
+			"fields": {
+				"addresses": {
+					"type": {
+						"element_type": { "name": "Address", "type": "named" },
+						"type": "array"
+					}
+				},
+				"id": {
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "Int64", "type": "named" }
+					}
+				},
+				"name": { "type": { "name": "String", "type": "named" } }
+			}
+		},
+		"Pet": {
+			"fields": {
+				"categories": {
+					"type": {
+						"element_type": { "name": "Category", "type": "named" },
+						"type": "array"
+					}
+				},
+				"id": {
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "Int", "type": "named" }
+					}
+				},
+				"name": {
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "String", "type": "named" }
+					}
+				}
+			}
+		},
+		"RetryPolicy": {
+			"description": "Retry policy of request",
+			"fields": {
+				"delay": {
+					"description": "The initial wait time in milliseconds before a retry is attempted.",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "Int32", "type": "named" }
+					}
+				},
+				"httpStatus": {
+					"description": "List of HTTP status the connector will retry on",
+					"type": {
+						"type": "nullable",
+						"underlying_type": {
+							"element_type": { "name": "Int32", "type": "named" },
+							"type": "array"
+						}
+					}
+				},
+				"jitter": {
+					"description": "How much does the reconnection time vary relative to the base value. Must be in range (0, 1)",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "Float64", "type": "named" }
+					}
+				},
+				"maxIntervalSeconds": {
+					"description": "How much can the wait time grow. Defaults to 60 seconds",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "Float64", "type": "named" }
+					}
+				},
+				"multiplier": {
+					"description": "How much should the reconnection time grow on subsequent attempts. Must be \u003e=1; 1 = constant interval",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "Float64", "type": "named" }
+					}
+				},
+				"times": {
+					"description": "Number of retry times",
+					"type": { "name": "Int32", "type": "named" }
+				}
+			}
+		}
+	},
+	"procedures": [
+		{
+			"arguments": {
+				"body": {
+					"description": "Request body of /pet",
+					"type": { "name": "Pet", "type": "named" }
+				},
+				"headers": {
+					"description": "Headers forwarded from the Hasura engine",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "JSON", "type": "named" }
+					}
+				}
+			},
+			"description": "Add a new pet to the store",
+			"name": "addPet",
+			"result_type": { "name": "Pet", "type": "named" }
+		},
+		{
+			"arguments": {
+				"additionalHeaders": {
+					"description": "Additional request headers",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "JSON", "type": "named" }
+					}
+				},
+				"body": {
+					"description": "Request body",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "JSON", "type": "named" }
+					}
+				},
+				"headers": {
+					"description": "Headers forwarded from the Hasura engine",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "JSON", "type": "named" }
+					}
+				},
+				"method": {
+					"description": "Request method",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "RawHttpMethod", "type": "named" }
+					}
+				},
+				"retry": {
+					"description": "Retry policy",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "RetryPolicy", "type": "named" }
+					}
+				},
+				"timeout": {
+					"description": "Request timeout in seconds",
+					"type": {
+						"type": "nullable",
+						"underlying_type": { "name": "Int32", "type": "named" }
+					}
+				},
+				"url": {
+					"description": "Request URL",
+					"type": { "name": "String", "type": "named" }
+				}
+			},
+			"description": "Send an HTTP request",
+			"name": "sendHttpRequest",
+			"result_type": {
+				"type": "nullable",
+				"underlying_type": { "name": "JSON", "type": "named" }
+			}
+		}
+	],
+	"scalar_types": {
+		"Float64": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": { "type": "float64" }
+		},
+		"Int": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": { "type": "int32" }
+		},
+		"Int32": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": { "type": "int32" }
+		},
+		"Int64": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": { "type": "int64" }
+		},
+		"JSON": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": { "type": "json" }
+		},
+		"RawHttpMethod": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": {
+				"one_of": ["get", "post", "put", "patch", "delete"],
+				"type": "enum"
+			}
+		},
+		"String": {
+			"aggregate_functions": {},
+			"comparison_operators": {},
+			"representation": { "type": "string" }
+		}
+	}
 }

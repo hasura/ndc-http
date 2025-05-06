@@ -18,7 +18,10 @@ type ApiKeyCredential struct {
 }
 
 // NewApiKeyCredential creates a new APIKeyCredential instance.
-func NewApiKeyCredential(client *http.Client, config *schema.APIKeyAuthConfig) (*ApiKeyCredential, error) {
+func NewApiKeyCredential(
+	client *http.Client,
+	config *schema.APIKeyAuthConfig,
+) (*ApiKeyCredential, error) {
 	value, err := config.Value.Get()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create ApiKeyCredential: %w", err)

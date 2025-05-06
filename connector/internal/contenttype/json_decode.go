@@ -43,6 +43,7 @@ func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 	switch t := underlyingType.(type) {
 	case *schema.ArrayType:
 		var rawResult []any
+
 		err := json.NewDecoder(r).Decode(&rawResult)
 		if err != nil {
 			return nil, err
@@ -55,6 +56,7 @@ func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 		return c.evalArrayType(rawResult, t, []string{})
 	case *schema.NamedType:
 		var result any
+
 		err := json.NewDecoder(r).Decode(&result)
 		if err != nil {
 			return nil, err
@@ -73,7 +75,11 @@ func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 	}
 }
 
-func (c *JSONDecoder) evalSchemaType(value any, schemaType schema.Type, fieldPaths []string) (any, error) {
+func (c *JSONDecoder) evalSchemaType(
+	value any,
+	schemaType schema.Type,
+	fieldPaths []string,
+) (any, error) {
 	if utils.IsNil(value) {
 		return nil, nil
 	}
@@ -90,25 +96,39 @@ func (c *JSONDecoder) evalSchemaType(value any, schemaType schema.Type, fieldPat
 	}
 }
 
-func (c *JSONDecoder) evalArrayType(value any, arrayType *schema.ArrayType, fieldPaths []string) (any, error) {
+func (c *JSONDecoder) evalArrayType(
+	value any,
+	arrayType *schema.ArrayType,
+	fieldPaths []string,
+) (any, error) {
 	arrayValue, ok := value.([]any)
 	if !ok {
 		return value, nil
 	}
 
 	results := make([]any, len(arrayValue))
+
 	for i, item := range arrayValue {
-		result, err := c.evalSchemaType(item, arrayType.ElementType, append(fieldPaths, strconv.Itoa(i)))
+		result, err := c.evalSchemaType(
+			item,
+			arrayType.ElementType,
+			append(fieldPaths, strconv.Itoa(i)),
+		)
 		if err != nil {
 			return nil, err
 		}
+
 		results[i] = result
 	}
 
 	return results, nil
 }
 
-func (c *JSONDecoder) evalNamedType(value any, schemaType *schema.NamedType, fieldPaths []string) (any, error) {
+func (c *JSONDecoder) evalNamedType(
+	value any,
+	schemaType *schema.NamedType,
+	fieldPaths []string,
+) (any, error) {
 	scalarType, ok := c.schema.ScalarTypes[schemaType.Name]
 	if ok {
 		result, err := c.evalScalarType(value, scalarType)
@@ -130,6 +150,7 @@ func (c *JSONDecoder) evalNamedType(value any, schemaType *schema.NamedType, fie
 	}
 
 	results := make(map[string]any)
+
 	for key, field := range objectType.Fields {
 		fieldValue, ok := objectValue[key]
 		if !ok {

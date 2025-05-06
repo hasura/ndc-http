@@ -20,7 +20,12 @@ type Credential interface {
 }
 
 // NewCredential creates a generic credential from the security scheme.
-func NewCredential(ctx context.Context, httpClient *http.Client, baseServerURL *url.URL, security schema.SecurityScheme) (Credential, bool, error) {
+func NewCredential(
+	ctx context.Context,
+	httpClient *http.Client,
+	baseServerURL *url.URL,
+	security schema.SecurityScheme,
+) (Credential, bool, error) {
 	if security.SecuritySchemer == nil {
 		return nil, false, errors.New("empty security scheme")
 	}
@@ -40,6 +45,7 @@ func NewCredential(ctx context.Context, httpClient *http.Client, baseServerURL *
 		return cred, err != nil, err
 	case *schema.OAuth2Config:
 		var headerForwardingRequired bool
+
 		for flowType, flow := range ss.Flows {
 			if flowType != schema.ClientCredentialsFlow {
 				headerForwardingRequired = true

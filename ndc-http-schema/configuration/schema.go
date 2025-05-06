@@ -17,7 +17,11 @@ import (
 )
 
 // BuildSchemaFromConfig build NDC HTTP schema from the configuration.
-func BuildSchemaFromConfig(config *Configuration, configDir string, logger *slog.Logger) ([]NDCHttpRuntimeSchema, map[string][]string) {
+func BuildSchemaFromConfig(
+	config *Configuration,
+	configDir string,
+	logger *slog.Logger,
+) ([]NDCHttpRuntimeSchema, map[string][]string) {
 	schemas := make([]NDCHttpRuntimeSchema, len(config.Files))
 	errors := make(map[string][]string)
 	existedFileIDs := []string{}
@@ -35,7 +39,10 @@ func BuildSchemaFromConfig(config *Configuration, configDir string, logger *slog
 		fileID := file.File
 
 		if slices.Contains(existedFileIDs, fileID) {
-			logger.Warn(fmt.Sprintf("the file %s is duplicated. Make sure that is intended", fileID))
+			logger.Warn(
+				fmt.Sprintf("the file %s is duplicated. Make sure that is intended", fileID),
+			)
+
 			fileID += "_" + strconv.Itoa(i)
 		}
 
@@ -59,12 +66,17 @@ func BuildSchemaFromConfig(config *Configuration, configDir string, logger *slog
 }
 
 // ReadSchemaOutputFile reads the schema output file in disk.
-func ReadSchemaOutputFile(configDir string, filePath string, logger *slog.Logger) ([]NDCHttpRuntimeSchema, error) {
+func ReadSchemaOutputFile(
+	configDir string,
+	filePath string,
+	logger *slog.Logger,
+) ([]NDCHttpRuntimeSchema, error) {
 	if filePath == "" {
 		return nil, nil
 	}
 
 	outputFilePath := filepath.Join(configDir, filePath)
+
 	rawBytes, err := os.ReadFile(outputFilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -83,7 +95,10 @@ func ReadSchemaOutputFile(configDir string, filePath string, logger *slog.Logger
 }
 
 // MergeNDCHttpSchemas merge HTTP schemas into a single schema object.
-func MergeNDCHttpSchemas(config *Configuration, schemas []NDCHttpRuntimeSchema) (*rest.NDCHttpSchema, []NDCHttpRuntimeSchema, map[string][]string) {
+func MergeNDCHttpSchemas(
+	config *Configuration,
+	schemas []NDCHttpRuntimeSchema,
+) (*rest.NDCHttpSchema, []NDCHttpRuntimeSchema, map[string][]string) {
 	ndcSchema := &rest.NDCHttpSchema{
 		ScalarTypes: make(schema.SchemaResponseScalarTypes),
 		ObjectTypes: make(map[string]rest.ObjectType),
@@ -96,10 +111,13 @@ func MergeNDCHttpSchemas(config *Configuration, schemas []NDCHttpRuntimeSchema) 
 
 	for i, item := range schemas {
 		if item.NDCHttpSchema == nil {
-			errors[item.Name] = []string{fmt.Sprintf("schema of the item %d (%s) is empty", i, item.Name)}
+			errors[item.Name] = []string{
+				fmt.Sprintf("schema of the item %d (%s) is empty", i, item.Name),
+			}
 
 			return nil, nil, errors
 		}
+
 		settings := item.Settings
 		if settings == nil {
 			settings = &rest.NDCHttpSettings{}
@@ -116,6 +134,7 @@ func MergeNDCHttpSchemas(config *Configuration, schemas []NDCHttpRuntimeSchema) 
 				ScalarTypes: item.ScalarTypes,
 			},
 		}
+
 		var errs []string
 
 		for name, scalar := range item.ScalarTypes {
@@ -171,14 +190,20 @@ func MergeNDCHttpSchemas(config *Configuration, schemas []NDCHttpRuntimeSchema) 
 
 			continue
 		}
+
 		appliedSchemas[i] = meta
 	}
 
 	return ndcSchema, appliedSchemas, errors
 }
 
-func buildSchemaFile(config *Configuration, configDir string, configItem *ConfigItem, logger *slog.Logger) (*rest.NDCHttpSchema, error) {
-	if configItem.ConvertConfig.File == "" {
+func buildSchemaFile(
+	config *Configuration,
+	configDir string,
+	configItem *ConfigItem,
+	logger *slog.Logger,
+) (*rest.NDCHttpSchema, error) {
+	if configItem.File == "" {
 		return nil, errFilePathRequired
 	}
 
@@ -194,14 +219,15 @@ func buildSchemaFile(config *Configuration, configDir string, configItem *Config
 		if err != nil {
 			return nil, err
 		}
+
 		if err := templates.ExecuteTemplate(os.Stderr, templateEmptySettings, map[string]any{
 			"ContextPath": configDir,
-			"Namespace":   configItem.ConvertConfig.File,
+			"Namespace":   configItem.File,
 		}); err != nil {
 			logger.Warn(err.Error())
 		}
 
-		return nil, fmt.Errorf("the servers setting of schema %s is empty", configItem.ConvertConfig.File)
+		return nil, fmt.Errorf("the servers setting of schema %s is empty", configItem.File)
 	}
 
 	// cache original result type to be used if header forwarding or distributed execution is enabled
@@ -235,6 +261,7 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 	}
 
 	var serverIDs []string
+
 	for i, server := range restSchema.Settings.Servers {
 		if server.ID != "" {
 			serverIDs = append(serverIDs, server.ID)
@@ -282,13 +309,17 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 			"message": {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("An optional human-readable summary of the error"),
-					Type:        schema.NewNullableType(schema.NewNamedType(string(rest.ScalarString))).Encode(),
+					Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarString))).
+						Encode(),
 				},
 			},
 			"details": {
 				ObjectField: schema.ObjectField{
-					Description: utils.ToPtr("Any additional structured information about the error"),
-					Type:        schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).Encode(),
+					Description: utils.ToPtr(
+						"Any additional structured information about the error",
+					),
+					Type: schema.NewNullableType(schema.NewNamedType(string(rest.ScalarJSON))).
+						Encode(),
 				},
 			},
 		},
@@ -299,10 +330,11 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 		fn := restSchema.Functions[key]
 		funcName := buildDistributedName(key)
 		distributedFn := rest.OperationInfo{
-			Request:            fn.Request,
-			Arguments:          cloneDistributedArguments(fn.Arguments),
-			Description:        fn.Description,
-			ResultType:         schema.NewNamedType(buildDistributedResultObjectType(restSchema, funcName, fn.ResultType)).Encode(),
+			Request:     fn.Request,
+			Arguments:   cloneDistributedArguments(fn.Arguments),
+			Description: fn.Description,
+			ResultType: schema.NewNamedType(buildDistributedResultObjectType(restSchema, funcName, fn.ResultType)).
+				Encode(),
 			OriginalResultType: fn.OriginalResultType,
 		}
 		restSchema.Functions[funcName] = distributedFn
@@ -314,10 +346,11 @@ func buildHTTPArguments(config *Configuration, restSchema *rest.NDCHttpSchema, c
 		procName := buildDistributedName(key)
 
 		distributedProc := rest.OperationInfo{
-			Request:            proc.Request,
-			Arguments:          cloneDistributedArguments(proc.Arguments),
-			Description:        proc.Description,
-			ResultType:         schema.NewNamedType(buildDistributedResultObjectType(restSchema, procName, proc.ResultType)).Encode(),
+			Request:     proc.Request,
+			Arguments:   cloneDistributedArguments(proc.Arguments),
+			Description: proc.Description,
+			ResultType: schema.NewNamedType(buildDistributedResultObjectType(restSchema, procName, proc.ResultType)).
+				Encode(),
 			OriginalResultType: proc.OriginalResultType,
 		}
 		restSchema.Procedures[procName] = distributedProc
@@ -342,11 +375,22 @@ func buildHeadersForwardingResponse(config *Configuration, restSchema *rest.NDCH
 	}
 
 	for name, op := range restSchema.Functions {
-		op.ResultType = createHeaderForwardingResponseTypes(restSchema, name, op.ResultType, config.ForwardHeaders.ResponseHeaders)
+		op.ResultType = createHeaderForwardingResponseTypes(
+			restSchema,
+			name,
+			op.ResultType,
+			config.ForwardHeaders.ResponseHeaders,
+		)
 		restSchema.Functions[name] = op
 	}
+
 	for name, op := range restSchema.Procedures {
-		op.ResultType = createHeaderForwardingResponseTypes(restSchema, name, op.ResultType, config.ForwardHeaders.ResponseHeaders)
+		op.ResultType = createHeaderForwardingResponseTypes(
+			restSchema,
+			name,
+			op.ResultType,
+			config.ForwardHeaders.ResponseHeaders,
+		)
 		restSchema.Procedures[name] = op
 	}
 }
@@ -357,24 +401,33 @@ func applyForwardingHeadersArgument(config *Configuration, info *rest.OperationI
 	}
 }
 
-func cloneDistributedArguments(arguments map[string]rest.ArgumentInfo) map[string]rest.ArgumentInfo {
+func cloneDistributedArguments(
+	arguments map[string]rest.ArgumentInfo,
+) map[string]rest.ArgumentInfo {
 	result := map[string]rest.ArgumentInfo{}
+
 	for k, v := range arguments {
 		if k != rest.HTTPOptionsArgumentName {
 			result[k] = v
 		}
 	}
+
 	result[rest.HTTPOptionsArgumentName] = rest.ArgumentInfo{
 		ArgumentInfo: schema.ArgumentInfo{
 			Description: distributedObjectType.Description,
-			Type:        schema.NewNullableNamedType(rest.HTTPDistributedOptionsObjectName).Encode(),
+			Type: schema.NewNullableNamedType(rest.HTTPDistributedOptionsObjectName).
+				Encode(),
 		},
 	}
 
 	return result
 }
 
-func buildDistributedResultObjectType(restSchema *rest.NDCHttpSchema, operationName string, underlyingType schema.Type) string {
+func buildDistributedResultObjectType(
+	restSchema *rest.NDCHttpSchema,
+	operationName string,
+	underlyingType schema.Type,
+) string {
 	distResultType := restUtils.StringSliceToPascalCase([]string{operationName, "Result"})
 	distResultDataType := distResultType + "Data"
 
@@ -402,13 +455,15 @@ func buildDistributedResultObjectType(restSchema *rest.NDCHttpSchema, operationN
 			"results": {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("Results of " + operationName),
-					Type:        schema.NewArrayType(schema.NewNamedType(distResultDataType)).Encode(),
+					Type: schema.NewArrayType(schema.NewNamedType(distResultDataType)).
+						Encode(),
 				},
 			},
 			"errors": {
 				ObjectField: schema.ObjectField{
 					Description: utils.ToPtr("Error responses of " + operationName),
-					Type:        schema.NewArrayType(schema.NewNamedType(rest.DistributedErrorObjectName)).Encode(),
+					Type: schema.NewArrayType(schema.NewNamedType(rest.DistributedErrorObjectName)).
+						Encode(),
 				},
 			},
 		},
@@ -426,13 +481,19 @@ func validateRequestSchema(req *rest.Request, defaultMethod string) (*rest.Reque
 		if defaultMethod == "" {
 			return nil, errHTTPMethodRequired
 		}
+
 		req.Method = defaultMethod
 	}
 
 	return req, nil
 }
 
-func createHeaderForwardingResponseTypes(restSchema *rest.NDCHttpSchema, operationName string, resultType schema.Type, settings *ForwardResponseHeadersSettings) schema.Type {
+func createHeaderForwardingResponseTypes(
+	restSchema *rest.NDCHttpSchema,
+	operationName string,
+	resultType schema.Type,
+	settings *ForwardResponseHeadersSettings,
+) schema.Type {
 	objectName := restUtils.ToPascalCase(operationName) + "HeadersResponse"
 	objectType := NewHeaderForwardingResponseObjectType(resultType, settings)
 
@@ -462,7 +523,10 @@ func cloneOperationInfo(operation rest.OperationInfo, req *rest.Request) rest.Op
 }
 
 // NewHeaderForwardingResponseObjectType creates a new type for header forwarding response.
-func NewHeaderForwardingResponseObjectType(resultType schema.Type, settings *ForwardResponseHeadersSettings) rest.ObjectType {
+func NewHeaderForwardingResponseObjectType(
+	resultType schema.Type,
+	settings *ForwardResponseHeadersSettings,
+) rest.ObjectType {
 	return rest.ObjectType{
 		Fields: map[string]rest.ObjectField{
 			settings.HeadersField: {

@@ -33,11 +33,14 @@ const (
 // PatchConfig the configuration for JSON patch.
 type PatchConfig struct {
 	Path     string        `json:"path"     yaml:"path"`
-	Strategy PatchStrategy `json:"strategy" jsonschema:"enum=merge,enum=json6902,default=merge" yaml:"strategy"`
+	Strategy PatchStrategy `json:"strategy" yaml:"strategy" jsonschema:"enum=merge,enum=json6902,default=merge"`
 }
 
 // ApplyPatchToHTTPSchema applies JSON patches to NDC HTTP schema and validate the output.
-func ApplyPatchToHTTPSchema(input *schema.NDCHttpSchema, patchFiles []PatchConfig) (*schema.NDCHttpSchema, error) {
+func ApplyPatchToHTTPSchema(
+	input *schema.NDCHttpSchema,
+	patchFiles []PatchConfig,
+) (*schema.NDCHttpSchema, error) {
 	if len(patchFiles) == 0 {
 		return input, nil
 	}
@@ -46,6 +49,7 @@ func ApplyPatchToHTTPSchema(input *schema.NDCHttpSchema, patchFiles []PatchConfi
 	if err != nil {
 		return nil, err
 	}
+
 	rawResult, err := ApplyPatchFromRawJSON(bs, patchFiles)
 	if err != nil {
 		return nil, err
@@ -77,6 +81,7 @@ func ApplyPatchFromRawJSON(input []byte, patchFiles []PatchConfig) ([]byte, erro
 			if err != nil {
 				return fmt.Errorf("%s: %w", patchFile.Path, err)
 			}
+
 			strategy := patchFile.Strategy
 			if strategy == "" {
 				strategy, err = guessPatchStrategy(jsonPatch)
@@ -84,12 +89,14 @@ func ApplyPatchFromRawJSON(input []byte, patchFiles []PatchConfig) ([]byte, erro
 					return fmt.Errorf("%s: %w", patchFile.Path, err)
 				}
 			}
+
 			switch strategy {
 			case PatchStrategyJSON6902:
 				patch, err := jsonpatch.DecodePatch(jsonPatch)
 				if err != nil {
 					return applyPatchFromFileError(patchFile, err)
 				}
+
 				input, err = patch.Apply(input)
 				if err != nil {
 					return applyPatchFromFileError(patchFile, err)
@@ -123,11 +130,13 @@ func convertMaybeYAMLToJSONBytes(input []byte) ([]byte, error) {
 		return nil, errEmptyInput
 	}
 
-	if (runes[0] == '{' && runes[len(runes)-1] == '}') || (runes[0] == '[' && runes[len(runes)-1] == ']') {
+	if (runes[0] == '{' && runes[len(runes)-1] == '}') ||
+		(runes[0] == '[' && runes[len(runes)-1] == ']') {
 		return runes, nil
 	}
 
 	var anyOutput any
+
 	input = []byte(replaceYAMLNumberKeysToString(string(input)))
 
 	if err := yaml.Unmarshal(input, &anyOutput); err != nil {
@@ -145,6 +154,7 @@ func guessPatchStrategy(runes []byte) (PatchStrategy, error) {
 	if runes[0] == '{' && runes[len(runes)-1] == '}' {
 		return PatchStrategyMerge, nil
 	}
+
 	if runes[0] == '[' && runes[len(runes)-1] == ']' {
 		return PatchStrategyJSON6902, nil
 	}

@@ -15,8 +15,12 @@ import (
 )
 
 // ConvertToNDCSchema converts to NDC HTTP schema from file.
-func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logger *slog.Logger) error {
+func CommandConvertToNDCSchema(
+	args *configuration.ConvertCommandArguments,
+	logger *slog.Logger,
+) error {
 	start := time.Now()
+
 	if args.File == "" && args.Config == "" {
 		err := errors.New("--config or --file argument is required")
 		logger.Error(err.Error())
@@ -32,6 +36,7 @@ func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logg
 	}
 
 	var config configuration.ConvertConfig
+
 	if args.Config != "" {
 		rawConfig, err := utils.ReadFileFromPath(args.Config)
 		if err != nil {
@@ -39,11 +44,13 @@ func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logg
 
 			return err
 		}
+
 		if err := yaml.Unmarshal(rawConfig, &config); err != nil {
 			logger.Error(err.Error())
 
 			return err
 		}
+
 		configDir = filepath.Dir(args.Config)
 	}
 
@@ -78,6 +85,7 @@ func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logg
 		} else {
 			err = utils.WriteSchemaFile(config.Output, result)
 		}
+
 		if err != nil {
 			logger.Error("failed to write schema file", slog.String("error", err.Error()))
 
@@ -112,7 +120,7 @@ func CommandConvertToNDCSchema(args *configuration.ConvertCommandArguments, logg
 		return err
 	}
 
-	fmt.Fprint(os.Stdout, string(resultBytes))
+	_, _ = fmt.Fprint(os.Stdout, string(resultBytes))
 
 	return nil
 }

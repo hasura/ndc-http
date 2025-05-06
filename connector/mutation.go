@@ -13,7 +13,12 @@ import (
 )
 
 // Mutation executes a mutation.
-func (c *HTTPConnector) Mutation(ctx context.Context, configuration *configuration.Configuration, state *State, request *schema.MutationRequest) (*schema.MutationResponse, error) {
+func (c *HTTPConnector) Mutation(
+	ctx context.Context,
+	configuration *configuration.Configuration,
+	state *State,
+	request *schema.MutationRequest,
+) (*schema.MutationResponse, error) {
 	if len(request.Operations) == 1 || c.config.Concurrency.Mutation <= 1 {
 		return c.execMutationSync(ctx, state, request)
 	}
@@ -22,7 +27,12 @@ func (c *HTTPConnector) Mutation(ctx context.Context, configuration *configurati
 }
 
 // MutationExplain explains a mutation by creating an execution plan.
-func (c *HTTPConnector) MutationExplain(ctx context.Context, configuration *configuration.Configuration, state *State, request *schema.MutationRequest) (*schema.ExplainResponse, error) {
+func (c *HTTPConnector) MutationExplain(
+	ctx context.Context,
+	configuration *configuration.Configuration,
+	state *State,
+	request *schema.MutationRequest,
+) (*schema.ExplainResponse, error) {
 	if len(request.Operations) == 0 {
 		return nil, schema.BadRequestError("mutation operations must not be empty", nil)
 	}
@@ -41,11 +51,16 @@ func (c *HTTPConnector) MutationExplain(ctx context.Context, configuration *conf
 
 		return c.serializeExplainResponse(ctx, requests)
 	default:
-		return nil, schema.BadRequestError(fmt.Sprintf("invalid operation type: %s", operation.Type), nil)
+		return nil, schema.BadRequestError(
+			fmt.Sprintf("invalid operation type: %s", operation.Type),
+			nil,
+		)
 	}
 }
 
-func (c *HTTPConnector) explainProcedure(operation *schema.MutationOperation) (*internal.RequestBuilderResults, error) {
+func (c *HTTPConnector) explainProcedure(
+	operation *schema.MutationOperation,
+) (*internal.RequestBuilderResults, error) {
 	procedure, metadata, err := c.metadata.GetProcedure(operation.Name)
 	if err != nil {
 		return nil, err
@@ -61,13 +76,19 @@ func (c *HTTPConnector) explainProcedure(operation *schema.MutationOperation) (*
 	return c.upstreams.BuildRequests(metadata, operation.Name, procedure, rawArgs)
 }
 
-func (c *HTTPConnector) execMutationSync(ctx context.Context, state *State, request *schema.MutationRequest) (*schema.MutationResponse, error) {
+func (c *HTTPConnector) execMutationSync(
+	ctx context.Context,
+	state *State,
+	request *schema.MutationRequest,
+) (*schema.MutationResponse, error) {
 	operationResults := make([]schema.MutationOperationResults, len(request.Operations))
+
 	for i, operation := range request.Operations {
 		result, err := c.execMutationOperation(ctx, state, operation, i)
 		if err != nil {
 			return nil, err
 		}
+
 		operationResults[i] = result
 	}
 
@@ -76,7 +97,11 @@ func (c *HTTPConnector) execMutationSync(ctx context.Context, state *State, requ
 	}, nil
 }
 
-func (c *HTTPConnector) execMutationAsync(ctx context.Context, state *State, request *schema.MutationRequest) (*schema.MutationResponse, error) {
+func (c *HTTPConnector) execMutationAsync(
+	ctx context.Context,
+	state *State,
+	request *schema.MutationRequest,
+) (*schema.MutationResponse, error) {
 	operationResults := make([]schema.MutationOperationResults, len(request.Operations))
 
 	eg, ctx := errgroup.WithContext(ctx)
@@ -89,6 +114,7 @@ func (c *HTTPConnector) execMutationAsync(ctx context.Context, state *State, req
 				if err != nil {
 					return err
 				}
+
 				operationResults[index] = result
 
 				return nil
@@ -105,17 +131,27 @@ func (c *HTTPConnector) execMutationAsync(ctx context.Context, state *State, req
 	}, nil
 }
 
-func (c *HTTPConnector) execMutationOperation(parentCtx context.Context, state *State, operation schema.MutationOperation, index int) (schema.MutationOperationResults, error) {
+func (c *HTTPConnector) execMutationOperation(
+	parentCtx context.Context,
+	state *State,
+	operation schema.MutationOperation,
+	index int,
+) (schema.MutationOperationResults, error) {
 	ctx, span := state.Tracer.Start(parentCtx, fmt.Sprintf("Execute Operation %d", index))
 	defer span.End()
 
 	var requests *internal.RequestBuilderResults
+
 	var err error
+
 	if operation.Name == internal.ProcedureSendHTTPRequest {
 		if c.procSendHttpRequest == nil {
 			span.SetStatus(codes.Error, internal.ProcedureSendHTTPRequest+" mutation is disabled")
 
-			return nil, schema.InternalServerError(internal.ProcedureSendHTTPRequest+" mutation is disabled. Set runtime.enableRawRequest=true to enable this operation", nil)
+			return nil, schema.InternalServerError(
+				internal.ProcedureSendHTTPRequest+" mutation is disabled. Set runtime.enableRawRequest=true to enable this operation",
+				nil,
+			)
 		}
 
 		requests, err = internal.NewRawRequestBuilder(operation, c.config.ForwardHeaders).Build()
@@ -134,6 +170,7 @@ func (c *HTTPConnector) execMutationOperation(parentCtx context.Context, state *
 	}
 
 	client := c.upstreams.CreateHTTPClient(requests)
+
 	result, _, err := client.Send(ctx, operation.Fields)
 	if err != nil {
 		span.SetStatus(codes.Error, "failed to execute mutation")

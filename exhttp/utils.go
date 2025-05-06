@@ -10,6 +10,7 @@ import (
 // ParsePort parses the server port from a raw string.
 func ParsePort(rawPort string, scheme string) (int, error) {
 	port := 80
+
 	if rawPort != "" {
 		p, err := strconv.Atoi(rawPort)
 		if err != nil {

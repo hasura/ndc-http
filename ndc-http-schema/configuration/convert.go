@@ -24,7 +24,9 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 	}
 
 	var result *schema.NDCHttpSchema
+
 	var errs []error
+
 	options := openapi.ConvertOptions{
 		MethodAlias:         config.MethodAlias,
 		Prefix:              config.Prefix,
@@ -49,7 +51,17 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 			errs = append(errs, err)
 		}
 	default:
-		return nil, fmt.Errorf("invalid spec %s, expected %+v", config.Spec, []schema.SchemaSpecType{schema.OpenAPIv3Spec, schema.OpenAPIv2Spec, schema.OAS3Spec, schema.OAS2Spec, schema.NDCSpec})
+		return nil, fmt.Errorf(
+			"invalid spec %s, expected %+v",
+			config.Spec,
+			[]schema.SchemaSpecType{
+				schema.OpenAPIv3Spec,
+				schema.OpenAPIv2Spec,
+				schema.OAS3Spec,
+				schema.OAS2Spec,
+				schema.NDCSpec,
+			},
+		)
 	}
 
 	if result == nil {
@@ -67,23 +79,32 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 }
 
 // ResolveConvertConfigArguments resolves convert config arguments.
-func ResolveConvertConfigArguments(config *ConvertConfig, configDir string, args *ConvertCommandArguments) {
+func ResolveConvertConfigArguments(
+	config *ConvertConfig,
+	configDir string,
+	args *ConvertCommandArguments,
+) {
 	if args != nil {
 		if args.Spec != "" {
 			config.Spec = schema.SchemaSpecType(args.Spec)
 		}
+
 		if len(args.MethodAlias) > 0 {
 			config.MethodAlias = args.MethodAlias
 		}
+
 		if args.Prefix != "" {
 			config.Prefix = args.Prefix
 		}
+
 		if args.TrimPrefix != "" {
 			config.TrimPrefix = args.TrimPrefix
 		}
+
 		if args.EnvPrefix != "" {
 			config.EnvPrefix = args.EnvPrefix
 		}
+
 		if args.Pure {
 			config.Pure = args.Pure
 		}
@@ -91,10 +112,12 @@ func ResolveConvertConfigArguments(config *ConvertConfig, configDir string, args
 		if args.NoDeprecation {
 			config.NoDeprecation = args.NoDeprecation
 		}
+
 		if len(args.AllowedContentTypes) > 0 {
 			config.AllowedContentTypes = args.AllowedContentTypes
 		}
 	}
+
 	if config.Spec == "" {
 		config.Spec = schema.OAS3Spec
 	}

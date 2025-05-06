@@ -6,7 +6,7 @@ definition:
   outputType: Album!
   arguments:
     - name: id
-      type: Int32!
+      type: int32!
       description: The ID of the album to retrieve
   source:
     dataConnectorName: myapi

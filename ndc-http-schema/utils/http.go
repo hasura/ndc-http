@@ -24,7 +24,9 @@ func IsContentTypeText(contentType string) bool {
 
 // IsContentTypeText checks if the content type relates to binary.
 func IsContentTypeBinary(contentType string) bool {
-	return strings.HasPrefix(contentType, "application/") || strings.HasPrefix(contentType, "image/") || strings.HasPrefix(contentType, "video/")
+	return strings.HasPrefix(contentType, "application/") ||
+		strings.HasPrefix(contentType, "image/") ||
+		strings.HasPrefix(contentType, "video/")
 }
 
 // IsContentTypeMultipartForm checks the content type relates to multipart form.

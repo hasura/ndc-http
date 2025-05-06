@@ -11,17 +11,26 @@ import (
 )
 
 // GetSchema gets the connector's schema.
-func (c *HTTPConnector) GetSchema(ctx context.Context, configuration *configuration.Configuration, _ *State) (schema.SchemaResponseMarshaler, error) {
+func (c *HTTPConnector) GetSchema(
+	ctx context.Context,
+	configuration *configuration.Configuration,
+	_ *State,
+) (schema.SchemaResponseMarshaler, error) {
 	return c.rawSchema, nil
 }
 
 // ApplyNDCHttpSchemas applies slice of raw NDC HTTP schemas to the connector.
-func (c *HTTPConnector) ApplyNDCHttpSchemas(ctx context.Context, schemas []configuration.NDCHttpRuntimeSchema, logger *slog.Logger) error {
+func (c *HTTPConnector) ApplyNDCHttpSchemas(
+	ctx context.Context,
+	schemas []configuration.NDCHttpRuntimeSchema,
+	logger *slog.Logger,
+) error {
 	config := c.config
 
 	httpSchema, metadata, errs := configuration.MergeNDCHttpSchemas(config, schemas)
 	if len(errs) > 0 {
 		printSchemaValidationError(logger, errs)
+
 		if httpSchema == nil || config.Strict {
 			return errBuildSchemaFailed
 		}
@@ -33,8 +42,14 @@ func (c *HTTPConnector) ApplyNDCHttpSchemas(ctx context.Context, schemas []confi
 		}
 	}
 
-	ndcSchema, procSendHttp := internal.ApplyDefaultConnectorSchema(httpSchema.ToSchemaResponse(), config)
-	schemaBytes, err := json.Marshal(internal.ApplyPromptQLSettingsToSchema(ndcSchema, c.upstreams.RuntimeSettings))
+	ndcSchema, procSendHttp := internal.ApplyDefaultConnectorSchema(
+		httpSchema.ToSchemaResponse(),
+		config,
+	)
+
+	schemaBytes, err := json.Marshal(
+		internal.ApplyPromptQLSettingsToSchema(ndcSchema, c.upstreams.RuntimeSettings),
+	)
 	if err != nil {
 		return err
 	}

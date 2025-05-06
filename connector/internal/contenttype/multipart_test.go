@@ -88,9 +88,14 @@ func TestCreateMultipartForm(t *testing.T) {
 
 			var arguments map[string]any
 			assert.NilError(t, json.Unmarshal([]byte(tc.RawArguments), &arguments))
-			builder := NewMultipartFormEncoder(ndcSchema, info, arguments, MultipartFormEncoderOptions{
-				StringifyJSON: true,
-			})
+			builder := NewMultipartFormEncoder(
+				ndcSchema,
+				info,
+				arguments,
+				MultipartFormEncoderOptions{
+					StringifyJSON: true,
+				},
+			)
 			buf, mediaType, err := builder.Encode(arguments["body"])
 			assert.NilError(t, err)
 

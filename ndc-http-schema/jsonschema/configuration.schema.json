@@ -235,12 +235,12 @@
       "properties": {
         "headersField": {
           "type": "string",
-          "pattern": "^[a-zA-Z_]\\w+$",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]+$",
           "description": "Name of the field in the NDC function/procedure's result which contains the response headers."
         },
         "resultField": {
           "type": "string",
-          "pattern": "^[a-zA-Z_]\\w+$",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]+$",
           "description": "Name of the field in the NDC function/procedure's result which contains the result."
         },
         "forwardHeaders": {
@@ -299,24 +299,53 @@
     "RetryPolicySetting": {
       "properties": {
         "times": {
-          "$ref": "#/$defs/EnvInt",
-          "description": "Number of retry times"
+          "$ref": "#/$defs/EnvInt"
         },
         "delay": {
-          "$ref": "#/$defs/EnvInt",
-          "description": "Delay retry delay in milliseconds"
+          "$ref": "#/$defs/EnvInt"
         },
         "httpStatus": {
           "items": {
             "type": "integer"
           },
-          "type": "array",
-          "description": "HTTPStatus retries if the remote service returns one of these http status"
+          "type": "array"
+        },
+        "jitter": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "multiplier": {
+          "type": "number"
+        },
+        "maxIntervalSeconds": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "maxElapsedTimeSeconds": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "description": "RetryPolicySetting represents retry policy settings."
+      "type": "object"
     },
     "SchemaSpecType": {
       "type": "string",

@@ -5,15 +5,15 @@ definition:
   name: Photo
   fields:
     - name: albumId
-      type: Int64
+      type: int64
     - name: id
-      type: Int64
+      type: int64
     - name: thumbnailUrl
-      type: URI
+      type: string
     - name: title
       type: String
     - name: url
-      type: URI
+      type: string
   graphql:
     typeName: Photo
     inputTypeName: Photo_input
@@ -44,7 +44,7 @@ definition:
   outputType: "[Photo!]!"
   arguments:
     - name: id
-      type: Int32!
+      type: int32!
       description: post id
   source:
     dataConnectorName: myapi

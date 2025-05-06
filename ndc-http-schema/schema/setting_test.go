@@ -192,7 +192,10 @@ func TestNDCHttpSettings(t *testing.T) {
 			expected: NDCHttpSettings{
 				Servers: []ServerConfig{
 					{
-						URL: utils.NewEnvString("PET_STORE_SERVER_URL", "https://petstore3.swagger.io/api/v3"),
+						URL: utils.NewEnvString(
+							"PET_STORE_SERVER_URL",
+							"https://petstore3.swagger.io/api/v3",
+						),
 					},
 					{
 						URL: utils.NewEnvStringValue("https://petstore3.swagger.io/api/v3.1"),
@@ -263,7 +266,9 @@ func TestNDCHttpSettings(t *testing.T) {
 						SecuritySchemer: NewMutualTLSAuthConfig(),
 					},
 					"oidc": {
-						SecuritySchemer: NewOpenIDConnectConfig("http://localhost:8080/oauth/token"),
+						SecuritySchemer: NewOpenIDConnectConfig(
+							"http://localhost:8080/oauth/token",
+						),
 					},
 					"petstore_auth": {
 						SecuritySchemer: &OAuth2Config{
@@ -271,8 +276,12 @@ func TestNDCHttpSettings(t *testing.T) {
 							Flows: map[OAuthFlowType]OAuthFlow{
 								ImplicitFlow: {
 									AuthorizationURL: "https://petstore3.swagger.io/oauth/authorize",
-									TokenURL:         utils.ToPtr(utils.NewEnvStringValue("https://petstore3.swagger.io/oauth/token")),
-									RefreshURL:       "https://petstore3.swagger.io/oauth/token",
+									TokenURL: utils.ToPtr(
+										utils.NewEnvStringValue(
+											"https://petstore3.swagger.io/oauth/token",
+										),
+									),
+									RefreshURL: "https://petstore3.swagger.io/oauth/token",
 									Scopes: map[string]string{
 										"read:pets":  "read your pets",
 										"write:pets": "modify pets in your account",
@@ -373,7 +382,12 @@ func TestNDCHttpSettings(t *testing.T) {
 				ss := result.SecuritySchemes[key]
 				ss.JSONSchema()
 				assert.Equal(t, expectedSS.GetType(), ss.GetType())
-				assert.DeepEqual(t, expectedSS.SecuritySchemer, ss.SecuritySchemer, cmp.Exporter(func(t reflect.Type) bool { return true }))
+				assert.DeepEqual(
+					t,
+					expectedSS.SecuritySchemer,
+					ss.SecuritySchemer,
+					cmp.Exporter(func(t reflect.Type) bool { return true }),
+				)
 			}
 
 			assert.DeepEqual(t, tc.expected.Version, result.Version)

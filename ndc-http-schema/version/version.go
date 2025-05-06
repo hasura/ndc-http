@@ -20,10 +20,12 @@ func initBuildVersion() {
 	}
 
 	BuildVersion = DevVersion
+
 	bi, ok := debug.ReadBuildInfo()
 	if !ok {
 		return
 	}
+
 	if bi.Main.Version != "" {
 		BuildVersion = bi.Main.Version
 

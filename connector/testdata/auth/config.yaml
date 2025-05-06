@@ -20,7 +20,7 @@ files:
   - file: schema.yaml
     spec: ndc
     timeout:
-      value: 10
+      value: 30
     retry:
       times:
         value: 1

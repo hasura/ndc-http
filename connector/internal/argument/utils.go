@@ -12,7 +12,10 @@ import (
 	"github.com/hasura/ndc-sdk-go/utils"
 )
 
-func convertTypePresentationFromString(input string, typeRep schema.TypeRepresentation) (any, error) {
+func convertTypePresentationFromString(
+	input string,
+	typeRep schema.TypeRepresentation,
+) (any, error) {
 	switch t := typeRep.Interface().(type) {
 	case *schema.TypeRepresentationBoolean:
 		return strconv.ParseBool(input)

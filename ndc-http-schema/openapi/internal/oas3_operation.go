@@ -25,7 +25,12 @@ type oas3OperationBuilder struct {
 	commonParams []*v3.Parameter
 }
 
-func newOAS3OperationBuilder(builder *OAS3Builder, pathKey string, method string, commonParams []*v3.Parameter) *oas3OperationBuilder {
+func newOAS3OperationBuilder(
+	builder *OAS3Builder,
+	pathKey string,
+	method string,
+	commonParams []*v3.Parameter,
+) *oas3OperationBuilder {
 	return &oas3OperationBuilder{
 		builder:      builder,
 		pathKey:      pathKey,
@@ -36,13 +41,21 @@ func newOAS3OperationBuilder(builder *OAS3Builder, pathKey string, method string
 }
 
 // BuildFunction build a HTTP NDC function information from OpenAPI v3 operation.
-func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.OperationInfo, string, error) {
-	if oc.builder.ConvertOptions.NoDeprecation && itemGet.Deprecated != nil && *itemGet.Deprecated {
+func (oc *oas3OperationBuilder) BuildFunction(
+	itemGet *v3.Operation,
+) (*rest.OperationInfo, string, error) {
+	if oc.builder.NoDeprecation && itemGet.Deprecated != nil && *itemGet.Deprecated {
 		return nil, "", nil
 	}
 
 	start := time.Now()
-	funcName := buildUniqueOperationName(oc.builder.schema, itemGet.OperationId, oc.pathKey, oc.method, oc.builder.ConvertOptions)
+	funcName := buildUniqueOperationName(
+		oc.builder.schema,
+		itemGet.OperationId,
+		oc.pathKey,
+		oc.method,
+		oc.builder.ConvertOptions,
+	)
 
 	defer func() {
 		oc.builder.Logger.Info("function",
@@ -53,7 +66,11 @@ func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.Oper
 		)
 	}()
 
-	resultType, schemaResponse, err := oc.convertResponse(itemGet.Responses, oc.pathKey, []string{funcName, "Result"})
+	resultType, schemaResponse, err := oc.convertResponse(
+		itemGet.Responses,
+		oc.pathKey,
+		[]string{funcName, "Result"},
+	)
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
@@ -68,6 +85,7 @@ func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.Oper
 	}
 
 	description := oc.getOperationDescription(itemGet)
+
 	requestURL, arguments, err := evalOperationPath(oc.pathKey, oc.Arguments)
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
@@ -90,12 +108,19 @@ func (oc *oas3OperationBuilder) BuildFunction(itemGet *v3.Operation) (*rest.Oper
 }
 
 func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
-	if operation == nil || (oc.builder.ConvertOptions.NoDeprecation && operation.Deprecated != nil && *operation.Deprecated) {
+	if operation == nil ||
+		(oc.builder.NoDeprecation && operation.Deprecated != nil && *operation.Deprecated) {
 		return nil
 	}
 
 	start := time.Now()
-	procName := buildUniqueOperationName(oc.builder.schema, operation.OperationId, oc.pathKey, oc.method, oc.builder.ConvertOptions)
+	procName := buildUniqueOperationName(
+		oc.builder.schema,
+		operation.OperationId,
+		oc.pathKey,
+		oc.method,
+		oc.builder.ConvertOptions,
+	)
 
 	defer func() {
 		oc.builder.Logger.Info("procedure",
@@ -106,7 +131,11 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 		)
 	}()
 
-	resultType, schemaResponse, err := oc.convertResponse(operation.Responses, oc.pathKey, []string{procName, "Result"})
+	resultType, schemaResponse, err := oc.convertResponse(
+		operation.Responses,
+		oc.pathKey,
+		[]string{procName, "Result"},
+	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
@@ -120,7 +149,11 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
 
-	reqBody, bodyTypes, err := oc.convertRequestBody(operation.RequestBody, oc.pathKey, []string{procName, "Body"})
+	reqBody, bodyTypes, err := oc.convertRequestBody(
+		operation.RequestBody,
+		oc.pathKey,
+		[]string{procName, "Body"},
+	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", oc.pathKey, err)
 	}
@@ -140,7 +173,11 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 		if reqBody != nil && bodyType.TypeWrite != nil {
 			description := bodyType.TypeSchema.Description
 			if description == "" {
-				description = fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
+				description = fmt.Sprintf(
+					"Request body of %s %s",
+					strings.ToUpper(oc.method),
+					oc.pathKey,
+				)
 			}
 
 			// renaming query parameter name `body` if exist to avoid conflicts
@@ -160,11 +197,17 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 			}
 
 			if len(bodyTypes) > 1 {
-				newProcName = buildUnionOperationName(oc.builder.schema, newProcName, bodyType.TypeRead, i)
+				newProcName = buildUnionOperationName(
+					oc.builder.schema,
+					newProcName,
+					bodyType.TypeRead,
+					i,
+				)
 			}
 		}
 
 		description := oc.getOperationDescription(operation)
+
 		requestURL, arguments, err := evalOperationPath(oc.pathKey, arguments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", procName, err)
@@ -190,13 +233,17 @@ func (oc *oas3OperationBuilder) BuildProcedure(operation *v3.Operation) error {
 	return nil
 }
 
-func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPath string, fieldPaths []string) error {
+func (oc *oas3OperationBuilder) convertParameters(
+	params []*v3.Parameter,
+	apiPath string,
+	fieldPaths []string,
+) error {
 	if len(params) == 0 && len(oc.commonParams) == 0 {
 		return nil
 	}
 
 	for _, param := range append(params, oc.commonParams...) {
-		if param == nil || (param.Deprecated && oc.builder.ConvertOptions.NoDeprecation) {
+		if param == nil || (param.Deprecated && oc.builder.NoDeprecation) {
 			continue
 		}
 
@@ -210,7 +257,11 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 			paramRequired = true
 		}
 
-		schemaResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.ParameterLocation(param.In)).
+		schemaResult, err := newOASSchemaBuilder(
+			oc.builder.OASBuilderState,
+			apiPath,
+			rest.ParameterLocation(param.In),
+		).
 			getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 		if err != nil {
 			return err
@@ -258,18 +309,24 @@ func (oc *oas3OperationBuilder) convertParameters(params []*v3.Parameter, apiPat
 	return nil
 }
 
-func (oc *oas3OperationBuilder) getContentType(contents *orderedmap.Map[string, *v3.MediaType]) (string, *v3.MediaType) {
+func (oc *oas3OperationBuilder) getContentType(
+	contents *orderedmap.Map[string, *v3.MediaType],
+) (string, *v3.MediaType) {
 	var contentType string
+
 	var media *v3.MediaType
+
 	for _, ct := range preferredContentTypes {
 		for iter := contents.First(); iter != nil; iter = iter.Next() {
 			key := iter.Key()
 			value := iter.Value()
+
 			if strings.HasPrefix(key, ct) && value != nil {
 				return key, value
 			}
 
-			if media == nil && value != nil && (len(oc.builder.AllowedContentTypes) == 0 || slices.Contains(oc.builder.AllowedContentTypes, key)) {
+			if media == nil && value != nil &&
+				(len(oc.builder.AllowedContentTypes) == 0 || slices.Contains(oc.builder.AllowedContentTypes, key)) {
 				contentType = key
 				media = value
 			}
@@ -279,17 +336,19 @@ func (oc *oas3OperationBuilder) getContentType(contents *orderedmap.Map[string, 
 	return contentType, media
 }
 
-func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiPath string, fieldPaths []string) (*rest.RequestBody, []SchemaInfoCache, error) {
+func (oc *oas3OperationBuilder) convertRequestBody(
+	reqBody *v3.RequestBody,
+	apiPath string,
+	fieldPaths []string,
+) (*rest.RequestBody, []SchemaInfoCache, error) {
 	if reqBody == nil || reqBody.Content == nil {
 		return nil, nil, nil
 	}
 
 	contentType, content := oc.getContentType(reqBody.Content)
 
-	bodyRequired := false
-	if reqBody.Required != nil && *reqBody.Required {
-		bodyRequired = true
-	}
+	bodyRequired := reqBody.Required != nil && *reqBody.Required
+
 	location := rest.InBody
 	if contentType == rest.ContentTypeFormURLEncoded {
 		location = rest.InQuery
@@ -319,6 +378,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 	}
 
 	bodyResult.Encoding = make(map[string]rest.EncodingObject)
+
 	for iter := content.Encoding.First(); iter != nil; iter = iter.Next() {
 		encodingValue := iter.Value()
 		if encodingValue == nil {
@@ -342,14 +402,20 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 
 		if encodingValue.Headers != nil && encodingValue.Headers.Len() > 0 {
 			item.Headers = make(map[string]rest.RequestParameter)
+
 			for encodingHeader := encodingValue.Headers.First(); encodingHeader != nil; encodingHeader = encodingHeader.Next() {
 				key := strings.TrimSpace(encodingHeader.Key())
 				header := encodingHeader.Value()
+
 				if key == "" || header == nil {
 					continue
 				}
 
-				headerResult, err := newOASSchemaBuilder(oc.builder.OASBuilderState, apiPath, rest.InHeader).
+				headerResult, err := newOASSchemaBuilder(
+					oc.builder.OASBuilderState,
+					apiPath,
+					rest.InHeader,
+				).
 					getSchemaTypeFromProxy(header.Schema, header.AllowEmptyValue, append(fieldPaths, key))
 				if err != nil {
 					return nil, nil, err
@@ -365,6 +431,7 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 					if err != nil {
 						return nil, nil, err
 					}
+
 					headerEncoding.Style = style
 				}
 
@@ -391,24 +458,32 @@ func (oc *oas3OperationBuilder) convertRequestBody(reqBody *v3.RequestBody, apiP
 				}
 			}
 		}
+
 		bodyResult.Encoding[iter.Key()] = item
 	}
 
 	return bodyResult, bodyTypes, nil
 }
 
-func (oc *oas3OperationBuilder) convertResponse(responses *v3.Responses, apiPath string, fieldPaths []string) (schema.TypeEncoder, *rest.Response, error) {
+func (oc *oas3OperationBuilder) convertResponse(
+	responses *v3.Responses,
+	apiPath string,
+	fieldPaths []string,
+) (schema.TypeEncoder, *rest.Response, error) {
 	if responses == nil || responses.Codes == nil || responses.Codes.IsZero() {
 		return nil, nil, nil
 	}
 
 	var resp *v3.Response
+
 	var statusCode int64
+
 	if responses.Codes != nil && !responses.Codes.IsZero() {
 		for r := responses.Codes.First(); r != nil; r = r.Next() {
 			if r.Key() == "" {
 				continue
 			}
+
 			code, err := strconv.ParseInt(r.Key(), 10, 32)
 			if err != nil {
 				continue
@@ -486,6 +561,7 @@ func (oc *oas3OperationBuilder) getOperationDescription(operation *v3.Operation)
 	if operation.Summary != "" {
 		return utils.StripHTMLTags(operation.Summary)
 	}
+
 	if operation.Description != "" {
 		return utils.StripHTMLTags(operation.Description)
 	}

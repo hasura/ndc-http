@@ -2,24 +2,24 @@
 kind: ObjectType
 version: v1
 definition:
-  name: UserAddressGeo
+  name: UserAddressGeoObject
   fields:
     - name: lat
       type: String
     - name: lng
       type: String
   graphql:
-    typeName: UserAddressGeo
-    inputTypeName: UserAddressGeo_input
+    typeName: UserAddressGeoObject
+    inputTypeName: UserAddressGeoObject_input
   dataConnectorTypeMapping:
     - dataConnectorName: myapi
-      dataConnectorObjectType: UserAddressGeo
+      dataConnectorObjectType: UserAddressGeoObject
 
 ---
 kind: TypePermissions
 version: v1
 definition:
-  typeName: UserAddressGeo
+  typeName: UserAddressGeoObject
   permissions:
     - role: admin
       output:
@@ -31,12 +31,12 @@ definition:
 kind: ObjectType
 version: v1
 definition:
-  name: UserAddress
+  name: UserAddressObject
   fields:
     - name: city
       type: String
     - name: geo
-      type: UserAddressGeo
+      type: UserAddressGeoObject
     - name: street
       type: String
     - name: suite
@@ -44,17 +44,17 @@ definition:
     - name: zipcode
       type: String
   graphql:
-    typeName: UserAddress
-    inputTypeName: UserAddress_input
+    typeName: UserAddressObject
+    inputTypeName: UserAddressObject_input
   dataConnectorTypeMapping:
     - dataConnectorName: myapi
-      dataConnectorObjectType: UserAddress
+      dataConnectorObjectType: UserAddressObject
 
 ---
 kind: TypePermissions
 version: v1
 definition:
-  typeName: UserAddress
+  typeName: UserAddressObject
   permissions:
     - role: admin
       output:
@@ -69,7 +69,7 @@ definition:
 kind: ObjectType
 version: v1
 definition:
-  name: UserCompany
+  name: UserCompanyObject
   fields:
     - name: bs
       type: String
@@ -78,17 +78,17 @@ definition:
     - name: name
       type: String
   graphql:
-    typeName: UserCompany
-    inputTypeName: UserCompany_input
+    typeName: UserCompanyObject
+    inputTypeName: UserCompanyObject_input
   dataConnectorTypeMapping:
     - dataConnectorName: myapi
-      dataConnectorObjectType: UserCompany
+      dataConnectorObjectType: UserCompanyObject
 
 ---
 kind: TypePermissions
 version: v1
 definition:
-  typeName: UserCompany
+  typeName: UserCompanyObject
   permissions:
     - role: admin
       output:
@@ -104,13 +104,13 @@ definition:
   name: User
   fields:
     - name: address
-      type: UserAddress
+      type: UserAddressObject
     - name: company
-      type: UserCompany
+      type: UserCompanyObject
     - name: email
       type: String
     - name: id
-      type: Int64
+      type: int64
     - name: name
       type: String
     - name: phone
@@ -152,7 +152,7 @@ definition:
   outputType: User!
   arguments:
     - name: id
-      type: Int32!
+      type: int32!
       description: The ID of the user to retrieve
   source:
     dataConnectorName: myapi

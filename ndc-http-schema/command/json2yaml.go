@@ -14,7 +14,7 @@ import (
 // Json2YamlCommandArguments represent available command arguments for the json2yaml command.
 type Json2YamlCommandArguments struct {
 	File   string `help:"File path needs to be converted. Print to stdout if not set" required:"" short:"f"`
-	Output string `help:"The location where the ndc schema file will be generated"    short:"o"`
+	Output string `help:"The location where the ndc schema file will be generated"                short:"o"`
 }
 
 // Json2Yaml converts a JSON file to YAML.
@@ -36,6 +36,7 @@ func Json2Yaml(args *Json2YamlCommandArguments, logger *slog.Logger) error {
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)
 	encoder.SetIndent(2)
+
 	if err := encoder.Encode(jsonContent); err != nil {
 		slog.Error(err.Error())
 
@@ -48,12 +49,13 @@ func Json2Yaml(args *Json2YamlCommandArguments, logger *slog.Logger) error {
 
 			return err
 		}
+
 		logger.Info("generated successfully to " + args.Output)
 
 		return nil
 	}
 
-	fmt.Fprint(os.Stdout, buf.String())
+	_, _ = fmt.Fprint(os.Stdout, buf.String())
 
 	return nil
 }

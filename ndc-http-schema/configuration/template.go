@@ -31,6 +31,7 @@ func getTemplates() (*template.Template, error) {
 	}
 
 	var err error
+
 	_templates, err = template.ParseFS(templateFS, "templates/*.gotmpl")
 	if err != nil {
 		return nil, err
@@ -53,6 +54,7 @@ func writeColorTextIf(w io.Writer, text string, color string, noColor bool) {
 
 func writeErrorIf(w io.Writer, text string, noColor bool) {
 	writeColorTextIf(w, "ERROR", ansiBrightRed, noColor)
+
 	if text != "" {
 		_, _ = w.Write([]byte(text))
 	}
@@ -60,6 +62,7 @@ func writeErrorIf(w io.Writer, text string, noColor bool) {
 
 func writeWarningIf(w io.Writer, text string, noColor bool) {
 	writeColorTextIf(w, "WARNING", ansiBrightYellow, noColor)
+
 	if text != "" {
 		_, _ = w.Write([]byte(text))
 	}

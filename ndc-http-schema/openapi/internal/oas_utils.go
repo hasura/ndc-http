@@ -23,6 +23,7 @@ func getSchemaRefTypeName(name string) string {
 
 func extractNullableFromOASTypes(names []string) ([]string, bool) {
 	var typeNames []string
+
 	var nullable bool
 
 	for _, name := range names {
@@ -36,8 +37,15 @@ func extractNullableFromOASTypes(names []string) ([]string, bool) {
 	return typeNames, nullable
 }
 
-func getScalarFromType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, fieldPaths []string) string {
+func getScalarFromType(
+	sm *rest.NDCHttpSchema,
+	names []string,
+	format string,
+	enumNodes []*yaml.Node,
+	fieldPaths []string,
+) string {
 	namesLen := len(names)
+
 	switch {
 	case namesLen == 0 && len(enumNodes) > 0:
 		return buildEnumScalar(sm, enumNodes, fieldPaths)
@@ -73,7 +81,13 @@ func buildEnumScalar(sm *rest.NDCHttpSchema, enumNodes []*yaml.Node, fieldPaths 
 	return scalarName
 }
 
-func getScalarFromOASType(sm *rest.NDCHttpSchema, names []string, format string, enumNodes []*yaml.Node, fieldPaths []string) string {
+func getScalarFromOASType(
+	sm *rest.NDCHttpSchema,
+	names []string,
+	format string,
+	enumNodes []*yaml.Node,
+	fieldPaths []string,
+) string {
 	switch names[0] {
 	case "boolean":
 		return string(rest.ScalarBoolean)
@@ -150,6 +164,7 @@ func canSetEnumToSchema(sm *rest.NDCHttpSchema, scalarName string, enums []strin
 // remove nullable types from raw OpenAPI types.
 func evaluateOpenAPITypes(input []string) []string {
 	var typeNames []string
+
 	for _, t := range input {
 		if t != "null" {
 			typeNames = append(typeNames, t)
@@ -166,6 +181,7 @@ func createSchemaFromOpenAPISchema(input *base.Schema) *rest.TypeSchema {
 	if input == nil {
 		return ps
 	}
+
 	ps.Type = evaluateOpenAPITypes(input.Type)
 	ps.Format = input.Format
 	ps.Pattern = utils.RemoveYAMLSpecialCharacters([]byte(input.Pattern))
@@ -193,7 +209,10 @@ func createSchemaFromOpenAPISchema(input *base.Schema) *rest.TypeSchema {
 // check if the OAS type is a scalar.
 func isPrimitiveScalar(names []string) bool {
 	for _, name := range names {
-		if !slices.Contains([]string{"boolean", "integer", "number", "string", "file", "long", "null"}, name) {
+		if !slices.Contains(
+			[]string{"boolean", "integer", "number", "string", "file", "long", "null"},
+			name,
+		) {
 			return false
 		}
 	}
@@ -203,8 +222,15 @@ func isPrimitiveScalar(names []string) bool {
 
 // Find common fields in all objects to merge the type.
 // If they have the same type, we don't need to wrap it with the nullable type.
-func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, srcObjects []rest.ObjectType, unionType oasUnionType, fieldPaths []string) {
+func mergeUnionObjects(
+	httpSchema *rest.NDCHttpSchema,
+	dest *rest.ObjectType,
+	srcObjects []rest.ObjectType,
+	unionType oasUnionType,
+	fieldPaths []string,
+) {
 	mergedObjectFields := make(map[string][]rest.ObjectField)
+
 	for _, object := range srcObjects {
 		for key, field := range object.Fields {
 			mergedObjectFields[key] = append(mergedObjectFields[key], field)
@@ -235,6 +261,7 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 		}
 
 		var unionField rest.ObjectField
+
 		for i, field := range fields {
 			if i == 0 {
 				unionField = field
@@ -242,8 +269,14 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 				continue
 			}
 
-			unionType, ok := mergeUnionTypes(httpSchema, field.Type, unionField.Type, append(fieldPaths, key))
+			unionType, ok := mergeUnionTypes(
+				httpSchema,
+				field.Type,
+				unionField.Type,
+				append(fieldPaths, key),
+			)
 			unionField.Type = unionType.Encode()
+
 			if !ok {
 				break
 			}
@@ -257,7 +290,8 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 			}
 		}
 
-		if len(fields) < len(srcObjects) && unionType != oasAllOf && !utils.IsNullableTypeEncoder(unionField.Type.Interface()) {
+		if len(fields) < len(srcObjects) && unionType != oasAllOf &&
+			!utils.IsNullableTypeEncoder(unionField.Type.Interface()) {
 			unionField.Type = (schema.NullableType{
 				Type:           schema.TypeNullable,
 				UnderlyingType: unionField.Type,
@@ -269,19 +303,25 @@ func mergeUnionObjects(httpSchema *rest.NDCHttpSchema, dest *rest.ObjectType, sr
 }
 
 // evaluate and filter invalid types in allOf, anyOf or oneOf schemas.
-func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.ParameterLocation) ([]*base.SchemaProxy, *base.Schema, bool, bool) {
+func evalSchemaProxiesSlice(
+	schemaProxies []*base.SchemaProxy,
+	location rest.ParameterLocation,
+) ([]*base.SchemaProxy, *base.Schema, bool, bool) {
 	results := []*base.SchemaProxy{}
 	typeNames := []string{}
+
 	var nullable, isEmptyObject bool
 
 	for _, proxy := range schemaProxies {
 		if proxy == nil {
 			continue
 		}
+
 		sc := proxy.Schema()
-		if sc == nil || (len(sc.Type) == 0 && len(sc.AllOf) == 0 && len(sc.AnyOf) == 0 && len(sc.OneOf) == 0 &&
-			(sc.Properties == nil || sc.Properties.Len() == 0) &&
-			(sc.Items == nil || sc.Items.A != nil)) {
+		if sc == nil ||
+			(len(sc.Type) == 0 && len(sc.AllOf) == 0 && len(sc.AnyOf) == 0 && len(sc.OneOf) == 0 &&
+				(sc.Properties == nil || sc.Properties.Len() == 0) &&
+				(sc.Items == nil || sc.Items.A != nil)) {
 			continue
 		}
 
@@ -294,7 +334,8 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 			continue
 		}
 
-		if len(sc.Type) == 1 && sc.Type[0] == "object" && (sc.Properties == nil || sc.Properties.Len() == 0) &&
+		if len(sc.Type) == 1 && sc.Type[0] == "object" &&
+			(sc.Properties == nil || sc.Properties.Len() == 0) &&
 			(sc.AdditionalProperties == nil || !sc.AdditionalProperties.B) {
 			isEmptyObject = true
 
@@ -320,6 +361,7 @@ func evalSchemaProxiesSlice(schemaProxies []*base.SchemaProxy, location rest.Par
 // guess the result type from content type.
 func getResultTypeFromContentType(contentType string) schema.TypeEncoder {
 	var scalarName rest.ScalarName
+
 	switch {
 	case strings.HasPrefix(contentType, "text/"):
 		scalarName = rest.ScalarString
@@ -334,6 +376,7 @@ func getResultTypeFromContentType(contentType string) schema.TypeEncoder {
 
 func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 	ct := strings.TrimSpace(strings.Split(contentType, ";")[0])
+
 	switch {
 	case utils.IsContentTypeJSON(ct) || utils.IsContentTypeXML(ct) || ct == rest.ContentTypeNdJSON:
 		return rest.ScalarJSON
@@ -344,7 +387,12 @@ func guessScalarResultTypeFromContentType(contentType string) rest.ScalarName {
 	}
 }
 
-func evalUniqueScalarEnumName(sm *rest.NDCHttpSchema, name string, enums []string, times int) string {
+func evalUniqueScalarEnumName(
+	sm *rest.NDCHttpSchema,
+	name string,
+	enums []string,
+	times int,
+) string {
 	newName := name
 
 	if times > 0 {
@@ -358,11 +406,17 @@ func evalUniqueScalarEnumName(sm *rest.NDCHttpSchema, name string, enums []strin
 	return evalUniqueScalarEnumName(sm, name, enums, times+1)
 }
 
-func buildUnionOperationName(sm *rest.NDCHttpSchema, operationName string, typeEncoder schema.TypeEncoder, index int) string {
+func buildUnionOperationName(
+	sm *rest.NDCHttpSchema,
+	operationName string,
+	typeEncoder schema.TypeEncoder,
+	index int,
+) string {
 	newName := operationName
 	suffix := getNamedType(typeEncoder, true, "")
 
-	if _, ok := defaultScalarTypes[rest.ScalarName(suffix)]; !ok && strings.HasPrefix(suffix, utils.ToPascalCase(operationName)) {
+	if _, ok := defaultScalarTypes[rest.ScalarName(suffix)]; !ok &&
+		strings.HasPrefix(suffix, utils.ToPascalCase(operationName)) {
 		newName += strconv.Itoa(index)
 	} else {
 		newName += "_" + suffix

@@ -3,8 +3,7 @@ OUTPUT_DIR := _output
 
 .PHONY: format
 format:
-	gofmt -w -s .
-	cd ndc-http-schema && gofmt -w -s .
+	golangci-lint fmt
 
 .PHONY: test
 test:
@@ -15,7 +14,14 @@ test:
 # https://golangci-lint.run/usage/install
 .PHONY: lint
 lint:
+	golangci-lint run
+	cd exhttp && golangci-lint run
+	cd ndc-http-schema && golangci-lint run
+
+.PHONY: lint-fix
+lint-fix:
 	golangci-lint run --fix
+	cd exhttp && golangci-lint run --fix
 	cd ndc-http-schema && golangci-lint run --fix
 
 # clean the output directory

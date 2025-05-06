@@ -21,7 +21,11 @@ type ArgumentPreset struct {
 }
 
 // NewArgumentPreset create a new ArgumentPreset instance.
-func NewArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.ArgumentPresetConfig, isGlobal bool) (*ArgumentPreset, error) {
+func NewArgumentPreset(
+	httpSchema *rest.NDCHttpSchema,
+	preset rest.ArgumentPresetConfig,
+	isGlobal bool,
+) (*ArgumentPreset, error) {
 	jsonPath, targets, err := configuration.ValidateArgumentPreset(httpSchema, preset, isGlobal)
 	if err != nil {
 		return nil, err
@@ -40,13 +44,18 @@ func NewArgumentPreset(httpSchema *rest.NDCHttpSchema, preset rest.ArgumentPrese
 }
 
 // Evaluate iterates and inject values into request arguments recursively.
-func (ap ArgumentPreset) Evaluate(operationName string, arguments map[string]any, headers map[string]string) (map[string]any, error) {
+func (ap ArgumentPreset) Evaluate(
+	operationName string,
+	arguments map[string]any,
+	headers map[string]string,
+) (map[string]any, error) {
 	key := configuration.BuildArgumentPresetJSONPathKey(operationName, ap.Path)
 	if _, ok := ap.Targets[key]; !ok {
 		return arguments, nil
 	}
 
 	segments := ap.Path.Query().Segments()
+
 	rootSelector, ok := segments[0].Selectors()[0].(spec.Name)
 	if !ok || rootSelector == "" {
 		return nil, errors.New("invalid json path. The root selector must be an object name")
@@ -58,13 +67,19 @@ func (ap ArgumentPreset) Evaluate(operationName string, arguments map[string]any
 	}
 
 	selectorStr := string(rootSelector)
+
 	if len(segments) == 1 {
 		arguments[selectorStr] = value
 
 		return arguments, nil
 	}
 
-	nestedValue, err := ap.evalNestedField(segments[1:], arguments[string(rootSelector)], value, []string{selectorStr})
+	nestedValue, err := ap.evalNestedField(
+		segments[1:],
+		arguments[string(rootSelector)],
+		value,
+		[]string{selectorStr},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +89,12 @@ func (ap ArgumentPreset) Evaluate(operationName string, arguments map[string]any
 	return arguments, nil
 }
 
-func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any, value any, fieldPaths []string) (any, error) {
+func (ap ArgumentPreset) evalNestedField(
+	segments []*spec.Segment,
+	argument any,
+	value any,
+	fieldPaths []string,
+) (any, error) {
 	segmentsLen := len(segments)
 	if segmentsLen == 0 || len(segments[0].Selectors()) == 0 {
 		return value, nil
@@ -88,6 +108,7 @@ func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any,
 		}
 
 		selectorStr := string(selector)
+
 		if segmentsLen == 1 {
 			argumentMap[selectorStr] = value
 
@@ -110,6 +131,7 @@ func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any,
 
 		for i, arg := range argumentSlice {
 			var err error
+
 			argumentSlice[i], err = ap.evalNestedField(segments[1:], arg, value, append(fieldPaths, strconv.Itoa(i)))
 			if err != nil {
 				return nil, err
@@ -135,6 +157,7 @@ func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any,
 
 		for i := selector.Start(); i <= end; i += step {
 			var err error
+
 			argumentSlice[i], err = ap.evalNestedField(segments[1:], argumentSlice[i], value, append(fieldPaths, strconv.Itoa(i)))
 			if err != nil {
 				return nil, err
@@ -145,6 +168,7 @@ func (ap ArgumentPreset) evalNestedField(segments []*spec.Segment, argument any,
 	case spec.Index:
 		index := int(selector)
 		argumentSlice, sok := argument.([]any)
+
 		if !sok || len(argumentSlice) <= index {
 			return argument, nil
 		}

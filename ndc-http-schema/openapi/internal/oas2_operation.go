@@ -21,7 +21,11 @@ type oas2OperationBuilder struct {
 	Arguments map[string]rest.ArgumentInfo
 }
 
-func newOAS2OperationBuilder(builder *OAS2Builder, pathKey string, method string) *oas2OperationBuilder {
+func newOAS2OperationBuilder(
+	builder *OAS2Builder,
+	pathKey string,
+	method string,
+) *oas2OperationBuilder {
 	return &oas2OperationBuilder{
 		builder:   builder,
 		pathKey:   pathKey,
@@ -31,12 +35,21 @@ func newOAS2OperationBuilder(builder *OAS2Builder, pathKey string, method string
 }
 
 // BuildFunction build a HTTP NDC function information from OpenAPI v2 operation.
-func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonParams []*v2.Parameter) (*rest.OperationInfo, string, error) {
+func (oc *oas2OperationBuilder) BuildFunction(
+	operation *v2.Operation,
+	commonParams []*v2.Parameter,
+) (*rest.OperationInfo, string, error) {
 	if operation == nil {
 		return nil, "", nil
 	}
 
-	funcName := buildUniqueOperationName(oc.builder.schema, operation.OperationId, oc.pathKey, oc.method, oc.builder.ConvertOptions)
+	funcName := buildUniqueOperationName(
+		oc.builder.schema,
+		operation.OperationId,
+		oc.pathKey,
+		oc.method,
+		oc.builder.ConvertOptions,
+	)
 	oc.builder.Logger.Info("function",
 		slog.String("name", funcName),
 		slog.String("path", oc.pathKey),
@@ -57,10 +70,12 @@ func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonPar
 	}
 
 	description := oc.getOperationDescription(operation)
+
 	requestURL, arguments, err := evalOperationPath(oc.pathKey, oc.Arguments)
 	if err != nil {
 		return nil, "", fmt.Errorf("%s: %w", funcName, err)
 	}
+
 	function := rest.OperationInfo{
 		Request: &rest.Request{
 			URL:         requestURL,
@@ -78,12 +93,21 @@ func (oc *oas2OperationBuilder) BuildFunction(operation *v2.Operation, commonPar
 }
 
 // BuildProcedure build a HTTP NDC function information from OpenAPI v2 operation.
-func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonParams []*v2.Parameter) error {
+func (oc *oas2OperationBuilder) BuildProcedure(
+	operation *v2.Operation,
+	commonParams []*v2.Parameter,
+) error {
 	if operation == nil {
 		return nil
 	}
 
-	procName := buildUniqueOperationName(oc.builder.schema, operation.OperationId, oc.pathKey, oc.method, oc.builder.ConvertOptions)
+	procName := buildUniqueOperationName(
+		oc.builder.schema,
+		operation.OperationId,
+		oc.pathKey,
+		oc.method,
+		oc.builder.ConvertOptions,
+	)
 
 	oc.builder.Logger.Info("procedure",
 		slog.String("name", procName),
@@ -111,6 +135,7 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 
 	for i, bodyType := range bodyTypes {
 		newProcName := procName
+
 		arguments := make(map[string]rest.ArgumentInfo)
 		for key, arg := range oc.Arguments {
 			arguments[key] = arg
@@ -119,7 +144,11 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 		if reqBody != nil && bodyType.TypeWrite != nil {
 			description := bodyType.TypeSchema.Description
 			if description == "" {
-				description = fmt.Sprintf("Request body of %s %s", strings.ToUpper(oc.method), oc.pathKey)
+				description = fmt.Sprintf(
+					"Request body of %s %s",
+					strings.ToUpper(oc.method),
+					oc.pathKey,
+				)
 			}
 			// renaming query parameter name `body` if exist to avoid conflicts
 			if paramData, ok := arguments[rest.BodyKey]; ok {
@@ -138,11 +167,17 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 			}
 
 			if len(bodyTypes) > 1 {
-				newProcName = buildUnionOperationName(oc.builder.schema, newProcName, bodyType.TypeRead, i)
+				newProcName = buildUnionOperationName(
+					oc.builder.schema,
+					newProcName,
+					bodyType.TypeRead,
+					i,
+				)
 			}
 		}
 
 		description := oc.getOperationDescription(operation)
+
 		requestURL, arguments, err := evalOperationPath(oc.pathKey, arguments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", procName, err)
@@ -167,7 +202,11 @@ func (oc *oas2OperationBuilder) BuildProcedure(operation *v2.Operation, commonPa
 	return nil
 }
 
-func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commonParams []*v2.Parameter, fieldPaths []string) (*rest.RequestBody, []SchemaInfoCache, error) {
+func (oc *oas2OperationBuilder) convertParameters(
+	operation *v2.Operation,
+	commonParams []*v2.Parameter,
+	fieldPaths []string,
+) (*rest.RequestBody, []SchemaInfoCache, error) {
 	if operation == nil || (len(operation.Parameters) == 0 && len(commonParams) == 0) {
 		return nil, nil, nil
 	}
@@ -178,7 +217,9 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 	}
 
 	var requestBody *rest.RequestBody
+
 	var bodyTypes []SchemaInfoCache
+
 	formData := rest.TypeSchema{
 		Type: []string{"object"},
 	}
@@ -198,6 +239,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 		}
 
 		var schemaResult *SchemaInfoCache
+
 		var err error
 
 		paramRequired := false
@@ -207,7 +249,10 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 
 		switch {
 		case param.Type != "":
-			typeEncoder, err := oc.builder.getSchemaTypeFromParameter(param, append(fieldPaths, paramName))
+			typeEncoder, err := oc.builder.getSchemaTypeFromParameter(
+				param,
+				append(fieldPaths, paramName),
+			)
 			if err != nil {
 				return nil, nil, err
 			}
@@ -241,7 +286,11 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 				schemaResult.TypeSchema.MinLength = &minLength
 			}
 		case param.Schema != nil:
-			schemaResult, err = newOASSchemaBuilder(oc.builder.OASBuilderState, oc.pathKey, rest.ParameterLocation(param.In)).
+			schemaResult, err = newOASSchemaBuilder(
+				oc.builder.OASBuilderState,
+				oc.pathKey,
+				rest.ParameterLocation(param.In),
+			).
 				getSchemaTypeFromProxy(param.Schema, !paramRequired, append(fieldPaths, paramName))
 			if err != nil {
 				return nil, nil, err
@@ -268,6 +317,7 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 				Type: schemaType,
 			},
 		}
+
 		if param.Description != "" {
 			description := utils.StripHTMLTags(param.Description)
 			if description != "" {
@@ -298,9 +348,10 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 				if argument.Description != nil {
 					desc := utils.StripHTMLTags(*argument.Description)
 					if desc != "" {
-						param.ObjectField.Description = &desc
+						param.Description = &desc
 					}
 				}
+
 				formDataObject.Fields[paramName] = param
 			}
 		default:
@@ -336,8 +387,12 @@ func (oc *oas2OperationBuilder) convertParameters(operation *v2.Operation, commo
 	return requestBody, bodyTypes, nil
 }
 
-func (oc *oas2OperationBuilder) convertResponse(operation *v2.Operation, fieldPaths []string) (schema.TypeEncoder, *rest.Response, error) {
-	if operation.Responses == nil || operation.Responses.Codes == nil || operation.Responses.Codes.IsZero() {
+func (oc *oas2OperationBuilder) convertResponse(
+	operation *v2.Operation,
+	fieldPaths []string,
+) (schema.TypeEncoder, *rest.Response, error) {
+	if operation.Responses == nil || operation.Responses.Codes == nil ||
+		operation.Responses.Codes.IsZero() {
 		return nil, nil, nil
 	}
 
@@ -354,7 +409,9 @@ func (oc *oas2OperationBuilder) convertResponse(operation *v2.Operation, fieldPa
 	}
 
 	var resp *v2.Response
+
 	var statusCode int64
+
 	if operation.Responses.Codes == nil || operation.Responses.Codes.IsZero() {
 		// the response is always successful
 		resp = operation.Responses.Default
@@ -415,11 +472,11 @@ func (oc *oas2OperationBuilder) getContentTypeV2(contentTypes []string) string {
 		}
 	}
 
-	if len(oc.builder.ConvertOptions.AllowedContentTypes) == 0 {
+	if len(oc.builder.AllowedContentTypes) == 0 {
 		return contentTypes[0]
 	}
 
-	for _, ct := range oc.builder.ConvertOptions.AllowedContentTypes {
+	for _, ct := range oc.builder.AllowedContentTypes {
 		if slices.Contains(contentTypes, ct) {
 			return ct
 		}
@@ -432,6 +489,7 @@ func (oc *oas2OperationBuilder) getOperationDescription(operation *v2.Operation)
 	if operation.Summary != "" {
 		return utils.StripHTMLTags(operation.Summary)
 	}
+
 	if operation.Description != "" {
 		return utils.StripHTMLTags(operation.Description)
 	}

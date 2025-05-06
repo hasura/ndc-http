@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-sdk-go/schema"
 	"github.com/hasura/ndc-sdk-go/utils"
 )
@@ -47,6 +48,7 @@ func NewNDCHttpSchema() *NDCHttpSchema {
 func (ndc NDCHttpSchema) ToSchemaResponse() *schema.SchemaResponse {
 	functionKeys := utils.GetSortedKeys(ndc.Functions)
 	functions := make([]schema.FunctionInfo, len(functionKeys))
+
 	for i, key := range functionKeys {
 		fn := ndc.Functions[key]
 		functions[i] = fn.FunctionSchema(key)
@@ -54,10 +56,12 @@ func (ndc NDCHttpSchema) ToSchemaResponse() *schema.SchemaResponse {
 
 	procedureKeys := utils.GetSortedKeys(ndc.Procedures)
 	procedures := make([]schema.ProcedureInfo, len(procedureKeys))
+
 	for i, key := range procedureKeys {
 		proc := ndc.Procedures[key]
 		procedures[i] = proc.ProcedureSchema(key)
 	}
+
 	objectTypes := make(schema.SchemaResponseObjectTypes)
 	for key, object := range ndc.ObjectTypes {
 		objectTypes[key] = object.Schema()
@@ -100,25 +104,25 @@ func (rm *NDCHttpSchema) AddScalar(name string, scalar schema.ScalarType) {
 	}
 }
 
+// RuntimeSettings contain runtime settings for a server.
+type RuntimeSettings struct { // configure the request timeout in seconds, default 30s
+	Timeout uint               `json:"timeout,omitempty" mapstructure:"timeout" yaml:"timeout,omitempty"`
+	Retry   exhttp.RetryPolicy `json:"retry,omitempty"   mapstructure:"retry"   yaml:"retry,omitempty"`
+}
+
 type Response struct {
 	ContentType string `json:"contentType" mapstructure:"contentType" yaml:"contentType"`
 }
 
-// RuntimeSettings contain runtime settings for a server.
-type RuntimeSettings struct { // configure the request timeout in seconds, default 30s
-	Timeout uint        `json:"timeout,omitempty" mapstructure:"timeout" yaml:"timeout,omitempty"`
-	Retry   RetryPolicy `json:"retry,omitempty"   mapstructure:"retry"   yaml:"retry,omitempty"`
-}
-
 // Request represents the HTTP request information of the webhook.
 type Request struct {
-	URL         string                     `json:"url,omitempty"         mapstructure:"url"                                              yaml:"url,omitempty"`
-	Method      string                     `json:"method,omitempty"      jsonschema:"enum=get,enum=post,enum=put,enum=patch,enum=delete" mapstructure:"method"        yaml:"method,omitempty"`
-	Headers     map[string]utils.EnvString `json:"headers,omitempty"     mapstructure:"headers"                                          yaml:"headers,omitempty"`
-	Security    AuthSecurities             `json:"security,omitempty"    mapstructure:"security"                                         yaml:"security,omitempty"`
-	Servers     []ServerConfig             `json:"servers,omitempty"     mapstructure:"servers"                                          yaml:"servers,omitempty"`
-	RequestBody *RequestBody               `json:"requestBody,omitempty" mapstructure:"requestBody"                                      yaml:"requestBody,omitempty"`
-	Response    Response                   `json:"response"              mapstructure:"response"                                         yaml:"response"`
+	URL         string                     `json:"url,omitempty"         mapstructure:"url"         yaml:"url,omitempty"`
+	Method      string                     `json:"method,omitempty"      mapstructure:"method"      yaml:"method,omitempty"      jsonschema:"enum=get,enum=post,enum=put,enum=patch,enum=delete"`
+	Headers     map[string]utils.EnvString `json:"headers,omitempty"     mapstructure:"headers"     yaml:"headers,omitempty"`
+	Security    AuthSecurities             `json:"security,omitempty"    mapstructure:"security"    yaml:"security,omitempty"`
+	Servers     []ServerConfig             `json:"servers,omitempty"     mapstructure:"servers"     yaml:"servers,omitempty"`
+	RequestBody *RequestBody               `json:"requestBody,omitempty" mapstructure:"requestBody" yaml:"requestBody,omitempty"`
+	Response    Response                   `json:"response"              mapstructure:"response"    yaml:"response"`
 
 	*RuntimeSettings `yaml:",inline"`
 }
@@ -139,11 +143,11 @@ func (r Request) Clone() *Request {
 
 // RequestParameter represents an HTTP request parameter.
 type RequestParameter struct {
-	EncodingObject `yaml:",inline"`
-	Name           string            `json:"name,omitempty"         mapstructure:"name"                   yaml:"name,omitempty"`
-	ArgumentName   string            `json:"argumentName,omitempty" mapstructure:"argumentName,omitempty" yaml:"argumentName,omitempty"`
-	In             ParameterLocation `json:"in,omitempty"           mapstructure:"in"                     yaml:"in,omitempty"`
-	Schema         *TypeSchema       `json:"schema,omitempty"       mapstructure:"schema"                 yaml:"schema,omitempty"`
+	EncodingObject `                  yaml:",inline"`
+	Name           string            `yaml:"name,omitempty"         json:"name,omitempty"         mapstructure:"name"`
+	ArgumentName   string            `yaml:"argumentName,omitempty" json:"argumentName,omitempty" mapstructure:"argumentName,omitempty"`
+	In             ParameterLocation `yaml:"in,omitempty"           json:"in,omitempty"           mapstructure:"in"`
+	Schema         *TypeSchema       `yaml:"schema,omitempty"       json:"schema,omitempty"       mapstructure:"schema"`
 }
 
 // TypeSchema represents a serializable object of OpenAPI schema
@@ -158,40 +162,9 @@ type TypeSchema struct {
 	MinLength   *int64      `json:"minLength,omitempty" mapstructure:"minLength" yaml:"minLength,omitempty"`
 	Items       *TypeSchema `json:"items,omitempty"     mapstructure:"items"     yaml:"items,omitempty"`
 	XML         *XMLSchema  `json:"xml,omitempty"       mapstructure:"xml"       yaml:"xml,omitempty"`
-	Description string      `json:"-"                   yaml:"-"`
-	ReadOnly    bool        `json:"-"                   yaml:"-"`
-	WriteOnly   bool        `json:"-"                   yaml:"-"`
-}
-
-// RetryPolicy represents the retry policy of request.
-type RetryPolicy struct {
-	// Number of retry times
-	Times uint `json:"times,omitempty" mapstructure:"times" yaml:"times,omitempty"`
-	// Delay retry delay in milliseconds
-	Delay uint `json:"delay,omitempty" mapstructure:"delay" yaml:"delay,omitempty"`
-	// HTTPStatus retries if the remote service returns one of these http status
-	HTTPStatus []int `json:"httpStatus,omitempty" mapstructure:"httpStatus" yaml:"httpStatus,omitempty"`
-}
-
-// Schema returns the object type schema of this type.
-func (rp RetryPolicy) Schema() schema.ObjectType {
-	return schema.ObjectType{
-		Description: utils.ToPtr("Retry policy of request"),
-		Fields: schema.ObjectTypeFields{
-			"times": {
-				Description: utils.ToPtr("Number of retry times"),
-				Type:        schema.NewNamedType(string(ScalarInt32)).Encode(),
-			},
-			"delay": {
-				Description: utils.ToPtr("Delay retry delay in milliseconds"),
-				Type:        schema.NewNullableType(schema.NewNamedType(string(ScalarInt32))).Encode(),
-			},
-			"httpStatus": {
-				Description: utils.ToPtr("List of HTTP status the connector will retry on"),
-				Type:        schema.NewNullableType(schema.NewArrayType(schema.NewNamedType(string(ScalarInt32)))).Encode(),
-			},
-		},
-	}
+	Description string      `json:"-"                                            yaml:"-"`
+	ReadOnly    bool        `json:"-"                                            yaml:"-"`
+	WriteOnly   bool        `json:"-"                                            yaml:"-"`
 }
 
 // EncodingObject represents the [Encoding Object] that contains serialization strategy for application/x-www-form-urlencoded
@@ -203,21 +176,21 @@ type EncodingObject struct {
 	// The behavior follows the same values as query parameters, including default values.
 	// This property SHALL be ignored if the request body media type is not application/x-www-form-urlencoded or multipart/form-data.
 	// If a value is explicitly defined, then the value of contentType (implicit or explicit) SHALL be ignored
-	Style ParameterEncodingStyle `json:"style,omitempty" mapstructure:"style" yaml:"style,omitempty"`
+	Style ParameterEncodingStyle `json:"style,omitempty"         mapstructure:"style"         yaml:"style,omitempty"`
 	// When this is true, property values of type array or object generate separate parameters for each value of the array, or key-value-pair of the map.
 	// For other types of properties this property has no effect. When style is form, the default value is true. For all other styles, the default value is false.
 	// This property SHALL be ignored if the request body media type is not application/x-www-form-urlencoded or multipart/form-data.
 	// If a value is explicitly defined, then the value of contentType (implicit or explicit) SHALL be ignored
-	Explode *bool `json:"explode,omitempty" mapstructure:"explode" yaml:"explode,omitempty"`
+	Explode *bool `json:"explode,omitempty"       mapstructure:"explode"       yaml:"explode,omitempty"`
 	// By default, reserved characters :/?#[]@!$&'()*+,;= in form field values within application/x-www-form-urlencoded bodies are percent-encoded when sent.
 	// AllowReserved allows these characters to be sent as is:
 	AllowReserved bool `json:"allowReserved,omitempty" mapstructure:"allowReserved" yaml:"allowReserved,omitempty"`
 	// For more complex scenarios, such as nested arrays or JSON in form data, use the contentType keyword to specify the media type for encoding the value of a complex field.
-	ContentType []string `json:"contentType,omitempty" mapstructure:"contentType" yaml:"contentType,omitempty"`
+	ContentType []string `json:"contentType,omitempty"   mapstructure:"contentType"   yaml:"contentType,omitempty"`
 	// A map allowing additional information to be provided as headers, for example Content-Disposition.
 	// Content-Type is described separately and SHALL be ignored in this section.
 	// This property SHALL be ignored if the request body media type is not a multipart.
-	Headers map[string]RequestParameter `json:"headers,omitempty" mapstructure:"headers" yaml:"headers,omitempty"`
+	Headers map[string]RequestParameter `json:"headers,omitempty"       mapstructure:"headers"       yaml:"headers,omitempty"`
 }
 
 // SetHeader sets the encoding header.
@@ -279,15 +252,15 @@ type RequestBody struct {
 
 // OperationInfo extends connector command operation with OpenAPI HTTP information.
 type OperationInfo struct {
-	Request *Request `json:"request" mapstructure:"request" yaml:"request"`
+	Request *Request `json:"request"                        mapstructure:"request"               yaml:"request"`
 	// Any arguments that this collection requires
-	Arguments map[string]ArgumentInfo `json:"arguments" mapstructure:"arguments" yaml:"arguments"`
+	Arguments map[string]ArgumentInfo `json:"arguments"                      mapstructure:"arguments"             yaml:"arguments"`
 	// Column description
-	Description *string `json:"description,omitempty" mapstructure:"description,omitempty" yaml:"description,omitempty"`
+	Description *string `json:"description,omitempty"          mapstructure:"description,omitempty" yaml:"description,omitempty"`
 	// The name of the result type
-	ResultType schema.Type `json:"result_type" mapstructure:"result_type" yaml:"result_type"`
+	ResultType schema.Type `json:"result_type"                    mapstructure:"result_type"           yaml:"result_type"`
 	// The original result type is used when header forwarding or distributed execution is enabled
-	OriginalResultType schema.Type `json:"original_result_type,omitempty" mapstructure:"original_result_type" yaml:"original_result_type,omitempty"`
+	OriginalResultType schema.Type `json:"original_result_type,omitempty" mapstructure:"original_result_type"  yaml:"original_result_type,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -400,11 +373,11 @@ type ObjectType struct {
 	// Description of this type
 	Description *string `json:"description,omitempty" mapstructure:"description,omitempty" yaml:"description,omitempty"`
 	// Fields defined on this object type
-	Fields map[string]ObjectField `json:"fields" mapstructure:"fields" yaml:"fields"`
+	Fields map[string]ObjectField `json:"fields"                mapstructure:"fields"                yaml:"fields"`
 	// The alias of the object. It can be the original name of OpenAPI schema.
-	Alias string `json:"alias,omitempty" mapstructure:"alias" yaml:"alias,omitempty"`
+	Alias string `json:"alias,omitempty"       mapstructure:"alias"                 yaml:"alias,omitempty"`
 	// XML schema
-	XML *XMLSchema `json:"xml,omitempty" mapstructure:"xml" yaml:"xml,omitempty"`
+	XML *XMLSchema `json:"xml,omitempty"         mapstructure:"xml"                   yaml:"xml,omitempty"`
 }
 
 // Schema returns schema the object field.
@@ -440,6 +413,7 @@ func (j *ObjectField) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
+
 	rawType, ok := raw["type"]
 	if !ok || len(rawType) == 0 {
 		return errors.New("field type in ObjectField: required")
@@ -454,13 +428,16 @@ func (j *ObjectField) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawDesc, &desc); err != nil {
 			return fmt.Errorf("field description in ObjectField: %w", err)
 		}
+
 		j.Description = &desc
 	}
+
 	if rawArguments, ok := raw["arguments"]; ok {
 		var arguments schema.ObjectFieldArguments
 		if err := json.Unmarshal(rawArguments, &arguments); err != nil {
 			return fmt.Errorf("field arguments in ObjectField: %w", err)
 		}
+
 		j.Arguments = arguments
 	}
 
@@ -469,6 +446,7 @@ func (j *ObjectField) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawType, &ty); err != nil {
 			return fmt.Errorf("field http in ObjectField: %w", err)
 		}
+
 		j.HTTP = &ty
 	}
 
@@ -489,6 +467,7 @@ func (j *ArgumentInfo) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &raw); err != nil {
 		return err
 	}
+
 	rawType, ok := raw["type"]
 	if !ok || len(rawType) == 0 {
 		return errors.New("field type in ArgumentInfo: required")
@@ -503,6 +482,7 @@ func (j *ArgumentInfo) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawDesc, &desc); err != nil {
 			return fmt.Errorf("field description in ArgumentInfo: %w", err)
 		}
+
 		j.Description = &desc
 	}
 
@@ -511,6 +491,7 @@ func (j *ArgumentInfo) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(rawParameter, &param); err != nil {
 			return fmt.Errorf("field http in ArgumentInfo: %w", err)
 		}
+
 		j.HTTP = &param
 	}
 
@@ -523,17 +504,17 @@ type XMLSchema struct {
 	// When defined within items, it will affect the name of the individual XML elements within the list.
 	// When defined alongside type being array (outside the items), it will affect the wrapping element and only if wrapped is true.
 	// If wrapped is false, it will be ignored.
-	Name string `json:"name,omitempty" mapstructure:"name" yaml:"name,omitempty"`
+	Name string `json:"name,omitempty"      mapstructure:"name"      yaml:"name,omitempty"`
 	// The prefix to be used for the name.
-	Prefix string `json:"prefix,omitempty" mapstructure:"prefix" yaml:"prefix,omitempty"`
+	Prefix string `json:"prefix,omitempty"    mapstructure:"prefix"    yaml:"prefix,omitempty"`
 	// The URI of the namespace definition. This MUST be in the form of an absolute URI.
 	Namespace string `json:"namespace,omitempty" mapstructure:"namespace" yaml:"namespace,omitempty"`
 	// Used only for an array definition. Signifies whether the array is wrapped (for example, <books><book/><book/></books>) or unwrapped (<book/><book/>).
-	Wrapped bool `json:"wrapped,omitempty" mapstructure:"wrapped" yaml:"wrapped,omitempty"`
+	Wrapped bool `json:"wrapped,omitempty"   mapstructure:"wrapped"   yaml:"wrapped,omitempty"`
 	// Declares whether the property definition translates to an attribute instead of an element.
 	Attribute bool `json:"attribute,omitempty" mapstructure:"attribute" yaml:"attribute,omitempty"`
 	// Represents a text value of the xml element.
-	Text bool `json:"text,omitempty" mapstructure:"text" yaml:"text,omitempty"`
+	Text bool `json:"text,omitempty"      mapstructure:"text"      yaml:"text,omitempty"`
 }
 
 // GetFullName gets the full name with prefix.

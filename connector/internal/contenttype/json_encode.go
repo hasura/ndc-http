@@ -39,7 +39,11 @@ func (c *JSONEncoder) Encode(input any, resultType schema.Type) ([]byte, error) 
 	return c.buffer.Bytes(), nil
 }
 
-func (c *JSONEncoder) evalSchemaType(reflectValue reflect.Value, schemaType schema.Type, fieldPaths []string) error {
+func (c *JSONEncoder) evalSchemaType(
+	reflectValue reflect.Value,
+	schemaType schema.Type,
+	fieldPaths []string,
+) error {
 	rawType, err := schemaType.InterfaceT()
 	if err != nil {
 		return err
@@ -65,19 +69,32 @@ func (c *JSONEncoder) evalSchemaType(reflectValue reflect.Value, schemaType sche
 	}
 }
 
-func (c *JSONEncoder) evalArrayType(reflectValue reflect.Value, arrayType *schema.ArrayType, fieldPaths []string) error {
+func (c *JSONEncoder) evalArrayType(
+	reflectValue reflect.Value,
+	arrayType *schema.ArrayType,
+	fieldPaths []string,
+) error {
 	kind := reflectValue.Kind()
 	if kind != reflect.Slice && kind != reflect.Array {
-		return fmt.Errorf("%s: expected array, got %v", strings.Join(fieldPaths, "."), reflectValue.Kind())
+		return fmt.Errorf(
+			"%s: expected array, got %v",
+			strings.Join(fieldPaths, "."),
+			reflectValue.Kind(),
+		)
 	}
 
 	c.buffer.WriteRune('[')
+
 	valueLen := reflectValue.Len()
 
 	for i := range valueLen {
 		reflectElem := reflectValue.Index(i)
 
-		err := c.evalSchemaType(reflectElem, arrayType.ElementType, append(fieldPaths, strconv.Itoa(i)))
+		err := c.evalSchemaType(
+			reflectElem,
+			arrayType.ElementType,
+			append(fieldPaths, strconv.Itoa(i)),
+		)
 		if err != nil {
 			return err
 		}
@@ -92,7 +109,11 @@ func (c *JSONEncoder) evalArrayType(reflectValue reflect.Value, arrayType *schem
 	return nil
 }
 
-func (c *JSONEncoder) evalNamedType(reflectValue reflect.Value, schemaType *schema.NamedType, fieldPaths []string) error {
+func (c *JSONEncoder) evalNamedType(
+	reflectValue reflect.Value,
+	schemaType *schema.NamedType,
+	fieldPaths []string,
+) error {
 	scalarType, ok := c.schema.ScalarTypes[schemaType.Name]
 	if ok {
 		err := c.evalScalarType(reflectValue, scalarType)
@@ -110,10 +131,15 @@ func (c *JSONEncoder) evalNamedType(reflectValue reflect.Value, schemaType *sche
 
 	objectValue, ok := reflectValue.Interface().(map[string]any)
 	if !ok {
-		return fmt.Errorf("%s: expected object, got %v", strings.Join(fieldPaths, "."), reflectValue.Kind())
+		return fmt.Errorf(
+			"%s: expected object, got %v",
+			strings.Join(fieldPaths, "."),
+			reflectValue.Kind(),
+		)
 	}
 
 	var started bool
+
 	c.buffer.WriteRune('{')
 
 	for key, field := range objectType.Fields {
@@ -142,7 +168,10 @@ func (c *JSONEncoder) evalNamedType(reflectValue reflect.Value, schemaType *sche
 	return nil
 }
 
-func (c *JSONEncoder) evalScalarType(reflectValue reflect.Value, scalarType schema.ScalarType) error {
+func (c *JSONEncoder) evalScalarType(
+	reflectValue reflect.Value,
+	scalarType schema.ScalarType,
+) error {
 	switch rep := scalarType.Representation.Interface().(type) {
 	case *schema.TypeRepresentationBoolean:
 		boolValue, err := utils.DecodeBooleanReflection(reflectValue)

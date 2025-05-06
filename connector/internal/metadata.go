@@ -10,7 +10,9 @@ import (
 type MetadataCollection []configuration.NDCHttpRuntimeSchema
 
 // GetFunction gets the NDC function by name.
-func (rms MetadataCollection) GetFunction(name string) (*rest.OperationInfo, *configuration.NDCHttpRuntimeSchema, error) {
+func (rms MetadataCollection) GetFunction(
+	name string,
+) (*rest.OperationInfo, *configuration.NDCHttpRuntimeSchema, error) {
 	for _, rm := range rms {
 		fn := rm.GetFunction(name)
 		if fn != nil {
@@ -22,7 +24,9 @@ func (rms MetadataCollection) GetFunction(name string) (*rest.OperationInfo, *co
 }
 
 // GetProcedure gets the NDC procedure by name.
-func (rms MetadataCollection) GetProcedure(name string) (*rest.OperationInfo, *configuration.NDCHttpRuntimeSchema, error) {
+func (rms MetadataCollection) GetProcedure(
+	name string,
+) (*rest.OperationInfo, *configuration.NDCHttpRuntimeSchema, error) {
 	for _, rm := range rms {
 		fn := rm.GetProcedure(name)
 		if fn != nil {

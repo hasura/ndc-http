@@ -2,9 +2,9 @@
 kind: ScalarType
 version: v1
 definition:
-  name: Int32
+  name: int32
   graphql:
-    typeName: Int32
+    typeName: int32
 
 ---
 kind: BooleanExpressionType
@@ -13,7 +13,7 @@ definition:
   name: Int32_bool_exp
   operand:
     scalar:
-      type: Int32
+      type: int32
       comparisonOperators: []
       dataConnectorOperatorMapping:
         - dataConnectorName: myapi
@@ -32,17 +32,17 @@ version: v1
 definition:
   dataConnectorName: myapi
   dataConnectorScalarType: Int32
-  representation: Int32
+  representation: int32
   graphql:
-    comparisonExpressionTypeName: Int32_comparison_exp
+    comparisonExpressionTypeName: int32_comparison_exp
 
 ---
 kind: ScalarType
 version: v1
 definition:
-  name: Int64
+  name: int64
   graphql:
-    typeName: Int64
+    typeName: int64
 
 ---
 kind: BooleanExpressionType
@@ -51,7 +51,7 @@ definition:
   name: Int64_bool_exp
   operand:
     scalar:
-      type: Int64
+      type: int64
       comparisonOperators: []
       dataConnectorOperatorMapping:
         - dataConnectorName: myapi
@@ -70,9 +70,9 @@ version: v1
 definition:
   dataConnectorName: myapi
   dataConnectorScalarType: Int64
-  representation: Int64
+  representation: int64
   graphql:
-    comparisonExpressionTypeName: Int64_comparison_exp
+    comparisonExpressionTypeName: int64_comparison_exp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -88,39 +88,39 @@ definition:
 kind: ScalarType
 version: v1
 definition:
-  name: URI
+  name: string
   graphql:
-    typeName: URI
+    typeName: string
 
 ---
 kind: BooleanExpressionType
 version: v1
 definition:
-  name: URI_bool_exp
+  name: URIString_bool_exp
   operand:
     scalar:
-      type: URI
+      type: string
       comparisonOperators: []
       dataConnectorOperatorMapping:
         - dataConnectorName: myapi
-          dataConnectorScalarType: URI
+          dataConnectorScalarType: URIString
           operatorMapping: {}
   logicalOperators:
     enable: true
   isNull:
     enable: true
   graphql:
-    typeName: URI_bool_exp
+    typeName: URIString_bool_exp
 
 ---
 kind: DataConnectorScalarRepresentation
 version: v1
 definition:
   dataConnectorName: myapi
-  dataConnectorScalarType: URI
-  representation: URI
+  dataConnectorScalarType: URIString
+  representation: string
   graphql:
-    comparisonExpressionTypeName: URI_comparison_exp
+    comparisonExpressionTypeName: string_comparison_exp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -136,47 +136,9 @@ definition:
 kind: ScalarType
 version: v1
 definition:
-  name: RawHttpMethod
+  name: json
   graphql:
-    typeName: RawHttpMethod
-
----
-kind: BooleanExpressionType
-version: v1
-definition:
-  name: RawHttpMethod_bool_exp
-  operand:
-    scalar:
-      type: RawHttpMethod
-      comparisonOperators: []
-      dataConnectorOperatorMapping:
-        - dataConnectorName: myapi
-          dataConnectorScalarType: RawHttpMethod
-          operatorMapping: {}
-  logicalOperators:
-    enable: true
-  isNull:
-    enable: true
-  graphql:
-    typeName: RawHttpMethod_bool_exp
-
----
-kind: DataConnectorScalarRepresentation
-version: v1
-definition:
-  dataConnectorName: myapi
-  dataConnectorScalarType: RawHttpMethod
-  representation: RawHttpMethod
-  graphql:
-    comparisonExpressionTypeName: RawHttpMethod_comparison_exp
-
----
-kind: ScalarType
-version: v1
-definition:
-  name: JSON
-  graphql:
-    typeName: JSON
+    typeName: json
 
 ---
 kind: BooleanExpressionType
@@ -185,7 +147,7 @@ definition:
   name: JSON_bool_exp
   operand:
     scalar:
-      type: JSON
+      type: json
       comparisonOperators: []
       dataConnectorOperatorMapping:
         - dataConnectorName: myapi
@@ -204,7 +166,83 @@ version: v1
 definition:
   dataConnectorName: myapi
   dataConnectorScalarType: JSON
-  representation: JSON
+  representation: json
   graphql:
-    comparisonExpressionTypeName: JSON_comparison_exp
+    comparisonExpressionTypeName: json_comparison_exp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: enum
+  graphql:
+    typeName: enum
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: RawHttpMethod_bool_exp
+  operand:
+    scalar:
+      type: enum
+      comparisonOperators: []
+      dataConnectorOperatorMapping:
+        - dataConnectorName: myapi
+          dataConnectorScalarType: RawHttpMethod
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: RawHttpMethod_bool_exp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: myapi
+  dataConnectorScalarType: RawHttpMethod
+  representation: enum
+  graphql:
+    comparisonExpressionTypeName: enum_comparison_exp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: float64
+  graphql:
+    typeName: float64
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: Float64_bool_exp
+  operand:
+    scalar:
+      type: float64
+      comparisonOperators: []
+      dataConnectorOperatorMapping:
+        - dataConnectorName: myapi
+          dataConnectorScalarType: Float64
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: Float64_bool_exp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: myapi
+  dataConnectorScalarType: Float64
+  representation: float64
+  graphql:
+    comparisonExpressionTypeName: float64_comparison_exp
 

@@ -13,14 +13,11 @@ const (
 type DeflateCompressor struct{}
 
 // Compress the reader content with gzip encoding.
-func (dc DeflateCompressor) Compress(w io.Writer, data []byte) (int, error) {
+func (dc DeflateCompressor) Compress(w io.Writer, src io.Reader) (int64, error) {
 	zw := zlib.NewWriter(w)
 
-	size, err := zw.Write(data)
-	if err != nil {
-		return size, err
-	}
-	err = zw.Close()
+	size, err := io.Copy(zw, src)
+	_ = zw.Close()
 
 	return size, err
 }

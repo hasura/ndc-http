@@ -31,7 +31,11 @@ var tlsVersions = map[string]uint16{
 }
 
 // NewTLSTransport creates a new HTTP transport with TLS configuration.
-func NewTLSTransport(baseTransport http.RoundTripper, tlsConfig *TLSConfig, logger *slog.Logger) (*http.Transport, error) {
+func NewTLSTransport(
+	baseTransport http.RoundTripper,
+	tlsConfig *TLSConfig,
+	logger *slog.Logger,
+) (*http.Transport, error) {
 	bTransport, ok := baseTransport.(*http.Transport)
 	if !ok {
 		bTransport, _ = http.DefaultTransport.(*http.Transport)
@@ -51,33 +55,33 @@ func NewTLSTransport(baseTransport http.RoundTripper, tlsConfig *TLSConfig, logg
 // TLSConfig represents the transport layer security (LTS) configuration for the mutualTLS authentication.
 type TLSConfig struct {
 	// Path to the TLS cert to use for TLS required connections.
-	CertFile *utils.EnvString `json:"certFile,omitempty" mapstructure:"certFile" yaml:"certFile,omitempty"`
+	CertFile *utils.EnvString `json:"certFile,omitempty"                 mapstructure:"certFile"                 yaml:"certFile,omitempty"`
 	// Alternative to cert_file. Provide the certificate contents as a base64-encoded string instead of a filepath.
-	CertPem *utils.EnvString `json:"certPem,omitempty" mapstructure:"certPem" yaml:"certPem,omitempty"`
+	CertPem *utils.EnvString `json:"certPem,omitempty"                  mapstructure:"certPem"                  yaml:"certPem,omitempty"`
 	// Path to the TLS key to use for TLS required connections.
-	KeyFile *utils.EnvString `json:"keyFile,omitempty" mapstructure:"keyFile" yaml:"keyFile,omitempty"`
+	KeyFile *utils.EnvString `json:"keyFile,omitempty"                  mapstructure:"keyFile"                  yaml:"keyFile,omitempty"`
 	// Alternative to key_file. Provide the key contents as a base64-encoded string instead of a filepath.
-	KeyPem *utils.EnvString `json:"keyPem,omitempty" mapstructure:"keyPem" yaml:"keyPem,omitempty"`
+	KeyPem *utils.EnvString `json:"keyPem,omitempty"                   mapstructure:"keyPem"                   yaml:"keyPem,omitempty"`
 	// Path to the CA cert. For a client this verifies the server certificate. For a server this verifies client certificates.
 	// If empty uses system root CA.
-	CAFile *utils.EnvString `json:"caFile,omitempty" mapstructure:"caFile" yaml:"caFile,omitempty"`
+	CAFile *utils.EnvString `json:"caFile,omitempty"                   mapstructure:"caFile"                   yaml:"caFile,omitempty"`
 	// Alternative to ca_file. Provide the CA cert contents as a base64-encoded string instead of a filepath.
-	CAPem *utils.EnvString `json:"caPem,omitempty" mapstructure:"caPem" yaml:"caPem,omitempty"`
+	CAPem *utils.EnvString `json:"caPem,omitempty"                    mapstructure:"caPem"                    yaml:"caPem,omitempty"`
 	// Additionally you can configure TLS to be enabled but skip verifying the server's certificate chain.
-	InsecureSkipVerify *utils.EnvBool `json:"insecureSkipVerify,omitempty" mapstructure:"insecureSkipVerify" yaml:"insecureSkipVerify,omitempty"`
+	InsecureSkipVerify *utils.EnvBool `json:"insecureSkipVerify,omitempty"       mapstructure:"insecureSkipVerify"       yaml:"insecureSkipVerify,omitempty"`
 	// Whether to load the system certificate authorities pool alongside the certificate authority.
 	IncludeSystemCACertsPool *utils.EnvBool `json:"includeSystemCACertsPool,omitempty" mapstructure:"includeSystemCACertsPool" yaml:"includeSystemCACertsPool,omitempty"`
 	// Minimum acceptable TLS version.
-	MinVersion string `json:"minVersion,omitempty" mapstructure:"minVersion" yaml:"minVersion,omitempty"`
+	MinVersion string `json:"minVersion,omitempty"               mapstructure:"minVersion"               yaml:"minVersion,omitempty"`
 	// Maximum acceptable TLS version.
-	MaxVersion string `json:"maxVersion,omitempty" mapstructure:"maxVersion" yaml:"maxVersion,omitempty"`
+	MaxVersion string `json:"maxVersion,omitempty"               mapstructure:"maxVersion"               yaml:"maxVersion,omitempty"`
 	// Explicit cipher suites can be set. If left blank, a safe default list is used.
 	// See https://go.dev/src/crypto/tls/cipher_suites.go for a list of supported cipher suites.
-	CipherSuites []string `json:"cipherSuites,omitempty" mapstructure:"cipherSuites" yaml:"cipherSuites,omitempty"`
+	CipherSuites []string `json:"cipherSuites,omitempty"             mapstructure:"cipherSuites"             yaml:"cipherSuites,omitempty"`
 	// ServerName requested by client for virtual hosting.
 	// This sets the ServerName in the TLSConfig. Please refer to
 	// https://godoc.org/crypto/tls#Config for more information. (optional)
-	ServerName *utils.EnvString `json:"serverName,omitempty" mapstructure:"serverName" yaml:"serverName,omitempty"`
+	ServerName *utils.EnvString `json:"serverName,omitempty"               mapstructure:"serverName"               yaml:"serverName,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -86,13 +90,16 @@ func (tc TLSConfig) Validate() error {
 	if err != nil {
 		return fmt.Errorf("TLSConfig.minVersion: %w", err)
 	}
+
 	maxTLS, err := tc.GetMaxVersion()
 	if err != nil {
 		return fmt.Errorf("TLSConfig.maxVersion: %w", err)
 	}
 
 	if maxTLS < minTLS && maxTLS != defaultMaxTLSVersion {
-		return errors.New("invalid TLS configuration: minVersion cannot be greater than max_version")
+		return errors.New(
+			"invalid TLS configuration: minVersion cannot be greater than max_version",
+		)
 	}
 
 	if tc.CAFile != nil && tc.CAPem != nil {
@@ -100,13 +107,16 @@ func (tc TLSConfig) Validate() error {
 		if err != nil {
 			return fmt.Errorf("TLSConfig.caFile: %w", err)
 		}
+
 		caPem, err := tc.CAFile.GetOrDefault("")
 		if err != nil {
 			return fmt.Errorf("TLSConfig.caPem: %w", err)
 		}
 
 		if caFile != "" && caPem != "" {
-			return errors.New("invalid TLS configuration: provide either a CA file or the PEM-encoded string, but not both")
+			return errors.New(
+				"invalid TLS configuration: provide either a CA file or the PEM-encoded string, but not both",
+			)
 		}
 	}
 
@@ -115,13 +125,16 @@ func (tc TLSConfig) Validate() error {
 		if err != nil {
 			return fmt.Errorf("TLSConfig.certFile: %w", err)
 		}
+
 		certPem, err := tc.CertPem.GetOrDefault("")
 		if err != nil {
 			return fmt.Errorf("TLSConfig.caPem: %w", err)
 		}
 
 		if certFile != "" && certPem != "" {
-			return errors.New("for auth via TLS, provide either a certificate or the PEM-encoded string, but not both")
+			return errors.New(
+				"for auth via TLS, provide either a certificate or the PEM-encoded string, but not both",
+			)
 		}
 	}
 
@@ -130,13 +143,16 @@ func (tc TLSConfig) Validate() error {
 		if err != nil {
 			return fmt.Errorf("TLSConfig.keyFile: %w", err)
 		}
+
 		keyPem, err := tc.KeyPem.GetOrDefault("")
 		if err != nil {
 			return fmt.Errorf("TLSConfig.keyPem: %w", err)
 		}
 
 		if keyFile != "" && keyPem != "" {
-			return errors.New("for auth via TLS, provide either a certificate or the PEM-encoded string, but not both")
+			return errors.New(
+				"for auth via TLS, provide either a certificate or the PEM-encoded string, but not both",
+			)
 		}
 	}
 
@@ -172,6 +188,7 @@ func (tc TLSConfig) convertTLSVersion(v string, defaultVersion uint16) (uint16, 
 	if v == "" {
 		return defaultVersion, nil
 	}
+
 	val, ok := tlsVersions[v]
 	if !ok {
 		return 0, fmt.Errorf("unsupported TLS version: %q", v)
@@ -192,10 +209,12 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 	if err != nil {
 		return nil, fmt.Errorf("invalid TLS min_version: %w", err)
 	}
+
 	maxTLS, err := tlsConfig.GetMaxVersion()
 	if err != nil {
 		return nil, fmt.Errorf("invalid TLS max_version: %w", err)
 	}
+
 	cipherSuites, err := convertCipherSuites(tlsConfig.CipherSuites)
 	if err != nil {
 		return nil, err
@@ -210,6 +229,7 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 	}
 
 	var insecureSkipVerify bool
+
 	if tlsConfig.InsecureSkipVerify != nil {
 		insecureSkipVerify, err = tlsConfig.InsecureSkipVerify.GetOrDefault(false)
 		if err != nil {
@@ -223,6 +243,7 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 	}
 
 	var certificates []tls.Certificate
+
 	if cert != nil {
 		certificates = append(certificates, *cert)
 	} else if !insecureSkipVerify {
@@ -236,7 +257,7 @@ func loadTLSConfig(tlsConfig *TLSConfig, logger *slog.Logger) (*tls.Config, erro
 		MaxVersion:         maxTLS,
 		CipherSuites:       cipherSuites,
 		ServerName:         serverName,
-		InsecureSkipVerify: insecureSkipVerify,
+		InsecureSkipVerify: insecureSkipVerify, //nolint:gosec
 	}
 
 	return result, nil
@@ -246,7 +267,9 @@ func loadCACertPool(tlsConfig *TLSConfig) (*x509.CertPool, error) {
 	// There is no need to load the System Certs for RootCAs because
 	// if the value is nil, it will default to checking against th System Certs.
 	var err error
+
 	var certPool *x509.CertPool
+
 	var includeSystemCACertsPool bool
 
 	if tlsConfig.IncludeSystemCACertsPool != nil {
@@ -297,15 +320,18 @@ func loadCertFile(certPath string, includeSystemCACertsPool bool) (*x509.CertPoo
 
 func loadCertPem(certPem []byte, includeSystemCACertsPool bool) (*x509.CertPool, error) {
 	certPool := x509.NewCertPool()
+
 	if includeSystemCACertsPool {
 		scp, err := systemCertPool()
 		if err != nil {
 			return nil, err
 		}
+
 		if scp != nil {
 			certPool = scp
 		}
 	}
+
 	if !certPool.AppendCertsFromPEM(certPem) {
 		return nil, errors.New("failed to parse cert")
 	}
@@ -313,9 +339,15 @@ func loadCertPem(certPem []byte, includeSystemCACertsPool bool) (*x509.CertPool,
 	return certPool, nil
 }
 
-func loadCertificate(tlsConfig *TLSConfig, insecureSkipVerify bool, logger *slog.Logger) (*tls.Certificate, error) {
+func loadCertificate(
+	tlsConfig *TLSConfig,
+	insecureSkipVerify bool,
+	logger *slog.Logger,
+) (*tls.Certificate, error) {
 	var certData, keyData []byte
+
 	var certPem, keyPem string
+
 	var err error
 
 	if tlsConfig.CertPem != nil {
@@ -396,9 +428,12 @@ func loadCertificate(tlsConfig *TLSConfig, insecureSkipVerify bool, logger *slog
 
 func convertCipherSuites(cipherSuites []string) ([]uint16, error) {
 	var result []uint16
+
 	var errs []error
+
 	for _, suite := range cipherSuites {
 		found := false
+
 		for _, supported := range tls.CipherSuites() {
 			if suite == supported.Name {
 				result = append(result, supported.ID)
@@ -407,6 +442,7 @@ func convertCipherSuites(cipherSuites []string) ([]uint16, error) {
 				break
 			}
 		}
+
 		if !found {
 			errs = append(errs, fmt.Errorf("invalid TLS cipher suite: %q", suite))
 		}

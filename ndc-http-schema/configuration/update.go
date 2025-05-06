@@ -14,7 +14,10 @@ import (
 )
 
 // UpdateHTTPConfiguration validates and updates the HTTP configuration.
-func UpdateHTTPConfiguration(configurationDir string, logger *slog.Logger) (*Configuration, []NDCHttpRuntimeSchema, *schema.NDCHttpSchema, error) {
+func UpdateHTTPConfiguration(
+	configurationDir string,
+	logger *slog.Logger,
+) (*Configuration, []NDCHttpRuntimeSchema, *schema.NDCHttpSchema, error) {
 	config, err := ReadConfigurationFile(configurationDir)
 	if err != nil {
 		return nil, nil, nil, err
@@ -23,6 +26,7 @@ func UpdateHTTPConfiguration(configurationDir string, logger *slog.Logger) (*Con
 	schemas, errs := BuildSchemaFromConfig(config, configurationDir, logger)
 	if len(errs) > 0 {
 		printSchemaValidationError(logger, errs)
+
 		if config.Strict {
 			return nil, nil, nil, errors.New("failed to build schema files")
 		}
@@ -31,6 +35,7 @@ func UpdateHTTPConfiguration(configurationDir string, logger *slog.Logger) (*Con
 	mergedSchema, validatedSchemas, errs := MergeNDCHttpSchemas(config, schemas)
 	if len(errs) > 0 {
 		printSchemaValidationError(logger, errs)
+
 		if validatedSchemas == nil || config.Strict {
 			return nil, nil, nil, errors.New("invalid http schema")
 		}
@@ -59,6 +64,7 @@ func printSchemaValidationError(logger *slog.Logger, errors map[string][]string)
 // ReadConfigurationFile reads and decodes the configuration file from the configuration directory.
 func ReadConfigurationFile(configurationDir string) (*Configuration, error) {
 	var config Configuration
+
 	jsonBytes, err := os.ReadFile(configurationDir + "/config.json")
 	if err == nil {
 		if err = json.Unmarshal(jsonBytes, &config); err != nil {
@@ -84,7 +90,10 @@ func ReadConfigurationFile(configurationDir string) (*Configuration, error) {
 
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("the config.{json,yaml,yml} file does not exist at %s", configurationDir)
+			return nil, fmt.Errorf(
+				"the config.{json,yaml,yml} file does not exist at %s",
+				configurationDir,
+			)
 		} else {
 			return nil, err
 		}

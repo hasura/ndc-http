@@ -22,8 +22,16 @@ type OAuth2Client struct {
 var _ Credential = &OAuth2Client{}
 
 // NewOAuth2Client creates an OAuth2 client from the security scheme.
-func NewOAuth2Client(ctx context.Context, httpClient *http.Client, baseServerURL *url.URL, flowType schema.OAuthFlowType, config *schema.OAuthFlow) (*OAuth2Client, error) {
-	if flowType != schema.ClientCredentialsFlow || config.TokenURL == nil || config.ClientID == nil || config.ClientSecret == nil {
+func NewOAuth2Client(
+	ctx context.Context,
+	httpClient *http.Client,
+	baseServerURL *url.URL,
+	flowType schema.OAuthFlowType,
+	config *schema.OAuthFlow,
+) (*OAuth2Client, error) {
+	if flowType != schema.ClientCredentialsFlow || config.TokenURL == nil ||
+		config.ClientID == nil ||
+		config.ClientSecret == nil {
 		return &OAuth2Client{
 			client:  httpClient,
 			isEmpty: true,
@@ -44,10 +52,12 @@ func NewOAuth2Client(ctx context.Context, httpClient *http.Client, baseServerURL
 	if tokenURL.Host == "" {
 		tu := utils.CloneURL(baseServerURL)
 		tu.Path = path.Join(tu.Path, tokenURL.Path)
+
 		q := tu.Query()
 		for k, v := range tokenURL.Query() {
 			q[k] = v
 		}
+
 		tu.RawQuery = q.Encode()
 		tu.RawFragment = tokenURL.RawFragment
 
@@ -70,11 +80,13 @@ func NewOAuth2Client(ctx context.Context, httpClient *http.Client, baseServerURL
 	}
 
 	var endpointParams url.Values
+
 	for key, envValue := range config.EndpointParams {
 		value, err := envValue.GetOrDefault("")
 		if err != nil {
 			return nil, fmt.Errorf("endpointParams[%s]: %w", key, err)
 		}
+
 		if value != "" {
 			endpointParams.Set(key, value)
 		}

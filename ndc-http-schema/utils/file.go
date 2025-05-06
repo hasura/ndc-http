@@ -22,6 +22,7 @@ import (
 // MarshalSchema encodes the NDC HTTP schema to bytes.
 func MarshalSchema(content any, format schema.SchemaFileFormat) ([]byte, error) {
 	var fileBuffer bytes.Buffer
+
 	switch format {
 	case schema.SchemaFileJSON:
 		encoder := json.NewEncoder(&fileBuffer)
@@ -34,6 +35,7 @@ func MarshalSchema(content any, format schema.SchemaFileFormat) ([]byte, error) 
 	case schema.SchemaFileYAML:
 		encoder := yaml.NewEncoder(&fileBuffer)
 		encoder.SetIndent(2)
+
 		if err := encoder.Encode(content); err != nil {
 			return nil, fmt.Errorf("failed to encode NDC HTTP schema: %w", err)
 		}
@@ -78,12 +80,14 @@ func ReadFileFromPath(filePath string) ([]byte, error) {
 		}
 
 		if resp.Body != nil {
-			defer resp.Body.Close()
 			result, err = io.ReadAll(resp.Body)
+			_ = resp.Body.Close()
+
 			if err != nil {
 				return nil, fmt.Errorf("failed to read content from %s: %w", filePath, err)
 			}
 		}
+
 		if resp.StatusCode != http.StatusOK {
 			errorMsg := string(result)
 			if errorMsg == "" {
@@ -116,13 +120,16 @@ func WalkFiles(filePath string, callback func(data []byte) error) error {
 		}
 
 		var result []byte
+
 		if resp.Body != nil {
-			defer resp.Body.Close()
 			result, err = io.ReadAll(resp.Body)
+			_ = resp.Body.Close()
+
 			if err != nil {
 				return fmt.Errorf("failed to read content from %s: %w", filePath, err)
 			}
 		}
+
 		if resp.StatusCode != http.StatusOK {
 			errorMsg := string(result)
 			if errorMsg == "" {
@@ -131,6 +138,7 @@ func WalkFiles(filePath string, callback func(data []byte) error) error {
 
 			return fmt.Errorf("failed to download file from %s: %s", filePath, errorMsg)
 		}
+
 		if len(result) == 0 {
 			return fmt.Errorf("failed to read file from %s: no content", filePath)
 		}
@@ -148,6 +156,7 @@ func WalkFiles(filePath string, callback func(data []byte) error) error {
 		if err != nil {
 			return fmt.Errorf("failed to read content from %s: %w", p, err)
 		}
+
 		if len(result) == 0 {
 			return fmt.Errorf("failed to read file from %s: no content", p)
 		}
@@ -175,7 +184,8 @@ func WalkFiles(filePath string, callback func(data []byte) error) error {
 
 // ResolveFilePath resolves file path with directory.
 func ResolveFilePath(dir string, filePath string) string {
-	if !strings.HasPrefix(filePath, "/") && !strings.HasPrefix(filePath, "\\") && !strings.HasPrefix(filePath, "http") {
+	if !strings.HasPrefix(filePath, "/") && !strings.HasPrefix(filePath, "\\") &&
+		!strings.HasPrefix(filePath, "http") {
 		return path.Join(dir, filePath)
 	}
 

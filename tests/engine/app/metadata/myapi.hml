@@ -14,48 +14,330 @@ definition:
   schema:
     version: v0.1
     schema:
-      scalar_types:
-        Boolean:
-          representation:
-            type: boolean
-          aggregate_functions: {}
-          comparison_operators: {}
-        Int32:
-          representation:
-            type: int32
-          aggregate_functions: {}
-          comparison_operators: {}
-        Int64:
-          representation:
-            type: int64
-          aggregate_functions: {}
-          comparison_operators: {}
-        JSON:
-          representation:
-            type: json
-          aggregate_functions: {}
-          comparison_operators: {}
-        RawHttpMethod:
-          representation:
-            type: enum
-            one_of:
-              - get
-              - post
-              - put
-              - patch
-              - delete
-          aggregate_functions: {}
-          comparison_operators: {}
-        String:
-          representation:
-            type: string
-          aggregate_functions: {}
-          comparison_operators: {}
-        URI:
-          representation:
-            type: string
-          aggregate_functions: {}
-          comparison_operators: {}
+      collections: []
+      functions:
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: Filter by album ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+            userId:
+              description: Filter by user ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+          description: Get all available albums
+          name: getAlbums
+          result_type:
+            element_type:
+              name: Album
+              type: named
+            type: array
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: The ID of the album to retrieve
+              type:
+                name: Int32
+                type: named
+          description: Get specific album
+          name: getAlbumsId
+          result_type:
+            name: Album
+            type: named
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: post id
+              type:
+                name: Int32
+                type: named
+          description: Get photos for a specific album
+          name: getAlbumsIdPhotos
+          result_type:
+            element_type:
+              name: Photo
+              type: named
+            type: array
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: The ID of the comment to retrieve
+              type:
+                name: Int32
+                type: named
+          description: Get specific comment
+          name: getComment
+          result_type:
+            name: Comment
+            type: named
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: Filter by comment ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+            postId:
+              description: Filter by post ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+          description: Get all available comments
+          name: getComments
+          result_type:
+            element_type:
+              name: Comment
+              type: named
+            type: array
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: The ID of the photo to retrieve
+              type:
+                name: Int32
+                type: named
+          description: Get specific photo
+          name: getPhoto
+          result_type:
+            name: Photo
+            type: named
+        - arguments:
+            albumId:
+              description: Filter by album ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: Filter by photo ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+          description: Get all available photos
+          name: getPhotos
+          result_type:
+            element_type:
+              name: Photo
+              type: named
+            type: array
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: The ID of the post to retrieve
+              type:
+                name: Int32
+                type: named
+          description: Get specific post
+          name: getPostById
+          result_type:
+            name: Post
+            type: named
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: Filter by post ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+            userId:
+              description: Filter by user ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+          description: Get all available posts
+          name: getPosts
+          result_type:
+            element_type:
+              name: Post
+              type: named
+            type: array
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: post id
+              type:
+                name: Int32
+                type: named
+          description: Get comments for a specific post
+          name: getPostsIdComments
+          result_type:
+            element_type:
+              name: Comment
+              type: named
+            type: array
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: The ID of the todo to retrieve
+              type:
+                name: Int32
+                type: named
+          description: Get specific todo
+          name: getTodo
+          result_type:
+            name: Todo
+            type: named
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: Filter by todo ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+            userId:
+              description: Filter by user ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+          description: Get all available todos
+          name: getTodos
+          result_type:
+            element_type:
+              name: Todo
+              type: named
+            type: array
+        - arguments:
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: The ID of the user to retrieve
+              type:
+                name: Int32
+                type: named
+          description: Get specific user
+          name: getUser
+          result_type:
+            name: User
+            type: named
+        - arguments:
+            email:
+              description: Filter by user email address
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: Filter by user ID
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int32
+                  type: named
+          description: Get all available users
+          name: getUsers
+          result_type:
+            element_type:
+              name: User
+              type: named
+            type: array
       object_types:
         Album:
           fields:
@@ -63,750 +345,520 @@ definition:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
             title:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             userId:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
         Comment:
           fields:
             body:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             email:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             id:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
             name:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             postId:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
         Photo:
           fields:
             albumId:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
             id:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
             thumbnailUrl:
               type:
                 type: nullable
                 underlying_type:
+                  name: URIString
                   type: named
-                  name: URI
             title:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             url:
               type:
                 type: nullable
                 underlying_type:
+                  name: URIString
                   type: named
-                  name: URI
         Post:
           fields:
             body:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             id:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
             title:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             userId:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
+        PostInput:
+          fields:
+            body:
+              type:
+                type: nullable
+                underlying_type:
+                  name: String
+                  type: named
+            id:
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int64
+                  type: named
+            title:
+              type:
+                type: nullable
+                underlying_type:
+                  name: String
+                  type: named
+            userId:
+              type:
+                type: nullable
+                underlying_type:
+                  name: Int64
+                  type: named
         RetryPolicy:
           description: Retry policy of request
           fields:
             delay:
-              description: Delay retry delay in milliseconds
+              description: The initial wait time in milliseconds before a retry is attempted.
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int32
+                  type: named
             httpStatus:
               description: List of HTTP status the connector will retry on
               type:
                 type: nullable
                 underlying_type:
-                  type: array
                   element_type:
-                    type: named
                     name: Int32
+                    type: named
+                  type: array
+            jitter:
+              description: How much does the reconnection time vary relative to the base value. Must be in range (0, 1)
+              type:
+                type: nullable
+                underlying_type:
+                  name: Float64
+                  type: named
+            maxIntervalSeconds:
+              description: How much can the wait time grow. Defaults to 60 seconds
+              type:
+                type: nullable
+                underlying_type:
+                  name: Float64
+                  type: named
+            multiplier:
+              description: How much should the reconnection time grow on subsequent attempts. Must be >=1; 1 = constant interval
+              type:
+                type: nullable
+                underlying_type:
+                  name: Float64
+                  type: named
             times:
               description: Number of retry times
               type:
-                type: named
                 name: Int32
+                type: named
         Todo:
           fields:
             completed:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Boolean
+                  type: named
             id:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
             title:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             userId:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
         User:
           fields:
             address:
               type:
                 type: nullable
                 underlying_type:
+                  name: UserAddressObject
                   type: named
-                  name: UserAddress
             company:
               type:
                 type: nullable
                 underlying_type:
+                  name: UserCompanyObject
                   type: named
-                  name: UserCompany
             email:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             id:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int64
+                  type: named
             name:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             phone:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             username:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             website:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
-        UserAddress:
-          fields:
-            city:
-              type:
-                type: nullable
-                underlying_type:
                   type: named
-                  name: String
-            geo:
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: UserAddressGeo
-            street:
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: String
-            suite:
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: String
-            zipcode:
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: String
-        UserAddressGeo:
+        UserAddressGeoObject:
           fields:
             lat:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             lng:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
-        UserCompany:
+                  type: named
+        UserAddressObject:
+          fields:
+            city:
+              type:
+                type: nullable
+                underlying_type:
+                  name: String
+                  type: named
+            geo:
+              type:
+                type: nullable
+                underlying_type:
+                  name: UserAddressGeoObject
+                  type: named
+            street:
+              type:
+                type: nullable
+                underlying_type:
+                  name: String
+                  type: named
+            suite:
+              type:
+                type: nullable
+                underlying_type:
+                  name: String
+                  type: named
+            zipcode:
+              type:
+                type: nullable
+                underlying_type:
+                  name: String
+                  type: named
+        UserCompanyObject:
           fields:
             bs:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             catchPhrase:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
+                  type: named
             name:
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: String
-      collections: []
-      functions:
-        - name: getAlbums
-          description: Get all available albums
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
                   type: named
-                  name: JSON
-            id:
-              description: Filter by album ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-            userId:
-              description: Filter by user ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: Album
-        - name: getAlbumsId
-          description: Get specific album
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: The ID of the album to retrieve
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: named
-            name: Album
-        - name: getAlbumsIdPhotos
-          description: Get photos for a specific album
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: post id
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: Photo
-        - name: getComment
-          description: Get specific comment
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: The ID of the comment to retrieve
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: named
-            name: Comment
-        - name: getComments
-          description: Get all available comments
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: Filter by comment ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-            postId:
-              description: Filter by post ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: Comment
-        - name: getPhoto
-          description: Get specific photo
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: The ID of the photo to retrieve
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: named
-            name: Photo
-        - name: getPhotos
-          description: Get all available photos
-          arguments:
-            albumId:
-              description: Filter by album ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: Filter by photo ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: Photo
-        - name: getPostById
-          description: Get specific post
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: The ID of the post to retrieve
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: named
-            name: Post
-        - name: getPosts
-          description: Get all available posts
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: Filter by post ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-            userId:
-              description: Filter by user ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: Post
-        - name: getPostsIdComments
-          description: Get comments for a specific post
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: post id
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: Comment
-        - name: getTodo
-          description: Get specific todo
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: The ID of the todo to retrieve
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: named
-            name: Todo
-        - name: getTodos
-          description: Get all available todos
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: Filter by todo ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-            userId:
-              description: Filter by user ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: Todo
-        - name: getUser
-          description: Get specific user
-          arguments:
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: The ID of the user to retrieve
-              type:
-                type: named
-                name: Int32
-          result_type:
-            type: named
-            name: User
-        - name: getUsers
-          description: Get all available users
-          arguments:
-            email:
-              description: Filter by user email address
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: Filter by user ID
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: Int32
-          result_type:
-            type: array
-            element_type:
-              type: named
-              name: User
       procedures:
-        - name: createPost
-          description: Create a post
-          arguments:
+        - arguments:
             body:
               description: Post object that needs to be added
               type:
+                name: PostInput
                 type: named
-                name: Post
             headers:
               description: Headers forwarded from the Hasura engine
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: JSON
+                  type: named
+          description: Create a post
+          name: createPost
           result_type:
-            type: named
             name: Post
-        - name: deletePostById
-          description: Delete specific post
-          arguments:
+            type: named
+        - arguments:
             headers:
               description: Headers forwarded from the Hasura engine
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: JSON
+                  type: named
             id:
               description: The ID of the post to retrieve
               type:
-                type: named
                 name: Int32
+                type: named
+          description: Delete specific post
+          name: deletePostById
           result_type:
             type: nullable
             underlying_type:
-              type: named
               name: Boolean
-        - name: patchPostById
+              type: named
+        - arguments:
+            body:
+              description: Post object that needs to be updated
+              type:
+                name: PostInput
+                type: named
+            headers:
+              description: Headers forwarded from the Hasura engine
+              type:
+                type: nullable
+                underlying_type:
+                  name: JSON
+                  type: named
+            id:
+              description: The ID of the post to retrieve
+              type:
+                name: Int32
+                type: named
           description: patch specific post
-          arguments:
+          name: patchPostById
+          result_type:
+            name: Post
+            type: named
+        - arguments:
             body:
               description: Post object that needs to be updated
               type:
+                name: PostInput
                 type: named
-                name: Post
             headers:
               description: Headers forwarded from the Hasura engine
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: JSON
+                  type: named
             id:
               description: The ID of the post to retrieve
               type:
-                type: named
                 name: Int32
-          result_type:
-            type: named
-            name: Post
-        - name: updatePostById
+                type: named
           description: Update specific post
-          arguments:
-            body:
-              description: Post object that needs to be updated
-              type:
-                type: named
-                name: Post
-            headers:
-              description: Headers forwarded from the Hasura engine
-              type:
-                type: nullable
-                underlying_type:
-                  type: named
-                  name: JSON
-            id:
-              description: The ID of the post to retrieve
-              type:
-                type: named
-                name: Int32
+          name: updatePostById
           result_type:
-            type: named
             name: Post
-        - name: sendHttpRequest
-          description: Send an HTTP request
-          arguments:
+            type: named
+        - arguments:
             additionalHeaders:
               description: Additional request headers
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: JSON
+                  type: named
             body:
               description: Request body
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: JSON
+                  type: named
             headers:
               description: Headers forwarded from the Hasura engine
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: JSON
+                  type: named
             method:
               description: Request method
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: RawHttpMethod
+                  type: named
             retry:
               description: Retry policy
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: RetryPolicy
+                  type: named
             timeout:
               description: Request timeout in seconds
               type:
                 type: nullable
                 underlying_type:
-                  type: named
                   name: Int32
+                  type: named
             url:
               description: Request URL
               type:
-                type: named
                 name: String
+                type: named
+          description: Send an HTTP request
+          name: sendHttpRequest
           result_type:
             type: nullable
             underlying_type:
-              type: named
               name: JSON
+              type: named
+      scalar_types:
+        Boolean:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            type: boolean
+        Float64:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            type: float64
+        Int32:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            type: int32
+        Int64:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            type: int64
+        JSON:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            type: json
+        RawHttpMethod:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            one_of:
+              - get
+              - post
+              - put
+              - patch
+              - delete
+            type: enum
+        String:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            type: string
+        URIString:
+          aggregate_functions: {}
+          comparison_operators: {}
+          representation:
+            type: string
     capabilities:
-      version: 0.1.6
       capabilities:
-        query:
-          variables: {}
-          explain: {}
-          nested_fields: {}
-          exists: {}
         mutation:
           explain: {}
+        query:
+          exists: {}
+          explain: {}
+          nested_fields: {}
+          variables: {}
+      version: 0.1.6
   argumentPresets:
     - argument: headers
       value:

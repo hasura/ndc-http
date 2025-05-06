@@ -28,13 +28,16 @@ func NewOAS2Builder(options ConvertOptions) *OAS2Builder {
 	}
 }
 
-func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.Swagger]) (*rest.NDCHttpSchema, error) {
+func (oc *OAS2Builder) BuildDocumentModel(
+	docModel *libopenapi.DocumentModel[v2.Swagger],
+) (*rest.NDCHttpSchema, error) {
 	if docModel.Model.Info != nil {
 		oc.schema.Settings.Version = docModel.Model.Info.Version
 	}
 
 	if docModel.Model.Host != "" {
 		scheme := "https"
+
 		for _, s := range docModel.Model.Schemes {
 			if strings.HasPrefix(s, "http") {
 				scheme = s
@@ -42,8 +45,12 @@ func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.
 				break
 			}
 		}
+
 		envName := utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"})
-		serverURL := strings.TrimRight(fmt.Sprintf("%s://%s%s", scheme, docModel.Model.Host, docModel.Model.BasePath), "/")
+		serverURL := strings.TrimRight(
+			fmt.Sprintf("%s://%s%s", scheme, docModel.Model.Host, docModel.Model.BasePath),
+			"/",
+		)
 		oc.schema.Settings.Servers = append(oc.schema.Settings.Servers, rest.ServerConfig{
 			URL: sdkUtils.NewEnvString(envName, serverURL),
 		})
@@ -63,7 +70,8 @@ func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.
 		}
 	}
 
-	if docModel.Model.SecurityDefinitions != nil && docModel.Model.SecurityDefinitions.Definitions != nil {
+	if docModel.Model.SecurityDefinitions != nil &&
+		docModel.Model.SecurityDefinitions.Definitions != nil {
 		oc.schema.Settings.SecuritySchemes = make(map[string]rest.SecurityScheme)
 		for scheme := docModel.Model.SecurityDefinitions.Definitions.First(); scheme != nil; scheme = scheme.Next() {
 			err := oc.convertSecuritySchemes(scheme)
@@ -81,28 +89,40 @@ func (oc *OAS2Builder) BuildDocumentModel(docModel *libopenapi.DocumentModel[v2.
 	}).Build()
 }
 
-func (oc *OAS2Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v2.SecurityScheme]) error {
+func (oc *OAS2Builder) convertSecuritySchemes(
+	scheme orderedmap.Pair[string, *v2.SecurityScheme],
+) error {
 	key := scheme.Key()
+
 	security := scheme.Value()
 	if security == nil {
 		return nil
 	}
 
 	result := rest.SecurityScheme{}
+
 	switch security.Type {
 	case string(rest.APIKeyScheme):
 		inLocation, err := rest.ParseAPIKeyLocation(security.In)
 		if err != nil {
 			return err
 		}
-		valueEnv := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key}))
+
+		valueEnv := sdkUtils.NewEnvStringVariable(
+			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key}),
+		)
 		result.SecuritySchemer = rest.NewAPIKeyAuthConfig(security.Name, inLocation, valueEnv)
 	case string(rest.BasicAuthScheme):
-		user := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "USERNAME"}))
-		password := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "PASSWORD"}))
+		user := sdkUtils.NewEnvStringVariable(
+			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "USERNAME"}),
+		)
+		password := sdkUtils.NewEnvStringVariable(
+			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "PASSWORD"}),
+		)
 		result.SecuritySchemer = rest.NewBasicAuthConfig(user, password)
 	case "oauth2":
 		var flowType rest.OAuthFlowType
+
 		switch security.Flow {
 		case "accessCode":
 			flowType = rest.AuthorizationCodeFlow
@@ -113,14 +133,18 @@ func (oc *OAS2Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v2
 		case "application":
 			flowType = rest.ClientCredentialsFlow
 		}
+
 		flow := rest.OAuthFlow{
 			AuthorizationURL: security.AuthorizationUrl,
 		}
 
-		tokenURL := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN_URL"}))
+		tokenURL := sdkUtils.NewEnvStringVariable(
+			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN_URL"}),
+		)
 		if security.TokenUrl != "" {
 			tokenURL.Value = &security.TokenUrl
 		}
+
 		flow.TokenURL = &tokenURL
 
 		if security.Scopes != nil {
@@ -128,12 +152,17 @@ func (oc *OAS2Builder) convertSecuritySchemes(scheme orderedmap.Pair[string, *v2
 			for scope := security.Scopes.Values.First(); scope != nil; scope = scope.Next() {
 				scopes[scope.Key()] = scope.Value()
 			}
+
 			flow.Scopes = scopes
 		}
 
 		if flowType == rest.ClientCredentialsFlow {
-			clientID := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_ID"}))
-			clientSecret := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_SECRET"}))
+			clientID := sdkUtils.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_ID"}),
+			)
+			clientSecret := sdkUtils.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_SECRET"}),
+			)
 			flow.ClientID = &clientID
 			flow.ClientSecret = &clientSecret
 		}
@@ -159,26 +188,43 @@ func (oc *OAS2Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v2.
 	if err != nil {
 		return err
 	}
+
 	if funcGet != nil {
 		oc.schema.Functions[funcName] = *funcGet
 	}
 
-	err = newOAS2OperationBuilder(oc, pathKey, "post").BuildProcedure(pathValue.Post, pathValue.Parameters)
+	err = newOAS2OperationBuilder(
+		oc,
+		pathKey,
+		"post",
+	).BuildProcedure(pathValue.Post, pathValue.Parameters)
 	if err != nil {
 		return err
 	}
 
-	err = newOAS2OperationBuilder(oc, pathKey, "put").BuildProcedure(pathValue.Put, pathValue.Parameters)
+	err = newOAS2OperationBuilder(
+		oc,
+		pathKey,
+		"put",
+	).BuildProcedure(pathValue.Put, pathValue.Parameters)
 	if err != nil {
 		return err
 	}
 
-	err = newOAS2OperationBuilder(oc, pathKey, "patch").BuildProcedure(pathValue.Patch, pathValue.Parameters)
+	err = newOAS2OperationBuilder(
+		oc,
+		pathKey,
+		"patch",
+	).BuildProcedure(pathValue.Patch, pathValue.Parameters)
 	if err != nil {
 		return err
 	}
 
-	err = newOAS2OperationBuilder(oc, pathKey, "delete").BuildProcedure(pathValue.Delete, pathValue.Parameters)
+	err = newOAS2OperationBuilder(
+		oc,
+		pathKey,
+		"delete",
+	).BuildProcedure(pathValue.Delete, pathValue.Parameters)
 	if err != nil {
 		return err
 	}
@@ -186,23 +232,32 @@ func (oc *OAS2Builder) pathToNDCOperations(pathItem orderedmap.Pair[string, *v2.
 	return nil
 }
 
-func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string, *base.SchemaProxy]) error {
+func (oc *OAS2Builder) convertComponentSchemas(
+	schemaItem orderedmap.Pair[string, *base.SchemaProxy],
+) error {
 	typeKey := schemaItem.Key()
 	typeValue := schemaItem.Value()
 	typeSchema := typeValue.Schema()
 
 	oc.Logger.Debug("component schema", slog.String("name", typeKey))
+
 	if _, ok := oc.schema.ObjectTypes[typeKey]; ok {
 		return nil
 	}
+
 	if _, ok := oc.schema.ScalarTypes[typeKey]; ok {
 		return nil
 	}
+
 	if typeSchema == nil {
 		return nil
 	}
 
-	schemaResult, err := newOASSchemaBuilder(oc.OASBuilderState, "", rest.InBody).getSchemaType(typeSchema, []string{typeKey})
+	schemaResult, err := newOASSchemaBuilder(
+		oc.OASBuilderState,
+		"",
+		rest.InBody,
+	).getSchemaType(typeSchema, []string{typeKey})
 	if err != nil {
 		return err
 	}
@@ -243,12 +298,17 @@ func (oc *OAS2Builder) convertComponentSchemas(schemaItem orderedmap.Pair[string
 }
 
 // get and convert an OpenAPI data type to a NDC type from parameter.
-func (oc *OAS2Builder) getSchemaTypeFromParameter(param *v2.Parameter, fieldPaths []string) (schema.TypeEncoder, error) {
+func (oc *OAS2Builder) getSchemaTypeFromParameter(
+	param *v2.Parameter,
+	fieldPaths []string,
+) (schema.TypeEncoder, error) {
 	var typeEncoder schema.TypeEncoder
+
 	nullable := param.Required == nil || !*param.Required
 
 	paramType := param.Type
 	hasArrayItem := param.Items != nil && param.Items.Type != ""
+
 	if param.Type == "" && hasArrayItem {
 		paramType = "array"
 	}
@@ -265,10 +325,20 @@ func (oc *OAS2Builder) getSchemaTypeFromParameter(param *v2.Parameter, fieldPath
 		}
 	default:
 		if !isPrimitiveScalar([]string{param.Type}) {
-			return nil, fmt.Errorf("%s: unsupported schema type %s", strings.Join(fieldPaths, "."), param.Type)
+			return nil, fmt.Errorf(
+				"%s: unsupported schema type %s",
+				strings.Join(fieldPaths, "."),
+				param.Type,
+			)
 		}
 
-		scalarName := getScalarFromType(oc.schema, []string{param.Type}, param.Format, param.Enum, fieldPaths)
+		scalarName := getScalarFromType(
+			oc.schema,
+			[]string{param.Type},
+			param.Format,
+			param.Enum,
+			fieldPaths,
+		)
 		typeEncoder = schema.NewNamedType(scalarName)
 	}
 

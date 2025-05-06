@@ -13,7 +13,6 @@ import (
 
 const (
 	acceptHeader               = "Accept"
-	acceptEncodingHeader       = "Accept-Encoding"
 	defaultTimeoutSeconds uint = 30
 	defaultRetryDelays    uint = 1000
 )
@@ -21,9 +20,8 @@ const (
 var errRequestBodyRequired = errors.New("request body is required")
 
 var (
-	defaultRetryHTTPStatus = []int{429, 500, 502, 503}
-	sensitiveHeaderRegex   = regexp.MustCompile(`auth|key|secret|token`)
-	urlAndHeaderLocations  = []rest.ParameterLocation{rest.InPath, rest.InQuery, rest.InHeader}
+	sensitiveHeaderRegex  = regexp.MustCompile(`auth|key|secret|token`)
+	urlAndHeaderLocations = []rest.ParameterLocation{rest.InPath, rest.InQuery, rest.InHeader}
 )
 
 // HTTPOptions represent execution options for HTTP requests.
@@ -40,14 +38,17 @@ func (ro *HTTPOptions) FromValue(value any) error {
 	if utils.IsNil(value) {
 		return nil
 	}
+
 	valueMap, ok := value.(map[string]any)
 	if !ok {
 		return fmt.Errorf("invalid http options; expected object, got %v", value)
 	}
+
 	rawServerIds, err := utils.GetNullableStringSlice(valueMap, "servers")
 	if err != nil {
 		return fmt.Errorf("invalid http options; %w", err)
 	}
+
 	if rawServerIds != nil {
 		ro.Servers = *rawServerIds
 	}
@@ -56,6 +57,7 @@ func (ro *HTTPOptions) FromValue(value any) error {
 	if err != nil {
 		return fmt.Errorf("invalid parallel in http options: %w", err)
 	}
+
 	ro.Parallel = parallel != nil && *parallel
 
 	return nil
@@ -74,6 +76,7 @@ func (de DistributedError) Error() string {
 	if de.Message != "" {
 		return fmt.Sprintf("%s: %s", de.Server, de.Message)
 	}
+
 	bs, err := json.Marshal(de.Details)
 	if err != nil {
 		bs = []byte("")

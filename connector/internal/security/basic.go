@@ -20,7 +20,10 @@ type BasicCredential struct {
 var _ Credential = &BasicCredential{}
 
 // NewBasicCredential creates a new BasicCredential instance.
-func NewBasicCredential(client *http.Client, config *schema.BasicAuthConfig) (*BasicCredential, error) {
+func NewBasicCredential(
+	client *http.Client,
+	config *schema.BasicAuthConfig,
+) (*BasicCredential, error) {
 	user, err := config.Username.Get()
 	if err != nil {
 		return nil, fmt.Errorf("BasicAuthConfig.Username: %w", err)
@@ -63,6 +66,7 @@ func (bc BasicCredential) InjectMock(req *http.Request) bool {
 	if bc.UserInfo == nil {
 		return false
 	}
+
 	_, _ = bc.inject(req, *url.UserPassword("xxx", "xxx"))
 
 	return true

@@ -60,7 +60,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	}`)
 
 	t.Run("auth_default_explain", func(t *testing.T) {
-		res, err := http.Post(fmt.Sprintf("%s/query/explain", testServer.URL), "application/json", bytes.NewBuffer(findPetsBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query/explain", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(findPetsBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
 			Details: schema.ExplainResponseDetails{
@@ -71,7 +75,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	})
 
 	t.Run("auth_default", func(t *testing.T) {
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(findPetsBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(findPetsBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
@@ -123,7 +131,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	}`)
 
 	t.Run("auth_api_key_explain", func(t *testing.T) {
-		res, err := http.Post(fmt.Sprintf("%s/mutation/explain", testServer.URL), "application/json", bytes.NewBuffer(addPetBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation/explain", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(addPetBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
 			Details: schema.ExplainResponseDetails{
@@ -135,7 +147,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	})
 
 	t.Run("auth_api_key", func(t *testing.T) {
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(addPetBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(addPetBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -178,7 +194,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	}`)
 
 	t.Run("auth_bearer_explain", func(t *testing.T) {
-		res, err := http.Post(fmt.Sprintf("%s/query/explain", testServer.URL), "application/json", bytes.NewBuffer(authBearerBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query/explain", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(authBearerBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
 			Details: schema.ExplainResponseDetails{
@@ -190,14 +210,20 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 
 	t.Run("auth_bearer", func(t *testing.T) {
 		for i := 0; i < 2; i++ {
-			res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(authBearerBody))
+			res, err := http.Post(
+				fmt.Sprintf("%s/query", testServer.URL),
+				"application/json",
+				bytes.NewBuffer(authBearerBody),
+			)
 			assert.NilError(t, err)
 			assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 				{
 					Rows: []map[string]any{
 						{
 							"__value": map[string]any{
-								"headers":  map[string]any{"Content-Type": string("application/json")},
+								"headers": map[string]any{
+									"Content-Type": string("application/json"),
+								},
 								"response": []any{map[string]any{}},
 							},
 						},
@@ -208,7 +234,6 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	})
 
 	t.Run("auth_cookie", func(t *testing.T) {
-
 		requestBody := []byte(`{
 		"collection": "findPetsCookie",
 		"query": {
@@ -230,7 +255,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(requestBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(requestBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
@@ -279,7 +308,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			],
 			"collection_relationships": {}
 		}`)
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(addPetOidcBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(addPetOidcBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -315,14 +348,22 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			}`, retryAfter))
 		}
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(getReqBody(false)))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(getReqBody(false)),
+		)
 		assert.NilError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, res.StatusCode)
 		assert.Equal(t, state.RetryCount, int32(2))
 
 		atomic.StoreInt32(&state.RetryCount, 0)
 		start := time.Now()
-		res, err = http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(getReqBody(true)))
+		res, err = http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(getReqBody(true)),
+		)
 		assert.NilError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, res.StatusCode)
 		assert.Equal(t, state.RetryCount, int32(2))
@@ -352,7 +393,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(rawBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(rawBody),
+		)
 		assert.NilError(t, err)
 		res.Body.Close()
 
@@ -404,7 +449,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -461,7 +510,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -510,7 +563,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -566,7 +623,11 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		"collection_relationships": {}
 	}`, state.Server.URL))
 
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{
 			OperationResults: []schema.MutationOperationResults{
@@ -644,7 +705,11 @@ func TestHTTPConnector_distribution(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 
 		defer res.Body.Close()
@@ -678,9 +743,12 @@ func TestHTTPConnector_distribution(t *testing.T) {
 		assert.Equal(t, 0, len(row.Value.Response.Errors))
 		assert.Equal(t, 2, len(row.Value.Response.Results))
 
-		slices.SortFunc(row.Value.Response.Results, func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
-			return strings.Compare(a.Server, b.Server)
-		})
+		slices.SortFunc(
+			row.Value.Response.Results,
+			func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
+				return strings.Compare(a.Server, b.Server)
+			},
+		)
 
 		assert.DeepEqual(t, expectedResults, row.Value.Response.Results)
 
@@ -722,7 +790,11 @@ func TestHTTPConnector_distribution(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 
 		defer res.Body.Close()
@@ -755,9 +827,12 @@ func TestHTTPConnector_distribution(t *testing.T) {
 		assert.Equal(t, 0, len(row.Response.Errors))
 		assert.Equal(t, 2, len(row.Response.Results))
 
-		slices.SortFunc(row.Response.Results, func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
-			return strings.Compare(a.Server, b.Server)
-		})
+		slices.SortFunc(
+			row.Response.Results,
+			func(a internal.DistributedResult[[]distributedResultData], b internal.DistributedResult[[]distributedResultData]) int {
+				return strings.Compare(a.Server, b.Server)
+			},
+		)
 
 		assert.DeepEqual(t, expectedResults, row.Response.Results)
 		assert.Equal(t, int32(1), mock.catCount)
@@ -802,7 +877,11 @@ func TestHTTPConnector_distribution(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
@@ -863,7 +942,11 @@ func TestHTTPConnector_multiSchemas(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-	res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+	res, err := http.Post(
+		fmt.Sprintf("%s/query", testServer.URL),
+		"application/json",
+		bytes.NewBuffer(reqBody),
+	)
 	assert.NilError(t, err)
 	assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 		{
@@ -891,7 +974,11 @@ func TestHTTPConnector_multiSchemas(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
-	res, err = http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+	res, err = http.Post(
+		fmt.Sprintf("%s/query", testServer.URL),
+		"application/json",
+		bytes.NewBuffer(reqBody),
+	)
 	assert.NilError(t, err)
 
 	assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
@@ -964,11 +1051,18 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 		switch r.Method {
 		case http.MethodGet:
 			if r.Header.Get("Authorization") != fmt.Sprintf("Bearer %s", bearerToken) {
-				t.Fatalf("invalid bearer token, expected %s, got %s", bearerToken, r.Header.Get("Authorization"))
+				t.Fatalf(
+					"invalid bearer token, expected %s, got %s",
+					bearerToken,
+					r.Header.Get("Authorization"),
+				)
 				return
 			}
 			if r.Header.Get("X-Custom-Header") != "This is a test" {
-				t.Fatalf("invalid X-Custom-Header, expected `This is a test`, got %s", r.Header.Get("X-Custom-Header"))
+				t.Fatalf(
+					"invalid X-Custom-Header, expected `This is a test`, got %s",
+					r.Header.Get("X-Custom-Header"),
+				)
 				return
 			}
 
@@ -1041,7 +1135,11 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 			w.Header().Add("Content-Type", "application/xml")
 			w.WriteHeader(http.StatusOK)
 
-			_, _ = w.Write([]byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<pet><category><id>1</id><name>Dogs</name></category><id>10</id><name>doggie</name><photoUrls><photoUrl>string</photoUrl></photoUrls><status>available</status><tags><tag><id>0</id><name>string</name></tag></tags></pet>"))
+			_, _ = w.Write(
+				[]byte(
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<pet><category><id>1</id><name>Dogs</name></category><id>10</id><name>doggie</name><photoUrls><photoUrl>string</photoUrl></photoUrls><status>available</status><tags><tag><id>0</id><name>string</name></tag></tags></pet>",
+				),
+			)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
@@ -1059,7 +1157,11 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 			}
 
 			tokenBody := "token=" + authToken
-			tokenResp, err := http.DefaultClient.Post("http://localhost:4445/admin/oauth2/introspect", rest.ContentTypeFormURLEncoded, bytes.NewBufferString(tokenBody))
+			tokenResp, err := http.DefaultClient.Post(
+				"http://localhost:4445/admin/oauth2/introspect",
+				rest.ContentTypeFormURLEncoded,
+				bytes.NewBufferString(tokenBody),
+			)
 			assert.NilError(t, err)
 			assert.Equal(t, http.StatusOK, tokenResp.StatusCode)
 
@@ -1096,7 +1198,10 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 		switch r.Method {
 		case http.MethodPost:
 			if r.Header.Get("Authorization") != "Bearer random_token" {
-				t.Errorf("invalid bearer token, expected: `Authorization: Bearer random_token`, got %s", r.Header.Get("Authorization"))
+				t.Errorf(
+					"invalid bearer token, expected: `Authorization: Bearer random_token`, got %s",
+					r.Header.Get("Authorization"),
+				)
 				t.FailNow()
 				return
 			}
@@ -1172,7 +1277,15 @@ func (mds *mockDistributedServer) createServer(t *testing.T) *httptest.Server {
 		return func(w http.ResponseWriter, r *http.Request) {
 			if r.Header.Get("api_key") != apiKey {
 				w.WriteHeader(http.StatusUnauthorized)
-				_, _ = w.Write([]byte(fmt.Sprintf(`{"message": "invalid api key, expected %s, got %s"}`, apiKey, r.Header.Get("api_key"))))
+				_, _ = w.Write(
+					[]byte(
+						fmt.Sprintf(
+							`{"message": "invalid api key, expected %s, got %s"}`,
+							apiKey,
+							r.Header.Get("api_key"),
+						),
+					),
+				)
 				return
 			}
 			switch r.Method {
@@ -1227,7 +1340,13 @@ func (mds *mockMultiSchemaServer) createServer() *httptest.Server {
 			switch r.Method {
 			case http.MethodGet:
 				if r.Header.Get("pet") != name {
-					slog.Error(fmt.Sprintf("expected r.Header.Get(\"pet\") == %s, got %s", name, r.Header.Get("pet")))
+					slog.Error(
+						fmt.Sprintf(
+							"expected r.Header.Get(\"pet\") == %s, got %s",
+							name,
+							r.Header.Get("pet"),
+						),
+					)
 					w.WriteHeader(http.StatusBadRequest)
 
 					return
@@ -1267,7 +1386,11 @@ func TestConnectorOAuth(t *testing.T) {
 		"token_endpoint_auth_method": "client_secret_post"
 	}`, oauth2ClientID, oauth2ClientSecret))
 
-	oauthResp, err := http.DefaultClient.Post("http://localhost:4445/admin/clients", "application/json", bytes.NewBuffer(createClientBody))
+	oauthResp, err := http.DefaultClient.Post(
+		"http://localhost:4445/admin/clients",
+		"application/json",
+		bytes.NewBuffer(createClientBody),
+	)
 	assert.NilError(t, err)
 	defer oauthResp.Body.Close()
 
@@ -1305,7 +1428,11 @@ func TestConnectorOAuth(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
-	res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(findPetsBody))
+	res, err := http.Post(
+		fmt.Sprintf("%s/query", testServer.URL),
+		"application/json",
+		bytes.NewBuffer(findPetsBody),
+	)
 	assert.NilError(t, err)
 	assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 		{
@@ -1343,7 +1470,11 @@ func TestConnectorOAuth(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
-	res, err = http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(failureBody))
+	res, err = http.Post(
+		fmt.Sprintf("%s/query", testServer.URL),
+		"application/json",
+		bytes.NewBuffer(failureBody),
+	)
 	assert.NilError(t, err)
 	defer res.Body.Close()
 
@@ -1351,7 +1482,10 @@ func TestConnectorOAuth(t *testing.T) {
 
 	respBody, err := io.ReadAll(res.Body)
 	assert.NilError(t, err)
-	assert.Assert(t, strings.Contains(string(respBody), "oauth2: cannot fetch token: 400 Bad Request"))
+	assert.Assert(
+		t,
+		strings.Contains(string(respBody), "oauth2: cannot fetch token: 400 Bad Request"),
+	)
 }
 
 type mockTLSServer struct {
@@ -1373,7 +1507,11 @@ func (mtls *mockTLSServer) Count() int {
 	return mtls.counter
 }
 
-func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string, insecure bool) *httptest.Server {
+func (mts *mockTLSServer) createMockTLSServer(
+	t *testing.T,
+	dir string,
+	insecure bool,
+) *httptest.Server {
 	t.Helper()
 	mux := http.NewServeMux()
 
@@ -1405,7 +1543,10 @@ func (mts *mockTLSServer) createMockTLSServer(t *testing.T, dir string, insecure
 		caCertPool.AppendCertsFromPEM(caCertFile)
 
 		// Create the TLS Config with the CA pool and enable Client certificate validation
-		cert, err := tls.LoadX509KeyPair(filepath.Join(dir, "server.crt"), filepath.Join(dir, "server.key"))
+		cert, err := tls.LoadX509KeyPair(
+			filepath.Join(dir, "server.crt"),
+			filepath.Join(dir, "server.key"),
+		)
 		assert.NilError(t, err)
 
 		tlsConfig = &tls.Config{
@@ -1474,7 +1615,11 @@ func TestConnectorTLS(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(findPetsBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(findPetsBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
@@ -1509,7 +1654,11 @@ func TestConnectorTLS(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(findPetsBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(findPetsBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
@@ -1558,7 +1707,11 @@ func TestConnectorTLSInsecure(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(findPetsBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(findPetsBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
@@ -1680,7 +1833,11 @@ func TestConnectorArgumentPresets(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/query", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
 			{
@@ -1722,7 +1879,11 @@ func TestConnectorArgumentPresets(t *testing.T) {
 			"collection_relationships": {}
 		}`)
 
-		res, err := http.Post(fmt.Sprintf("%s/mutation", testServer.URL), "application/json", bytes.NewBuffer(reqBody))
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(reqBody),
+		)
 		assert.NilError(t, err)
 
 		assertHTTPResponse(t, res, http.StatusOK, schema.MutationResponse{

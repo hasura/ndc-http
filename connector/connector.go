@@ -8,10 +8,12 @@ import (
 	"path/filepath"
 
 	"github.com/hasura/ndc-http/connector/internal"
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/connector"
 	"github.com/hasura/ndc-sdk-go/schema"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // HTTPConnector implements the SDK interface of NDC specification.
@@ -38,7 +40,10 @@ func NewHTTPConnector(opts ...Option) *HTTPConnector {
 
 // ParseConfiguration validates the configuration files provided by the user, returning a validated 'Configuration',
 // or throwing an error to prevents Connector startup.
-func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir string) (*configuration.Configuration, error) {
+func (c *HTTPConnector) ParseConfiguration(
+	ctx context.Context,
+	configurationDir string,
+) (*configuration.Configuration, error) {
 	restCapabilities := schema.CapabilitiesResponse{
 		Version: "0.1.6",
 		Capabilities: schema.Capabilities{
@@ -52,10 +57,12 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 			},
 		},
 	}
+
 	rawCapabilities, err := json.Marshal(restCapabilities)
 	if err != nil {
 		return nil, fmt.Errorf("failed to encode capabilities: %w", err)
 	}
+
 	c.capabilities = schema.NewRawCapabilitiesResponseUnsafe(rawCapabilities)
 
 	config, err := configuration.ReadConfigurationFile(configurationDir)
@@ -64,6 +71,7 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 	}
 
 	logger := connector.GetLogger(ctx)
+
 	schemas, err := configuration.ReadSchemaOutputFile(configurationDir, config.Output, logger)
 	if err != nil {
 		return nil, err
@@ -72,7 +80,12 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 	var errs map[string][]string
 
 	if schemas == nil {
-		logger.Debug(fmt.Sprintf("output file at %s does not exist. Parsing files...", filepath.Join(configurationDir, config.Output)))
+		logger.Debug(
+			fmt.Sprintf(
+				"output file at %s does not exist. Parsing files...",
+				filepath.Join(configurationDir, config.Output),
+			),
+		)
 
 		schemas, errs = configuration.BuildSchemaFromConfig(config, configurationDir, logger)
 		if len(errs) > 0 {
@@ -82,7 +95,16 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 		}
 	}
 
+	c.httpClient.Transport = exhttp.NewTelemetryTransport(
+		c.httpClient.Transport,
+		exhttp.TelemetryConfig{
+			Logger:     logger,
+			Attributes: []attribute.KeyValue{attribute.String("db.system", "http")},
+		},
+	)
+
 	c.config = config
+
 	c.upstreams, err = internal.NewUpstreamManager(c.httpClient, config)
 	if err != nil {
 		return nil, err
@@ -102,7 +124,11 @@ func (c *HTTPConnector) ParseConfiguration(ctx context.Context, configurationDir
 //
 // In addition, this function should register any
 // connector-specific metrics with the metrics registry.
-func (c *HTTPConnector) TryInitState(ctx context.Context, configuration *configuration.Configuration, metrics *connector.TelemetryState) (*State, error) {
+func (c *HTTPConnector) TryInitState(
+	ctx context.Context,
+	configuration *configuration.Configuration,
+	metrics *connector.TelemetryState,
+) (*State, error) {
 	return &State{
 		Tracer: metrics.Tracer,
 	}, nil
@@ -114,11 +140,17 @@ func (c *HTTPConnector) TryInitState(ctx context.Context, configuration *configu
 // is able to reach its data source over the network.
 //
 // Should throw if the check fails, else resolve.
-func (c *HTTPConnector) HealthCheck(ctx context.Context, configuration *configuration.Configuration, state *State) error {
+func (c *HTTPConnector) HealthCheck(
+	ctx context.Context,
+	configuration *configuration.Configuration,
+	state *State,
+) error {
 	return nil
 }
 
 // GetCapabilities get the connector's capabilities.
-func (c *HTTPConnector) GetCapabilities(configuration *configuration.Configuration) schema.CapabilitiesResponseMarshaler {
+func (c *HTTPConnector) GetCapabilities(
+	configuration *configuration.Configuration,
+) schema.CapabilitiesResponseMarshaler {
 	return c.capabilities
 }

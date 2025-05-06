@@ -70,7 +70,11 @@ func (j *SecuritySchemeType) UnmarshalJSON(b []byte) error {
 func ParseSecuritySchemeType(value string) (SecuritySchemeType, error) {
 	result := SecuritySchemeType(value)
 	if !slices.Contains(securityScheme_enums, result) {
-		return result, fmt.Errorf("invalid SecuritySchemeType. Expected %+v, got <%s>", securityScheme_enums, value)
+		return result, fmt.Errorf(
+			"invalid SecuritySchemeType. Expected %+v, got <%s>",
+			securityScheme_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -116,7 +120,11 @@ func (j *APIKeyLocation) UnmarshalJSON(b []byte) error {
 func ParseAPIKeyLocation(value string) (APIKeyLocation, error) {
 	result := APIKeyLocation(value)
 	if !slices.Contains(apiKeyLocation_enums, result) {
-		return result, fmt.Errorf("invalid APIKeyLocation. Expected %+v, got <%s>", apiKeyLocation_enums, value)
+		return result, fmt.Errorf(
+			"invalid APIKeyLocation. Expected %+v, got <%s>",
+			apiKeyLocation_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -255,6 +263,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case BasicAuthScheme:
@@ -262,6 +271,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case HTTPAuthScheme:
@@ -269,6 +279,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case OAuth2Scheme:
@@ -276,6 +287,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case OpenIDConnectScheme:
@@ -283,6 +295,7 @@ func (j *SecurityScheme) UnmarshalJSON(b []byte) error {
 		if err := json.Unmarshal(b, &config); err != nil {
 			return err
 		}
+
 		_ = config.Validate()
 		j.SecuritySchemer = &config
 	case CookieAuthScheme:
@@ -355,6 +368,7 @@ func (ss *APIKeyAuthConfig) Validate() error {
 	if ss.Name == "" {
 		return errors.New("name is required for apiKey security")
 	}
+
 	if _, err := ParseAPIKeyLocation(string(ss.In)); err != nil {
 		return err
 	}
@@ -471,7 +485,11 @@ func (j *OAuthFlowType) UnmarshalJSON(b []byte) error {
 func ParseOAuthFlowType(value string) (OAuthFlowType, error) {
 	result := OAuthFlowType(value)
 	if !slices.Contains(oauthFlow_enums, result) {
-		return result, fmt.Errorf("invalid OAuthFlowType. Expected %+v, got <%s>", oauthFlow_enums, value)
+		return result, fmt.Errorf(
+			"invalid OAuthFlowType. Expected %+v, got <%s>",
+			oauthFlow_enums,
+			value,
+		)
 	}
 
 	return result, nil
@@ -493,7 +511,10 @@ type OAuthFlow struct {
 // Validate if the current instance is valid.
 func (ss OAuthFlow) Validate(flowType OAuthFlowType) error {
 	if ss.TokenURL == nil {
-		if slices.Contains([]OAuthFlowType{PasswordFlow, ClientCredentialsFlow, AuthorizationCodeFlow}, flowType) {
+		if slices.Contains(
+			[]OAuthFlowType{PasswordFlow, ClientCredentialsFlow, AuthorizationCodeFlow},
+			flowType,
+		) {
 			return fmt.Errorf("tokenUrl is required for oauth2 %s security", flowType)
 		}
 	} else if ss.TokenURL.Value == nil && ss.TokenURL.Variable == nil {

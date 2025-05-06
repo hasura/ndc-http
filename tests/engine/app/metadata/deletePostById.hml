@@ -6,7 +6,7 @@ definition:
   outputType: Boolean
   arguments:
     - name: id
-      type: Int32!
+      type: int32!
       description: The ID of the post to retrieve
   source:
     dataConnectorName: myapi

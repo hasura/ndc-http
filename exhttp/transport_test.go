@@ -34,7 +34,7 @@ func TestHTTPTransport(t *testing.T) {
 		InsecureSkipVerify: utils.ToPtr(utils.NewEnvBoolValue(true)),
 	}
 
-	_ = baseConfig.ToTransport()
+	_ = NewTelemetryTransport(baseConfig.ToTransport(), TelemetryConfig{})
 	_, err := HTTPTransportTLSConfig{
 		HTTPTransportConfig: baseConfig,
 		TLS:                 tlsConfig,
@@ -49,5 +49,9 @@ func TestHTTPTransport(t *testing.T) {
 			Value: utils.ToPtr("foo.pem"),
 		},
 	}, slog.Default())
-	assert.ErrorContains(t, err, "failed to load TLS config: failed to read certificate file: open foo.pem: no such file or directory")
+	assert.ErrorContains(
+		t,
+		err,
+		"failed to load TLS config: failed to read certificate file: open foo.pem: no such file or directory",
+	)
 }

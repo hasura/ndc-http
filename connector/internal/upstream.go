@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log/slog"
@@ -9,50 +10,52 @@ import (
 	"strconv"
 
 	"github.com/hasura/ndc-http/connector/internal/argument"
-	"github.com/hasura/ndc-http/connector/internal/compression"
 	"github.com/hasura/ndc-http/connector/internal/security"
+	"github.com/hasura/ndc-http/exhttp"
+	"github.com/hasura/ndc-http/exhttp/compression"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
-	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/version"
 	"github.com/hasura/ndc-sdk-go/connector"
+	"github.com/hasura/ndc-sdk-go/schema"
 	"github.com/hasura/ndc-sdk-go/utils"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
 // UpstreamManager represents a manager for an upstream.
 type UpstreamManager struct {
-	config        *configuration.Configuration
-	defaultClient *http.Client
-	upstreams     map[string]UpstreamSetting
-	compressors   *compression.Compressors
-	propagator    propagation.TextMapPropagator
-
+	config          *configuration.Configuration
+	defaultClient   *http.Client
+	upstreams       map[string]UpstreamSetting
 	RuntimeSettings configuration.RuntimeSettings
 }
 
 // NewUpstreamManager creates a new UpstreamManager instance.
-func NewUpstreamManager(httpClient *http.Client, config *configuration.Configuration) (*UpstreamManager, error) {
+func NewUpstreamManager(
+	httpClient *http.Client,
+	config *configuration.Configuration,
+) (*UpstreamManager, error) {
 	runtimeSettings, err := config.Runtime.Validate()
 	if err != nil {
 		return nil, err
 	}
 
 	return &UpstreamManager{
-		config:        config,
-		defaultClient: httpClient,
-		upstreams:     make(map[string]UpstreamSetting),
-		compressors:   compression.NewCompressors(),
-		propagator:    otel.GetTextMapPropagator(),
-
+		config:          config,
+		defaultClient:   httpClient,
+		upstreams:       make(map[string]UpstreamSetting),
 		RuntimeSettings: *runtimeSettings,
 	}, nil
 }
 
 // Register evaluates and registers an upstream from config.
-func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configuration.NDCHttpRuntimeSchema, ndcSchema *schema.NDCHttpSchema) error {
+func (um *UpstreamManager) Register(
+	ctx context.Context,
+	runtimeSchema *configuration.NDCHttpRuntimeSchema,
+	ndcSchema *rest.NDCHttpSchema,
+) error {
 	logger := connector.GetLogger(ctx)
 	namespace := runtimeSchema.Name
 	httpClient := um.defaultClient
@@ -64,11 +67,21 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 		}
 
 		if tlsClient != nil {
+			transport := tlsClient.Transport
+			tlsClient.Transport = exhttp.NewTelemetryTransport(
+				transport,
+				exhttp.TelemetryConfig{
+					Logger:     logger,
+					Attributes: []attribute.KeyValue{attribute.String("db.system", "http")},
+				},
+			)
+
 			httpClient = tlsClient
 		}
 	}
 
 	var defaultServerURL *url.URL
+
 	settings := UpstreamSetting{
 		servers:    make(map[string]Server),
 		security:   runtimeSchema.Settings.Security,
@@ -78,10 +91,15 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 	}
 
 	if len(runtimeSchema.Settings.ArgumentPresets) > 0 {
-		argumentPresets, err := argument.NewArgumentPresets(ndcSchema, runtimeSchema.Settings.ArgumentPresets, true)
+		argumentPresets, err := argument.NewArgumentPresets(
+			ndcSchema,
+			runtimeSchema.Settings.ArgumentPresets,
+			true,
+		)
 		if err != nil {
 			return fmt.Errorf("%s: %w", namespace, err)
 		}
+
 		settings.argumentPresets = argumentPresets
 	}
 
@@ -95,7 +113,9 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 		if err != nil {
 			// Relax the error to allow schema introspection without environment variables setting.
 			// Moreover, because there are many security schemes the user may use one of them.
-			logger.Error(fmt.Sprintf("failed to register server %s:%s, %s", namespace, serverID, err))
+			logger.Error(
+				fmt.Sprintf("failed to register server %s:%s, %s", namespace, serverID, err),
+			)
 
 			continue
 		}
@@ -105,6 +125,7 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 		}
 
 		serverClient := httpClient
+
 		if server.TLS != nil {
 			tlsClient, err := security.NewHTTPClientTLS(um.defaultClient, server.TLS, logger)
 			if err != nil {
@@ -117,25 +138,45 @@ func (um *UpstreamManager) Register(ctx context.Context, runtimeSchema *configur
 		}
 
 		newServer := Server{
-			URL:         serverURL,
-			Headers:     um.getHeadersFromEnv(logger, namespace, server.Headers),
-			Security:    server.Security,
-			Credentials: um.registerSecurityCredentials(ctx, serverClient, serverURL, server.SecuritySchemes, logger.With(slog.String("namespace", namespace), slog.String("server_id", serverID))),
-			HTTPClient:  serverClient,
+			URL:      serverURL,
+			Headers:  um.getHeadersFromEnv(logger, namespace, server.Headers),
+			Security: server.Security,
+			Credentials: um.registerSecurityCredentials(
+				ctx,
+				serverClient,
+				serverURL,
+				server.SecuritySchemes,
+				logger.With(
+					slog.String("namespace", namespace),
+					slog.String("server_id", serverID),
+				),
+			),
+			HTTPClient: serverClient,
 		}
 
 		if len(server.ArgumentPresets) > 0 {
-			argumentPresets, err := argument.NewArgumentPresets(ndcSchema, server.ArgumentPresets, false)
+			argumentPresets, err := argument.NewArgumentPresets(
+				ndcSchema,
+				server.ArgumentPresets,
+				false,
+			)
 			if err != nil {
 				return fmt.Errorf("%s.server[%s]: %w", namespace, serverID, err)
 			}
+
 			newServer.ArgumentPresets = argumentPresets
 		}
 
 		settings.servers[serverID] = newServer
 	}
 
-	settings.credentials = um.registerSecurityCredentials(ctx, httpClient, defaultServerURL, runtimeSchema.Settings.SecuritySchemes, logger.With(slog.String("namespace", namespace)))
+	settings.credentials = um.registerSecurityCredentials(
+		ctx,
+		httpClient,
+		defaultServerURL,
+		runtimeSchema.Settings.SecuritySchemes,
+		logger.With(slog.String("namespace", namespace)),
+	)
 
 	um.upstreams[namespace] = settings
 
@@ -151,7 +192,35 @@ func (um *UpstreamManager) CreateHTTPClient(requests *RequestBuilderResults) *HT
 }
 
 // ExecuteRequest executes a request to the upstream server.
-func (um *UpstreamManager) ExecuteRequest(ctx context.Context, span trace.Span, request *RetryableRequest, namespace string) (*http.Response, context.CancelFunc, error) {
+func (um *UpstreamManager) ExecuteRequest(
+	ctx context.Context,
+	span trace.Span,
+	request *RetryableRequest,
+	namespace string,
+) (*http.Response, context.CancelFunc, error) {
+	contentEncoding := request.Headers.Get(rest.ContentEncodingHeader)
+	if len(request.Body) > 0 && compression.DefaultCompressor.IsEncodingSupported(contentEncoding) {
+		var buf bytes.Buffer
+
+		_, err := compression.DefaultCompressor.Compress(
+			&buf,
+			contentEncoding,
+			bytes.NewReader(request.Body),
+		)
+		if err != nil {
+			span.SetStatus(codes.Error, "failed to execute the request")
+			span.RecordError(err)
+
+			return nil, nil, schema.NewConnectorError(
+				http.StatusInternalServerError,
+				err.Error(),
+				nil,
+			)
+		}
+
+		request.Body = buf.Bytes()
+	}
+
 	req, cancel, err := request.CreateRequest(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -164,28 +233,28 @@ func (um *UpstreamManager) ExecuteRequest(ctx context.Context, span trace.Span, 
 		return nil, nil, err
 	}
 
-	setHeaderAttributes(span, "http.request.header.", req.Header)
-
-	req.Header.Set(acceptEncodingHeader, um.compressors.AcceptEncoding())
 	req.Header.Set("User-Agent", "ndc-http/"+version.BuildVersion)
-	um.propagator.Inject(ctx, propagation.HeaderCarrier(req.Header))
 
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		cancel()
+	clientWrapper := exhttp.NewClient(httpClient, exhttp.NewRetryMiddleware(request.Runtime.Retry))
 
-		return nil, nil, err
-	}
+	resp, err := clientWrapper.Do(req)
 
-	return resp, cancel, nil
+	return resp, cancel, err
 }
 
-func (um *UpstreamManager) evalRequestSettings(ctx context.Context, request *RetryableRequest, req *http.Request, namespace string) (*http.Client, error) {
+func (um *UpstreamManager) evalRequestSettings(
+	ctx context.Context,
+	request *RetryableRequest,
+	req *http.Request,
+	namespace string,
+) (*http.Client, error) {
 	httpClient := um.defaultClient
+
 	settings, ok := um.upstreams[namespace]
 	if !ok {
 		return um.defaultClient, nil
 	}
+
 	if settings.httpClient != nil {
 		httpClient = settings.httpClient
 	}
@@ -203,6 +272,7 @@ func (um *UpstreamManager) evalRequestSettings(ctx context.Context, request *Ret
 	securityOptional := securities.IsOptional()
 
 	var err error
+
 	server, ok := settings.servers[request.ServerID]
 	if ok {
 		if server.HTTPClient != nil {
@@ -217,9 +287,14 @@ func (um *UpstreamManager) evalRequestSettings(ctx context.Context, request *Ret
 
 		if !securityOptional && len(server.Credentials) > 0 {
 			var hc *http.Client
+
 			hc, err = um.evalSecuritySchemes(req, securities, server.Credentials)
 			if err != nil {
-				logger.Error(fmt.Sprintf("failed to evaluate the authentication: %s", err), slog.String("namespace", namespace), slog.String("server_id", request.ServerID))
+				logger.Error(
+					fmt.Sprintf("failed to evaluate the authentication: %s", err),
+					slog.String("namespace", namespace),
+					slog.String("server_id", request.ServerID),
+				)
 			}
 
 			if hc != nil {
@@ -231,7 +306,10 @@ func (um *UpstreamManager) evalRequestSettings(ctx context.Context, request *Ret
 	if !securityOptional && len(settings.credentials) > 0 {
 		hc, err := um.evalSecuritySchemes(req, securities, settings.credentials)
 		if err != nil {
-			logger.Error(fmt.Sprintf("failed to evaluate the authentication: %s", err), slog.String("namespace", namespace))
+			logger.Error(
+				fmt.Sprintf("failed to evaluate the authentication: %s", err),
+				slog.String("namespace", namespace),
+			)
 
 			return nil, err
 		}
@@ -244,7 +322,11 @@ func (um *UpstreamManager) evalRequestSettings(ctx context.Context, request *Ret
 	return httpClient, nil
 }
 
-func (um *UpstreamManager) evalSecuritySchemes(req *http.Request, securities rest.AuthSecurities, credentials map[string]security.Credential) (*http.Client, error) {
+func (um *UpstreamManager) evalSecuritySchemes(
+	req *http.Request,
+	securities rest.AuthSecurities,
+	credentials map[string]security.Credential,
+) (*http.Client, error) {
 	for _, security := range securities {
 		sc, ok := credentials[security.Name()]
 		if !ok {
@@ -265,7 +347,11 @@ func (um *UpstreamManager) evalSecuritySchemes(req *http.Request, securities res
 }
 
 // InjectMockCredential injects mock credential into the request for explain APIs.
-func (um *UpstreamManager) InjectMockRequestSettings(req *http.Request, namespace string, securities rest.AuthSecurities) {
+func (um *UpstreamManager) InjectMockRequestSettings(
+	req *http.Request,
+	namespace string,
+	securities rest.AuthSecurities,
+) {
 	settings, ok := um.upstreams[namespace]
 	if !ok {
 		return
@@ -288,6 +374,7 @@ func (um *UpstreamManager) InjectMockRequestSettings(req *http.Request, namespac
 		if !ok {
 			continue
 		}
+
 		hasAuth := sc.InjectMock(req)
 		if hasAuth {
 			return
@@ -295,12 +382,21 @@ func (um *UpstreamManager) InjectMockRequestSettings(req *http.Request, namespac
 	}
 }
 
-func (um *UpstreamManager) getHeadersFromEnv(logger *slog.Logger, namespace string, headers map[string]utils.EnvString) map[string]string {
+func (um *UpstreamManager) getHeadersFromEnv(
+	logger *slog.Logger,
+	namespace string,
+	headers map[string]utils.EnvString,
+) map[string]string {
 	results := make(map[string]string)
+
 	for key, header := range headers {
 		value, err := header.Get()
 		if err != nil {
-			logger.Error(err.Error(), slog.String("namespace", namespace), slog.String("header", key))
+			logger.Error(
+				err.Error(),
+				slog.String("namespace", namespace),
+				slog.String("header", key),
+			)
 		} else if value != "" {
 			results[key] = value
 		}
@@ -309,11 +405,22 @@ func (um *UpstreamManager) getHeadersFromEnv(logger *slog.Logger, namespace stri
 	return results
 }
 
-func (um *UpstreamManager) registerSecurityCredentials(ctx context.Context, httpClient *http.Client, baseServerURL *url.URL, securitySchemes map[string]rest.SecurityScheme, logger *slog.Logger) map[string]security.Credential {
+func (um *UpstreamManager) registerSecurityCredentials(
+	ctx context.Context,
+	httpClient *http.Client,
+	baseServerURL *url.URL,
+	securitySchemes map[string]rest.SecurityScheme,
+	logger *slog.Logger,
+) map[string]security.Credential {
 	credentials := make(map[string]security.Credential)
 
 	for key, ss := range securitySchemes {
-		cred, headerForwardRequired, err := security.NewCredential(ctx, httpClient, baseServerURL, ss)
+		cred, headerForwardRequired, err := security.NewCredential(
+			ctx,
+			httpClient,
+			baseServerURL,
+			ss,
+		)
 		if err != nil {
 			// Relax the error to allow schema introspection without environment variables setting.
 			// Moreover, because there are many security schemes the user may use one of them.
@@ -326,8 +433,13 @@ func (um *UpstreamManager) registerSecurityCredentials(ctx context.Context, http
 		}
 
 		credentials[key] = cred
-		if headerForwardRequired && (!um.config.ForwardHeaders.Enabled || um.config.ForwardHeaders.ArgumentField == nil || *um.config.ForwardHeaders.ArgumentField == "") {
-			logger.Warn("the security scheme needs header forwarding enabled with argumentField set", slog.String("scheme", key))
+
+		if headerForwardRequired &&
+			(!um.config.ForwardHeaders.Enabled || um.config.ForwardHeaders.ArgumentField == nil || *um.config.ForwardHeaders.ArgumentField == "") {
+			logger.Warn(
+				"the security scheme needs header forwarding enabled with argumentField set",
+				slog.String("scheme", key),
+			)
 		}
 	}
 
