@@ -74,7 +74,7 @@ func TestConfigValidator(t *testing.T) {
 
 			validStatus.renderReadme(&readmeBuf)
 			readmeOutput := readmeBuf.String()
-			log.Println(readmeOutput)
+			// log.Println(readmeOutput)
 			assert.Equal(
 				t,
 				spacesRegex.ReplaceAllString(string(readmeBytes), "\n"),

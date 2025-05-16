@@ -2,7 +2,7 @@
 
 ## Environment Variables
 
-The connector plugin can't automatically add environment variables. Therefore, you need to manually add required environment variables.
+The connector plugin can't automatically add environment variables. Therefore, you need to manually add the required environment variables.
 
 ```bash
 ddn connector env add --connector testdata/validation/connector/http/connector.yaml --ENV_NAME=value
@@ -45,12 +45,12 @@ ddn connector env add --connector testdata/validation/connector/http/connector.y
 
 ## Forwarding Headers
 
-The following headers should be forwarding from the engine:
+The following headers should be forwarded from the engine:
 
 - Cookie
 - X-Pet-Status
 
-Check if you already enabled header forwarding settings in the `config.yaml` file:
+Check if you have already enabled header forwarding settings in the `config.yaml` file:
 
 ```yaml
 forwardHeaders:
