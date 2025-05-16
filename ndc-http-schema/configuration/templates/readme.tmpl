@@ -1,0 +1,50 @@
+# HTTP connector
+
+## Environment Variables
+
+The connector plugin can't automatically add environment variables. Therefore, you need to manually add required environment variables.
+
+```bash
+ddn connector env add --connector {{ .ContextPath }}/connector.yaml --ENV_NAME=value
+```
+{{range $index, $server := .Servers }}
+### {{ $server.Name }}
+
+| Name | Type | Default |
+| ---- | ---- | ------- |
+{{range $index, $variable := $server.Variables }}| {{ $variable.Name }} | {{ $variable.Type }} | {{ $variable.Default }} |
+{{end}}
+{{end}}
+{{- if .ForwardingHeaders }}
+## Forwarding Headers
+
+The following headers should be forwarding from the engine:
+
+{{range $index, $variable := .ForwardingHeaders }}- {{ $variable }}
+{{end}}
+Check if you already enabled header forwarding settings in the `config.yaml` file:
+
+```yaml
+forwardHeaders:
+  enabled: true
+  argumentField: headers
+```
+
+And check if you already configured argument presets in `{{ .SubgraphPath }}/metadata/{{ .SubgraphName }}.yaml`:
+
+```yaml
+kind: DataConnectorLink
+version: v1
+definition:
+  argumentPresets:
+    - argument: headers
+      value:
+        httpHeaders:
+          forward:
+            {{range $index, $variable := .ForwardingHeaders }}- {{ $variable }}
+            {{end}}
+```
+{{- end }}
+## Advanced Configurations
+
+Read more at [ndc-http/docs](https://github.com/hasura/ndc-http/blob/main/docs).

@@ -1,593 +1,594 @@
 [
-  {
-    "name": "testdata/auth/schema.yaml",
-    "settings": {
-      "servers": [
-        {
-          "url": {
-            "env": "PET_STORE_URL"
-          }
-        }
-      ],
-      "securitySchemes": {
-        "api_key": {
-          "type": "apiKey",
-          "in": "header",
-          "name": "api_key",
-          "value": {
-            "env": "PET_STORE_API_KEY"
-          }
-        },
-        "basic": {
-          "type": "basic",
-          "header": "Authorization",
-          "username": {
-            "value": "user"
-          },
-          "password": {
-            "value": "password"
-          }
-        },
-        "bearer": {
-          "type": "http",
-          "header": "",
-          "scheme": "bearer",
-          "value": {
-            "env": "PET_STORE_BEARER_TOKEN"
-          }
-        },
-        "petstore_auth": {
-          "type": "oauth2",
-          "flows": {
-            "implicit": {
-              "authorizationUrl": "https://petstore3.swagger.io/oauth/authorize",
-              "scopes": {
-                "read:pets": "read your pets",
-                "write:pets": "modify pets in your account"
-              }
-            }
-          }
-        }
-      },
-      "security": [
-        {
-          "api_key": []
-        }
-      ],
-      "version": "1.0.18",
-      "responseTransforms": [
-        {
-          "body": [
-            {
-              "subscription": "$[*].subscription"
-            }
-          ],
-          "targets": ["findPets"]
-        },
-        {
-          "body": "$[*].subscription[*].name",
-          "targets": ["findPets"]
-        },
-        {
-          "body": "$[0]",
-          "targets": ["findPets"]
-        }
-      ]
-    },
-    "functions": {
-      "findPets": {
-        "request": {
-          "url": "/pet",
-          "method": "get",
-          "response": {
-            "contentType": ""
-          }
-        },
-        "arguments": {},
-        "description": "Finds Pets",
-        "result_type": {
-          "type": "nullable",
-          "underlying_type": {
-            "element_type": {
-              "name": "String",
-              "type": "named"
-            },
-            "type": "array"
-          }
-        },
-        "original_result_type": {
-          "element_type": {
-            "name": "Pet",
-            "type": "named"
-          },
-          "type": "array"
-        }
-      },
-      "findPetsByStatus": {
-        "request": {
-          "url": "/pet/findByStatus",
-          "method": "get",
-          "security": [
-            {
-              "bearer": []
-            }
-          ],
-          "response": {
-            "contentType": ""
-          }
-        },
-        "arguments": {
-          "status": {
-            "description": "Status values that need to be considered for filter",
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "String",
-                "type": "named"
-              }
-            },
-            "http": {
-              "in": "query",
-              "schema": {
-                "type": ["string"]
-              }
-            }
-          }
-        },
-        "description": "Finds Pets by status",
-        "result_type": {
-          "element_type": {
-            "name": "Pet",
-            "type": "named"
-          },
-          "type": "array"
-        },
-        "original_result_type": {
-          "element_type": {
-            "name": "Pet",
-            "type": "named"
-          },
-          "type": "array"
-        }
-      },
-      "petRetry": {
-        "request": {
-          "url": "/pet/retry",
-          "method": "get",
-          "response": {
-            "contentType": ""
-          }
-        },
-        "arguments": {},
-        "result_type": {
-          "element_type": {
-            "name": "Pet",
-            "type": "named"
-          },
-          "type": "array"
-        },
-        "original_result_type": {
-          "element_type": {
-            "name": "Pet",
-            "type": "named"
-          },
-          "type": "array"
-        }
-      }
-    },
-    "object_types": {
-      "Category": {
-        "fields": {
-          "id": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "Int64",
-                "type": "named"
-              }
-            },
-            "http": {
-              "type": ["integer"],
-              "format": "int64"
-            }
-          },
-          "name": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "String",
-                "type": "named"
-              }
-            },
-            "http": {
-              "type": ["string"]
-            }
-          }
-        },
-        "xml": {
-          "name": "category"
-        }
-      },
-      "CreateModelRequest": {
-        "fields": {
-          "model": {
-            "description": "The name of the model to create",
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "String",
-                "type": "named"
-              }
-            }
-          }
-        }
-      },
-      "FindPetsTransformedResult": {
-        "fields": {
-          "subscription": {
-            "type": {
-              "element_type": {
-                "name": "subscriptionObject",
-                "type": "named"
-              },
-              "type": "array"
-            }
-          }
-        }
-      },
-      "Pet": {
-        "fields": {
-          "id": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "Int",
-                "type": "named"
-              }
-            }
-          },
-          "name": {
-            "type": {
-              "name": "String",
-              "type": "named"
-            }
-          },
-          "subscription": {
-            "type": {
-              "name": "subscriptionObject",
-              "type": "named"
-            }
-          }
-        }
-      },
-      "PetXml": {
-        "fields": {
-          "category": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "Category",
-                "type": "named"
-              }
-            },
-            "http": {
-              "type": ["object"],
-              "xml": {
-                "name": "category"
-              }
-            }
-          },
-          "field": {
-            "description": "This empty field is returned instead of the list of scopes if the user making the call doesn't have the authorization required.",
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "JSON",
-                "type": "named"
-              }
-            },
-            "http": {}
-          },
-          "id": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "Int64",
-                "type": "named"
-              }
-            },
-            "http": {
-              "type": ["integer"],
-              "format": "int64"
-            }
-          },
-          "name": {
-            "type": {
-              "name": "String",
-              "type": "named"
-            },
-            "http": {
-              "type": ["string"]
-            }
-          },
-          "photoUrls": {
-            "type": {
-              "element_type": {
-                "name": "String",
-                "type": "named"
-              },
-              "type": "array"
-            },
-            "http": {
-              "type": ["array"],
-              "items": {
-                "type": ["string"],
-                "xml": {
-                  "name": "photoUrl"
-                }
-              },
-              "xml": {
-                "wrapped": true
-              }
-            }
-          },
-          "status": {
-            "description": "pet status in the store",
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "String",
-                "type": "named"
-              }
-            },
-            "http": {
-              "type": ["string"]
-            }
-          },
-          "tags": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "element_type": {
-                  "name": "Tag",
-                  "type": "named"
-                },
-                "type": "array"
-              }
-            },
-            "http": {
-              "type": ["array"],
-              "xml": {
-                "wrapped": true
-              }
-            }
-          }
-        },
-        "xml": {
-          "name": "pet"
-        }
-      },
-      "ProgressResponse": {
-        "fields": {
-          "completed": {
-            "description": "The completed size of the task",
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "Int32",
-                "type": "named"
-              }
-            }
-          },
-          "status": {
-            "description": "The status of the request",
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "String",
-                "type": "named"
-              }
-            }
-          }
-        }
-      },
-      "Tag": {
-        "fields": {
-          "id": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "Int64",
-                "type": "named"
-              }
-            },
-            "http": {
-              "type": ["integer"],
-              "format": "int64"
-            }
-          },
-          "name": {
-            "type": {
-              "type": "nullable",
-              "underlying_type": {
-                "name": "String",
-                "type": "named"
-              }
-            },
-            "http": {
-              "type": ["string"]
-            }
-          }
-        },
-        "xml": {
-          "name": "tag"
-        }
-      },
-      "subscriptionObject": {
-        "fields": {
-          "name": {
-            "type": {
-              "name": "String",
-              "type": "named"
-            }
-          }
-        }
-      }
-    },
-    "procedures": {
-      "addPet": {
-        "request": {
-          "url": "/pet",
-          "method": "post",
-          "headers": {
-            "Content-Type": {
-              "value": "application/json"
-            }
-          },
-          "security": [
-            {
-              "api_key": []
-            }
-          ],
-          "requestBody": {
-            "contentType": "application/json"
-          },
-          "response": {
-            "contentType": ""
-          }
-        },
-        "arguments": {
-          "body": {
-            "description": "Request body of /pet",
-            "type": {
-              "name": "Pet",
-              "type": "named"
-            },
-            "http": {
-              "in": "body"
-            }
-          }
-        },
-        "description": "Add a new pet to the store",
-        "result_type": {
-          "name": "Pet",
-          "type": "named"
-        },
-        "original_result_type": {
-          "name": "Pet",
-          "type": "named"
-        }
-      },
-      "createModel": {
-        "request": {
-          "url": "/model",
-          "method": "post",
-          "security": [
-            {
-              "basic": []
-            }
-          ],
-          "requestBody": {
-            "contentType": "application/json"
-          },
-          "response": {
-            "contentType": "application/x-ndjson"
-          }
-        },
-        "arguments": {
-          "body": {
-            "description": "Request body of POST /api/create",
-            "type": {
-              "name": "CreateModelRequest",
-              "type": "named"
-            }
-          }
-        },
-        "result_type": {
-          "element_type": {
-            "name": "ProgressResponse",
-            "type": "named"
-          },
-          "type": "array"
-        },
-        "original_result_type": {
-          "element_type": {
-            "name": "ProgressResponse",
-            "type": "named"
-          },
-          "type": "array"
-        }
-      },
-      "putPetXml": {
-        "request": {
-          "url": "/pet/xml",
-          "method": "put",
-          "requestBody": {
-            "contentType": "application/xml"
-          },
-          "response": {
-            "contentType": "application/xml"
-          }
-        },
-        "arguments": {
-          "body": {
-            "description": "Request body of PUT /pet/xml",
-            "type": {
-              "name": "PetXml",
-              "type": "named"
-            },
-            "http": {
-              "in": "body"
-            }
-          }
-        },
-        "description": "Update an existing pet",
-        "result_type": {
-          "name": "PetXml",
-          "type": "named"
-        },
-        "original_result_type": {
-          "name": "PetXml",
-          "type": "named"
-        }
-      }
-    },
-    "scalar_types": {
-      "Int": {
-        "aggregate_functions": {},
-        "comparison_operators": {},
-        "representation": {
-          "type": "int32"
-        }
-      },
-      "Int32": {
-        "aggregate_functions": {},
-        "comparison_operators": {},
-        "representation": {
-          "type": "int32"
-        }
-      },
-      "Int64": {
-        "aggregate_functions": {},
-        "comparison_operators": {},
-        "representation": {
-          "type": "int64"
-        }
-      },
-      "JSON": {
-        "aggregate_functions": {},
-        "comparison_operators": {},
-        "representation": {
-          "type": "json"
-        }
-      },
-      "String": {
-        "aggregate_functions": {},
-        "comparison_operators": {},
-        "representation": {
-          "type": "string"
-        }
-      }
-    }
-  }
+	{
+		"name": "testdata/auth/schema.yaml",
+		"settings": {
+			"servers": [
+				{
+					"url": {
+						"env": "PET_STORE_URL",
+						"value": "http://localhost:1234"
+					}
+				}
+			],
+			"securitySchemes": {
+				"api_key": {
+					"type": "apiKey",
+					"in": "header",
+					"name": "api_key",
+					"value": {
+						"env": "PET_STORE_API_KEY"
+					}
+				},
+				"basic": {
+					"type": "basic",
+					"header": "Authorization",
+					"username": {
+						"value": "user"
+					},
+					"password": {
+						"value": "password"
+					}
+				},
+				"bearer": {
+					"type": "http",
+					"header": "",
+					"scheme": "bearer",
+					"value": {
+						"env": "PET_STORE_BEARER_TOKEN"
+					}
+				},
+				"petstore_auth": {
+					"type": "oauth2",
+					"flows": {
+						"implicit": {
+							"authorizationUrl": "https://petstore3.swagger.io/oauth/authorize",
+							"scopes": {
+								"read:pets": "read your pets",
+								"write:pets": "modify pets in your account"
+							}
+						}
+					}
+				}
+			},
+			"security": [
+				{
+					"api_key": []
+				}
+			],
+			"version": "1.0.18",
+			"responseTransforms": [
+				{
+					"body": [
+						{
+							"subscription": "$[*].subscription"
+						}
+					],
+					"targets": ["findPets"]
+				},
+				{
+					"body": "$[*].subscription[*].name",
+					"targets": ["findPets"]
+				},
+				{
+					"body": "$[0]",
+					"targets": ["findPets"]
+				}
+			]
+		},
+		"functions": {
+			"findPets": {
+				"request": {
+					"url": "/pet",
+					"method": "get",
+					"response": {
+						"contentType": ""
+					}
+				},
+				"arguments": {},
+				"description": "Finds Pets",
+				"result_type": {
+					"type": "nullable",
+					"underlying_type": {
+						"element_type": {
+							"name": "String",
+							"type": "named"
+						},
+						"type": "array"
+					}
+				},
+				"original_result_type": {
+					"element_type": {
+						"name": "Pet",
+						"type": "named"
+					},
+					"type": "array"
+				}
+			},
+			"findPetsByStatus": {
+				"request": {
+					"url": "/pet/findByStatus",
+					"method": "get",
+					"security": [
+						{
+							"bearer": []
+						}
+					],
+					"response": {
+						"contentType": ""
+					}
+				},
+				"arguments": {
+					"status": {
+						"description": "Status values that need to be considered for filter",
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "String",
+								"type": "named"
+							}
+						},
+						"http": {
+							"in": "query",
+							"schema": {
+								"type": ["string"]
+							}
+						}
+					}
+				},
+				"description": "Finds Pets by status",
+				"result_type": {
+					"element_type": {
+						"name": "Pet",
+						"type": "named"
+					},
+					"type": "array"
+				},
+				"original_result_type": {
+					"element_type": {
+						"name": "Pet",
+						"type": "named"
+					},
+					"type": "array"
+				}
+			},
+			"petRetry": {
+				"request": {
+					"url": "/pet/retry",
+					"method": "get",
+					"response": {
+						"contentType": ""
+					}
+				},
+				"arguments": {},
+				"result_type": {
+					"element_type": {
+						"name": "Pet",
+						"type": "named"
+					},
+					"type": "array"
+				},
+				"original_result_type": {
+					"element_type": {
+						"name": "Pet",
+						"type": "named"
+					},
+					"type": "array"
+				}
+			}
+		},
+		"object_types": {
+			"Category": {
+				"fields": {
+					"id": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "Int64",
+								"type": "named"
+							}
+						},
+						"http": {
+							"type": ["integer"],
+							"format": "int64"
+						}
+					},
+					"name": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "String",
+								"type": "named"
+							}
+						},
+						"http": {
+							"type": ["string"]
+						}
+					}
+				},
+				"xml": {
+					"name": "category"
+				}
+			},
+			"CreateModelRequest": {
+				"fields": {
+					"model": {
+						"description": "The name of the model to create",
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "String",
+								"type": "named"
+							}
+						}
+					}
+				}
+			},
+			"FindPetsTransformedResult": {
+				"fields": {
+					"subscription": {
+						"type": {
+							"element_type": {
+								"name": "subscriptionObject",
+								"type": "named"
+							},
+							"type": "array"
+						}
+					}
+				}
+			},
+			"Pet": {
+				"fields": {
+					"id": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "Int",
+								"type": "named"
+							}
+						}
+					},
+					"name": {
+						"type": {
+							"name": "String",
+							"type": "named"
+						}
+					},
+					"subscription": {
+						"type": {
+							"name": "subscriptionObject",
+							"type": "named"
+						}
+					}
+				}
+			},
+			"PetXml": {
+				"fields": {
+					"category": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "Category",
+								"type": "named"
+							}
+						},
+						"http": {
+							"type": ["object"],
+							"xml": {
+								"name": "category"
+							}
+						}
+					},
+					"field": {
+						"description": "This empty field is returned instead of the list of scopes if the user making the call doesn't have the authorization required.",
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "JSON",
+								"type": "named"
+							}
+						},
+						"http": {}
+					},
+					"id": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "Int64",
+								"type": "named"
+							}
+						},
+						"http": {
+							"type": ["integer"],
+							"format": "int64"
+						}
+					},
+					"name": {
+						"type": {
+							"name": "String",
+							"type": "named"
+						},
+						"http": {
+							"type": ["string"]
+						}
+					},
+					"photoUrls": {
+						"type": {
+							"element_type": {
+								"name": "String",
+								"type": "named"
+							},
+							"type": "array"
+						},
+						"http": {
+							"type": ["array"],
+							"items": {
+								"type": ["string"],
+								"xml": {
+									"name": "photoUrl"
+								}
+							},
+							"xml": {
+								"wrapped": true
+							}
+						}
+					},
+					"status": {
+						"description": "pet status in the store",
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "String",
+								"type": "named"
+							}
+						},
+						"http": {
+							"type": ["string"]
+						}
+					},
+					"tags": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"element_type": {
+									"name": "Tag",
+									"type": "named"
+								},
+								"type": "array"
+							}
+						},
+						"http": {
+							"type": ["array"],
+							"xml": {
+								"wrapped": true
+							}
+						}
+					}
+				},
+				"xml": {
+					"name": "pet"
+				}
+			},
+			"ProgressResponse": {
+				"fields": {
+					"completed": {
+						"description": "The completed size of the task",
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "Int32",
+								"type": "named"
+							}
+						}
+					},
+					"status": {
+						"description": "The status of the request",
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "String",
+								"type": "named"
+							}
+						}
+					}
+				}
+			},
+			"Tag": {
+				"fields": {
+					"id": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "Int64",
+								"type": "named"
+							}
+						},
+						"http": {
+							"type": ["integer"],
+							"format": "int64"
+						}
+					},
+					"name": {
+						"type": {
+							"type": "nullable",
+							"underlying_type": {
+								"name": "String",
+								"type": "named"
+							}
+						},
+						"http": {
+							"type": ["string"]
+						}
+					}
+				},
+				"xml": {
+					"name": "tag"
+				}
+			},
+			"subscriptionObject": {
+				"fields": {
+					"name": {
+						"type": {
+							"name": "String",
+							"type": "named"
+						}
+					}
+				}
+			}
+		},
+		"procedures": {
+			"addPet": {
+				"request": {
+					"url": "/pet",
+					"method": "post",
+					"headers": {
+						"Content-Type": {
+							"value": "application/json"
+						}
+					},
+					"security": [
+						{
+							"api_key": []
+						}
+					],
+					"requestBody": {
+						"contentType": "application/json"
+					},
+					"response": {
+						"contentType": ""
+					}
+				},
+				"arguments": {
+					"body": {
+						"description": "Request body of /pet",
+						"type": {
+							"name": "Pet",
+							"type": "named"
+						},
+						"http": {
+							"in": "body"
+						}
+					}
+				},
+				"description": "Add a new pet to the store",
+				"result_type": {
+					"name": "Pet",
+					"type": "named"
+				},
+				"original_result_type": {
+					"name": "Pet",
+					"type": "named"
+				}
+			},
+			"createModel": {
+				"request": {
+					"url": "/model",
+					"method": "post",
+					"security": [
+						{
+							"basic": []
+						}
+					],
+					"requestBody": {
+						"contentType": "application/json"
+					},
+					"response": {
+						"contentType": "application/x-ndjson"
+					}
+				},
+				"arguments": {
+					"body": {
+						"description": "Request body of POST /api/create",
+						"type": {
+							"name": "CreateModelRequest",
+							"type": "named"
+						}
+					}
+				},
+				"result_type": {
+					"element_type": {
+						"name": "ProgressResponse",
+						"type": "named"
+					},
+					"type": "array"
+				},
+				"original_result_type": {
+					"element_type": {
+						"name": "ProgressResponse",
+						"type": "named"
+					},
+					"type": "array"
+				}
+			},
+			"putPetXml": {
+				"request": {
+					"url": "/pet/xml",
+					"method": "put",
+					"requestBody": {
+						"contentType": "application/xml"
+					},
+					"response": {
+						"contentType": "application/xml"
+					}
+				},
+				"arguments": {
+					"body": {
+						"description": "Request body of PUT /pet/xml",
+						"type": {
+							"name": "PetXml",
+							"type": "named"
+						},
+						"http": {
+							"in": "body"
+						}
+					}
+				},
+				"description": "Update an existing pet",
+				"result_type": {
+					"name": "PetXml",
+					"type": "named"
+				},
+				"original_result_type": {
+					"name": "PetXml",
+					"type": "named"
+				}
+			}
+		},
+		"scalar_types": {
+			"Int": {
+				"aggregate_functions": {},
+				"comparison_operators": {},
+				"representation": {
+					"type": "int32"
+				}
+			},
+			"Int32": {
+				"aggregate_functions": {},
+				"comparison_operators": {},
+				"representation": {
+					"type": "int32"
+				}
+			},
+			"Int64": {
+				"aggregate_functions": {},
+				"comparison_operators": {},
+				"representation": {
+					"type": "int64"
+				}
+			},
+			"JSON": {
+				"aggregate_functions": {},
+				"comparison_operators": {},
+				"representation": {
+					"type": "json"
+				}
+			},
+			"String": {
+				"aggregate_functions": {},
+				"comparison_operators": {},
+				"representation": {
+					"type": "string"
+				}
+			}
+		}
+	}
 ]

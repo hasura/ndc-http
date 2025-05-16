@@ -3,6 +3,7 @@ settings:
   servers:
     - url:
         env: PET_STORE_URL
+        value: http://localhost:1234
   securitySchemes:
     api_key:
       type: apiKey

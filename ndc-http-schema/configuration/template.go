@@ -11,8 +11,9 @@ var templateFS embed.FS
 var _templates *template.Template
 
 const (
-	templateEmptySettings = "server_empty.gotmpl"
-	templateEnvVariables  = "env_variables.gotmpl"
+	templateEmptySettings = "server_empty.tmpl"
+	templateEnvVariables  = "env_variables.tmpl"
+	templateReadme        = "readme.tmpl"
 )
 
 const (
@@ -32,7 +33,7 @@ func getTemplates() (*template.Template, error) {
 
 	var err error
 
-	_templates, err = template.ParseFS(templateFS, "templates/*.gotmpl")
+	_templates, err = template.ParseFS(templateFS, "templates/*.tmpl")
 	if err != nil {
 		return nil, err
 	}

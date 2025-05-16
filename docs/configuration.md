@@ -52,10 +52,26 @@ files:
       times:
         value: 1
       delay:
-        # The default delay between each retry in milliseconds.
+        # The initial wait time in milliseconds before a retry is attempted.
         # The connector prefers the Retry-After header in the response if exists
         value: 500
       httpStatus: [429, 500, 502, 503]
+      
+      ## How much does the reconnection time vary relative to the base value. 
+      ## This is useful to prevent multiple clients to reconnect at the exact same time, as it makes the wait times distinct.
+      ## Must be in range (0, 1); Defaults to 0.5.
+      # jitter: 0.5
+      
+      ## How much should the reconnection time grow on subsequent attempts.
+      ## Must be >=1; 1 = constant interval. Defaults to 1.5.
+      # multiplier: 1.5
+
+      ## Maximum total time in seconds for all retries.
+      # maxElapsedTimeSeconds: 600
+
+      ## How much can the wait time in seconds grow. Defaults to 60 seconds.
+      # maxIntervalSeconds: 60
+      
 ```
 
 ## JSON Patch
@@ -74,7 +90,7 @@ files:
         strategy: json6902
 ```
 
-See [the example](./ndc-http-schema/command/testdata/patch) for more context.
+See [the example](../ndc-http-schema/command/testdata/patch) for more context.
 
 ## Runtime Settings
 

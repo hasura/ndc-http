@@ -1,0 +1,10 @@
+  Make sure that the following environment variable mappings were added to your subgraph configuration{{ if .ServiceName }} (with subgraph prefixes such as {{.ServiceName}}_){{ end }}:
+
+    {{range $index, $variable := .Variables }}- {{ $variable }}
+    {{end}}
+  
+  Use the DDN CLI to add environment variables if you haven't added them yet:
+  
+    ddn connector env add \
+      {{range $index, $variable := .Variables }}--env {{ $variable }}=<value> \
+      {{end}}--connector {{ .ContextPath }}/connector.yaml

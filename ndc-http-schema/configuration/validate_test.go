@@ -66,6 +66,20 @@ func TestConfigValidator(t *testing.T) {
 				spacesRegex.ReplaceAllString(string(expectedBytes), "\n"),
 				spacesRegex.ReplaceAllString(buf.String(), "\n"),
 			)
+
+			// test README.md
+			var readmeBuf bytes.Buffer
+			readmeBytes, err := os.ReadFile(filepath.Join(tc.Dir, "README.md"))
+			assert.NilError(t, err)
+
+			validStatus.renderReadme(&readmeBuf)
+			readmeOutput := readmeBuf.String()
+			log.Println(readmeOutput)
+			assert.Equal(
+				t,
+				spacesRegex.ReplaceAllString(string(readmeBytes), "\n"),
+				spacesRegex.ReplaceAllString(readmeOutput, "\n"),
+			)
 		})
 	}
 }

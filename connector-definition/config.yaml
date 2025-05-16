@@ -1,4 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/hasura/ndc-http/refs/heads/main/ndc-http-schema/jsonschema/configuration.schema.json
+# The generated schema output will be generated to this file location.
+# The schema is an array of API documentation files that were converted to ndc-http-schema configuration specs.
+# You can find out more about that specs and advanced configurations in https://github.com/hasura/ndc-http/tree/main/ndc-http-schema#ndc-http-configuration
 output: schema.output.json
 strict: false
 forwardHeaders:
@@ -14,10 +17,14 @@ concurrency:
 files:
   - file: https://raw.githubusercontent.com/hasura/ndc-http/main/connector/testdata/jsonplaceholder/swagger.json
     spec: oas2
+    ## If there are many files you should set a prefix for each file item to avoid conflicting variable names.
+    # envPrefix: ""
     timeout:
       value: 30
     retry:
       times:
         value: 0
       delay:
+        # The initial wait time in milliseconds before a retry is attempted.
+        # The connector prefers the Retry-After header in the response if exists
         value: 1000
