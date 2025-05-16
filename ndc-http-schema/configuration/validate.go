@@ -108,12 +108,7 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 	}
 
 	for _, header := range ndcSchema.Settings.Headers {
-		if header.Variable != nil {
-			docInfo.Variables[*header.Variable] = parseSchemaDocVariableInfo(header)
-		}
-
-		_, err := header.Get()
-		if err != nil && header.Variable != nil {
+		if !cv.validateEnvString(docInfo, &header) && header.Variable != nil {
 			cv.requiredVariables[*header.Variable] = true
 		}
 	}
@@ -155,12 +150,7 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 		}
 
 		for _, header := range server.Headers {
-			if header.Variable != nil {
-				docInfo.Variables[*header.Variable] = parseSchemaDocVariableInfo(header)
-			}
-
-			_, err := header.Get()
-			if err != nil && header.Variable != nil {
+			if !cv.validateEnvString(docInfo, &header) && header.Variable != nil {
 				cv.requiredVariables[*header.Variable] = true
 			}
 		}
