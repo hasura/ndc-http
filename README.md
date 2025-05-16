@@ -13,6 +13,7 @@ The connector can automatically transform OpenAPI 2.0 and 3.0 definitions to NDC
 - [Supported authentication](./docs/authentication.md).
 - [Supported headers forwarding](./docs/authentication.md#headers-forwarding).
 - [Supported argument presets](./docs/argument_presets.md).
+- [Supported response transforms](./docs/response_transform.md).
 - [Supported timeout and retry](#timeout-and-retry).
 - Supported concurrency and [sending distributed requests](./docs/distribution.md) to multiple servers.
 - [GraphQL-to-REST proxy](./docs/schemaless_request.md).
@@ -62,6 +63,7 @@ Follow the [Quick Start Guide](https://hasura.io/docs/3.0/getting-started/overvi
 - [Configuration](./docs/configuration.md)
 - [Authentication](./docs/authentication.md)
 - [Argument Presets](./docs/argument_presets.md)
+- [Response Transforms](./docs/response_transform.md)
 - [Schemaless Requests](./docs/schemaless_request.md)
 - [Distributed Execution](./docs/distribution.md)
 - [Recipes](https://github.com/hasura/ndc-http-recipes/tree/main): You can find or request pre-built configuration recipes of popular API services here.
