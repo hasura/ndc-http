@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/ndc"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -35,6 +36,9 @@ func (oc *OAS2Builder) BuildDocumentModel(
 		oc.schema.Settings.Version = docModel.Model.Info.Version
 	}
 
+	envName := utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"})
+	urlEnv := sdkUtils.NewEnvStringVariable(envName)
+
 	if docModel.Model.Host != "" {
 		scheme := "https"
 
@@ -46,15 +50,19 @@ func (oc *OAS2Builder) BuildDocumentModel(
 			}
 		}
 
-		envName := utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"})
 		serverURL := strings.TrimRight(
 			fmt.Sprintf("%s://%s%s", scheme, docModel.Model.Host, docModel.Model.BasePath),
 			"/",
 		)
-		oc.schema.Settings.Servers = append(oc.schema.Settings.Servers, rest.ServerConfig{
-			URL: sdkUtils.NewEnvString(envName, serverURL),
-		})
+
+		if _, err := exhttp.ParseHttpURL(serverURL); err == nil {
+			urlEnv = sdkUtils.NewEnvString(envName, serverURL)
+		}
 	}
+
+	oc.schema.Settings.Servers = append(oc.schema.Settings.Servers, rest.ServerConfig{
+		URL: urlEnv,
+	})
 
 	if docModel.Model.Definitions != nil {
 		for cSchema := docModel.Model.Definitions.Definitions.First(); cSchema != nil; cSchema = cSchema.Next() {

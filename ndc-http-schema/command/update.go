@@ -35,17 +35,24 @@ func UpdateConfiguration(args *UpdateCommandArguments, logger *slog.Logger, noCo
 		return err
 	}
 
-	if validStatus.IsOk() {
-		return nil
+	if err := validStatus.WriteReadme(); err != nil {
+		logger.Error(err.Error())
 	}
 
-	validStatus.Render(os.Stderr)
+	if !validStatus.IsOk() {
+		validStatus.Render(os.Stderr)
 
-	if validStatus.HasError() {
-		return errors.New("detected configuration errors. Update your configuration and try again")
+		if validStatus.HasError() {
+			return errors.New(
+				"detected configuration errors. Update your configuration and try again",
+			)
+		}
 	}
 
-	logger.Info("Updated successfully", slog.Duration("exec_time", time.Since(start)))
+	logger.Info(
+		"Updated successfully. See the README.md for more information.",
+		slog.Duration("exec_time", time.Since(start)),
+	)
 
 	return nil
 }

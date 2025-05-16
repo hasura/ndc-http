@@ -4,7 +4,6 @@
     "servers": [
       {
         "url": {
-          "value": "",
           "env": "SERVER_URL"
         }
       }

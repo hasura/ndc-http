@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/ndc"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -44,6 +45,15 @@ func (oc *OAS3Builder) BuildDocumentModel(
 	}
 
 	oc.schema.Settings.Servers = oc.convertServers(docModel.Model.Servers)
+	if len(oc.schema.Settings.Servers) == 0 {
+		oc.schema.Settings.Servers = []rest.ServerConfig{
+			{
+				URL: sdkUtils.NewEnvStringVariable(
+					utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"}),
+				),
+			},
+		}
+	}
 
 	if docModel.Model.Components != nil && docModel.Model.Components.Schemas != nil {
 		for cSchema := docModel.Model.Components.Schemas.First(); cSchema != nil; cSchema = cSchema.Next() {
@@ -82,46 +92,53 @@ func (oc *OAS3Builder) BuildDocumentModel(
 }
 
 func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig {
-	var results []rest.ServerConfig
+	var results []rest.ServerConfig //nolint:prealloc
 
-	for i, server := range servers {
-		if server.URL != "" {
-			var serverID, envName string
-
-			idExtension := server.Extensions.GetOrZero("x-server-id")
-			if idExtension != nil {
-				serverID = idExtension.Value
-			}
-
-			if serverID != "" {
-				envName = utils.StringSliceToConstantCase(
-					[]string{oc.EnvPrefix, serverID, "SERVER_URL"},
-				)
-			} else {
-				envName = utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"})
-				if i > 0 {
-					envName = fmt.Sprintf("%s_%d", envName, i+1)
-				}
-			}
-
-			serverURL := server.URL
-
-			for variable := server.Variables.First(); variable != nil; variable = variable.Next() {
-				value := variable.Value()
-				if value == nil || value.Default == "" {
-					continue
-				}
-
-				key := variable.Key()
-				serverURL = strings.ReplaceAll(serverURL, fmt.Sprintf("{%s}", key), value.Default)
-			}
-
-			conf := rest.ServerConfig{
-				ID:  serverID,
-				URL: sdkUtils.NewEnvString(envName, strings.TrimRight(serverURL, "/")),
-			}
-			results = append(results, conf)
+	for _, server := range servers {
+		if server.URL == "" {
+			continue
 		}
+
+		var serverID, envName string
+
+		index := len(results)
+		serverURL := server.URL
+
+		for variable := server.Variables.First(); variable != nil; variable = variable.Next() {
+			value := variable.Value()
+			if value == nil || value.Default == "" {
+				continue
+			}
+
+			key := variable.Key()
+			serverURL = strings.ReplaceAll(serverURL, fmt.Sprintf("{%s}", key), value.Default)
+		}
+
+		if _, err := exhttp.ParseHttpURL(serverURL); err != nil {
+			continue
+		}
+
+		idExtension := server.Extensions.GetOrZero("x-server-id")
+		if idExtension != nil {
+			serverID = idExtension.Value
+		}
+
+		if serverID != "" {
+			envName = utils.StringSliceToConstantCase(
+				[]string{oc.EnvPrefix, serverID, "SERVER_URL"},
+			)
+		} else {
+			envName = utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"})
+			if index > 0 {
+				envName = fmt.Sprintf("%s_%d", envName, index+1)
+			}
+		}
+
+		conf := rest.ServerConfig{
+			ID:  serverID,
+			URL: sdkUtils.NewEnvString(envName, strings.TrimRight(serverURL, "/")),
+		}
+		results = append(results, conf)
 	}
 
 	return results

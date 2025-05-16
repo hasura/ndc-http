@@ -5,6 +5,7 @@
       "servers": [
         {
           "url": {
+            "value": "http://localhost:1234",
             "env": "PET_STORE_URL"
           }
         }
@@ -62,15 +63,21 @@
               "subscription": "$[*].subscription"
             }
           ],
-          "targets": ["findPets"]
+          "targets": [
+            "findPets"
+          ]
         },
         {
           "body": "$[*].subscription[*].name",
-          "targets": ["findPets"]
+          "targets": [
+            "findPets"
+          ]
         },
         {
           "body": "$[0]",
-          "targets": ["findPets"]
+          "targets": [
+            "findPets"
+          ]
         }
       ]
     },
@@ -129,7 +136,9 @@
             "http": {
               "in": "query",
               "schema": {
-                "type": ["string"]
+                "type": [
+                  "string"
+                ]
               }
             }
           }
@@ -187,7 +196,9 @@
               }
             },
             "http": {
-              "type": ["integer"],
+              "type": [
+                "integer"
+              ],
               "format": "int64"
             }
           },
@@ -200,7 +211,9 @@
               }
             },
             "http": {
-              "type": ["string"]
+              "type": [
+                "string"
+              ]
             }
           }
         },
@@ -271,7 +284,9 @@
               }
             },
             "http": {
-              "type": ["object"],
+              "type": [
+                "object"
+              ],
               "xml": {
                 "name": "category"
               }
@@ -297,7 +312,9 @@
               }
             },
             "http": {
-              "type": ["integer"],
+              "type": [
+                "integer"
+              ],
               "format": "int64"
             }
           },
@@ -307,7 +324,9 @@
               "type": "named"
             },
             "http": {
-              "type": ["string"]
+              "type": [
+                "string"
+              ]
             }
           },
           "photoUrls": {
@@ -319,9 +338,13 @@
               "type": "array"
             },
             "http": {
-              "type": ["array"],
+              "type": [
+                "array"
+              ],
               "items": {
-                "type": ["string"],
+                "type": [
+                  "string"
+                ],
                 "xml": {
                   "name": "photoUrl"
                 }
@@ -341,7 +364,9 @@
               }
             },
             "http": {
-              "type": ["string"]
+              "type": [
+                "string"
+              ]
             }
           },
           "tags": {
@@ -356,7 +381,9 @@
               }
             },
             "http": {
-              "type": ["array"],
+              "type": [
+                "array"
+              ],
               "xml": {
                 "wrapped": true
               }
@@ -402,7 +429,9 @@
               }
             },
             "http": {
-              "type": ["integer"],
+              "type": [
+                "integer"
+              ],
               "format": "int64"
             }
           },
@@ -415,7 +444,9 @@
               }
             },
             "http": {
-              "type": ["string"]
+              "type": [
+                "string"
+              ]
             }
           }
         },

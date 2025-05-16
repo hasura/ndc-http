@@ -1,13 +1,10 @@
 package configuration
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/hasura/ndc-http/exhttp"
@@ -25,7 +22,11 @@ type ConfigValidator struct {
 	contextPath  string
 	noColor      bool
 
+	subgraphName              string
+	connectorName             string
+	schemaDocs                []*schemaDocInfo
 	requiredVariables         map[string]bool
+	forwardedHeaderNames      map[string]bool
 	requiredHeadersForwarding map[schema.SecuritySchemeType]bool
 	warnings                  map[string][]string
 	errors                    map[string][]string
@@ -52,11 +53,15 @@ func ValidateConfiguration(
 		noColor:                   noColor,
 		mergedSchema:              mergedSchema,
 		requiredVariables:         make(map[string]bool),
+		forwardedHeaderNames:      make(map[string]bool),
 		requiredHeadersForwarding: map[schema.SecuritySchemeType]bool{},
 		contextPath:               contextPath,
 		errors:                    map[string][]string{},
 		warnings:                  map[string][]string{},
 	}
+
+	cv.subgraphName = cv.findSubgraphName()
+	cv.connectorName = cv.findConnectorName()
 
 	for _, item := range schemas {
 		if err := cv.evaluateSchema(&item); err != nil {
@@ -80,92 +85,14 @@ func (cv *ConfigValidator) HasError() bool {
 	return len(cv.errors) > 0
 }
 
-// Render renders the help text.
-func (cv *ConfigValidator) Render(w io.Writer) {
-	if len(cv.errors) > 0 {
-		writeErrorIf(w, ":", cv.noColor)
-
-		for ns, errs := range cv.errors {
-			_, _ = w.Write([]byte("\n\n"))
-			_, _ = w.Write([]byte(ns))
-
-			for _, err := range errs {
-				_, _ = w.Write([]byte("\n  * "))
-				_, _ = w.Write([]byte(err))
-			}
-		}
-	}
-
-	if len(cv.warnings) > 0 || len(cv.requiredHeadersForwarding) > 0 {
-		writeWarningIf(w, ":\n", cv.noColor)
-
-		if len(cv.requiredHeadersForwarding) > 0 &&
-			(!cv.config.ForwardHeaders.Enabled || cv.config.ForwardHeaders.ArgumentField == nil || *cv.config.ForwardHeaders.ArgumentField == "") {
-			_, _ = fmt.Fprintf(
-				w,
-				"\n  * Authorization header must be forwarded for the following authentication schemes: %v",
-				utils.GetSortedKeys(cv.requiredHeadersForwarding),
-			)
-			_, _ = w.Write(
-				[]byte(
-					"\n    See https://github.com/hasura/ndc-http/blob/main/docs/authentication.md#headers-forwarding for more information.",
-				),
-			)
-		}
-
-		for ns, errs := range cv.warnings {
-			_, _ = w.Write([]byte("\n\n  "))
-			_, _ = w.Write([]byte(ns))
-			_, _ = w.Write([]byte("\n"))
-
-			for _, err := range errs {
-				_, _ = w.Write([]byte("\n    * "))
-				_, _ = w.Write([]byte(err))
-			}
-		}
-	}
-
-	if len(cv.requiredVariables) > 0 {
-		writeColorTextIf(w, "\n\nEnvironment Variables:\n", ansiBrightYellow, cv.noColor)
-
-		var prefix string
-
-		serviceName := cv.getServiceName()
-		if serviceName != "" {
-			prefix = strings.ToUpper(serviceName) + "_"
-		}
-
-		variables := make([][]string, 0, len(cv.requiredVariables))
-		for _, key := range utils.GetSortedKeys(cv.requiredVariables) {
-			variables = append(variables, []string{key, prefix + key})
-		}
-
-		err := cv.templates.ExecuteTemplate(w, templateEnvVariables, map[string]any{
-			"ContextPath": cv.contextPath,
-			"ServiceName": serviceName,
-			"Variables":   variables,
-		})
-		if err != nil {
-			slog.Error(fmt.Sprintf("failed to render environment variables: %s", err))
-		}
-	}
-}
-
-func (cv *ConfigValidator) getServiceName() string {
-	subgraphName := cv.findSubgraphName()
-	if subgraphName == "" {
-		return ""
-	}
-
-	connectorName := cv.findConnectorName()
-	if connectorName == "" {
-		return ""
-	}
-
-	return subgraphName + "_" + connectorName
-}
-
 func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error {
+	docInfo := &schemaDocInfo{
+		Name:      ndcSchema.Name,
+		Variables: make(map[string]schemaDocVariableInfo),
+	}
+
+	cv.schemaDocs = append(cv.schemaDocs, docInfo)
+
 	if ndcSchema.Settings == nil || len(ndcSchema.Settings.Servers) == 0 {
 		errorMsg, err := cv.renderTemplate(templateEmptySettings, map[string]any{
 			"ContextPath": cv.contextPath,
@@ -181,8 +108,7 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 	}
 
 	for _, header := range ndcSchema.Settings.Headers {
-		_, err := header.Get()
-		if err != nil && header.Variable != nil {
+		if !cv.validateEnvString(docInfo, &header) && header.Variable != nil {
 			cv.requiredVariables[*header.Variable] = true
 		}
 	}
@@ -206,6 +132,10 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 	for i, server := range ndcSchema.Settings.Servers {
 		serverPath := fmt.Sprintf("settings.server[%d]", i)
 
+		if server.URL.Variable != nil {
+			docInfo.Variables[*server.URL.Variable] = parseSchemaDocVariableInfo(server.URL)
+		}
+
 		if server.URL.Value == nil {
 			_, err := server.URL.Get()
 			if err == nil {
@@ -220,8 +150,7 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 		}
 
 		for _, header := range server.Headers {
-			_, err := header.Get()
-			if err != nil && header.Variable != nil {
+			if !cv.validateEnvString(docInfo, &header) && header.Variable != nil {
 				cv.requiredVariables[*header.Variable] = true
 			}
 		}
@@ -252,6 +181,8 @@ func (cv *ConfigValidator) validateArgumentPresets(
 	argumentPresets []schema.ArgumentPresetConfig,
 	isGlobal bool,
 ) {
+	schemaDoc := cv.getLastSchemaDoc()
+
 	for i, preset := range argumentPresets {
 		_, _, err := ValidateArgumentPreset(cv.mergedSchema, preset, isGlobal)
 		if err != nil {
@@ -262,10 +193,15 @@ func (cv *ConfigValidator) validateArgumentPresets(
 
 		switch t := preset.Value.Interface().(type) {
 		case *schema.ArgumentPresetValueEnv:
+			schemaDoc.Variables[t.Name] = schemaDocVariableInfo{
+				Name: t.Name,
+			}
+
 			if _, envOk := os.LookupEnv(t.Name); !envOk {
 				cv.requiredVariables[t.Name] = true
 			}
 		case *schema.ArgumentPresetValueForwardHeader:
+			cv.forwardedHeaderNames[t.Name] = true
 			cv.addWarning(namespace, fmt.Sprintf("Make sure that the %s header is added to the header forwarding list.", t.Name))
 		}
 	}
@@ -283,18 +219,14 @@ func (cv *ConfigValidator) validateTLSCert(tlsConfig *exhttp.TLSConfig) {
 		return
 	}
 
-	if tlsConfig.CertPem != nil {
-		_, err := tlsConfig.CertPem.Get()
-		if err == nil {
-			return
-		}
+	schemaDoc := cv.getLastSchemaDoc()
+
+	if cv.validateEnvString(schemaDoc, tlsConfig.CertPem) {
+		return
 	}
 
-	if tlsConfig.CertFile != nil {
-		_, err := tlsConfig.CertFile.Get()
-		if err == nil {
-			return
-		}
+	if cv.validateEnvString(schemaDoc, tlsConfig.CertFile) {
+		return
 	}
 
 	if tlsConfig.CertPem != nil && tlsConfig.CertPem.Variable != nil {
@@ -309,18 +241,14 @@ func (cv *ConfigValidator) validateTLSCA(tlsConfig *exhttp.TLSConfig) {
 		return
 	}
 
-	if tlsConfig.CAPem != nil {
-		_, err := tlsConfig.CAPem.Get()
-		if err == nil {
-			return
-		}
+	schemaDoc := cv.getLastSchemaDoc()
+
+	if cv.validateEnvString(schemaDoc, tlsConfig.CAPem) {
+		return
 	}
 
-	if tlsConfig.CAFile != nil {
-		_, err := tlsConfig.CAFile.Get()
-		if err == nil {
-			return
-		}
+	if cv.validateEnvString(schemaDoc, tlsConfig.CAFile) {
+		return
 	}
 
 	if tlsConfig.CAPem != nil && tlsConfig.CAPem.Variable != nil {
@@ -335,18 +263,14 @@ func (cv *ConfigValidator) validateTLSKey(tlsConfig *exhttp.TLSConfig) {
 		return
 	}
 
-	if tlsConfig.KeyPem != nil {
-		_, err := tlsConfig.KeyPem.Get()
-		if err == nil {
-			return
-		}
+	schemaDoc := cv.getLastSchemaDoc()
+
+	if cv.validateEnvString(schemaDoc, tlsConfig.KeyPem) {
+		return
 	}
 
-	if tlsConfig.KeyFile != nil {
-		_, err := tlsConfig.KeyFile.Get()
-		if err == nil {
-			return
-		}
+	if cv.validateEnvString(schemaDoc, tlsConfig.KeyFile) {
+		return
 	}
 
 	if tlsConfig.KeyPem != nil && tlsConfig.KeyPem.Variable != nil {
@@ -363,6 +287,14 @@ func (cv *ConfigValidator) validateInsecureSkipVerify(
 ) {
 	if tlsConfig.InsecureSkipVerify == nil {
 		return
+	}
+
+	schemaDoc := cv.getLastSchemaDoc()
+
+	if tlsConfig.InsecureSkipVerify.Variable != nil {
+		schemaDoc.Variables[*tlsConfig.InsecureSkipVerify.Variable] = parseSchemaDocVariableInfo(
+			*tlsConfig.InsecureSkipVerify,
+		)
 	}
 
 	_, err := tlsConfig.InsecureSkipVerify.Get()
@@ -388,30 +320,31 @@ func (cv *ConfigValidator) validateSecurityScheme(
 		return
 	}
 
+	schemaDoc := cv.getLastSchemaDoc()
+
 	switch schemer := ss.SecuritySchemer.(type) {
 	case *schema.APIKeyAuthConfig:
-		_, err := schemer.Value.Get()
-		if err != nil && schemer.Value.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Value) && schemer.Value.Variable != nil {
 			cv.requiredVariables[*schemer.Value.Variable] = true
 		}
 	case *schema.HTTPAuthConfig:
-		_, err := schemer.Value.Get()
-		if err != nil && schemer.Value.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Value) && schemer.Value.Variable != nil {
 			cv.requiredVariables[*schemer.Value.Variable] = true
 		}
 	case *schema.BasicAuthConfig:
-		_, err := schemer.Username.Get()
-		if err != nil && schemer.Username.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Username) && schemer.Username.Variable != nil {
 			cv.requiredVariables[*schemer.Username.Variable] = true
 		}
 
-		_, err = schemer.Password.Get()
-		if err != nil && schemer.Password.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Password) && schemer.Password.Variable != nil {
 			cv.requiredVariables[*schemer.Password.Variable] = true
 		}
 	case *schema.MutualTLSAuthConfig:
 	case *schema.OAuth2Config:
 		cv.validateOAuth2Config(namespace, key, schemer)
+	case *schema.CookieAuthConfig:
+		cv.forwardedHeaderNames["Cookie"] = true
+		cv.requiredHeadersForwarding[schemer.GetType()] = true
 	default:
 		cv.requiredHeadersForwarding[schemer.GetType()] = true
 	}
@@ -422,6 +355,8 @@ func (cv *ConfigValidator) validateOAuth2Config(
 	key string,
 	schemer *schema.OAuth2Config,
 ) {
+	schemaDoc := cv.getLastSchemaDoc()
+
 	for flowType, flow := range schemer.Flows {
 		if flowType != schema.ClientCredentialsFlow {
 			cv.requiredHeadersForwarding[schemer.GetType()] = true
@@ -436,20 +371,14 @@ func (cv *ConfigValidator) validateOAuth2Config(
 
 		if flow.TokenURL == nil {
 			cv.addWarning(namespace, fmt.Sprintf("%s.flow.tokenUrl is null%s", key, defaultMessage))
-		} else {
-			_, err := flow.TokenURL.Get()
-			if err != nil && flow.TokenURL.Variable != nil {
-				cv.requiredVariables[*flow.TokenURL.Variable] = true
-			}
+		} else if !cv.validateEnvString(schemaDoc, flow.TokenURL) && flow.TokenURL.Variable != nil {
+			cv.requiredVariables[*flow.TokenURL.Variable] = true
 		}
 
 		if flow.ClientID == nil {
 			cv.addWarning(namespace, fmt.Sprintf("%s.flow.clientId is null%s", key, defaultMessage))
-		} else {
-			_, err := flow.ClientID.Get()
-			if err != nil && flow.ClientID.Variable != nil {
-				cv.requiredVariables[*flow.ClientID.Variable] = true
-			}
+		} else if !cv.validateEnvString(schemaDoc, flow.ClientID) && flow.ClientID.Variable != nil {
+			cv.requiredVariables[*flow.ClientID.Variable] = true
 		}
 
 		if flow.ClientSecret == nil {
@@ -457,16 +386,12 @@ func (cv *ConfigValidator) validateOAuth2Config(
 				namespace,
 				fmt.Sprintf("%s.flow.clientSecret is null%s", key, defaultMessage),
 			)
-		} else {
-			_, err := flow.ClientSecret.Get()
-			if err != nil && flow.ClientSecret.Variable != nil {
-				cv.requiredVariables[*flow.ClientSecret.Variable] = true
-			}
+		} else if !cv.validateEnvString(schemaDoc, flow.ClientSecret) && flow.ClientSecret.Variable != nil {
+			cv.requiredVariables[*flow.ClientSecret.Variable] = true
 		}
 
 		for _, param := range flow.EndpointParams {
-			_, err := param.Get()
-			if err != nil && param.Variable != nil {
+			if !cv.validateEnvString(schemaDoc, &param) && param.Variable != nil {
 				cv.requiredVariables[*param.Variable] = true
 			}
 		}
@@ -527,15 +452,6 @@ func (cv *ConfigValidator) findSubgraphName() string {
 	return definition.Definition.Name
 }
 
-func (cv *ConfigValidator) renderTemplate(name string, data map[string]any) (string, error) {
-	var buf bytes.Buffer
-	if err := cv.templates.ExecuteTemplate(&buf, name, data); err != nil {
-		return "", err
-	}
-
-	return buf.String(), nil
-}
-
 func (cv *ConfigValidator) addWarning(namespace string, value string) {
 	_, ok := cv.warnings[namespace]
 	if !ok {
@@ -552,4 +468,23 @@ func (cv *ConfigValidator) addError(namespace string, value string) {
 	} else {
 		cv.errors[namespace] = append(cv.errors[namespace], value)
 	}
+}
+
+func (cv *ConfigValidator) validateEnvString(
+	schemaDoc *schemaDocInfo,
+	value *utils.EnvString,
+) bool {
+	if value == nil {
+		return false
+	}
+
+	if value.Variable != nil {
+		schemaDoc.Variables[*value.Variable] = parseSchemaDocVariableInfo(
+			*value,
+		)
+	}
+
+	_, err := value.Get()
+
+	return err == nil
 }
