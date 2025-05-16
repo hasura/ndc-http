@@ -231,11 +231,11 @@ func (cv *ConfigValidator) validateTLSCert(tlsConfig *exhttp.TLSConfig) {
 
 	schemaDoc := cv.getLastSchemaDoc()
 
-	if cv.validateOptionalEnvString(schemaDoc, tlsConfig.CertPem) {
+	if cv.validateEnvString(schemaDoc, tlsConfig.CertPem) {
 		return
 	}
 
-	if cv.validateOptionalEnvString(schemaDoc, tlsConfig.CertFile) {
+	if cv.validateEnvString(schemaDoc, tlsConfig.CertFile) {
 		return
 	}
 
@@ -253,11 +253,11 @@ func (cv *ConfigValidator) validateTLSCA(tlsConfig *exhttp.TLSConfig) {
 
 	schemaDoc := cv.getLastSchemaDoc()
 
-	if cv.validateOptionalEnvString(schemaDoc, tlsConfig.CAPem) {
+	if cv.validateEnvString(schemaDoc, tlsConfig.CAPem) {
 		return
 	}
 
-	if cv.validateOptionalEnvString(schemaDoc, tlsConfig.CAFile) {
+	if cv.validateEnvString(schemaDoc, tlsConfig.CAFile) {
 		return
 	}
 
@@ -275,11 +275,11 @@ func (cv *ConfigValidator) validateTLSKey(tlsConfig *exhttp.TLSConfig) {
 
 	schemaDoc := cv.getLastSchemaDoc()
 
-	if cv.validateOptionalEnvString(schemaDoc, tlsConfig.KeyPem) {
+	if cv.validateEnvString(schemaDoc, tlsConfig.KeyPem) {
 		return
 	}
 
-	if cv.validateOptionalEnvString(schemaDoc, tlsConfig.KeyFile) {
+	if cv.validateEnvString(schemaDoc, tlsConfig.KeyFile) {
 		return
 	}
 
@@ -334,39 +334,19 @@ func (cv *ConfigValidator) validateSecurityScheme(
 
 	switch schemer := ss.SecuritySchemer.(type) {
 	case *schema.APIKeyAuthConfig:
-		if schemer.Value.Variable != nil {
-			schemaDoc.Variables[*schemer.Value.Variable] = parseSchemaDocVariableInfo(schemer.Value)
-		}
-
-		_, err := schemer.Value.Get()
-		if err != nil && schemer.Value.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Value) && schemer.Value.Variable != nil {
 			cv.requiredVariables[*schemer.Value.Variable] = true
 		}
 	case *schema.HTTPAuthConfig:
-		if schemer.Value.Variable != nil {
-			schemaDoc.Variables[*schemer.Value.Variable] = parseSchemaDocVariableInfo(schemer.Value)
-		}
-
-		_, err := schemer.Value.Get()
-		if err != nil && schemer.Value.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Value) && schemer.Value.Variable != nil {
 			cv.requiredVariables[*schemer.Value.Variable] = true
 		}
 	case *schema.BasicAuthConfig:
-		if schemer.Username.Variable != nil {
-			schemaDoc.Variables[*schemer.Username.Variable] = parseSchemaDocVariableInfo(schemer.Username)
-		}
-
-		if schemer.Password.Variable != nil {
-			schemaDoc.Variables[*schemer.Password.Variable] = parseSchemaDocVariableInfo(schemer.Password)
-		}
-
-		_, err := schemer.Username.Get()
-		if err != nil && schemer.Username.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Username) && schemer.Username.Variable != nil {
 			cv.requiredVariables[*schemer.Username.Variable] = true
 		}
 
-		_, err = schemer.Password.Get()
-		if err != nil && schemer.Password.Variable != nil {
+		if !cv.validateEnvString(schemaDoc, &schemer.Password) && schemer.Password.Variable != nil {
 			cv.requiredVariables[*schemer.Password.Variable] = true
 		}
 	case *schema.MutualTLSAuthConfig:
@@ -401,28 +381,14 @@ func (cv *ConfigValidator) validateOAuth2Config(
 
 		if flow.TokenURL == nil {
 			cv.addWarning(namespace, fmt.Sprintf("%s.flow.tokenUrl is null%s", key, defaultMessage))
-		} else {
-			if flow.TokenURL.Variable != nil {
-				schemaDoc.Variables[*flow.TokenURL.Variable] = parseSchemaDocVariableInfo(*flow.TokenURL)
-			}
-
-			_, err := flow.TokenURL.Get()
-			if err != nil && flow.TokenURL.Variable != nil {
-				cv.requiredVariables[*flow.TokenURL.Variable] = true
-			}
+		} else if !cv.validateEnvString(schemaDoc, flow.TokenURL) && flow.TokenURL.Variable != nil {
+			cv.requiredVariables[*flow.TokenURL.Variable] = true
 		}
 
 		if flow.ClientID == nil {
 			cv.addWarning(namespace, fmt.Sprintf("%s.flow.clientId is null%s", key, defaultMessage))
-		} else {
-			if flow.ClientID.Variable != nil {
-				schemaDoc.Variables[*flow.ClientID.Variable] = parseSchemaDocVariableInfo(*flow.ClientID)
-			}
-
-			_, err := flow.ClientID.Get()
-			if err != nil && flow.ClientID.Variable != nil {
-				cv.requiredVariables[*flow.ClientID.Variable] = true
-			}
+		} else if !cv.validateEnvString(schemaDoc, flow.ClientID) && flow.ClientID.Variable != nil {
+			cv.requiredVariables[*flow.ClientID.Variable] = true
 		}
 
 		if flow.ClientSecret == nil {
@@ -430,24 +396,12 @@ func (cv *ConfigValidator) validateOAuth2Config(
 				namespace,
 				fmt.Sprintf("%s.flow.clientSecret is null%s", key, defaultMessage),
 			)
-		} else {
-			if flow.ClientSecret.Variable != nil {
-				schemaDoc.Variables[*flow.ClientSecret.Variable] = parseSchemaDocVariableInfo(*flow.ClientSecret)
-			}
-
-			_, err := flow.ClientSecret.Get()
-			if err != nil && flow.ClientSecret.Variable != nil {
-				cv.requiredVariables[*flow.ClientSecret.Variable] = true
-			}
+		} else if !cv.validateEnvString(schemaDoc, flow.ClientSecret) && flow.ClientSecret.Variable != nil {
+			cv.requiredVariables[*flow.ClientSecret.Variable] = true
 		}
 
 		for _, param := range flow.EndpointParams {
-			if param.Variable != nil {
-				schemaDoc.Variables[*param.Variable] = parseSchemaDocVariableInfo(param)
-			}
-
-			_, err := param.Get()
-			if err != nil && param.Variable != nil {
+			if !cv.validateEnvString(schemaDoc, &param) && param.Variable != nil {
 				cv.requiredVariables[*param.Variable] = true
 			}
 		}
@@ -526,7 +480,7 @@ func (cv *ConfigValidator) addError(namespace string, value string) {
 	}
 }
 
-func (cv *ConfigValidator) validateOptionalEnvString(
+func (cv *ConfigValidator) validateEnvString(
 	schemaDoc *schemaDocInfo,
 	value *utils.EnvString,
 ) bool {
