@@ -206,7 +206,7 @@ func parseSchemaDocVariableInfo(value any) schemaDocVariableInfo {
 
 		return schemaDocVariableInfo{
 			Name:    *t.Variable,
-			Type:    "boolean",
+			Type:    "float",
 			Default: defaultValue,
 		}
 	case utils.EnvInt:
