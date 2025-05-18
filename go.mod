@@ -1,13 +1,15 @@
 module github.com/hasura/ndc-http
 
-go 1.23
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
 	github.com/go-viper/mapstructure/v2 v2.2.1
 	github.com/google/uuid v1.6.0
 	github.com/hasura/ndc-http/exhttp v0.0.1
-	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20250506025034-110f7e0a6d03
-	github.com/hasura/ndc-sdk-go v1.9.1
+	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-00010101000000-000000000000
+	github.com/hasura/ndc-sdk-go v1.10.0
 	github.com/theory/jsonpath v0.9.0
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0

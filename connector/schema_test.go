@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"reflect"
 	"testing"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
@@ -190,6 +191,9 @@ func assertHTTPResponse[B any](t *testing.T, res *http.Response, statusCode int,
 		t.Errorf("failed to decode json body, got error: %s; body: %s", err, string(bodyBytes))
 	}
 
-	log.Println(string(bodyBytes))
+	if !reflect.DeepEqual(expectedBody, body) {
+		log.Println(string(bodyBytes))
+	}
+
 	assert.DeepEqual(t, expectedBody, body)
 }
