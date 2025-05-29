@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/cenkalti/backoff/v5 v5.0.2
-	github.com/hasura/ndc-sdk-go v1.9.2-0.20250529042229-8a36842bab62
+	github.com/hasura/ndc-sdk-go v1.9.2-0.20250529074814-cea3b5620b29
 	github.com/prometheus/common v0.64.0
 	go.opentelemetry.io/otel v1.36.0
 	go.opentelemetry.io/otel/trace v1.36.0

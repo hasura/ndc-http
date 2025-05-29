@@ -9,7 +9,7 @@ require (
 	github.com/evanphx/json-patch v0.5.2
 	github.com/google/go-cmp v0.7.0
 	github.com/hasura/ndc-http/exhttp v0.0.1
-	github.com/hasura/ndc-sdk-go v1.9.2-0.20250529042229-8a36842bab62
+	github.com/hasura/ndc-sdk-go v1.9.2-0.20250529074814-cea3b5620b29
 	github.com/invopop/jsonschema v0.13.0
 	github.com/lmittmann/tint v1.1.1
 	github.com/pb33f/libopenapi v0.22.0
