@@ -37,6 +37,7 @@
   ],
   "object_types": {
     "HasuraPost": {
+      "description": null,
       "fields": {
         "body": {
           "type": {
@@ -74,9 +75,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraPostInput": {
+      "description": null,
       "fields": {
         "body": {
           "type": {
@@ -114,7 +117,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

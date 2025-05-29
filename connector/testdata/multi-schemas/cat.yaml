@@ -36,6 +36,10 @@ scalar_types:
   Int:
     aggregate_functions: {}
     comparison_operators: {}
+    representation:
+      type: int32
   String:
     aggregate_functions: {}
     comparison_operators: {}
+    representation:
+      type: string

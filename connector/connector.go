@@ -45,15 +45,15 @@ func (c *HTTPConnector) ParseConfiguration(
 	configurationDir string,
 ) (*configuration.Configuration, error) {
 	restCapabilities := schema.CapabilitiesResponse{
-		Version: "0.1.6",
+		Version: schema.NDCVersion,
 		Capabilities: schema.Capabilities{
 			Query: schema.QueryCapabilities{
-				Variables:    schema.LeafCapability{},
+				Variables:    &schema.LeafCapability{},
 				NestedFields: schema.NestedFieldCapabilities{},
-				Explain:      schema.LeafCapability{},
+				Explain:      &schema.LeafCapability{},
 			},
 			Mutation: schema.MutationCapabilities{
-				Explain: schema.LeafCapability{},
+				Explain: &schema.LeafCapability{},
 			},
 		},
 	}

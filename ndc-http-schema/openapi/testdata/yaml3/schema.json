@@ -66,9 +66,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "AllocationResponse": {
+      "description": null,
       "fields": {
         "assignee": {
           "type": {
@@ -129,9 +131,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "AllocationResponse1AssigneeAllOf": {
+      "description": null,
       "fields": {
         "gid": {
           "description": "Globally unique identifier of the resource, as a string.",
@@ -163,9 +167,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetAllocationResultObject": {
+      "description": null,
       "fields": {
         "data": {
           "type": {
@@ -176,7 +182,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [],

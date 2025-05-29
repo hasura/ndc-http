@@ -73,6 +73,7 @@
   ],
   "object_types": {
     "CancelNotificationSuccessResponse": {
+      "description": null,
       "fields": {
         "success": {
           "type": {
@@ -83,9 +84,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "CreateNotificationSuccessResponse": {
+      "description": null,
       "fields": {
         "errors": {
           "type": {
@@ -123,9 +126,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DeliveryData": {
+      "description": null,
       "fields": {
         "converted": {
           "description": "Number of messages that were clicked.",
@@ -177,9 +182,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "ExportEventsSuccessResponse": {
+      "description": null,
       "fields": {
         "csv_file_url": {
           "type": {
@@ -190,9 +197,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Filter": {
+      "description": null,
       "fields": {
         "field": {
           "description": "Name of the field to use as the first operand in the filter expression.",
@@ -228,9 +237,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "FilterInput": {
+      "description": null,
       "fields": {
         "field": {
           "description": "Name of the field to use as the first operand in the filter expression.",
@@ -266,9 +277,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetNotificationHistoryBodyObjectInput": {
+      "description": null,
       "fields": {
         "app_id": {
           "type": {
@@ -299,9 +312,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "NotificationHistorySuccessResponse": {
+      "description": null,
       "fields": {
         "destination_url": {
           "type": {
@@ -321,9 +336,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "NotificationInput": {
+      "description": null,
       "fields": {
         "contents": {
           "type": {
@@ -434,9 +451,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "NotificationSlice": {
+      "description": null,
       "fields": {
         "limit": {
           "type": {
@@ -477,9 +496,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "NotificationWithMeta": {
+      "description": null,
       "fields": {
         "completed_at": {
           "description": "Unix timestamp indicating when notification delivery completed. The delivery duration from start to finish can be calculated with completed_at - send_after.",
@@ -684,9 +705,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "OutcomeData": {
+      "description": null,
       "fields": {
         "aggregation": {
           "type": {
@@ -706,7 +729,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PlatformDeliveryData": {
       "description": "Hash of delivery statistics broken out by target device platform.",
@@ -783,9 +807,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PlatformDeliveryDataEmailAllOf": {
+      "description": null,
       "fields": {
         "bounced": {
           "description": "Number of recipients who registered as a hard or soft bounce and didn't receive your email.",
@@ -907,9 +933,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PlatformDeliveryDataSmsAllOf": {
+      "description": null,
       "fields": {
         "converted": {
           "description": "Number of messages that were clicked.",
@@ -991,9 +1019,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "StringMap": {
+      "description": null,
       "fields": {
         "en": {
           "description": "Text in English.  Will be used as a fallback",
@@ -1005,9 +1035,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "StringMapInput": {
+      "description": null,
       "fields": {
         "en": {
           "description": "Text in English.  Will be used as a fallback",
@@ -1019,7 +1051,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

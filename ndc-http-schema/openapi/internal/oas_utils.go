@@ -250,7 +250,6 @@ func mergeUnionObjects(
 
 			if unionType != oasAllOf && !utils.IsNullableTypeEncoder(newField.Type.Interface()) {
 				newField.Type = (schema.NullableType{
-					Type:           schema.TypeNullable,
 					UnderlyingType: newField.Type,
 				}).Encode()
 			}
@@ -293,7 +292,6 @@ func mergeUnionObjects(
 		if len(fields) < len(srcObjects) && unionType != oasAllOf &&
 			!utils.IsNullableTypeEncoder(unionField.Type.Interface()) {
 			unionField.Type = (schema.NullableType{
-				Type:           schema.TypeNullable,
 				UnderlyingType: unionField.Type,
 			}).Encode()
 		}

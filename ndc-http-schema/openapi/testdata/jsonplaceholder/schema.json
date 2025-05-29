@@ -353,6 +353,7 @@
   ],
   "object_types": {
     "Album": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -381,9 +382,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Comment": {
+      "description": null,
       "fields": {
         "body": {
           "type": {
@@ -430,9 +433,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Photo": {
+      "description": null,
       "fields": {
         "albumId": {
           "type": {
@@ -479,9 +484,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Post": {
+      "description": null,
       "fields": {
         "body": {
           "type": {
@@ -519,9 +526,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostInput": {
+      "description": null,
       "fields": {
         "body": {
           "type": {
@@ -559,9 +568,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Todo": {
+      "description": null,
       "fields": {
         "completed": {
           "type": {
@@ -599,9 +610,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "User": {
+      "description": null,
       "fields": {
         "address": {
           "type": {
@@ -675,9 +688,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UserAddressGeoObject": {
+      "description": null,
       "fields": {
         "lat": {
           "type": {
@@ -697,9 +712,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UserAddressObject": {
+      "description": null,
       "fields": {
         "city": {
           "type": {
@@ -746,9 +763,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UserCompanyObject": {
+      "description": null,
       "fields": {
         "bs": {
           "type": {
@@ -777,7 +796,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

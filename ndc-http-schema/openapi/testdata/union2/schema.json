@@ -16,6 +16,7 @@
   ],
   "object_types": {
     "CatInput": {
+      "description": null,
       "fields": {
         "age": {
           "type": {
@@ -47,9 +48,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DogInput": {
+      "description": null,
       "fields": {
         "icon": {
           "type": {
@@ -78,9 +81,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetPetResultAnyOf": {
+      "description": null,
       "fields": {
         "age": {
           "type": {
@@ -139,9 +144,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Pet": {
+      "description": null,
       "fields": {
         "age": {
           "type": {
@@ -204,7 +211,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

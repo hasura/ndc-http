@@ -51,6 +51,7 @@
   ],
   "object_types": {
     "CatInput": {
+      "description": null,
       "fields": {
         "age": {
           "type": {
@@ -91,9 +92,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DogInput": {
+      "description": null,
       "fields": {
         "icon": {
           "type": {
@@ -131,9 +134,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetPetsResultAnyOf": {
+      "description": null,
       "fields": {
         "age": {
           "type": {
@@ -201,9 +206,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PaymentSource": {
+      "description": null,
       "fields": {
         "allow_redisplay": {
           "description": "This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to unspecified.",
@@ -488,9 +495,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Pet": {
+      "description": null,
       "fields": {
         "age": {
           "type": {
@@ -562,7 +571,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

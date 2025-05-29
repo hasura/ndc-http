@@ -51,6 +51,7 @@
   ],
   "object_types": {
     "HasuraOneSignalCreateNotificationSuccessResponse": {
+      "description": null,
       "fields": {
         "errors": {
           "type": {
@@ -88,9 +89,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalDeliveryData": {
+      "description": null,
       "fields": {
         "converted": {
           "description": "Number of messages that were clicked.",
@@ -142,9 +145,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalFilter": {
+      "description": null,
       "fields": {
         "field": {
           "description": "Name of the field to use as the first operand in the filter expression.",
@@ -180,9 +185,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalFilterInput": {
+      "description": null,
       "fields": {
         "field": {
           "description": "Name of the field to use as the first operand in the filter expression.",
@@ -218,9 +225,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalNotificationInput": {
+      "description": null,
       "fields": {
         "contents": {
           "type": {
@@ -343,9 +352,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalNotificationSlice": {
+      "description": null,
       "fields": {
         "limit": {
           "type": {
@@ -386,9 +397,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalNotificationWithMeta": {
+      "description": null,
       "fields": {
         "completed_at": {
           "description": "Unix timestamp indicating when notification delivery completed. The delivery duration from start to finish can be calculated with completed_at - send_after.",
@@ -605,9 +618,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalOutcomeData": {
+      "description": null,
       "fields": {
         "aggregation": {
           "type": {
@@ -627,7 +642,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalPlatformDeliveryData": {
       "description": "Hash of delivery statistics broken out by target device platform.",
@@ -704,9 +720,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalPlatformDeliveryDataEmailAllOf": {
+      "description": null,
       "fields": {
         "bounced": {
           "description": "Number of recipients who registered as a hard or soft bounce and didn't receive your email.",
@@ -828,9 +846,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalPlatformDeliveryDataSmsAllOf": {
+      "description": null,
       "fields": {
         "converted": {
           "description": "Number of messages that were clicked.",
@@ -912,9 +932,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalStringMap": {
+      "description": null,
       "fields": {
         "en": {
           "description": "Text in English.  Will be used as a fallback",
@@ -926,9 +948,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraOneSignalStringMapInput": {
+      "description": null,
       "fields": {
         "en": {
           "description": "Text in English.  Will be used as a fallback",
@@ -940,7 +964,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

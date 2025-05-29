@@ -12,7 +12,7 @@ definition:
     X-Test-Header:
       value: test
   schema:
-    version: v0.1
+    version: v0.2
     schema:
       collections: []
       functions:
@@ -340,6 +340,7 @@ definition:
             type: array
       object_types:
         Album:
+          description: null
           fields:
             id:
               type:
@@ -359,7 +360,9 @@ definition:
                 underlying_type:
                   name: Int64
                   type: named
+          foreign_keys: {}
         Comment:
+          description: null
           fields:
             body:
               type:
@@ -391,7 +394,9 @@ definition:
                 underlying_type:
                   name: Int64
                   type: named
+          foreign_keys: {}
         Photo:
+          description: null
           fields:
             albumId:
               type:
@@ -423,7 +428,9 @@ definition:
                 underlying_type:
                   name: URIString
                   type: named
+          foreign_keys: {}
         Post:
+          description: null
           fields:
             body:
               type:
@@ -449,7 +456,9 @@ definition:
                 underlying_type:
                   name: Int64
                   type: named
+          foreign_keys: {}
         PostInput:
+          description: null
           fields:
             body:
               type:
@@ -475,6 +484,7 @@ definition:
                 underlying_type:
                   name: Int64
                   type: named
+          foreign_keys: {}
         RetryPolicy:
           description: Retry policy of request
           fields:
@@ -520,7 +530,9 @@ definition:
               type:
                 name: Int32
                 type: named
+          foreign_keys: {}
         Todo:
+          description: null
           fields:
             completed:
               type:
@@ -546,7 +558,9 @@ definition:
                 underlying_type:
                   name: Int64
                   type: named
+          foreign_keys: {}
         User:
+          description: null
           fields:
             address:
               type:
@@ -596,7 +610,9 @@ definition:
                 underlying_type:
                   name: String
                   type: named
+          foreign_keys: {}
         UserAddressGeoObject:
+          description: null
           fields:
             lat:
               type:
@@ -610,7 +626,9 @@ definition:
                 underlying_type:
                   name: String
                   type: named
+          foreign_keys: {}
         UserAddressObject:
+          description: null
           fields:
             city:
               type:
@@ -642,7 +660,9 @@ definition:
                 underlying_type:
                   name: String
                   type: named
+          foreign_keys: {}
         UserCompanyObject:
+          description: null
           fields:
             bs:
               type:
@@ -662,6 +682,7 @@ definition:
                 underlying_type:
                   name: String
                   type: named
+          foreign_keys: {}
       procedures:
         - arguments:
             body:
@@ -856,9 +877,10 @@ definition:
         query:
           exists: {}
           explain: {}
-          nested_fields: {}
+          nested_fields:
+            order_by: null
           variables: {}
-      version: 0.1.6
+      version: 0.2.2
   argumentPresets:
     - argument: headers
       value:

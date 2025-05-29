@@ -351,6 +351,7 @@
   ],
   "object_types": {
     "Address": {
+      "description": null,
       "fields": {
         "city": {
           "type": {
@@ -388,9 +389,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "AddressInput": {
+      "description": null,
       "fields": {
         "city": {
           "type": {
@@ -428,9 +431,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "ApiResponse": {
+      "description": null,
       "fields": {
         "code": {
           "type": {
@@ -459,7 +464,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "BillingMeterEvent": {
       "description": "Meter events represent actions that customers take in your system. You can use meter events to bill a customer based on their usage. Meter events are associated with billing meters, which define both the contents of the events payload and how to aggregate those events.",
@@ -513,9 +519,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Book": {
+      "description": null,
       "fields": {
         "attr": {
           "type": {
@@ -553,9 +561,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "BookInput": {
+      "description": null,
       "fields": {
         "attr": {
           "type": {
@@ -593,9 +603,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Category": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -615,9 +627,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "CategoryInput": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -637,9 +651,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "CreateFineTuningJobRequest": {
+      "description": null,
       "fields": {
         "model": {
           "type": {
@@ -650,9 +666,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "CreateFineTuningJobRequestInput": {
+      "description": null,
       "fields": {
         "model": {
           "type": {
@@ -663,9 +681,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Customer": {
+      "description": null,
       "fields": {
         "address": {
           "type": {
@@ -697,9 +717,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "CustomerInput": {
+      "description": null,
       "fields": {
         "address": {
           "type": {
@@ -731,9 +753,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetArchitecturesResultEntryObject": {
+      "description": null,
       "fields": {
         "md5": {
           "type": {
@@ -778,9 +802,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetArchitecturesResultObject": {
+      "description": null,
       "fields": {
         "count": {
           "type": {
@@ -839,9 +865,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetInvoicesResultObject": {
+      "description": null,
       "fields": {
         "has_more": {
           "description": "True if this list has another page of items after this one that can be fetched.",
@@ -864,9 +892,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetSearchXmlResultOneOf": {
+      "description": null,
       "fields": {
         "matches": {
           "type": {
@@ -901,9 +931,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetSearchXmlResultOneOf0ProjectObject": {
+      "description": null,
       "fields": {
         "description": {
           "type": {
@@ -941,9 +973,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetSearchXmlResultOneOf0ProjectPersonObject": {
+      "description": null,
       "fields": {
         "role": {
           "type": {
@@ -970,9 +1004,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GetSearchXmlResultOneOf1PackageObject": {
+      "description": null,
       "fields": {
         "description": {
           "type": {
@@ -1010,9 +1046,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Order": {
+      "description": null,
       "fields": {
         "complete": {
           "type": {
@@ -1078,9 +1116,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "OrderInput": {
+      "description": null,
       "fields": {
         "complete": {
           "type": {
@@ -1146,9 +1186,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Pet": {
+      "description": null,
       "fields": {
         "category": {
           "type": {
@@ -1215,9 +1257,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PetInput": {
+      "description": null,
       "fields": {
         "category": {
           "type": {
@@ -1284,9 +1328,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostBillingMeterEventsBodyObjectInput": {
+      "description": null,
       "fields": {
         "event_name": {
           "description": "The name of the meter event. Corresponds with the `event_name` field on a meter.",
@@ -1335,7 +1381,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyAfterExpirationObjectInput": {
       "description": "Configure actions after a Checkout Session has expired.",
@@ -1349,9 +1396,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyAfterExpirationRecoveryObjectInput": {
+      "description": null,
       "fields": {
         "allow_promotion_codes": {
           "type": {
@@ -1368,9 +1417,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyAutomaticTaxLiabilityObjectInput": {
+      "description": null,
       "fields": {
         "account": {
           "type": {
@@ -1387,7 +1438,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyAutomaticTaxObjectInput": {
       "description": "Settings for automatic tax lookup for this session and resulting payments, invoices, and subscriptions.",
@@ -1407,7 +1459,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyConsentCollectionObjectInput": {
       "description": "Configure fields for the Checkout Session to gather active consent from customers.",
@@ -1439,9 +1492,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyConsentCollectionPaymentMethodReuseAgreementObjectInput": {
+      "description": null,
       "fields": {
         "position": {
           "type": {
@@ -1449,9 +1504,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomFieldsDropdownObjectInput": {
+      "description": null,
       "fields": {
         "options": {
           "type": {
@@ -1462,9 +1519,11 @@
             "type": "array"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomFieldsDropdownOptionsObjectInput": {
+      "description": null,
       "fields": {
         "label": {
           "type": {
@@ -1478,9 +1537,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomFieldsLabelObjectInput": {
+      "description": null,
       "fields": {
         "custom": {
           "type": {
@@ -1494,9 +1555,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomFieldsNumericObjectInput": {
+      "description": null,
       "fields": {
         "maximum_length": {
           "type": {
@@ -1516,9 +1579,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomFieldsObjectInput": {
+      "description": null,
       "fields": {
         "dropdown": {
           "type": {
@@ -1574,9 +1639,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomFieldsTextObjectInput": {
+      "description": null,
       "fields": {
         "maximum_length": {
           "type": {
@@ -1596,9 +1663,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomTextAfterSubmitAnyOfObjectInput": {
+      "description": null,
       "fields": {
         "message": {
           "type": {
@@ -1606,7 +1675,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomTextObjectInput": {
       "description": "Display additional text for your customers using custom text.",
@@ -1647,9 +1717,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomTextShippingAddressAnyOfObjectInput": {
+      "description": null,
       "fields": {
         "message": {
           "type": {
@@ -1657,9 +1729,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomTextSubmitAnyOfObjectInput": {
+      "description": null,
       "fields": {
         "message": {
           "type": {
@@ -1667,9 +1741,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomTextTermsOfServiceAcceptanceAnyOfObjectInput": {
+      "description": null,
       "fields": {
         "message": {
           "type": {
@@ -1677,7 +1753,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyCustomerUpdateObjectInput": {
       "description": "Controls what fields on Customer can be updated by the Checkout Session. Can only be provided when `customer` is provided.",
@@ -1709,9 +1786,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyDiscountsObjectInput": {
+      "description": null,
       "fields": {
         "coupon": {
           "type": {
@@ -1731,9 +1810,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataCustomFieldsAnyOfObjectInput": {
+      "description": null,
       "fields": {
         "name": {
           "type": {
@@ -1747,9 +1828,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataIssuerObjectInput": {
+      "description": null,
       "fields": {
         "account": {
           "type": {
@@ -1766,9 +1849,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataObjectInput": {
+      "description": null,
       "fields": {
         "account_tax_ids": {
           "type": {
@@ -1839,9 +1924,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyInvoiceCreationInvoiceDataRenderingOptionsAnyOfObjectInput": {
+      "description": null,
       "fields": {
         "amount_tax_display": {
           "type": {
@@ -1852,7 +1939,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyInvoiceCreationObjectInput": {
       "description": "Generate a post-purchase Invoice for one-time payments.",
@@ -1872,9 +1960,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyLineItemsAdjustableQuantityObjectInput": {
+      "description": null,
       "fields": {
         "enabled": {
           "type": {
@@ -1900,9 +1990,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyLineItemsObjectInput": {
+      "description": null,
       "fields": {
         "adjustable_quantity": {
           "type": {
@@ -1964,9 +2056,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyLineItemsPriceDataObjectInput": {
+      "description": null,
       "fields": {
         "currency": {
           "type": {
@@ -2028,9 +2122,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyLineItemsPriceDataProductDataObjectInput": {
+      "description": null,
       "fields": {
         "description": {
           "type": {
@@ -2077,9 +2173,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyLineItemsPriceDataRecurringObjectInput": {
+      "description": null,
       "fields": {
         "interval": {
           "type": {
@@ -2096,9 +2194,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyObjectInput": {
+      "description": null,
       "fields": {
         "after_expiration": {
           "description": "Configure actions after a Checkout Session has expired.",
@@ -2498,7 +2598,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentIntentDataObjectInput": {
       "description": "A subset of parameters to be passed to PaymentIntent creation for Checkout Sessions in `payment` mode.",
@@ -2611,9 +2712,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentIntentDataShippingAddressObjectInput": {
+      "description": null,
       "fields": {
         "city": {
           "type": {
@@ -2666,9 +2769,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentIntentDataShippingObjectInput": {
+      "description": null,
       "fields": {
         "address": {
           "type": {
@@ -2709,9 +2814,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentIntentDataTransferDataObjectInput": {
+      "description": null,
       "fields": {
         "amount": {
           "type": {
@@ -2728,9 +2835,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitMandateOptionsObjectInput": {
+      "description": null,
       "fields": {
         "custom_mandate_url": {
           "type": {
@@ -2780,9 +2889,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsAcssDebitObjectInput": {
+      "description": null,
       "fields": {
         "affirm": {
           "type": {
@@ -2829,9 +2940,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsAffirmObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -2842,9 +2955,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsAfterpayClearpayObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -2855,9 +2970,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsAlipayObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -2868,9 +2985,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsAuBecsDebitObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -2881,9 +3000,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsBacsDebitObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -2894,9 +3015,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsBancontactObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -2907,9 +3030,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsBoletoObjectInput": {
+      "description": null,
       "fields": {
         "expires_after_days": {
           "type": {
@@ -2929,9 +3054,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCardInstallmentsObjectInput": {
+      "description": null,
       "fields": {
         "enabled": {
           "type": {
@@ -2942,9 +3069,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCardObjectInput": {
+      "description": null,
       "fields": {
         "installments": {
           "type": {
@@ -2991,9 +3120,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCashappObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3004,9 +3135,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferEuBankTransferObjectInput": {
+      "description": null,
       "fields": {
         "country": {
           "type": {
@@ -3014,9 +3147,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceBankTransferObjectInput": {
+      "description": null,
       "fields": {
         "eu_bank_transfer": {
           "type": {
@@ -3045,9 +3180,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsCustomerBalanceObjectInput": {
+      "description": null,
       "fields": {
         "bank_transfer": {
           "type": {
@@ -3076,9 +3213,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsEpsObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3089,9 +3228,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsFpxObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3102,9 +3243,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsGiropayObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3115,9 +3258,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsGrabpayObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3128,9 +3273,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsIdealObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3141,9 +3288,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsKlarnaObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3154,9 +3303,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsKonbiniObjectInput": {
+      "description": null,
       "fields": {
         "expires_after_days": {
           "type": {
@@ -3176,9 +3327,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsLinkObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3189,7 +3342,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsObjectInput": {
       "description": "Payment-method-specific configuration.",
@@ -3464,9 +3618,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsOxxoObjectInput": {
+      "description": null,
       "fields": {
         "expires_after_days": {
           "type": {
@@ -3486,9 +3642,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsP24ObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3508,9 +3666,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsPaynowObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3521,9 +3681,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsPaypalObjectInput": {
+      "description": null,
       "fields": {
         "capture_method": {
           "type": {
@@ -3570,9 +3732,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsPixObjectInput": {
+      "description": null,
       "fields": {
         "expires_after_seconds": {
           "type": {
@@ -3583,9 +3747,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsRevolutPayObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3596,9 +3762,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsSepaDebitObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3609,9 +3777,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsSofortObjectInput": {
+      "description": null,
       "fields": {
         "setup_future_usage": {
           "type": {
@@ -3622,9 +3792,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsSwishObjectInput": {
+      "description": null,
       "fields": {
         "reference": {
           "type": {
@@ -3635,9 +3807,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountFinancialConnectionsObjectInput": {
+      "description": null,
       "fields": {
         "permissions": {
           "type": {
@@ -3663,9 +3837,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsUsBankAccountObjectInput": {
+      "description": null,
       "fields": {
         "financial_connections": {
           "type": {
@@ -3694,9 +3870,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPaymentMethodOptionsWechatPayObjectInput": {
+      "description": null,
       "fields": {
         "app_id": {
           "type": {
@@ -3722,7 +3900,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyPhoneNumberCollectionObjectInput": {
       "description": "Controls phone number collection settings for the session.  We recommend that you review your privacy policy and check with your legal contacts before using this feature. Learn more about [collecting phone numbers with Checkout](https://stripe.com/docs/payments/checkout/phone-numbers).",
@@ -3733,7 +3912,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodySetupIntentDataObjectInput": {
       "description": "A subset of parameters to be passed to SetupIntent creation for Checkout Sessions in `setup` mode.",
@@ -3765,7 +3945,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyShippingAddressCollectionObjectInput": {
       "description": "When set, provides configuration for Checkout to collect a shipping address from a customer.",
@@ -3779,9 +3960,11 @@
             "type": "array"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyShippingOptionsObjectInput": {
+      "description": null,
       "fields": {
         "shipping_rate": {
           "type": {
@@ -3801,9 +3984,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMaximumObjectInput": {
+      "description": null,
       "fields": {
         "unit": {
           "type": {
@@ -3817,9 +4002,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateMinimumObjectInput": {
+      "description": null,
       "fields": {
         "unit": {
           "type": {
@@ -3833,9 +4020,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyShippingOptionsShippingRateDataDeliveryEstimateObjectInput": {
+      "description": null,
       "fields": {
         "maximum": {
           "type": {
@@ -3855,9 +4044,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyShippingOptionsShippingRateDataFixedAmountObjectInput": {
+      "description": null,
       "fields": {
         "amount": {
           "type": {
@@ -3880,9 +4071,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyShippingOptionsShippingRateDataObjectInput": {
+      "description": null,
       "fields": {
         "delivery_estimate": {
           "type": {
@@ -3944,9 +4137,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsIssuerObjectInput": {
+      "description": null,
       "fields": {
         "account": {
           "type": {
@@ -3963,9 +4158,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodySubscriptionDataInvoiceSettingsObjectInput": {
+      "description": null,
       "fields": {
         "issuer": {
           "type": {
@@ -3976,7 +4173,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodySubscriptionDataObjectInput": {
       "description": "A subset of parameters to be passed to subscription creation for Checkout Sessions in `subscription` mode.",
@@ -4092,9 +4290,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodySubscriptionDataTransferDataObjectInput": {
+      "description": null,
       "fields": {
         "amount_percent": {
           "type": {
@@ -4111,9 +4311,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodySubscriptionDataTrialSettingsEndBehaviorObjectInput": {
+      "description": null,
       "fields": {
         "missing_payment_method": {
           "type": {
@@ -4121,9 +4323,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodySubscriptionDataTrialSettingsObjectInput": {
+      "description": null,
       "fields": {
         "end_behavior": {
           "type": {
@@ -4131,7 +4335,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostCheckoutSessionsBodyTaxIdCollectionObjectInput": {
       "description": "Controls tax ID collection settings for the session.",
@@ -4142,7 +4347,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostFilesBodyFileLinkDataObjectInput": {
       "description": "Optional parameters that automatically create a [file link](https://stripe.com/docs/api#file_links) for the newly created file.",
@@ -4171,9 +4377,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostFilesBodyObjectInput": {
+      "description": null,
       "fields": {
         "expand": {
           "description": "Specifies which fields in the response should be expanded.",
@@ -4224,7 +4432,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostTestHelpersTreasuryInboundTransfersIdFailBodyFailureDetailsObjectInput": {
       "description": "Details about a failed InboundTransfer.",
@@ -4238,9 +4447,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PostTestHelpersTreasuryInboundTransfersIdFailBodyObjectInput": {
+      "description": null,
       "fields": {
         "expand": {
           "description": "Specifies which fields in the response should be expanded.",
@@ -4265,9 +4476,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PutCommentXmlBodyCommentObjectInput": {
+      "description": null,
       "fields": {
         "bsrequest": {
           "type": {
@@ -4339,9 +4552,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PutCommentXmlBodyObjectInput": {
+      "description": null,
       "fields": {
         "comment": {
           "type": {
@@ -4400,9 +4615,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PutCommentXmlResultCommentObject": {
+      "description": null,
       "fields": {
         "bsrequest": {
           "type": {
@@ -4474,9 +4691,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PutCommentXmlResultObject": {
+      "description": null,
       "fields": {
         "comment": {
           "type": {
@@ -4535,9 +4754,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "SnakeObject": {
+      "description": null,
       "fields": {
         "features": {
           "type": {
@@ -4557,9 +4778,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "SnakeObjectIdObject": {
+      "description": null,
       "fields": {
         "complete": {
           "type": {
@@ -4616,9 +4839,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Tag": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -4638,9 +4863,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "TagInput": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -4660,7 +4887,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "TreasuryInboundTransfer": {
       "description": "Use [InboundTransfers](https://stripe.com/docs/treasury/moving-money/financial-accounts/into/inbound-transfers) to add funds to your [FinancialAccount](https://stripe.com/docs/api#financial_accounts) via a PaymentMethod that is owned by you. The funds will be transferred via an ACH debit.",
@@ -4814,9 +5042,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "TreasuryInboundTransfersResourceFailureDetails": {
+      "description": null,
       "fields": {
         "code": {
           "description": "Reason for the failure.",
@@ -4825,9 +5055,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "TreasuryInboundTransfersResourceInboundTransferResourceStatusTransitions": {
+      "description": null,
       "fields": {
         "canceled_at": {
           "description": "Timestamp describing when an InboundTransfer changed status to `canceled`.",
@@ -4859,9 +5091,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UploadPetMultipartBodyObjectInput": {
+      "description": null,
       "fields": {
         "address": {
           "type": {
@@ -4914,9 +5148,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "User": {
+      "description": null,
       "fields": {
         "email": {
           "type": {
@@ -4991,9 +5227,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UserInput": {
+      "description": null,
       "fields": {
         "email": {
           "type": {
@@ -5068,7 +5306,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [
