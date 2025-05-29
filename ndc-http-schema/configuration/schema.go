@@ -363,11 +363,9 @@ func buildHeadersForwardingResponse(config *Configuration, restSchema *rest.NDCH
 	}
 
 	if _, ok := restSchema.ScalarTypes[string(rest.ScalarJSON)]; !ok {
-		restSchema.ScalarTypes[string(rest.ScalarJSON)] = schema.ScalarType{
-			AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
-			ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
-			Representation:      schema.NewTypeRepresentationJSON().Encode(),
-		}
+		scalarType := schema.NewScalarType()
+		scalarType.Representation = schema.NewTypeRepresentationJSON().Encode()
+		restSchema.ScalarTypes[string(rest.ScalarJSON)] = *scalarType
 	}
 
 	if config.ForwardHeaders.ResponseHeaders == nil {

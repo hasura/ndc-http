@@ -23,36 +23,43 @@ var defaultScalarTypes = map[rest.ScalarName]schema.ScalarType{
 	rest.ScalarBoolean: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationBoolean().Encode(),
 	},
 	rest.ScalarString: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationString().Encode(),
 	},
 	rest.ScalarInt32: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationInt32().Encode(),
 	},
 	rest.ScalarInt64: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationInt64().Encode(),
 	},
 	rest.ScalarFloat32: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationFloat32().Encode(),
 	},
 	rest.ScalarFloat64: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationFloat64().Encode(),
 	},
 	rest.ScalarJSON: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationJSON().Encode(),
 	},
 	// string format variants https://swagger.io/docs/specification/data-models/data-types/#string
@@ -60,55 +67,65 @@ var defaultScalarTypes = map[rest.ScalarName]schema.ScalarType{
 	rest.ScalarDate: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationDate().Encode(),
 	},
 	// string with date-time format
 	rest.ScalarTimestampTZ: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationTimestampTZ().Encode(),
 	},
 	// string with byte format
 	rest.ScalarBytes: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationBytes().Encode(),
 	},
 	// string with byte format
 	rest.ScalarBinary: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationBytes().Encode(),
 	},
 	rest.ScalarEmail: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationString().Encode(),
 	},
 	rest.ScalarURI: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationString().Encode(),
 	},
 	rest.ScalarUUID: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationUUID().Encode(),
 	},
 	rest.ScalarIPV4: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationString().Encode(),
 	},
 	rest.ScalarIPV6: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationString().Encode(),
 	},
 	// unix-time the timestamp integer which is measured in seconds since the Unix epoch
 	rest.ScalarUnixTime: {
 		AggregateFunctions:  schema.ScalarTypeAggregateFunctions{},
 		ComparisonOperators: map[string]schema.ComparisonOperatorDefinition{},
+		ExtractionFunctions: schema.ScalarTypeExtractionFunctions{},
 		Representation:      schema.NewTypeRepresentationInt32().Encode(),
 	},
 }

@@ -389,7 +389,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "AdvancedStatsClicksOpens": {
       "description": "The individual events and their stats.",
@@ -434,9 +435,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "ApiResponse": {
+      "description": null,
       "fields": {
         "code": {
           "type": {
@@ -465,9 +468,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Category": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -487,9 +492,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "CategoryInput": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -509,9 +516,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "ContactdbCustomFieldWithIdValue": {
+      "description": null,
       "fields": {
         "id": {
           "description": "The ID of the custom field.",
@@ -553,9 +562,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "ContactdbRecipient": {
+      "description": null,
       "fields": {
         "recipients": {
           "type": {
@@ -569,9 +580,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "ContactdbRecipientRecipientsObject": {
+      "description": null,
       "fields": {
         "custom_fields": {
           "description": "The custom fields assigned to this recipient and their values.",
@@ -596,9 +609,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DomainAuthenticationDomainSpf": {
+      "description": null,
       "fields": {
         "automatic_security": {
           "description": "Indicates if this authenticated domain uses automated security.",
@@ -690,7 +705,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DomainAuthenticationDomainSpfDnsDkimObject": {
       "description": "The DKIM record for messages sent using this authenticated domain.",
@@ -723,7 +739,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DomainAuthenticationDomainSpfDnsDomainSpfObject": {
       "description": "The SPF record for the root domain.",
@@ -756,7 +773,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DomainAuthenticationDomainSpfDnsMailServerObject": {
       "description": "Designates which mail server is responsible for accepting messages from a domain.",
@@ -789,7 +807,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DomainAuthenticationDomainSpfDnsObject": {
       "description": "The DNS records for this authenticated domain.",
@@ -822,7 +841,8 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "DomainAuthenticationDomainSpfDnsSubdomainSpfObject": {
       "description": "The SPF record for the subdomain used to create this authenticated domain.",
@@ -855,9 +875,11 @@
             "type": "named"
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GETBrowsersStatsResultObject": {
+      "description": null,
       "fields": {
         "date": {
           "description": "The date that the statistics were gathered.",
@@ -882,9 +904,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GETBrowsersStatsResultStatsObject": {
+      "description": null,
       "fields": {
         "metrics": {
           "description": "The individual events and their stats.",
@@ -916,9 +940,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GETContactdbListsListIdRecipientsResultObject": {
+      "description": null,
       "fields": {
         "recipients": {
           "type": {
@@ -932,9 +958,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GETGeoStatsResultObject": {
+      "description": null,
       "fields": {
         "date": {
           "description": "The date that the statistics were gathered.",
@@ -959,9 +987,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "GETGeoStatsResultStatsObject": {
+      "description": null,
       "fields": {
         "metrics": {
           "type": {
@@ -992,9 +1022,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "OAuth2Client": {
+      "description": null,
       "fields": {
         "client_id": {
           "description": "ID  is the id for this client.",
@@ -1046,9 +1078,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "OAuth2ClientInput": {
+      "description": null,
       "fields": {
         "client_id": {
           "description": "ID  is the id for this client.",
@@ -1100,9 +1134,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Order": {
+      "description": null,
       "fields": {
         "complete": {
           "type": {
@@ -1159,9 +1195,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "OrderInput": {
+      "description": null,
       "fields": {
         "complete": {
           "type": {
@@ -1218,9 +1256,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Pet": {
+      "description": null,
       "fields": {
         "category": {
           "type": {
@@ -1287,9 +1327,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "PetInput": {
+      "description": null,
       "fields": {
         "category": {
           "type": {
@@ -1356,9 +1398,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "SnakeObject": {
+      "description": null,
       "fields": {
         "context": {
           "type": {
@@ -1387,9 +1431,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "Tag": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -1409,9 +1455,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "TagInput": {
+      "description": null,
       "fields": {
         "id": {
           "type": {
@@ -1431,9 +1479,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UpdatePetWithFormBody": {
+      "description": null,
       "fields": {
         "name": {
           "description": "Updated name of the pet",
@@ -1455,9 +1505,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UploadFileBody": {
+      "description": null,
       "fields": {
         "additionalMetadata": {
           "description": "Additional data to pass to server",
@@ -1479,9 +1531,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "User": {
+      "description": null,
       "fields": {
         "email": {
           "type": {
@@ -1556,9 +1610,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "UserInput": {
+      "description": null,
       "fields": {
         "email": {
           "type": {
@@ -1633,7 +1689,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

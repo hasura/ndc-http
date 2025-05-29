@@ -37,6 +37,7 @@
   ],
   "object_types": {
     "HasuraMockJsonPost": {
+      "description": null,
       "fields": {
         "body": {
           "type": {
@@ -74,9 +75,11 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     },
     "HasuraMockJsonPostInput": {
+      "description": null,
       "fields": {
         "body": {
           "type": {
@@ -114,7 +117,8 @@
             }
           }
         }
-      }
+      },
+      "foreign_keys": {}
     }
   },
   "procedures": [

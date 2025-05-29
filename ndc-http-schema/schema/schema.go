@@ -385,6 +385,7 @@ func (of ObjectType) Schema() schema.ObjectType {
 	result := schema.ObjectType{
 		Description: of.Description,
 		Fields:      schema.ObjectTypeFields{},
+		ForeignKeys: schema.ObjectTypeForeignKeys{},
 	}
 
 	for key, field := range of.Fields {
