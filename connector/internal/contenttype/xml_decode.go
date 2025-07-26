@@ -387,6 +387,7 @@ func (c *XMLDecoder) decodeSimpleScalarValue(
 	respType, err := scalarType.Representation.InterfaceT()
 
 	var result any = nil
+
 	switch respType.(type) {
 	case *schema.TypeRepresentationString:
 		result = block.Data
@@ -503,6 +504,7 @@ L:
 			if err := evalXMLTree(decoder, childBlock); err != nil {
 				return err
 			}
+
 			block.Fields[tok.Name.Local] = append(block.Fields[tok.Name.Local], *childBlock)
 		case xml.CharData:
 			block.Data = string(tok)

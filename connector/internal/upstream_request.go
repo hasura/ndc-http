@@ -13,12 +13,12 @@ import (
 
 // RequestBuilderResults hold the result of built requests.
 type RequestBuilderResults struct {
+	*HTTPOptions
+
 	OperationName string
 	Requests      []*RetryableRequest
 	Operation     *rest.OperationInfo
 	Schema        *configuration.NDCHttpRuntimeSchema
-
-	*HTTPOptions
 }
 
 func (um *UpstreamManager) BuildRequests(

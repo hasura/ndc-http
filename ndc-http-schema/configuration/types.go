@@ -198,9 +198,10 @@ type ConvertConfig struct {
 
 // NDCHttpRuntimeSchema wraps NDCHttpSchema with runtime settings.
 type NDCHttpRuntimeSchema struct {
+	*rest.NDCHttpSchema
+
 	Name    string               `json:"name" yaml:"name"`
 	Runtime rest.RuntimeSettings `json:"-"    yaml:"-"`
-	*rest.NDCHttpSchema
 }
 
 // ConvertCommandArguments represent available command arguments for the convert command.

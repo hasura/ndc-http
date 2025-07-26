@@ -19,6 +19,8 @@ linters:
     - recvcheck
     - funcorder
     - tagalign
+    - wsl
+    - noinlineerr
 
   settings:
     nestif:

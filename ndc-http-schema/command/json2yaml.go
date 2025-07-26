@@ -34,6 +34,7 @@ func Json2Yaml(args *Json2YamlCommandArguments, logger *slog.Logger) error {
 	}
 
 	var buf bytes.Buffer
+
 	encoder := yaml.NewEncoder(&buf)
 	encoder.SetIndent(2)
 

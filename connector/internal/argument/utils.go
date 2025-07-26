@@ -56,9 +56,8 @@ func convertTypePresentationFromString(
 		return result.Format(time.RFC3339), err
 	case *schema.TypeRepresentationJSON, *schema.TypeRepresentationGeography, *schema.TypeRepresentationGeometry:
 		var result any
-		err := json.Unmarshal([]byte(input), &result)
 
-		return result, err
+		return result, json.Unmarshal([]byte(input), &result)
 	default:
 		return input, nil
 	}

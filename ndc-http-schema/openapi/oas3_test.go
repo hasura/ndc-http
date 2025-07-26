@@ -91,6 +91,15 @@ func TestOpenAPIv3ToRESTSchema(t *testing.T) {
 			Schema:   "testdata/yaml3/schema.json",
 			Options:  ConvertOptions{},
 		},
+		// go run ./ndc-http-schema convert -f ./ndc-http-schema/openapi/testdata/jikan/source.json -o ./ndc-http-schema/openapi/testdata/jikan/expected.json --spec openapi3
+		// go run ./ndc-http-schema convert -f ./ndc-http-schema/openapi/testdata/jikan/source.json -o ./ndc-http-schema/openapi/testdata/jikan/schema.json --pure --spec openapi3
+		{
+			Name:     "jikan",
+			Source:   "testdata/jikan/source.json",
+			Expected: "testdata/jikan/expected.json",
+			Schema:   "testdata/jikan/schema.json",
+			Options:  ConvertOptions{},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -130,7 +139,11 @@ func assertRESTSchemaEqual(
 	t.Helper()
 	assertDeepEqual(t, expected.Settings.Headers, output.Settings.Headers)
 	assertDeepEqual(t, expected.Settings.Security, output.Settings.Security)
-	assertDeepEqual(t, expected.Settings.SecuritySchemes, output.Settings.SecuritySchemes)
+
+	if len(expected.Settings.SecuritySchemes) > 0 || len(output.Settings.SecuritySchemes) > 0 {
+		assertDeepEqual(t, expected.Settings.SecuritySchemes, output.Settings.SecuritySchemes)
+	}
+
 	assertDeepEqual(t, expected.Settings.Version, output.Settings.Version)
 	for i, server := range expected.Settings.Servers {
 		sv := output.Settings.Servers[i]

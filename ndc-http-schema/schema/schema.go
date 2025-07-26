@@ -116,6 +116,8 @@ type Response struct {
 
 // Request represents the HTTP request information of the webhook.
 type Request struct {
+	*RuntimeSettings `yaml:",inline"`
+
 	URL         string                     `json:"url,omitempty"         mapstructure:"url"         yaml:"url,omitempty"`
 	Method      string                     `json:"method,omitempty"      mapstructure:"method"      yaml:"method,omitempty"      jsonschema:"enum=get,enum=post,enum=put,enum=patch,enum=delete"`
 	Headers     map[string]utils.EnvString `json:"headers,omitempty"     mapstructure:"headers"     yaml:"headers,omitempty"`
@@ -123,8 +125,6 @@ type Request struct {
 	Servers     []ServerConfig             `json:"servers,omitempty"     mapstructure:"servers"     yaml:"servers,omitempty"`
 	RequestBody *RequestBody               `json:"requestBody,omitempty" mapstructure:"requestBody" yaml:"requestBody,omitempty"`
 	Response    Response                   `json:"response"              mapstructure:"response"    yaml:"response"`
-
-	*RuntimeSettings `yaml:",inline"`
 }
 
 // Clone copies this instance to a new one.
@@ -143,11 +143,12 @@ func (r Request) Clone() *Request {
 
 // RequestParameter represents an HTTP request parameter.
 type RequestParameter struct {
-	EncodingObject `                  yaml:",inline"`
-	Name           string            `yaml:"name,omitempty"         json:"name,omitempty"         mapstructure:"name"`
-	ArgumentName   string            `yaml:"argumentName,omitempty" json:"argumentName,omitempty" mapstructure:"argumentName,omitempty"`
-	In             ParameterLocation `yaml:"in,omitempty"           json:"in,omitempty"           mapstructure:"in"`
-	Schema         *TypeSchema       `yaml:"schema,omitempty"       json:"schema,omitempty"       mapstructure:"schema"`
+	EncodingObject `yaml:",inline"`
+
+	Name         string            `yaml:"name,omitempty"         json:"name,omitempty"         mapstructure:"name"`
+	ArgumentName string            `yaml:"argumentName,omitempty" json:"argumentName,omitempty" mapstructure:"argumentName,omitempty"`
+	In           ParameterLocation `yaml:"in,omitempty"           json:"in,omitempty"           mapstructure:"in"`
+	Schema       *TypeSchema       `yaml:"schema,omitempty"       json:"schema,omitempty"       mapstructure:"schema"`
 }
 
 // TypeSchema represents a serializable object of OpenAPI schema

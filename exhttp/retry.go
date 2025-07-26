@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v5"
-	"github.com/hasura/ndc-http/exhttp/compression"
 	"github.com/hasura/ndc-sdk-go/schema"
 	"github.com/hasura/ndc-sdk-go/utils"
 )
@@ -227,8 +226,6 @@ func NewRetryMiddleware(config RetryPolicy) Middleware {
 // Do sends an HTTP request and returns an HTTP response,
 // following policy (such as redirects, cookies, auth) as configured on the client.
 func (r *retryMiddleware) Do(req *http.Request) (*http.Response, error) {
-	req.Header.Set("Accept-Encoding", compression.DefaultCompressor.AcceptEncoding())
-
 	if r.config.Times == 0 {
 		return r.doer.Do(req)
 	}
@@ -289,18 +286,20 @@ func (r *retryMiddleware) Do(req *http.Request) (*http.Response, error) {
 		backoff.WithMaxElapsedTime(r.config.GetMaxElapsedTime()),
 		backoff.WithMaxTries(r.config.Times+1),
 	)
-
 	if err == nil {
 		return resp, nil
 	}
 
 	var permanentErr *backoff.PermanentError
-
 	if errors.As(err, &permanentErr) {
 		return resp, permanentErr.Err
 	}
 
-	return resp, httpErr
+	if httpErr != nil {
+		return resp, httpErr
+	}
+
+	return resp, err
 }
 
 // The HTTP [Retry-After] response header indicates how long the user agent should wait before making a follow-up request.

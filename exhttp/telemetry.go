@@ -196,8 +196,9 @@ func (tt TelemetryConfig) printLog(
 }
 
 type telemetryTransport struct {
-	transport http.RoundTripper
 	TelemetryConfig
+
+	transport http.RoundTripper
 }
 
 // NewTelemetryTransport creates a new transport with telemetry.
@@ -221,8 +222,9 @@ func (tt telemetryTransport) RoundTrip(req *http.Request) (*http.Response, error
 
 // TelemetryMiddleware wraps the client with logging and tracing.
 type TelemetryMiddleware struct {
-	doer Doer
 	TelemetryConfig
+
+	doer Doer
 }
 
 // NewTelemetryMiddleware creates a new transport with telemetry.

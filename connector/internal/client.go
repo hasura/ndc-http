@@ -183,7 +183,7 @@ func (client *HTTPClient) sendSingle(
 
 	span.SetAttributes(attribute.String("execution.mode", mode))
 
-	var namespace string
+	var namespace, contentType string
 
 	var httpError *exhttp.HTTPError
 
@@ -205,10 +205,14 @@ func (client *HTTPClient) sendSingle(
 	defer func() {
 		cancel()
 
-		_ = resp.Body.Close()
+		if resp != nil && resp.Body != nil {
+			_ = resp.Body.Close()
+		}
 	}()
 
-	contentType := parseContentType(resp.Header.Get(rest.ContentTypeHeader))
+	if resp != nil {
+		contentType = parseContentType(resp.Header.Get(rest.ContentTypeHeader))
+	}
 
 	if httpError != nil {
 		details := make(map[string]any)
