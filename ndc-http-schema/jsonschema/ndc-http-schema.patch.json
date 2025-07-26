@@ -4,16 +4,7 @@
   "$ref": "#/$defs/NDCHttpSchema",
   "$defs": {
     "AggregateFunctionDefinition": {
-      "properties": {
-        "result_type": {
-          "$ref": "#/$defs/Type"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "result_type"
-      ]
+      "type": "object"
     },
     "ArgumentInfo": {
       "properties": {
@@ -225,6 +216,9 @@
         }
       },
       "additionalProperties": false,
+      "type": "object"
+    },
+    "ExtractionFunctionDefinition": {
       "type": "object"
     },
     "NDCHttpSchema": {
@@ -462,6 +456,12 @@
     },
     "Request": {
       "properties": {
+        "timeout": {
+          "type": "integer"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryPolicy"
+        },
         "url": {
           "type": "string"
         },
@@ -495,12 +495,6 @@
         },
         "response": {
           "$ref": "#/$defs/Response"
-        },
-        "timeout": {
-          "type": "integer"
-        },
-        "retry": {
-          "$ref": "#/$defs/RetryPolicy"
         }
       },
       "additionalProperties": false,
@@ -645,6 +639,9 @@
           },
           "type": "object"
         },
+        "extraction_functions": {
+          "$ref": "#/$defs/ScalarTypeExtractionFunctions"
+        },
         "representation": {
           "$ref": "#/$defs/TypeRepresentation"
         }
@@ -653,12 +650,19 @@
       "type": "object",
       "required": [
         "aggregate_functions",
-        "comparison_operators"
+        "comparison_operators",
+        "representation"
       ]
     },
     "ScalarTypeAggregateFunctions": {
       "additionalProperties": {
         "$ref": "#/$defs/AggregateFunctionDefinition"
+      },
+      "type": "object"
+    },
+    "ScalarTypeExtractionFunctions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ExtractionFunctionDefinition"
       },
       "type": "object"
     },
