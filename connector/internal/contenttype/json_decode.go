@@ -69,9 +69,8 @@ func (c *JSONDecoder) Decode(r io.Reader, resultType schema.Type) (any, error) {
 		return c.evalNamedType(result, t, []string{})
 	default:
 		var result any
-		err := json.NewDecoder(r).Decode(&result)
 
-		return result, err
+		return result, json.NewDecoder(r).Decode(&result)
 	}
 }
 

@@ -29,6 +29,7 @@ func NewXMLEncoder(httpSchema *rest.NDCHttpSchema) *XMLEncoder {
 // Encode marshals the body to xml bytes.
 func (c *XMLEncoder) Encode(bodyInfo *rest.ArgumentInfo, bodyData any) ([]byte, error) {
 	var buf bytes.Buffer
+
 	enc := xml.NewEncoder(&buf)
 
 	err := c.evalXMLField(enc, "", rest.ObjectField{
@@ -51,6 +52,7 @@ func (c *XMLEncoder) Encode(bodyInfo *rest.ArgumentInfo, bodyData any) ([]byte, 
 // Encode marshals the arbitrary body to xml bytes.
 func (c *XMLEncoder) EncodeArbitrary(bodyData any) ([]byte, error) {
 	var buf bytes.Buffer
+
 	enc := xml.NewEncoder(&buf)
 
 	err := c.encodeSimpleScalar(enc, "xml", reflect.ValueOf(bodyData), nil, []string{})

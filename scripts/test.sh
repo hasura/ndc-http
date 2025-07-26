@@ -42,7 +42,7 @@ cat ./coverage/profile.tmp | grep -v "main.go" > ./coverage/profile.tmp2
 cat ./coverage/profile.tmp2 | grep -v "version.go" > ./coverage/profile
 
 # start ndc-test
-NDC_TEST_VERSION=v0.2.2
+NDC_TEST_VERSION=v0.2.5
 CONFIG_PATH="./connector-definition"
 if [ -n "$1" ]; then
   CONFIG_PATH="$1"

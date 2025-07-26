@@ -190,6 +190,7 @@ func (c *RequestBuilder) buildRequestBody(
 					Encode(bodyData, bodyInfo.Type)
 			} else {
 				var buf bytes.Buffer
+
 				enc := json.NewEncoder(&buf)
 				enc.SetEscapeHTML(false)
 

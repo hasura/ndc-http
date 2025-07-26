@@ -235,7 +235,13 @@ func (um *UpstreamManager) ExecuteRequest(
 
 	req.Header.Set("User-Agent", "ndc-http/"+version.BuildVersion)
 
-	clientWrapper := exhttp.NewClient(httpClient, exhttp.NewRetryMiddleware(request.Runtime.Retry))
+	middlewares := []exhttp.Middleware{}
+
+	if request.Runtime.Retry.Times > 0 {
+		middlewares = append(middlewares, exhttp.NewRetryMiddleware(request.Runtime.Retry))
+	}
+
+	clientWrapper := exhttp.NewClient(httpClient, middlewares...)
 
 	resp, err := clientWrapper.Do(req)
 

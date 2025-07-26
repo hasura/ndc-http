@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"slices"
 	"strconv"
 	"strings"
 
@@ -91,7 +90,7 @@ func getScalarFromOASType(
 	switch names[0] {
 	case "boolean":
 		return string(rest.ScalarBoolean)
-	case "integer":
+	case "integer", "int32":
 		switch format {
 		case "unix-time":
 			return string(rest.ScalarUnixTime)
@@ -100,9 +99,9 @@ func getScalarFromOASType(
 		default:
 			return string(rest.ScalarInt32)
 		}
-	case "long":
+	case "long", "int64":
 		return string(rest.ScalarInt64)
-	case "number":
+	case "number", "float", "double":
 		switch format {
 		case "float":
 			return string(rest.ScalarFloat32)
@@ -209,10 +208,7 @@ func createSchemaFromOpenAPISchema(input *base.Schema) *rest.TypeSchema {
 // check if the OAS type is a scalar.
 func isPrimitiveScalar(names []string) bool {
 	for _, name := range names {
-		if !slices.Contains(
-			[]string{"boolean", "integer", "number", "string", "file", "long", "null"},
-			name,
-		) {
+		if name == "object" || name == "array" {
 			return false
 		}
 	}

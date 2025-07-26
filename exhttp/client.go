@@ -63,7 +63,7 @@ func (r *Client) Do(req *http.Request) (*http.Response, error) {
 
 // Get issues a GET to the specified URL.
 func (r *Client) Get(url string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil) //nolint:noctx
 	if err != nil {
 		return nil, err
 	}

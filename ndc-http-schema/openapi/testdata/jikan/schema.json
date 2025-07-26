@@ -1,0 +1,211 @@
+{
+  "collections": [],
+  "functions": [
+    {
+      "arguments": {
+        "id": {
+          "type": {
+            "name": "Int32",
+            "type": "named"
+          }
+        }
+      },
+      "description": "GET /anime/{id}/episodes",
+      "name": "getAnimeEpisodes",
+      "result_type": {
+        "name": "AnimeEpisodes",
+        "type": "named"
+      }
+    }
+  ],
+  "object_types": {
+    "AnimeEpisodes": {
+      "description": "Anime Episodes Resource",
+      "fields": {
+        "data": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "element_type": {
+                "name": "AnimeEpisodes0DataObject",
+                "type": "named"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "pagination": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "PaginationPaginationObject",
+              "type": "named"
+            }
+          }
+        }
+      },
+      "foreign_keys": {}
+    },
+    "AnimeEpisodes0DataObject": {
+      "description": null,
+      "fields": {
+        "aired": {
+          "description": "Aired Date ISO8601",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "filler": {
+          "description": "Filler episode",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Boolean",
+              "type": "named"
+            }
+          }
+        },
+        "forum_url": {
+          "description": "Episode discussion forum URL",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "mal_id": {
+          "description": "MyAnimeList ID",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        },
+        "recap": {
+          "description": "Recap episode",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Boolean",
+              "type": "named"
+            }
+          }
+        },
+        "score": {
+          "description": "Aggregated episode score (1.00 - 5.00) based on MyAnimeList user voting",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Float64",
+              "type": "named"
+            }
+          }
+        },
+        "title": {
+          "description": "Title",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "title_japanese": {
+          "description": "Title Japanese",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "title_romanji": {
+          "description": "title_romanji",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        },
+        "url": {
+          "description": "MyAnimeList URL. This is the URL of the episode's video. If there is no video url, this will be null.",
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "String",
+              "type": "named"
+            }
+          }
+        }
+      },
+      "foreign_keys": {}
+    },
+    "PaginationPaginationObject": {
+      "description": null,
+      "fields": {
+        "has_next_page": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Boolean",
+              "type": "named"
+            }
+          }
+        },
+        "last_visible_page": {
+          "type": {
+            "type": "nullable",
+            "underlying_type": {
+              "name": "Int32",
+              "type": "named"
+            }
+          }
+        }
+      },
+      "foreign_keys": {}
+    }
+  },
+  "procedures": [],
+  "scalar_types": {
+    "Boolean": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "boolean"
+      }
+    },
+    "Float64": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "float64"
+      }
+    },
+    "Int32": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "int32"
+      }
+    },
+    "String": {
+      "aggregate_functions": {},
+      "comparison_operators": {},
+      "representation": {
+        "type": "string"
+      }
+    }
+  }
+}
