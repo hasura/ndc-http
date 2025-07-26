@@ -21,7 +21,7 @@ linters:
     - tagalign
     - wsl
     - noinlineerr
-
+    - noctx
   settings:
     nestif:
       # Minimal complexity of if statements to report.
