@@ -45,11 +45,10 @@ build-cli:
 	go build -o _output/ndc-http-schema ./ndc-http-schema
 
 .PHONY: ci-build-cli
-ci-build-cli: export CGO_ENABLED=0
 ci-build-cli: clean
 	cd ./ndc-http-schema && \
 	go get github.com/mitchellh/gox && \
-	go run github.com/mitchellh/gox -ldflags '-X github.com/hasura/ndc-http/ndc-http-schema/version.BuildVersion=$(VERSION) -s -w -extldflags "-static"' \
+	CGO_ENABLED=0 go run github.com/mitchellh/gox -ldflags '-X github.com/hasura/ndc-http/ndc-http-schema/version.BuildVersion=$(VERSION) -s -w -extldflags "-static"' \
 		-osarch="linux/amd64 darwin/amd64 windows/amd64 darwin/arm64 linux/arm64" \
 		-output="../$(OUTPUT_DIR)/ndc-http-schema-{{.OS}}-{{.Arch}}" \
 		.
