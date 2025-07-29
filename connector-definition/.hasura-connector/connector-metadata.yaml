@@ -1,5 +1,3 @@
-version: v2
-ndcSpecGeneration: v0.2
 packagingDefinition:
   type: PrebuiltDockerImage
   dockerImage: ghcr.io/hasura/ndc-http:{{VERSION}}
