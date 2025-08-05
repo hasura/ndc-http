@@ -21,9 +21,11 @@ func (dc DeflateCompressor) Compress(w io.Writer, src io.Reader) (int64, error) 
 
 	size, copyErr := io.Copy(fw, src)
 	closeErr := fw.Close()
+
 	if copyErr != nil {
 		return 0, copyErr
 	}
+
 	if closeErr != nil {
 		return 0, closeErr
 	}

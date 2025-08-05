@@ -205,7 +205,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 		)
 		assert.NilError(t, err)
 		assertHTTPResponse(t, res, http.StatusInternalServerError, schema.ErrorResponse{
-			Message: "zlib: invalid header",
+			Message: "flate: corrupt input before offset 1",
 			Details: make(map[string]any),
 		})
 	})
