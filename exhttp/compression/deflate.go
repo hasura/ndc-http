@@ -14,15 +14,20 @@ type DeflateCompressor struct{}
 
 // Compress the reader content with deflate encoding.
 func (dc DeflateCompressor) Compress(w io.Writer, src io.Reader) (int64, error) {
-	zw, err := flate.NewWriter(w, flate.DefaultCompression)
+	fw, err := flate.NewWriter(w, flate.DefaultCompression)
 	if err != nil {
 		return 0, err
 	}
 
-	size, err := io.Copy(zw, src)
-	_ = zw.Close()
+	size, err := io.Copy(fw, src)
+	if err != nil {
+		return 0, err
+	}
+	if err := fw.Close(); err != nil {
+		return 0, err
+	}
 
-	return size, err
+	return size, nil
 }
 
 // Decompress the reader content with deflate encoding.
