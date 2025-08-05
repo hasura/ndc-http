@@ -1,7 +1,7 @@
 package compression
 
 import (
-	"compress/zlib"
+	"compress/flate"
 	"io"
 )
 
@@ -12,22 +12,30 @@ const (
 // DeflateCompressor implements the compression handler for deflate encoding.
 type DeflateCompressor struct{}
 
-// Compress the reader content with gzip encoding.
+// Compress the reader content with deflate encoding.
 func (dc DeflateCompressor) Compress(w io.Writer, src io.Reader) (int64, error) {
-	zw := zlib.NewWriter(w)
+	fw, err := flate.NewWriter(w, flate.DefaultCompression)
+	if err != nil {
+		return 0, err
+	}
 
-	size, err := io.Copy(zw, src)
-	_ = zw.Close()
+	size, copyErr := io.Copy(fw, src)
+	closeErr := fw.Close()
 
-	return size, err
+	if copyErr != nil {
+		return 0, copyErr
+	}
+
+	if closeErr != nil {
+		return 0, closeErr
+	}
+
+	return size, nil
 }
 
-// Decompress the reader content with gzip encoding.
+// Decompress the reader content with deflate encoding.
 func (dc DeflateCompressor) Decompress(reader io.ReadCloser) (io.ReadCloser, error) {
-	compressionReader, err := zlib.NewReader(reader)
-	if err != nil {
-		return nil, err
-	}
+	compressionReader := flate.NewReader(reader)
 
 	return readCloserWrapper{
 		CompressionReader: compressionReader,
