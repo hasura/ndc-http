@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hasura/ndc-http/exhttp v0.0.1
 	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20250529080459-8427bc6ad2b0
-	github.com/hasura/ndc-sdk-go v1.9.2-0.20250816084306-0d27d0875965
+	github.com/hasura/ndc-sdk-go v1.9.2-0.20250817042834-c2fe9de770b5
 	github.com/theory/jsonpath v0.10.0
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
@@ -31,6 +31,7 @@ require (
 	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1 // indirect
 	github.com/invopop/jsonschema v0.13.0 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pb33f/libopenapi v0.25.3 // indirect

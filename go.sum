@@ -37,8 +37,8 @@ github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc h1:GN2Lv3MGO7AS6PrR
 github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc/go.mod h1:+JKpmjMGhpgPL+rXZ5nsZieVzvarn86asRlBg4uNGnk=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1 h1:X5VWvz21y3gzm9Nw/kaUeku/1+uBhcekkmy4IkffJww=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1/go.mod h1:Zanoh4+gvIgluNqcfMVTJueD4wSS5hT7zTt4Mrutd90=
-github.com/hasura/ndc-sdk-go v1.9.2-0.20250816084306-0d27d0875965 h1:oARDJAmJtm7pAKOq4/DmXEQFQd5Azmt0kpV0kptHM1s=
-github.com/hasura/ndc-sdk-go v1.9.2-0.20250816084306-0d27d0875965/go.mod h1:0UM5BET0wcy3SRhrweAQ7i3zOUMzhLPrNLn+XalkIKE=
+github.com/hasura/ndc-sdk-go v1.9.2-0.20250817042834-c2fe9de770b5 h1:1gpCFTn9dbBSN3+dEHnD0gDl7YSAKvTcrOlmCEX6bSE=
+github.com/hasura/ndc-sdk-go v1.9.2-0.20250817042834-c2fe9de770b5/go.mod h1:7mbm2cvUkAo1MvNveXrR6dTaWJhojM5EQ3Nr+oPs0xk=
 github.com/hexops/gotextdiff v1.0.3 h1:gitA9+qJrrTCsiCl7+kh75nPqQt1cx4ZkudSTLoUqJM=
 github.com/hexops/gotextdiff v1.0.3/go.mod h1:pSWU5MAI3yDq+fZBTazCSJysOMbxWL1BSow5/V2vxeg=
 github.com/invopop/jsonschema v0.13.0 h1:KvpoAJWEjR3uD9Kbm2HWJmqsEaHt8lBUpd0qHcIi21E=

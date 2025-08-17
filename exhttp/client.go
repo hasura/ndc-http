@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/hasura/ndc-http/exhttp/compression"
+	"github.com/hasura/ndc-sdk-go/utils/compression"
 )
 
 const contentEncodingHeader = "Content-Encoding"
