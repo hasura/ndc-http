@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
 )
 
 // UnwrapNullableType unwraps the underlying type of the nullable type.

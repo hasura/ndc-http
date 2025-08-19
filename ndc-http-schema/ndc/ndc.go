@@ -10,7 +10,7 @@ import (
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
 )
 
 // ConvertOptions represent the common convert options for both OpenAPI v2 and v3.

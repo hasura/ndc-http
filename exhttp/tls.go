@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 var systemCertPool = x509.SystemCertPool

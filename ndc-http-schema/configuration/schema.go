@@ -12,8 +12,8 @@ import (
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
-	"github.com/hasura/ndc-sdk-go/schema"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 // BuildSchemaFromConfig build NDC HTTP schema from the configuration.

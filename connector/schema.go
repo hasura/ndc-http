@@ -7,7 +7,7 @@ import (
 
 	"github.com/hasura/ndc-http/connector/internal"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
 )
 
 // GetSchema gets the connector's schema.

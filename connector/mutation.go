@@ -7,7 +7,7 @@ import (
 
 	"github.com/hasura/ndc-http/connector/internal"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"go.opentelemetry.io/otel/codes"
 	"golang.org/x/sync/errgroup"
 )

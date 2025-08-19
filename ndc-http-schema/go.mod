@@ -1,13 +1,13 @@
 module github.com/hasura/ndc-http/ndc-http-schema
 
-go 1.24.0
+go 1.24
 
 require (
 	github.com/alecthomas/kong v1.12.1
 	github.com/evanphx/json-patch v0.5.2
 	github.com/google/go-cmp v0.7.0
 	github.com/hasura/ndc-http/exhttp v0.0.1
-	github.com/hasura/ndc-sdk-go v1.9.2-0.20250817042834-c2fe9de770b5
+	github.com/hasura/ndc-sdk-go/v2 v2.0.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/lmittmann/tint v1.1.2
 	github.com/pb33f/libopenapi v0.25.3

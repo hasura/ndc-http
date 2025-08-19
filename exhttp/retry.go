@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v5"
-	"github.com/hasura/ndc-sdk-go/schema"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 var defaultRetryHTTPStatus = []int{408, 429, 500, 502, 503}

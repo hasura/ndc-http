@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/hasura/ndc-sdk-go/connector"
+	"github.com/hasura/ndc-sdk-go/v2/connector"
 )
 
 var errBuildSchemaFailed = errors.New("failed to build NDC HTTP schema")

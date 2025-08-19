@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/hasura/ndc-sdk-go/connector"
+	"github.com/hasura/ndc-sdk-go/v2/connector"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"

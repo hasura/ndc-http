@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/hasura/ndc-http/exhttp"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/invopop/jsonschema"
 	"github.com/theory/jsonpath"
 	"github.com/theory/jsonpath/spec"

@@ -3,7 +3,7 @@ package main
 import (
 	rest "github.com/hasura/ndc-http/connector"
 	"github.com/hasura/ndc-http/ndc-http-schema/version"
-	"github.com/hasura/ndc-sdk-go/connector"
+	"github.com/hasura/ndc-sdk-go/v2/connector"
 )
 
 // Start the connector server at http://localhost:8080
@@ -12,7 +12,7 @@ import (
 //
 // See [NDC Go SDK] for more information.
 //
-// [NDC Go SDK]: https://github.com/hasura/ndc-sdk-go
+// [NDC Go SDK]: https://github.com/hasura/ndc-sdk-go/v2
 func main() {
 	if err := connector.Start(
 		rest.NewHTTPConnector(),

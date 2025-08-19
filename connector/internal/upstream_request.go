@@ -7,8 +7,8 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/schema"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 // RequestBuilderResults hold the result of built requests.

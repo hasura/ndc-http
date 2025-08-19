@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/invopop/jsonschema"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )

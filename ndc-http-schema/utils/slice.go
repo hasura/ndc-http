@@ -4,7 +4,7 @@ import (
 	"cmp"
 	"slices"
 
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 // SliceUnorderedEqual compares if both slices are equal with unordered positions.

@@ -9,7 +9,7 @@ import (
 
 	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"gopkg.in/yaml.v3"
 )
 
