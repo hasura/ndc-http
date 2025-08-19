@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/schema"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 // XMLEncoder implements a dynamic XML encoder from the HTTP schema.

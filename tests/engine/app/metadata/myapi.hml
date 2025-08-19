@@ -880,7 +880,7 @@ definition:
           nested_fields:
             order_by: null
           variables: {}
-      version: 0.2.2
+      version: 0.2.10
   argumentPresets:
     - argument: headers
       value:

@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/hasura/ndc-http/connector/internal"
-	"github.com/hasura/ndc-http/exhttp/compression"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/connector"
-	"github.com/hasura/ndc-sdk-go/ndctest"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/connector"
+	"github.com/hasura/ndc-sdk-go/v2/ndctest"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
+	"github.com/hasura/ndc-sdk-go/v2/utils/compression"
 	"gotest.tools/v3/assert"
 )
 
@@ -56,7 +56,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			assert.DeepEqual(t, postsBody, expected)
 
 			w.Header().Add(rest.ContentTypeHeader, "application/json")
-			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingGzip)
+			w.Header().Add(rest.ContentEncodingHeader, string(compression.EncodingGzip))
 			w.WriteHeader(http.StatusOK)
 
 			_, err = compressor.Compress(w, bytes.NewReader(rawPostsBody))
@@ -72,7 +72,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 		case http.MethodPost:
 			compressor := compression.GzipCompressor{}
 			w.Header().Add(rest.ContentTypeHeader, "application/json")
-			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingDeflate)
+			w.Header().Add(rest.ContentEncodingHeader, string(compression.EncodingDeflate))
 			w.WriteHeader(http.StatusOK)
 
 			_, err = compressor.Compress(w, bytes.NewReader(rawPostsBody))
@@ -86,7 +86,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 	mux.HandleFunc("/posts/deflate", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			assert.Equal(t, compression.EncodingDeflate, r.Header.Get(rest.ContentEncodingHeader))
+			assert.Equal(t, string(compression.EncodingDeflate), r.Header.Get(rest.ContentEncodingHeader))
 			compressor := compression.DeflateCompressor{}
 			reqBody, err := compressor.Decompress(r.Body)
 			assert.NilError(t, err)
@@ -96,7 +96,7 @@ func TestHTTPConnectorCompression(t *testing.T) {
 			assert.DeepEqual(t, postsBody, decodedResp)
 
 			w.Header().Add(rest.ContentTypeHeader, "application/json")
-			w.Header().Add(rest.ContentEncodingHeader, compression.EncodingDeflate)
+			w.Header().Add(rest.ContentEncodingHeader, string(compression.EncodingDeflate))
 			w.WriteHeader(http.StatusOK)
 
 			_, err = compressor.Compress(w, bytes.NewReader(rawPostsBody))

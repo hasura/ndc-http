@@ -23,8 +23,8 @@ import (
 
 	"github.com/hasura/ndc-http/connector/internal"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/connector"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/connector"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"gotest.tools/v3/assert"
 )
 

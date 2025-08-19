@@ -3,7 +3,7 @@ package internal
 import (
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
 )
 
 // MetadataCollection stores list of HTTP metadata with helper methods.

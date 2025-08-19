@@ -13,7 +13,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
-	"github.com/hasura/ndc-sdk-go/schema"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
 )
 
 // RawRequestBuilder represents a type to build a raw HTTP request.

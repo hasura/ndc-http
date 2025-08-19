@@ -7,13 +7,13 @@ import (
 	"fmt"
 
 	"github.com/hasura/ndc-http/exhttp"
-	"github.com/hasura/ndc-sdk-go/schema"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/schema"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 // NDCHttpSchema extends the [NDC SchemaResponse] with OpenAPI HTTP information
 //
-// [NDC schema]: https://github.com/hasura/ndc-sdk-go/blob/1d3339db29e13a170aa8be5ff7fae8394cba0e49/schema/schema.generated.go#L887
+// [NDC schema]: https://github.com/hasura/ndc-sdk-go/v2/blob/1d3339db29e13a170aa8be5ff7fae8394cba0e49/schema/schema.generated.go#L887
 type NDCHttpSchema struct {
 	SchemaRef string           `json:"$schema,omitempty" mapstructure:"$schema"  yaml:"$schema,omitempty"`
 	Settings  *NDCHttpSettings `json:"settings"          mapstructure:"settings" yaml:"settings"`

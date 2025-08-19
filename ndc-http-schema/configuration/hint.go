@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/utils"
+	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 // Render renders the help text.
