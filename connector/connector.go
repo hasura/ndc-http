@@ -154,3 +154,8 @@ func (c *HTTPConnector) GetCapabilities(
 ) schema.CapabilitiesResponseMarshaler {
 	return c.capabilities
 }
+
+// Close handles the graceful shutdown that cleans up the connector's state.
+func (c *HTTPConnector) Close(state *State) error {
+	return nil
+}
