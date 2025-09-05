@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hasura/ndc-http/exhttp v0.0.1
 	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20250529080459-8427bc6ad2b0
-	github.com/hasura/ndc-sdk-go/v2 v2.0.1-0.20250905162836-0dcff039dda3
+	github.com/hasura/ndc-sdk-go/v2 v2.1.0
 	github.com/theory/jsonpath v0.10.0
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0

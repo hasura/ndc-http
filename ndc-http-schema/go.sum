@@ -37,8 +37,8 @@ github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 h1:cLN4IBkmkYZNnk7E
 github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853/go.mod h1:+JKpmjMGhpgPL+rXZ5nsZieVzvarn86asRlBg4uNGnk=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.2 h1:8Tjv8EJ+pM1xP8mK6egEbD1OgnVTyacbefKhmbLhIhU=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.2/go.mod h1:pkJQ2tZHJ0aFOVEEot6oZmaVEZcRme73eIFmhiVuRWs=
-github.com/hasura/ndc-sdk-go/v2 v2.0.1-0.20250905162836-0dcff039dda3 h1:zuNqxzI2+So1ZTZIj2DDyRQUSxVDKKk82BXKU/yv0U4=
-github.com/hasura/ndc-sdk-go/v2 v2.0.1-0.20250905162836-0dcff039dda3/go.mod h1:9oV/on+he0ddFpyNF4RE7FwYb6+Bpir7IjUZr1Yr+VM=
+github.com/hasura/ndc-sdk-go/v2 v2.1.0 h1:2/JAYLKIWqSdABNVjzM0ANZorwMmTGwygXN0eXoASKI=
+github.com/hasura/ndc-sdk-go/v2 v2.1.0/go.mod h1:9oV/on+he0ddFpyNF4RE7FwYb6+Bpir7IjUZr1Yr+VM=
 github.com/hexops/gotextdiff v1.0.3 h1:gitA9+qJrrTCsiCl7+kh75nPqQt1cx4ZkudSTLoUqJM=
 github.com/hexops/gotextdiff v1.0.3/go.mod h1:pSWU5MAI3yDq+fZBTazCSJysOMbxWL1BSow5/V2vxeg=
 github.com/invopop/jsonschema v0.13.0 h1:KvpoAJWEjR3uD9Kbm2HWJmqsEaHt8lBUpd0qHcIi21E=
@@ -58,8 +58,6 @@ github.com/mailru/easyjson v0.9.0 h1:PrnmzHw7262yW8sTBwxi1PdJA3Iw/EKBa8psRf7d9a4
 github.com/mailru/easyjson v0.9.0/go.mod h1:1+xMtQp2MRNVL/V1bOzuP3aP8VNwRW55fQUto+XFtTU=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
-github.com/pb33f/libopenapi v0.25.3 h1:B0rf9Reo63tAx54gpoP9778Y84gk3JQoFtj7yg8vKfo=
-github.com/pb33f/libopenapi v0.25.3/go.mod h1:IefJDi7uJpflLs2wEnkiier/Y21w+dEbOrMCP5LB2aw=
 github.com/pb33f/libopenapi v0.25.9 h1:2FkkelYHhgkGoAVvrj9wLTvUiIEU8HI4m6jSYwpMbYg=
 github.com/pb33f/libopenapi v0.25.9/go.mod h1:3MKMFLcYAnTgOuueDd2HIidMphtHHAhPdspgjKVVFq8=
 github.com/pb33f/ordered-map/v2 v2.2.0 h1:+6D6e0nkcEjVPh6kF48ynz2Cb+D/ECH/Q3AOunHtj7E=

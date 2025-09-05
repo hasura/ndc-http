@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/cenkalti/backoff/v5 v5.0.3
-	github.com/hasura/ndc-sdk-go/v2 v2.0.1-0.20250905162836-0dcff039dda3
+	github.com/hasura/ndc-sdk-go/v2 v2.1.0
 	github.com/prometheus/common v0.66.1
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0
