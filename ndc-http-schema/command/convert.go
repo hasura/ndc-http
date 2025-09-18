@@ -11,7 +11,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/configuration"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // ConvertToNDCSchema converts to NDC HTTP schema from file.

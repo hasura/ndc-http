@@ -10,7 +10,7 @@ import (
 
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // UpdateHTTPConfiguration validates and updates the HTTP configuration.

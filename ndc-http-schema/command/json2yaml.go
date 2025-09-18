@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // Json2YamlCommandArguments represent available command arguments for the json2yaml command.

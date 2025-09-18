@@ -8,7 +8,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"github.com/pb33f/libopenapi/datamodel/high/base"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 func getSchemaRefTypeName(name string) string {
