@@ -16,7 +16,7 @@ import (
 	"strings"
 
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
 )
 
 // MarshalSchema encodes the NDC HTTP schema to bytes.
