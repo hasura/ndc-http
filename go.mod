@@ -6,8 +6,8 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/google/uuid v1.6.0
 	github.com/hasura/ndc-http/exhttp v0.0.1
-	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20250819162501-a3eb910eb990
-	github.com/hasura/ndc-sdk-go/v2 v2.1.0
+	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20250918171211-c2f47106e391
+	github.com/hasura/ndc-sdk-go/v2 v2.1.1-0.20250923144622-656e92a16c23
 	github.com/theory/jsonpath v0.10.1
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0
@@ -34,7 +34,7 @@ require (
 	github.com/mailru/easyjson v0.9.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pb33f/jsonpath v0.1.2 // indirect
-	github.com/pb33f/libopenapi v0.27.2 // indirect
+	github.com/pb33f/libopenapi v0.28.0 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
@@ -65,8 +65,8 @@ require (
 	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250908214217-97024824d090 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250908214217-97024824d090 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250922171735-9219d122eba9 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250922171735-9219d122eba9 // indirect
 	google.golang.org/grpc v1.75.1 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
