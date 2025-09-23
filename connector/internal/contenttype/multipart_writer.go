@@ -59,7 +59,7 @@ func (w *MultipartWriter) WriteDataURI(name string, value any, headers http.Head
 	return err
 }
 
-// WriteField calls CreateFormField and then writes the given value with json encoding.
+// WriteJSON calls CreateFormField and then writes the given value with json encoding.
 func (w *MultipartWriter) WriteJSON(fieldName string, value any, headers http.Header) error {
 	bs, err := json.Marshal(value)
 	if err != nil {

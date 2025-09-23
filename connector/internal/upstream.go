@@ -352,7 +352,7 @@ func (um *UpstreamManager) evalSecuritySchemes(
 	return nil, nil
 }
 
-// InjectMockCredential injects mock credential into the request for explain APIs.
+// InjectMockRequestSettings injects mock credential into the request for explain APIs.
 func (um *UpstreamManager) InjectMockRequestSettings(
 	req *http.Request,
 	namespace string,

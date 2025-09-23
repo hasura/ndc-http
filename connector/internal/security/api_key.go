@@ -8,7 +8,7 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 )
 
-// APIKeyCredential presents an API key credential.
+// ApiKeyCredential presents an API key credential.
 type ApiKeyCredential struct {
 	In    schema.APIKeyLocation
 	Name  string

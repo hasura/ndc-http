@@ -103,7 +103,7 @@ func (j *SchemaFileFormat) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// IsEmpty checks if the style enum is valid.
+// IsValid checks if the style enum is valid.
 func (j SchemaFileFormat) IsValid() bool {
 	return slices.Contains(schemaFileFormat_enums, j)
 }
@@ -171,7 +171,7 @@ func (j *ParameterLocation) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// IsEmpty checks if the style enum is valid.
+// IsValid checks if the style enum is valid.
 func (j ParameterLocation) IsValid() bool {
 	return slices.Contains(parameterLocation_enums, j)
 }
@@ -312,7 +312,7 @@ func (j *ParameterEncodingStyle) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// IsEmpty checks if the style enum is valid.
+// IsValid checks if the style enum is valid.
 func (j ParameterEncodingStyle) IsValid() bool {
 	return slices.Contains(parameterEncodingStyle_enums, j)
 }

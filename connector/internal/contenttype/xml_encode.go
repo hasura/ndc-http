@@ -49,7 +49,7 @@ func (c *XMLEncoder) Encode(bodyInfo *rest.ArgumentInfo, bodyData any) ([]byte, 
 	return append([]byte(xml.Header), buf.Bytes()...), nil
 }
 
-// Encode marshals the arbitrary body to xml bytes.
+// EncodeArbitrary marshals the arbitrary body to xml bytes.
 func (c *XMLEncoder) EncodeArbitrary(bodyData any) ([]byte, error) {
 	var buf bytes.Buffer
 

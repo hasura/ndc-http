@@ -85,7 +85,7 @@ func (j *ForwardHeadersSettings) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ForwardHeadersSettings hold settings of header forwarding from http response to Hasura engine.
+// ForwardResponseHeadersSettings hold settings of header forwarding from http response to Hasura engine.
 type ForwardResponseHeadersSettings struct {
 	// Name of the field in the NDC function/procedure's result which contains the response headers.
 	HeadersField string `json:"headersField"   jsonschema:"pattern=^[a-zA-Z_][a-zA-Z0-9_]+$" yaml:"headersField"`

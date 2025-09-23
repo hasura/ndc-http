@@ -22,7 +22,7 @@ func IsContentTypeText(contentType string) bool {
 	return strings.HasPrefix(contentType, "text/") || strings.HasPrefix(contentType, "image/svg")
 }
 
-// IsContentTypeText checks if the content type relates to binary.
+// IsContentTypeBinary checks if the content type relates to binary.
 func IsContentTypeBinary(contentType string) bool {
 	return strings.HasPrefix(contentType, "application/") ||
 		strings.HasPrefix(contentType, "image/") ||

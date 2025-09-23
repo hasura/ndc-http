@@ -330,7 +330,7 @@ func (j *OperationInfo) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Schema returns the connector schema of the function.
+// FunctionSchema returns the connector schema of the function.
 func (j OperationInfo) FunctionSchema(name string) schema.FunctionInfo {
 	arguments := make(schema.FunctionInfoArguments)
 
@@ -346,7 +346,7 @@ func (j OperationInfo) FunctionSchema(name string) schema.FunctionInfo {
 	}
 }
 
-// Schema returns the connector schema of the function.
+// ProcedureSchema returns the connector schema of the function.
 func (j OperationInfo) ProcedureSchema(name string) schema.ProcedureInfo {
 	arguments := make(schema.ProcedureInfoArguments)
 

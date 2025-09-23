@@ -14,7 +14,7 @@ import (
 	"go.yaml.in/yaml/v4"
 )
 
-// ConvertToNDCSchema converts to NDC HTTP schema from file.
+// CommandConvertToNDCSchema converts to NDC HTTP schema from file.
 func CommandConvertToNDCSchema(
 	args *configuration.ConvertCommandArguments,
 	logger *slog.Logger,

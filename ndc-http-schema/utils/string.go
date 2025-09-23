@@ -146,7 +146,7 @@ func StringSliceToConstantCase(inputs []string) string {
 	return strings.ToUpper(StringSliceToSnakeCase(inputs))
 }
 
-// SplitStrings wrap strings.Split with all leading and trailing white space removed.
+// SplitStringsAndTrimSpaces wrap strings.Split with all leading and trailing white space removed.
 func SplitStringsAndTrimSpaces(input string, sep string) []string {
 	results := []string{}
 

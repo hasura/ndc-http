@@ -80,7 +80,7 @@ func ParseSecuritySchemeType(value string) (SecuritySchemeType, error) {
 	return result, nil
 }
 
-// ApiKeyLocation represents the location enum for apiKey auth.
+// APIKeyLocation represents the location enum for apiKey auth.
 type APIKeyLocation string
 
 const (
@@ -335,7 +335,7 @@ type APIKeyAuthConfig struct {
 	Value utils.EnvString    `json:"value" mapstructure:"value" yaml:"value"`
 }
 
-var _ SecuritySchemer = &APIKeyAuthConfig{}
+var _ SecuritySchemer = (*APIKeyAuthConfig)(nil)
 
 // NewAPIKeyAuthConfig creates a new APIKeyAuthConfig instance.
 func NewAPIKeyAuthConfig(name string, in APIKeyLocation, value utils.EnvString) *APIKeyAuthConfig {
@@ -376,7 +376,7 @@ func (ss *APIKeyAuthConfig) Validate() error {
 	return nil
 }
 
-// GetValue get the authentication credential value.
+// GetType get the type of security scheme.
 func (ss APIKeyAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -392,7 +392,7 @@ type HTTPAuthConfig struct {
 	Value  utils.EnvString    `json:"value"  mapstructure:"value"  yaml:"value"`
 }
 
-var _ SecuritySchemer = &HTTPAuthConfig{}
+var _ SecuritySchemer = (*HTTPAuthConfig)(nil)
 
 // NewHTTPAuthConfig creates a new HTTPAuthConfig instance.
 func NewHTTPAuthConfig(scheme string, header string, value utils.EnvString) *HTTPAuthConfig {
@@ -413,7 +413,7 @@ func (ss *HTTPAuthConfig) Validate() error {
 	return nil
 }
 
-// GetValue get the authentication credential value.
+// GetType get the type of security scheme.
 func (ss HTTPAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -442,7 +442,7 @@ func (ss *BasicAuthConfig) Validate() error {
 	return nil
 }
 
-// GetValue get the authentication credential value.
+// GetType get the type of security scheme.
 func (ss BasicAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -548,7 +548,7 @@ type OAuth2Config struct {
 	Flows map[OAuthFlowType]OAuthFlow `json:"flows" mapstructure:"flows" yaml:"flows"`
 }
 
-var _ SecuritySchemer = &OAuth2Config{}
+var _ SecuritySchemer = (*OAuth2Config)(nil)
 
 // NewOAuth2Config creates a new OAuth2Config instance.
 func NewOAuth2Config(flows map[OAuthFlowType]OAuthFlow) *OAuth2Config {
@@ -558,7 +558,7 @@ func NewOAuth2Config(flows map[OAuthFlowType]OAuthFlow) *OAuth2Config {
 	}
 }
 
-// GetValue get the authentication credential value.
+// GetType get the type of security scheme.
 func (ss OAuth2Config) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -641,7 +641,7 @@ type OpenIDConnectConfig struct {
 	OpenIDConnectURL string             `json:"openIdConnectUrl" mapstructure:"openIdConnectUrl" yaml:"openIdConnectUrl"`
 }
 
-var _ SecuritySchemer = &OpenIDConnectConfig{}
+var _ SecuritySchemer = (*OpenIDConnectConfig)(nil)
 
 // NewOpenIDConnectConfig creates a new OpenIDConnectConfig instance.
 func NewOpenIDConnectConfig(oidcURL string) *OpenIDConnectConfig {
@@ -651,7 +651,7 @@ func NewOpenIDConnectConfig(oidcURL string) *OpenIDConnectConfig {
 	}
 }
 
-// GetValue get the authentication credential value.
+// GetType get the type of security scheme.
 func (ss OpenIDConnectConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -674,7 +674,7 @@ type CookieAuthConfig struct {
 	Type SecuritySchemeType `json:"type" mapstructure:"type" yaml:"type"`
 }
 
-var _ SecuritySchemer = &CookieAuthConfig{}
+var _ SecuritySchemer = (*CookieAuthConfig)(nil)
 
 // NewCookieAuthConfig creates a new CookieAuthConfig instance.
 func NewCookieAuthConfig() *CookieAuthConfig {
@@ -683,7 +683,7 @@ func NewCookieAuthConfig() *CookieAuthConfig {
 	}
 }
 
-// GetValue get the authentication credential value.
+// GetType get the type of security scheme.
 func (ss CookieAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }
@@ -698,7 +698,7 @@ type MutualTLSAuthConfig struct {
 	Type SecuritySchemeType `json:"type" mapstructure:"type" yaml:"type"`
 }
 
-var _ SecuritySchemer = &MutualTLSAuthConfig{}
+var _ SecuritySchemer = (*MutualTLSAuthConfig)(nil)
 
 // NewMutualTLSAuthConfig creates a new MutualTLSAuthConfig instance.
 func NewMutualTLSAuthConfig() *MutualTLSAuthConfig {
@@ -707,7 +707,7 @@ func NewMutualTLSAuthConfig() *MutualTLSAuthConfig {
 	}
 }
 
-// GetValue get the authentication credential value.
+// GetType get the type of security scheme.
 func (ss MutualTLSAuthConfig) GetType() SecuritySchemeType {
 	return ss.Type
 }

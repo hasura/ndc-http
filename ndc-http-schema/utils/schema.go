@@ -31,7 +31,7 @@ func UnwrapNullableTypeEncoder(input schema.TypeEncoder) (schema.TypeEncoder, bo
 	}
 }
 
-// WrapNullableType wraps the schema type with nullable.
+// WrapNullableTypeEncoder wraps the schema type with nullable.
 func WrapNullableTypeEncoder(input schema.TypeEncoder) schema.TypeEncoder {
 	if !IsNullableTypeEncoder(input) {
 		return schema.NewNullableType(input)
