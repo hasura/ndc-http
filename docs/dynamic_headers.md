@@ -23,7 +23,7 @@ forwardHeaders:
 ddn connector introspect \<connector-name\>
 ```
 
-- Finally add the headers argument which you defined above to the `argumentPresets` in `DataConnectorLink` metadata with allowed HTTP headers. For instance:  
+- Finally, add the headers argument, which you defined above, to the `argumentPresets` in `DataConnectorLink` metadata with allowed HTTP headers. For instance:  
 
 ```yaml
 kind: DataConnectorLink
@@ -44,7 +44,7 @@ definition:
 
 - Enable `forwardHeaders` in the `config.yaml` file of the connector directory, and configure `responseHeaders`.       
   - `headersField` and `resultField` field wrappers will be added in the connector schema. 
-  - `forwardHeaders` array are allowed headers that will be forwarded back.
+  - `forwardHeaders` array is allowed headers that will be forwarded back.
 
 ```yaml
 # ...
@@ -64,7 +64,7 @@ forwardHeaders:
 ddn connector introspect \<connector-name\>
 ```
 
-- Finally add the exact `responseHeaders` object which you defined above to `DataConnectorLink` metadata. For instance:  
+- Finally, add the exact `responseHeaders` object which you defined above to `DataConnectorLink` metadata. For instance:  
 
 ```yaml
 kind: DataConnectorLink
@@ -82,7 +82,7 @@ definition:
 
 ## Forward Headers from Pre-NDC Request Plugin
  
-You can use a [Pre-NDC Request Plugin](https://hasura.io/docs/3.0/plugins/introduction#pre-ndc-request-plugin) to modify the request, and add dynamic headers in runtime via `request_arguments.headers` field which is a string map. Those headers will be merged into HTTP request headers before sending to external services.
+You can use a [Pre-NDC Request Plugin](https://hasura.io/docs/3.0/plugins/introduction#pre-ndc-request-plugin) to modify the request, and add dynamic headers in runtime via `request_arguments.headers` field, which is a string map. Those headers will be merged into the HTTP request headers before being sent to external services.
 
 > See the full example at [Pre-NDC Request Plugin Request](https://hasura.io/docs/3.0/plugins/introduction#example-configuration)
  
