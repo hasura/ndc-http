@@ -71,7 +71,7 @@ func ValidateArgumentPreset(
 	return jsonPath, targets, nil
 }
 
-// BuildArgumentPresetKey builds the argument preset key.
+// BuildArgumentPresetJSONPathKey builds the argument preset key.
 func BuildArgumentPresetJSONPathKey(operationName string, jsonPath *jsonpath.Path) string {
 	return fmt.Sprintf("%s:%s", operationName, jsonPath.String())
 }

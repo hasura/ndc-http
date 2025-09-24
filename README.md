@@ -11,7 +11,7 @@ The connector can automatically transform OpenAPI 2.0 and 3.0 definitions to NDC
 - Composable API collections.
 - [Supported many API specifications](./docs/configuration.md#supported-specs).
 - [Supported authentication](./docs/authentication.md).
-- [Supported headers forwarding](./docs/authentication.md#headers-forwarding).
+- [Supported headers forwarding](./docs/dynamic_headers.md).
 - [Supported argument presets](./docs/argument_presets.md).
 - [Supported response transforms](./docs/response_transform.md).
 - [Supported timeout and retry](#timeout-and-retry).
@@ -62,6 +62,7 @@ Follow the [Quick Start Guide](https://hasura.io/docs/3.0/getting-started/overvi
 
 - [Configuration](./docs/configuration.md)
 - [Authentication](./docs/authentication.md)
+- [Forward Dynamic Headers](./docs/dynamic_headers.md)
 - [Argument Presets](./docs/argument_presets.md)
 - [Response Transforms](./docs/response_transform.md)
 - [Schemaless Requests](./docs/schemaless_request.md)

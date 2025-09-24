@@ -18,7 +18,13 @@ func OpenAPIv2ToNDCSchema(input []byte, options ConvertOptions) (*rest.NDCHttpSc
 		return nil, []error{err}
 	}
 
-	docModel, errs := document.BuildV2Model()
+	docModel, err := document.BuildV2Model()
+
+	errs := []error{}
+	if err != nil {
+		errs = append(errs, err)
+	}
+
 	// The errors won’t prevent the model from building
 	if docModel == nil && len(errs) > 0 {
 		return nil, errs

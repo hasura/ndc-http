@@ -47,7 +47,7 @@ func NewURLParameterEncoder(
 	}
 }
 
-// Encode URL parameters.
+// EncodeFormBody encodes body in form data format.
 func (c *URLParameterEncoder) EncodeFormBody(
 	bodyInfo *rest.ArgumentInfo,
 	bodyData any,
@@ -98,7 +98,7 @@ func (c *URLParameterEncoder) EncodeFormBody(
 	return []byte(rawQuery), nil
 }
 
-// Encode marshals the arbitrary body to xml bytes.
+// EncodeArbitrary marshals the arbitrary body to URL query parameters.
 func (c *URLParameterEncoder) EncodeArbitrary(bodyData any) ([]byte, error) {
 	queryParams, err := c.encodeParameterReflectionValues(
 		reflect.ValueOf(bodyData),

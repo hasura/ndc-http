@@ -94,7 +94,7 @@ func (ss *ServerConfig) Validate() error {
 	return nil
 }
 
-// Validate if the current instance is valid.
+// GetURL validates and return the URL.
 func (ss ServerConfig) GetURL() (*url.URL, error) {
 	rawURL, err := ss.URL.Get()
 	if err != nil {
@@ -174,7 +174,7 @@ func (apc ArgumentPresetConfig) Validate() (*jsonpath.Path, []regexp.Regexp, err
 	return jsonPath, targets, nil
 }
 
-// ArgumentPresetValue represents an argument preset value type.
+// ArgumentPresetValueType represents an argument preset value type.
 type ArgumentPresetValueType string
 
 const (

@@ -19,11 +19,25 @@ func (c *HTTPConnector) Mutation(
 	state *State,
 	request *schema.MutationRequest,
 ) (*schema.MutationResponse, error) {
-	if len(request.Operations) == 1 || c.config.Concurrency.Mutation <= 1 {
-		return c.execMutationSync(ctx, state, request)
+	var requestArguments internal.HTTPRequestArguments
+
+	if len(request.RequestArguments) > 0 {
+		err := json.Unmarshal(request.RequestArguments, &requestArguments)
+		if err != nil {
+			return nil, schema.UnprocessableContentError(
+				"invalid request_arguments in request body",
+				map[string]any{
+					"cause": err.Error(),
+				},
+			)
+		}
 	}
 
-	return c.execMutationAsync(ctx, state, request)
+	if len(request.Operations) == 1 || c.config.Concurrency.Mutation <= 1 {
+		return c.execMutationSync(ctx, state, request, requestArguments)
+	}
+
+	return c.execMutationAsync(ctx, state, request, requestArguments)
 }
 
 // MutationExplain explains a mutation by creating an execution plan.
@@ -49,7 +63,21 @@ func (c *HTTPConnector) MutationExplain(
 			return nil, err
 		}
 
-		return c.serializeExplainResponse(ctx, requests)
+		var requestArguments internal.HTTPRequestArguments
+
+		if len(request.RequestArguments) > 0 {
+			err = json.Unmarshal(request.RequestArguments, &requestArguments)
+			if err != nil {
+				return nil, schema.UnprocessableContentError(
+					"invalid request_arguments in request body",
+					map[string]any{
+						"cause": err.Error(),
+					},
+				)
+			}
+		}
+
+		return c.serializeExplainResponse(ctx, requests, requestArguments)
 	default:
 		return nil, schema.BadRequestError(
 			fmt.Sprintf("invalid operation type: %s", operation.Type),
@@ -80,11 +108,12 @@ func (c *HTTPConnector) execMutationSync(
 	ctx context.Context,
 	state *State,
 	request *schema.MutationRequest,
+	requestArguments internal.HTTPRequestArguments,
 ) (*schema.MutationResponse, error) {
 	operationResults := make([]schema.MutationOperationResults, len(request.Operations))
 
 	for i, operation := range request.Operations {
-		result, err := c.execMutationOperation(ctx, state, operation, i)
+		result, err := c.execMutationOperation(ctx, state, operation, i, requestArguments)
 		if err != nil {
 			return nil, err
 		}
@@ -101,6 +130,7 @@ func (c *HTTPConnector) execMutationAsync(
 	ctx context.Context,
 	state *State,
 	request *schema.MutationRequest,
+	requestArguments internal.HTTPRequestArguments,
 ) (*schema.MutationResponse, error) {
 	operationResults := make([]schema.MutationOperationResults, len(request.Operations))
 
@@ -110,7 +140,7 @@ func (c *HTTPConnector) execMutationAsync(
 	for i, operation := range request.Operations {
 		func(index int, op schema.MutationOperation) {
 			eg.Go(func() error {
-				result, err := c.execMutationOperation(ctx, state, op, index)
+				result, err := c.execMutationOperation(ctx, state, op, index, requestArguments)
 				if err != nil {
 					return err
 				}
@@ -136,6 +166,7 @@ func (c *HTTPConnector) execMutationOperation(
 	state *State,
 	operation schema.MutationOperation,
 	index int,
+	requestArguments internal.HTTPRequestArguments,
 ) (schema.MutationOperationResults, error) {
 	ctx, span := state.Tracer.Start(parentCtx, fmt.Sprintf("Execute Operation %d", index))
 	defer span.End()
@@ -169,7 +200,7 @@ func (c *HTTPConnector) execMutationOperation(
 		return nil, err
 	}
 
-	client := c.upstreams.CreateHTTPClient(requests)
+	client := c.upstreams.CreateHTTPClient(requests, requestArguments)
 
 	result, _, err := client.Send(ctx, operation.Fields)
 	if err != nil {

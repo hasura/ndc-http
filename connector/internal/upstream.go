@@ -184,10 +184,14 @@ func (um *UpstreamManager) Register(
 }
 
 // CreateHTTPClient create an HTTP client with requests.
-func (um *UpstreamManager) CreateHTTPClient(requests *RequestBuilderResults) *HTTPClient {
+func (um *UpstreamManager) CreateHTTPClient(
+	requests *RequestBuilderResults,
+	requestArguments HTTPRequestArguments,
+) *HTTPClient {
 	return &HTTPClient{
-		manager:  um,
-		requests: requests,
+		manager:          um,
+		requests:         requests,
+		requestArguments: requestArguments,
 	}
 }
 
@@ -197,6 +201,7 @@ func (um *UpstreamManager) ExecuteRequest(
 	span trace.Span,
 	request *RetryableRequest,
 	namespace string,
+	requestArguments HTTPRequestArguments,
 ) (*http.Response, context.CancelFunc, error) {
 	contentEncoding := request.Headers.Get(rest.ContentEncodingHeader)
 	if len(request.Body) > 0 && compression.DefaultCompressor.IsEncodingSupported(contentEncoding) {
@@ -234,6 +239,10 @@ func (um *UpstreamManager) ExecuteRequest(
 	}
 
 	req.Header.Set("User-Agent", "ndc-http/"+version.BuildVersion)
+	// merge headers from the request-level arguments with the highest priority
+	for key, value := range requestArguments.Headers {
+		req.Header.Set(key, value)
+	}
 
 	middlewares := []exhttp.Middleware{}
 
@@ -352,7 +361,7 @@ func (um *UpstreamManager) evalSecuritySchemes(
 	return nil, nil
 }
 
-// InjectMockCredential injects mock credential into the request for explain APIs.
+// InjectMockRequestSettings injects mock credential into the request for explain APIs.
 func (um *UpstreamManager) InjectMockRequestSettings(
 	req *http.Request,
 	namespace string,

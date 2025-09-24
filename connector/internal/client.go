@@ -30,8 +30,9 @@ var tracer = connector.NewTracer("HTTPClient")
 
 // HTTPClient represents a http client wrapper with advanced methods.
 type HTTPClient struct {
-	manager  *UpstreamManager
-	requests *RequestBuilderResults
+	manager          *UpstreamManager
+	requests         *RequestBuilderResults
+	requestArguments HTTPRequestArguments
 }
 
 // Send creates and executes the request and evaluate response selection.
@@ -192,7 +193,13 @@ func (client *HTTPClient) sendSingle(
 		span.SetAttributes(attribute.String("db.namespace", namespace))
 	}
 
-	resp, cancel, err := client.manager.ExecuteRequest(ctx, span, request, namespace)
+	resp, cancel, err := client.manager.ExecuteRequest(
+		ctx,
+		span,
+		request,
+		namespace,
+		client.requestArguments,
+	)
 	if err != nil {
 		span.SetStatus(codes.Error, "error happened when executing the request")
 		span.RecordError(err)

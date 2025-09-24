@@ -35,7 +35,7 @@ func NewArgumentPresets(
 	return result, nil
 }
 
-// ApplyArgumentPresents replace argument preset values into request arguments.
+// Apply replaces argument preset values into request arguments.
 func (ap ArgumentPresets) Apply(
 	operationName string,
 	arguments map[string]any,

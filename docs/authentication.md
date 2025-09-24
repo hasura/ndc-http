@@ -83,41 +83,11 @@ securitySchemes:
           write:pets: modify pets in your account
 ```
 
-For other OAuth 2.0 flows, you need to enable [headers forwarding](#headers-forwarding) from the Hasura engine to the connector.
+For other OAuth 2.0 flows, you need to enable [headers forwarding](./dynamic_headers.md#forward-headers-from-ddn-engine) from the Hasura engine to the connector.
 
 ## Cookie
 
-For Cookie authentication and OAuth 2.0, you need to enable [headers forwarding](#headers-forwarding) from the Hasura engine to the connector.
-
-## Headers Forwarding
-
-Enable `forwardHeaders` in the configuration file.
-
-```yaml
-# ...
-forwardHeaders:
-  enabled: true
-  argumentField: headers
-```
-
-And configure in the connector link metadata.
-
-```yaml
-kind: DataConnectorLink
-version: v1
-definition:
-  name: my_api
-  # ...
-  argumentPresets:
-    - argument: headers
-      value:
-        httpHeaders:
-          forward:
-            - Cookie
-          additional: {}
-```
-
-See the configuration example in [Hasura docs](https://hasura.io/docs/3.0/recipes/business-logic/http-header-forwarding/#step-2-update-the-metadata-1).
+For Cookie authentication and OAuth 2.0, you need to enable [headers forwarding](./dynamic_headers.md#forward-headers-from-ddn-engine) from the Hasura engine to the connector.
 
 ## Mutual TLS
 
