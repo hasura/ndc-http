@@ -59,6 +59,26 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
+	findPetsBodyWithRequestArguments := []byte(`{
+		"collection": "findPets",
+		"query": {
+			"fields": {
+				"__value": {
+					"type": "column",
+					"column": "__value"
+				}
+			}
+		},
+		"arguments": {},
+		"collection_relationships": {},
+		"request_arguments": {
+			"headers": {
+				"Api_key": "unauthorized",
+				"foo": "bar"
+			}
+		}
+	}`)
+
 	t.Run("auth_default_explain", func(t *testing.T) {
 		res, err := http.Post(
 			fmt.Sprintf("%s/query/explain", testServer.URL),
@@ -70,6 +90,22 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 			Details: schema.ExplainResponseDetails{
 				"url":     state.Server.URL + "/pet",
 				"headers": `{"Accept":["application/json"],"Api_key":["ran*******(14)"],"Content-Type":["application/json"]}`,
+			},
+		})
+	})
+
+	t.Run("query_with_request_arguments_explain", func(t *testing.T) {
+		res, err := http.Post(
+			fmt.Sprintf("%s/query/explain", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(findPetsBodyWithRequestArguments),
+		)
+
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
+			Details: schema.ExplainResponseDetails{
+				"url":     state.Server.URL + "/pet",
+				"headers": `{"Accept":["application/json"],"Api_key":["una*******(12)"],"Content-Type":["application/json"],"Foo":["bar"]}`,
 			},
 		})
 	})
@@ -102,6 +138,22 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		})
 	})
 
+	t.Run("query_with_request_arguments", func(t *testing.T) {
+		res, err := http.Post(
+			fmt.Sprintf("%s/query", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(findPetsBodyWithRequestArguments),
+		)
+		assert.NilError(t, err)
+
+		assertHTTPResponse(t, res, http.StatusUnprocessableEntity, schema.ErrorResponse{
+			Message: "422 Unprocessable Entity",
+			Details: map[string]any{
+				"error": "unauthorized",
+			},
+		})
+	})
+
 	addPetBody := []byte(`{
 		"operations": [
 			{
@@ -130,7 +182,41 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		"collection_relationships": {}
 	}`)
 
-	t.Run("auth_api_key_explain", func(t *testing.T) {
+	addPetBodyWithRequestArguments := []byte(`{
+		"operations": [
+			{
+				"type": "procedure",
+				"name": "addPet",
+				"arguments": {
+					"body": {
+						"name": "pet"
+					}
+				},
+				"fields": {
+					"type": "object",
+					"fields": {
+						"headers": {
+							"column": "headers",
+							"type": "column"
+						},
+						"response": {
+							"column": "response",
+							"type": "column"
+						}
+					}
+				}
+			}
+		],
+		"collection_relationships": {},
+		"request_arguments": {
+			"headers": {
+				"Api_key": "unauthorized",
+				"foo": "bar"
+			}
+		}
+	}`)
+
+	t.Run("mutation_auth_api_key_explain", func(t *testing.T) {
 		res, err := http.Post(
 			fmt.Sprintf("%s/mutation/explain", testServer.URL),
 			"application/json",
@@ -146,7 +232,23 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 		})
 	})
 
-	t.Run("auth_api_key", func(t *testing.T) {
+	t.Run("mutation_with_request_arguments_explain", func(t *testing.T) {
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation/explain", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(addPetBodyWithRequestArguments),
+		)
+		assert.NilError(t, err)
+		assertHTTPResponse(t, res, http.StatusOK, schema.ExplainResponse{
+			Details: schema.ExplainResponseDetails{
+				"url":     state.Server.URL + "/pet",
+				"headers": `{"Accept":["application/json"],"Api_key":["una*******(12)"],"Content-Type":["application/json"],"Foo":["bar"]}`,
+				"body":    "{\"name\":\"pet\"}",
+			},
+		})
+	})
+
+	t.Run("mutation_auth_api_key", func(t *testing.T) {
 		res, err := http.Post(
 			fmt.Sprintf("%s/mutation", testServer.URL),
 			"application/json",
@@ -164,6 +266,23 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 						"id":           float64(1),
 					},
 				}).Encode(),
+			},
+		})
+	})
+
+	t.Run("mutation_with_request_arguments", func(t *testing.T) {
+		res, err := http.Post(
+			fmt.Sprintf("%s/mutation", testServer.URL),
+			"application/json",
+			bytes.NewBuffer(addPetBodyWithRequestArguments),
+		)
+
+		assert.NilError(t, err)
+
+		assertHTTPResponse(t, res, http.StatusUnprocessableEntity, schema.ErrorResponse{
+			Message: "422 Unprocessable Entity",
+			Details: map[string]any{
+				"error": "unauthorized",
 			},
 		})
 	})
@@ -209,7 +328,7 @@ func TestHTTPConnectorAuthentication(t *testing.T) {
 	})
 
 	t.Run("auth_bearer", func(t *testing.T) {
-		for i := 0; i < 2; i++ {
+		for range 2 {
 			res, err := http.Post(
 				fmt.Sprintf("%s/query", testServer.URL),
 				"application/json",
@@ -1017,30 +1136,33 @@ func createMockServer(t *testing.T, apiKey string, bearerToken string) *mockServ
 	mux.HandleFunc("/pet", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet, http.MethodPost:
-			if r.Header.Get("api_key") != apiKey {
+			switch r.Header.Get("api_key") {
+			case apiKey:
+				petItemStr := `{
+					"id": "1",
+					"custom_field": [{
+						"foo": "bar"
+					}]
+				}`
+
+				if r.Method == http.MethodGet {
+					responseBody := fmt.Sprintf(`[%s]`, petItemStr)
+					writeResponse(w, responseBody)
+
+					return
+				}
+
+				var postBody any
+				err := json.NewDecoder(r.Body).Decode(&postBody)
+				assert.NilError(t, err)
+				writeResponse(w, petItemStr)
+			case "unauthorized":
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				w.Write([]byte("unauthorized"))
+			default:
 				t.Errorf("invalid api key, expected %s, got %s", apiKey, r.Header.Get("api_key"))
 				t.FailNow()
-				return
 			}
-
-			petItemStr := `{
-				"id": "1",
-				"custom_field": [{
-					"foo": "bar"
-				}]
-			}`
-
-			if r.Method == http.MethodGet {
-				responseBody := fmt.Sprintf(`[%s]`, petItemStr)
-				writeResponse(w, responseBody)
-
-				return
-			}
-
-			var postBody any
-			err := json.NewDecoder(r.Body).Decode(&postBody)
-			assert.NilError(t, err)
-			writeResponse(w, petItemStr)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
