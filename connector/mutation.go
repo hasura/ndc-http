@@ -24,9 +24,12 @@ func (c *HTTPConnector) Mutation(
 	if len(request.RequestArguments) > 0 {
 		err := json.Unmarshal(request.RequestArguments, &requestArguments)
 		if err != nil {
-			return nil, schema.UnprocessableContentError("invalid request_arguments in request body", map[string]any{
-				"cause": err.Error(),
-			})
+			return nil, schema.UnprocessableContentError(
+				"invalid request_arguments in request body",
+				map[string]any{
+					"cause": err.Error(),
+				},
+			)
 		}
 	}
 
@@ -65,9 +68,12 @@ func (c *HTTPConnector) MutationExplain(
 		if len(request.RequestArguments) > 0 {
 			err = json.Unmarshal(request.RequestArguments, &requestArguments)
 			if err != nil {
-				return nil, schema.UnprocessableContentError("invalid request_arguments in request body", map[string]any{
-					"cause": err.Error(),
-				})
+				return nil, schema.UnprocessableContentError(
+					"invalid request_arguments in request body",
+					map[string]any{
+						"cause": err.Error(),
+					},
+				)
 			}
 		}
 

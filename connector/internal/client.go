@@ -193,7 +193,13 @@ func (client *HTTPClient) sendSingle(
 		span.SetAttributes(attribute.String("db.namespace", namespace))
 	}
 
-	resp, cancel, err := client.manager.ExecuteRequest(ctx, span, request, namespace, client.requestArguments)
+	resp, cancel, err := client.manager.ExecuteRequest(
+		ctx,
+		span,
+		request,
+		namespace,
+		client.requestArguments,
+	)
 	if err != nil {
 		span.SetStatus(codes.Error, "error happened when executing the request")
 		span.RecordError(err)

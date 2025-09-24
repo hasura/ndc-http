@@ -184,7 +184,10 @@ func (um *UpstreamManager) Register(
 }
 
 // CreateHTTPClient create an HTTP client with requests.
-func (um *UpstreamManager) CreateHTTPClient(requests *RequestBuilderResults, requestArguments HTTPRequestArguments) *HTTPClient {
+func (um *UpstreamManager) CreateHTTPClient(
+	requests *RequestBuilderResults,
+	requestArguments HTTPRequestArguments,
+) *HTTPClient {
 	return &HTTPClient{
 		manager:          um,
 		requests:         requests,

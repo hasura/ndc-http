@@ -36,9 +36,12 @@ func (c *HTTPConnector) Query(
 	if len(request.RequestArguments) > 0 {
 		err = json.Unmarshal(request.RequestArguments, &requestArguments)
 		if err != nil {
-			return nil, schema.UnprocessableContentError("invalid request_arguments in request body", map[string]any{
-				"cause": err.Error(),
-			})
+			return nil, schema.UnprocessableContentError(
+				"invalid request_arguments in request body",
+				map[string]any{
+					"cause": err.Error(),
+				},
+			)
 		}
 	}
 
@@ -71,9 +74,12 @@ func (c *HTTPConnector) QueryExplain(
 	if len(request.RequestArguments) > 0 {
 		err = json.Unmarshal(request.RequestArguments, &requestArguments)
 		if err != nil {
-			return nil, schema.UnprocessableContentError("invalid request_arguments in request body", map[string]any{
-				"cause": err.Error(),
-			})
+			return nil, schema.UnprocessableContentError(
+				"invalid request_arguments in request body",
+				map[string]any{
+					"cause": err.Error(),
+				},
+			)
 		}
 	}
 
@@ -147,7 +153,15 @@ func (c *HTTPConnector) execQueryAsync(
 	for i, requestVar := range requestVars {
 		func(index int, vars schema.QueryRequestVariablesElem) {
 			eg.Go(func() error {
-				result, err := c.execQuery(ctx, state, request, valueField, vars, i, requestArguments)
+				result, err := c.execQuery(
+					ctx,
+					state,
+					request,
+					valueField,
+					vars,
+					i,
+					requestArguments,
+				)
 				if err != nil {
 					return err
 				}
@@ -229,6 +243,13 @@ func (c *HTTPConnector) serializeExplainResponse(
 
 	defer cancel()
 
+	// mask sensitive forwarded headers if exists
+	for key, value := range req.Header {
+		if internal.IsSensitiveHeader(key) {
+			req.Header.Set(key, restUtils.MaskString(value[0]))
+		}
+	}
+
 	c.upstreams.InjectMockRequestSettings(
 		req,
 		requests.Schema.Name,
@@ -237,14 +258,11 @@ func (c *HTTPConnector) serializeExplainResponse(
 
 	// merge headers from request-level arguments if exist
 	for key, value := range requestArguments.Headers {
-		req.Header.Set(key, value)
-	}
-
-	// mask sensitive forwarded headers if exists
-	for key, value := range req.Header {
 		if internal.IsSensitiveHeader(key) {
-			req.Header.Set(key, restUtils.MaskString(value[0]))
+			value = restUtils.MaskString(value)
 		}
+
+		req.Header.Set(key, value)
 	}
 
 	explainResp.Details["url"] = req.URL.String()
