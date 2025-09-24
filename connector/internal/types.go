@@ -129,3 +129,9 @@ func NewDistributedResponse[T any]() *DistributedResponse[T] {
 		Errors:  []DistributedError{},
 	}
 }
+
+// HTTPRequestArguments holds the data structure of the request-level argument
+// that is returned from the pre-ndc-plugin.
+type HTTPRequestArguments struct {
+	Headers map[string]string `json:"headers"`
+}

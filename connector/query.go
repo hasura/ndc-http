@@ -31,11 +31,22 @@ func (c *HTTPConnector) Query(
 		requestVars = []schema.QueryRequestVariablesElem{make(schema.QueryRequestVariablesElem)}
 	}
 
-	if len(requestVars) == 1 || c.config.Concurrency.Query <= 1 {
-		return c.execQuerySync(ctx, state, request, valueField, requestVars)
+	var requestArguments internal.HTTPRequestArguments
+
+	if len(request.RequestArguments) > 0 {
+		err = json.Unmarshal(request.RequestArguments, &requestArguments)
+		if err != nil {
+			return nil, schema.UnprocessableContentError("invalid request_arguments in request body", map[string]any{
+				"cause": err.Error(),
+			})
+		}
 	}
 
-	return c.execQueryAsync(ctx, state, request, valueField, requestVars)
+	if len(requestVars) == 1 || c.config.Concurrency.Query <= 1 {
+		return c.execQuerySync(ctx, state, request, valueField, requestVars, requestArguments)
+	}
+
+	return c.execQueryAsync(ctx, state, request, valueField, requestVars, requestArguments)
 }
 
 // QueryExplain explains a query by creating an execution plan.
@@ -55,7 +66,18 @@ func (c *HTTPConnector) QueryExplain(
 		return nil, err
 	}
 
-	return c.serializeExplainResponse(ctx, requests)
+	var requestArguments internal.HTTPRequestArguments
+
+	if len(request.RequestArguments) > 0 {
+		err = json.Unmarshal(request.RequestArguments, &requestArguments)
+		if err != nil {
+			return nil, schema.UnprocessableContentError("invalid request_arguments in request body", map[string]any{
+				"cause": err.Error(),
+			})
+		}
+	}
+
+	return c.serializeExplainResponse(ctx, requests, requestArguments)
 }
 
 func (c *HTTPConnector) explainQuery(
@@ -86,11 +108,12 @@ func (c *HTTPConnector) execQuerySync(
 	request *schema.QueryRequest,
 	valueField schema.NestedField,
 	requestVars []schema.QueryRequestVariablesElem,
+	requestArguments internal.HTTPRequestArguments,
 ) ([]schema.RowSet, error) {
 	rowSets := make([]schema.RowSet, len(requestVars))
 
 	for i, requestVar := range requestVars {
-		result, err := c.execQuery(ctx, state, request, valueField, requestVar, i)
+		result, err := c.execQuery(ctx, state, request, valueField, requestVar, i, requestArguments)
 		if err != nil {
 			return nil, err
 		}
@@ -114,6 +137,7 @@ func (c *HTTPConnector) execQueryAsync(
 	request *schema.QueryRequest,
 	valueField schema.NestedField,
 	requestVars []schema.QueryRequestVariablesElem,
+	requestArguments internal.HTTPRequestArguments,
 ) ([]schema.RowSet, error) {
 	rowSets := make([]schema.RowSet, len(requestVars))
 
@@ -123,7 +147,7 @@ func (c *HTTPConnector) execQueryAsync(
 	for i, requestVar := range requestVars {
 		func(index int, vars schema.QueryRequestVariablesElem) {
 			eg.Go(func() error {
-				result, err := c.execQuery(ctx, state, request, valueField, vars, i)
+				result, err := c.execQuery(ctx, state, request, valueField, vars, i, requestArguments)
 				if err != nil {
 					return err
 				}
@@ -156,6 +180,7 @@ func (c *HTTPConnector) execQuery(
 	queryFields schema.NestedField,
 	variables map[string]any,
 	index int,
+	requestArguments internal.HTTPRequestArguments,
 ) (any, error) {
 	ctx, span := state.Tracer.Start(ctx, fmt.Sprintf("Execute Query %d", index))
 	defer span.End()
@@ -168,7 +193,7 @@ func (c *HTTPConnector) execQuery(
 		return nil, err
 	}
 
-	client := c.upstreams.CreateHTTPClient(requests)
+	client := c.upstreams.CreateHTTPClient(requests, requestArguments)
 
 	result, _, err := client.Send(ctx, queryFields)
 	if err != nil {
@@ -184,6 +209,7 @@ func (c *HTTPConnector) execQuery(
 func (c *HTTPConnector) serializeExplainResponse(
 	ctx context.Context,
 	requests *internal.RequestBuilderResults,
+	requestArguments internal.HTTPRequestArguments,
 ) (*schema.ExplainResponse, error) {
 	explainResp := &schema.ExplainResponse{
 		Details: schema.ExplainResponseDetails{},
@@ -203,18 +229,23 @@ func (c *HTTPConnector) serializeExplainResponse(
 
 	defer cancel()
 
+	c.upstreams.InjectMockRequestSettings(
+		req,
+		requests.Schema.Name,
+		httpRequest.RawRequest.Security,
+	)
+
+	// merge headers from request-level arguments if exist
+	for key, value := range requestArguments.Headers {
+		req.Header.Set(key, value)
+	}
+
 	// mask sensitive forwarded headers if exists
 	for key, value := range req.Header {
 		if internal.IsSensitiveHeader(key) {
 			req.Header.Set(key, restUtils.MaskString(value[0]))
 		}
 	}
-
-	c.upstreams.InjectMockRequestSettings(
-		req,
-		requests.Schema.Name,
-		httpRequest.RawRequest.Security,
-	)
 
 	explainResp.Details["url"] = req.URL.String()
 
