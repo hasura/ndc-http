@@ -1,6 +1,6 @@
 module github.com/hasura/ndc-http/ndc-http-schema
 
-go 1.24.7
+go 1.24.9
 
 require (
 	github.com/alecthomas/kong v1.12.1
