@@ -3,6 +3,7 @@ package security
 import (
 	"context"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/url"
 	"path"
@@ -54,9 +55,7 @@ func NewOAuth2Client(
 		tu.Path = path.Join(tu.Path, tokenURL.Path)
 
 		q := tu.Query()
-		for k, v := range tokenURL.Query() {
-			q[k] = v
-		}
+		maps.Copy(q, tokenURL.Query())
 
 		tu.RawQuery = q.Encode()
 		tu.RawFragment = tokenURL.RawFragment

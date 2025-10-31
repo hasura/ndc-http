@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"maps"
 	"net/http"
 	"net/url"
 	"strings"
@@ -52,9 +53,7 @@ func (r *RetryableRequest) CreateRequest(
 		return nil, nil, err
 	}
 
-	for key, header := range r.Headers {
-		request.Header[key] = header
-	}
+	maps.Copy(request.Header, r.Headers)
 
 	request.Header.Set(rest.ContentTypeHeader, r.ContentType)
 

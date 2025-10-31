@@ -22,6 +22,7 @@ linters:
     - wsl
     - noinlineerr
     - noctx
+    - modernize
   settings:
     nestif:
       # Minimal complexity of if statements to report.
@@ -46,7 +47,7 @@ linters:
           disabled: true
         - name: exported
           disabled: true
-          
+
     gosec:
       excludes:
         - G115
@@ -54,7 +55,7 @@ linters:
         - G304
         - G306
         - G404
-        
+
     funlen:
       lines: 200
       statements: 90
@@ -78,7 +79,7 @@ linters:
     generated: strict
     # Log a warning if an exclusion rule is unused.
     warn-unused: false
-    rules: 
+    rules:
       - path: ndc-http-schema
         linters:
           - goconst

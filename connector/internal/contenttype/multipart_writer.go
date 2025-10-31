@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -35,9 +36,7 @@ func (w *MultipartWriter) WriteDataURI(name string, value any, headers http.Head
 	}
 
 	h := make(textproto.MIMEHeader)
-	for key, header := range headers {
-		h[key] = header
-	}
+	maps.Copy(h, headers)
 
 	h.Set("Content-Disposition",
 		fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
@@ -98,9 +97,7 @@ func (w *MultipartWriter) WriteField(fieldName, value string, headers http.Heade
 
 func createFieldMIMEHeader(fieldName string, headers http.Header) textproto.MIMEHeader {
 	h := make(textproto.MIMEHeader)
-	for key, header := range headers {
-		h[key] = header
-	}
+	maps.Copy(h, headers)
 
 	h.Set("Content-Disposition",
 		fmt.Sprintf(`form-data; name="%s"`, escapeQuotes(fieldName)))

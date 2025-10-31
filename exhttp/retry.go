@@ -19,10 +19,10 @@ var defaultRetryHTTPStatus = []int{408, 429, 500, 502, 503}
 // RetryPolicySetting represents retry policy settings.
 type RetryPolicySetting struct {
 	// Number of retry times
-	Times utils.EnvInt `json:"times,omitempty"      mapstructure:"times"      yaml:"times,omitempty"`
+	Times *utils.EnvInt `json:"times,omitempty"      mapstructure:"times"      yaml:"times,omitempty"`
 	// The initial wait time in milliseconds before a retry is attempted.
 	// Must be >0. Defaults to 1 second.
-	Delay utils.EnvInt `json:"delay,omitempty"      mapstructure:"delay"      yaml:"delay,omitempty"`
+	Delay *utils.EnvInt `json:"delay,omitempty"      mapstructure:"delay"      yaml:"delay,omitempty"`
 	// HTTPStatus retries if the remote service returns one of these http status
 	HTTPStatus []int `json:"httpStatus,omitempty" mapstructure:"httpStatus" yaml:"httpStatus,omitempty"`
 
@@ -42,20 +42,28 @@ type RetryPolicySetting struct {
 
 // Validate if the current instance is valid.
 func (rs RetryPolicySetting) Validate() (*RetryPolicy, error) {
-	var errs []error
+	var (
+		errs         []error
+		err          error
+		times, delay int64
+	)
 
-	times, err := rs.Times.Get()
-	if err != nil {
-		errs = append(errs, err)
-	} else if times < 0 {
-		errs = append(errs, errors.New("retry policy times must be positive"))
+	if rs.Times != nil {
+		times, err = rs.Times.Get()
+		if err != nil {
+			errs = append(errs, err)
+		} else if times < 0 {
+			errs = append(errs, errors.New("retry policy times must be positive"))
+		}
 	}
 
-	delay, err := rs.Delay.Get()
-	if err != nil {
-		errs = append(errs, err)
-	} else if delay < 0 {
-		errs = append(errs, errors.New("retry delay must be larger than 0"))
+	if rs.Delay != nil {
+		delay, err = rs.Delay.Get()
+		if err != nil {
+			errs = append(errs, err)
+		} else if delay < 0 {
+			errs = append(errs, errors.New("retry delay must be larger than 0"))
+		}
 	}
 
 	for _, status := range rs.HTTPStatus {

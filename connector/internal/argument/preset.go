@@ -146,9 +146,7 @@ func (ap ArgumentPreset) evalNestedField(
 		}
 
 		step := selector.Step()
-		if step < 1 {
-			step = 1
-		}
+		step = max(step, 1)
 
 		end := selector.End()
 		if end >= len(argumentSlice) {
