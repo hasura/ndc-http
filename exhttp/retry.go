@@ -42,20 +42,28 @@ type RetryPolicySetting struct {
 
 // Validate if the current instance is valid.
 func (rs RetryPolicySetting) Validate() (*RetryPolicy, error) {
-	var errs []error
+	var (
+		errs         []error
+		err          error
+		times, delay int64
+	)
 
-	times, err := rs.Times.Get()
-	if err != nil {
-		errs = append(errs, err)
-	} else if times < 0 {
-		errs = append(errs, errors.New("retry policy times must be positive"))
+	if rs.Times != nil {
+		times, err = rs.Times.Get()
+		if err != nil {
+			errs = append(errs, err)
+		} else if times < 0 {
+			errs = append(errs, errors.New("retry policy times must be positive"))
+		}
 	}
 
-	delay, err := rs.Delay.Get()
-	if err != nil {
-		errs = append(errs, err)
-	} else if delay < 0 {
-		errs = append(errs, errors.New("retry delay must be larger than 0"))
+	if rs.Delay != nil {
+		delay, err = rs.Delay.Get()
+		if err != nil {
+			errs = append(errs, err)
+		} else if delay < 0 {
+			errs = append(errs, errors.New("retry delay must be larger than 0"))
+		}
 	}
 
 	for _, status := range rs.HTTPStatus {
