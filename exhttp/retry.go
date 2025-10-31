@@ -19,10 +19,10 @@ var defaultRetryHTTPStatus = []int{408, 429, 500, 502, 503}
 // RetryPolicySetting represents retry policy settings.
 type RetryPolicySetting struct {
 	// Number of retry times
-	Times utils.EnvInt `json:"times,omitempty"      mapstructure:"times"      yaml:"times,omitempty"`
+	Times *utils.EnvInt `json:"times,omitempty"      mapstructure:"times"      yaml:"times,omitempty"`
 	// The initial wait time in milliseconds before a retry is attempted.
 	// Must be >0. Defaults to 1 second.
-	Delay utils.EnvInt `json:"delay,omitempty"      mapstructure:"delay"      yaml:"delay,omitempty"`
+	Delay *utils.EnvInt `json:"delay,omitempty"      mapstructure:"delay"      yaml:"delay,omitempty"`
 	// HTTPStatus retries if the remote service returns one of these http status
 	HTTPStatus []int `json:"httpStatus,omitempty" mapstructure:"httpStatus" yaml:"httpStatus,omitempty"`
 
