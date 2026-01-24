@@ -8,6 +8,14 @@ forwardHeaders:
   enabled: false
   argumentField: headers
   responseHeaders: null
+runtime:
+  # Enable the sendHttpRequest command.
+  # https://github.com/hasura/ndc-http/blob/main/docs/schemaless_request.md
+  enableRawRequest: false
+  # JSON scalars will be encoded to string.
+  # Enable this option if you need to make commands compatible with PromptQL
+  stringifyJson:
+    value: true
 concurrency:
   query: 1
   mutation: 1

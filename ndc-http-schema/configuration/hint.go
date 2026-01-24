@@ -69,7 +69,7 @@ func (cv *ConfigValidator) Render(w io.Writer) {
 		variables = append(variables, utils.GetSortedKeys(cv.requiredVariables)...)
 
 		err := cv.templates.ExecuteTemplate(w, templateEnvVariables, map[string]any{
-			"ContextPath": cv.contextPath,
+			"ContextPath": cv.relativeContextPath,
 			"ServiceName": strings.ToUpper(serviceName),
 			"Variables":   variables,
 		})
@@ -105,7 +105,7 @@ func (cv *ConfigValidator) renderReadme(w io.Writer) error {
 	}
 
 	data := map[string]any{
-		"ContextPath":       cv.contextPath,
+		"ContextPath":       cv.relativeContextPath,
 		"SubgraphName":      cv.subgraphName,
 		"SubgraphPath":      filepath.Dir(filepath.Dir(cv.contextPath)),
 		"ConnectorName":     cv.connectorName,

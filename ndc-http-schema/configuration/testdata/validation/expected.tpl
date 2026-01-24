@@ -26,6 +26,8 @@ Environment Variables:
     - PET_STORE_TEST_HEADER
     - PET_STORE_URL
 
+  If these variables are optional, for example, authentication tokens are forwarded from the client and the forwardHeaders option is enabled, then skip this warning.
+
   Use the DDN CLI to add environment variables if you haven't added them yet:
 
     ddn connector env add \
