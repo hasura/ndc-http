@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/prometheus/common/model"
 	"gotest.tools/v3/assert"
@@ -31,7 +32,7 @@ func TestHTTPTransport(t *testing.T) {
 		WriteBufferSize:        utils.ToPtr(1000),
 	}
 	tlsConfig := &TLSConfig{
-		InsecureSkipVerify: utils.ToPtr(utils.NewEnvBoolValue(true)),
+		InsecureSkipVerify: utils.ToPtr(goenvconf.NewEnvBoolValue(true)),
 	}
 
 	_ = NewTelemetryTransport(baseConfig.ToTransport(), TelemetryConfig{})
@@ -45,7 +46,7 @@ func TestHTTPTransport(t *testing.T) {
 	assert.NilError(t, err)
 
 	_, err = NewTLSTransport(nil, &TLSConfig{
-		CertFile: &utils.EnvString{
+		CertFile: &goenvconf.EnvString{
 			Value: utils.ToPtr("foo.pem"),
 		},
 	}, slog.Default())

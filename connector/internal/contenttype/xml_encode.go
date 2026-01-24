@@ -190,7 +190,13 @@ func (c *XMLEncoder) evalXMLFieldNamed(
 		// this field doesn't have the name, skip
 		xmlName := getTypeSchemaXMLName(field.HTTP, name, t.Name)
 
-		if err := c.encodeSimpleScalar(enc, xmlName, innerValue, attributes, fieldPaths); err != nil {
+		if err := c.encodeSimpleScalar(
+			enc,
+			xmlName,
+			innerValue,
+			attributes,
+			fieldPaths,
+		); err != nil {
 			return fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 		}
 
@@ -265,7 +271,13 @@ func (c *XMLEncoder) evalXMLFieldNamed(
 			objectField := objectType.Fields[key]
 			fieldValue := values[key]
 
-			if err := c.evalXMLField(enc, key, objectField, fieldValue, append(fieldPaths, key)); err != nil {
+			if err := c.evalXMLField(
+				enc,
+				key,
+				objectField,
+				fieldValue,
+				append(fieldPaths, key),
+			); err != nil {
 				return err
 			}
 		}
@@ -355,7 +367,11 @@ func (c *XMLEncoder) encodeXMLText(
 
 		resultBytes, err := json.Marshal(innerValue.Interface())
 		if err != nil {
-			return nil, fmt.Errorf("%s: failed to encode xml attribute, %w", strings.Join(fieldPaths, "."), err)
+			return nil, fmt.Errorf(
+				"%s: failed to encode xml attribute, %w",
+				strings.Join(fieldPaths, "."),
+				err,
+			)
 		}
 
 		result := string(resultBytes)
@@ -377,14 +393,21 @@ func (c *XMLEncoder) encodeXMLText(
 
 		resultBytes, err := json.Marshal(innerValue.Interface())
 		if err != nil {
-			return nil, fmt.Errorf("%s: failed to encode xml attribute, %w", strings.Join(fieldPaths, "."), err)
+			return nil, fmt.Errorf(
+				"%s: failed to encode xml attribute, %w",
+				strings.Join(fieldPaths, "."),
+				err,
+			)
 		}
 
 		result := string(resultBytes)
 
 		return &result, nil
 	default:
-		return nil, fmt.Errorf("%s: failed to encode xml attribute, unsupported schema type", strings.Join(fieldPaths, "."))
+		return nil, fmt.Errorf(
+			"%s: failed to encode xml attribute, unsupported schema type",
+			strings.Join(fieldPaths, "."),
+		)
 	}
 }
 
@@ -414,7 +437,13 @@ func (c *XMLEncoder) encodeSimpleScalar(
 
 		for i := range reflectValue.Len() {
 			item := reflectValue.Index(i)
-			if err := c.encodeSimpleScalar(enc, name, item, attributes, append(fieldPaths, strconv.Itoa(i))); err != nil {
+			if err := c.encodeSimpleScalar(
+				enc,
+				name,
+				item,
+				attributes,
+				append(fieldPaths, strconv.Itoa(i)),
+			); err != nil {
 				return err
 			}
 		}
@@ -474,7 +503,13 @@ func (c *XMLEncoder) encodeScalarMap(
 	keys := utils.GetSortedKeys(valueMap)
 	for _, key := range keys {
 		item := valueMap[key]
-		if err := c.encodeSimpleScalar(enc, key, reflect.ValueOf(item), nil, append(fieldPaths, key)); err != nil {
+		if err := c.encodeSimpleScalar(
+			enc,
+			key,
+			reflect.ValueOf(item),
+			nil,
+			append(fieldPaths, key),
+		); err != nil {
 			return err
 		}
 	}

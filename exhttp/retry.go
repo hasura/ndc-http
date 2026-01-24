@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v5"
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
@@ -19,10 +20,10 @@ var defaultRetryHTTPStatus = []int{408, 429, 500, 502, 503}
 // RetryPolicySetting represents retry policy settings.
 type RetryPolicySetting struct {
 	// Number of retry times
-	Times *utils.EnvInt `json:"times,omitempty"      mapstructure:"times"      yaml:"times,omitempty"`
+	Times *goenvconf.EnvInt `json:"times,omitempty" mapstructure:"times" yaml:"times,omitempty"`
 	// The initial wait time in milliseconds before a retry is attempted.
 	// Must be >0. Defaults to 1 second.
-	Delay *utils.EnvInt `json:"delay,omitempty"      mapstructure:"delay"      yaml:"delay,omitempty"`
+	Delay *goenvconf.EnvInt `json:"delay,omitempty" mapstructure:"delay" yaml:"delay,omitempty"`
 	// HTTPStatus retries if the remote service returns one of these http status
 	HTTPStatus []int `json:"httpStatus,omitempty" mapstructure:"httpStatus" yaml:"httpStatus,omitempty"`
 
@@ -30,14 +31,14 @@ type RetryPolicySetting struct {
 	// This is useful to prevent multiple clients to reconnect at the exact
 	// same time, as it makes the wait times distinct.
 	// Must be in range (0, 1); Defaults to 0.5.
-	Jitter *float64 `json:"jitter,omitempty"                jsonschema:"nullable,min=0,max=1" mapstructure:"jitter"                yaml:"jitter,omitempty"`
+	Jitter *float64 `json:"jitter,omitempty" jsonschema:"nullable,min=0,max=1" mapstructure:"jitter" yaml:"jitter,omitempty"`
 	// How much should the reconnection time grow on subsequent attempts.
 	// Must be >=1; 1 = constant interval. Defaults to 1.5.
-	Multiplier float64 `json:"multiplier,omitempty"            jsonschema:"min=1"                mapstructure:"multiplier"            yaml:"multiplier,omitempty"`
+	Multiplier float64 `json:"multiplier,omitempty" jsonschema:"min=1" mapstructure:"multiplier" yaml:"multiplier,omitempty"`
 	// How much can the wait time in seconds grow. Defaults to 60 seconds.
-	MaxIntervalSeconds uint `json:"maxIntervalSeconds,omitempty"    jsonschema:"nullable,min=0"       mapstructure:"maxIntervalSeconds"    yaml:"maxIntervalSeconds,omitempty"`
+	MaxIntervalSeconds uint `json:"maxIntervalSeconds,omitempty" jsonschema:"nullable,min=0" mapstructure:"maxIntervalSeconds" yaml:"maxIntervalSeconds,omitempty"`
 	// Maximum total time in seconds for all retries.
-	MaxElapsedTimeSeconds uint `json:"maxElapsedTimeSeconds,omitempty" jsonschema:"nullable,min=0"       mapstructure:"maxElapsedTimeSeconds" yaml:"maxElapsedTimeSeconds,omitempty"`
+	MaxElapsedTimeSeconds uint `json:"maxElapsedTimeSeconds,omitempty" jsonschema:"nullable,min=0" mapstructure:"maxElapsedTimeSeconds" yaml:"maxElapsedTimeSeconds,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -116,22 +117,22 @@ func (rs RetryPolicySetting) Validate() (*RetryPolicy, error) {
 // RetryPolicy represents the retry policy of request.
 type RetryPolicy struct {
 	// Number of retry times. Defaults to 0 (no retry).
-	Times uint `json:"times,omitempty"                 mapstructure:"times"                 yaml:"times,omitempty"`
+	Times uint `json:"times,omitempty" mapstructure:"times" yaml:"times,omitempty"`
 	// Delay retry delay in milliseconds. Defaults to 1 second
-	Delay uint `json:"delay,omitempty"                 mapstructure:"delay"                 yaml:"delay,omitempty"`
+	Delay uint `json:"delay,omitempty" mapstructure:"delay" yaml:"delay,omitempty"`
 	// HTTPStatus retries if the remote service returns one of these http status
-	HTTPStatus []int `json:"httpStatus,omitempty"            mapstructure:"httpStatus"            yaml:"httpStatus,omitempty"`
+	HTTPStatus []int `json:"httpStatus,omitempty" mapstructure:"httpStatus" yaml:"httpStatus,omitempty"`
 	// How much does the reconnection time vary relative to the base value.
 	// This is useful to prevent multiple clients to reconnect at the exact
 	// same time, as it makes the wait times distinct.
 	// Must be in range (0, 1); Defaults to 0.5.
-	Jitter *float64 `json:"jitter,omitempty"                mapstructure:"jitter"                yaml:"jitter,omitempty"`
+	Jitter *float64 `json:"jitter,omitempty" mapstructure:"jitter" yaml:"jitter,omitempty"`
 	// How much should the reconnection time grow on subsequent attempts.
 	// Must be >=1; 1 = constant interval. Defaults to 1.5.
-	Multiplier float64 `json:"multiplier,omitempty"            mapstructure:"multiplier"            yaml:"multiplier,omitempty"`
+	Multiplier float64 `json:"multiplier,omitempty" mapstructure:"multiplier" yaml:"multiplier,omitempty"`
 	// How much can the wait time grow.
 	// If <=0 = the wait time can infinitely grow. Defaults to 60 seconds.
-	MaxIntervalSeconds uint `json:"maxIntervalSeconds,omitempty"    mapstructure:"maxIntervalSeconds"    yaml:"maxIntervalSeconds,omitempty"`
+	MaxIntervalSeconds uint `json:"maxIntervalSeconds,omitempty" mapstructure:"maxIntervalSeconds" yaml:"maxIntervalSeconds,omitempty"`
 	// Maximum total time in seconds for all retries.
 	MaxElapsedTimeSeconds uint `json:"maxElapsedTimeSeconds,omitempty" mapstructure:"maxElapsedTimeSeconds" yaml:"maxElapsedTimeSeconds,omitempty"`
 }

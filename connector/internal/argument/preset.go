@@ -115,7 +115,12 @@ func (ap ArgumentPreset) evalNestedField(
 			return argumentMap, nil
 		}
 
-		nestedValue, err := ap.evalNestedField(segments[1:], argumentMap[selectorStr], value, append(fieldPaths, selectorStr))
+		nestedValue, err := ap.evalNestedField(
+			segments[1:],
+			argumentMap[selectorStr],
+			value,
+			append(fieldPaths, selectorStr),
+		)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 		}
@@ -132,7 +137,12 @@ func (ap ArgumentPreset) evalNestedField(
 		for i, arg := range argumentSlice {
 			var err error
 
-			argumentSlice[i], err = ap.evalNestedField(segments[1:], arg, value, append(fieldPaths, strconv.Itoa(i)))
+			argumentSlice[i], err = ap.evalNestedField(
+				segments[1:],
+				arg,
+				value,
+				append(fieldPaths, strconv.Itoa(i)),
+			)
 			if err != nil {
 				return nil, err
 			}
@@ -156,7 +166,12 @@ func (ap ArgumentPreset) evalNestedField(
 		for i := selector.Start(); i <= end; i += step {
 			var err error
 
-			argumentSlice[i], err = ap.evalNestedField(segments[1:], argumentSlice[i], value, append(fieldPaths, strconv.Itoa(i)))
+			argumentSlice[i], err = ap.evalNestedField(
+				segments[1:],
+				argumentSlice[i],
+				value,
+				append(fieldPaths, strconv.Itoa(i)),
+			)
 			if err != nil {
 				return nil, err
 			}
@@ -171,7 +186,12 @@ func (ap ArgumentPreset) evalNestedField(
 			return argument, nil
 		}
 
-		newValue, err := ap.evalNestedField(segments[1:], argumentSlice[index], value, append(fieldPaths, strconv.Itoa(index)))
+		newValue, err := ap.evalNestedField(
+			segments[1:],
+			argumentSlice[index],
+			value,
+			append(fieldPaths, strconv.Itoa(index)),
+		)
 		if err != nil {
 			return nil, err
 		}

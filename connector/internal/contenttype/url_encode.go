@@ -149,7 +149,12 @@ func (c *URLParameterEncoder) EncodeParameterValues(
 
 		elements, ok := reflectValue.Interface().([]any)
 		if !ok {
-			return nil, fmt.Errorf("%s: expected array, got <%s> %v", strings.Join(fieldPaths, ""), reflectValue.Kind(), reflectValue.Interface())
+			return nil, fmt.Errorf(
+				"%s: expected array, got <%s> %v",
+				strings.Join(fieldPaths, ""),
+				reflectValue.Kind(),
+				reflectValue.Interface(),
+			)
 		}
 
 		for i, elem := range elements {
@@ -192,13 +197,22 @@ func (c *URLParameterEncoder) EncodeParameterValues(
 			object, ok := anyValue.(map[string]any)
 
 			if !ok {
-				return nil, fmt.Errorf("%s: failed to evaluate object, got <%s> %v", strings.Join(fieldPaths, ""), kind, anyValue)
+				return nil, fmt.Errorf(
+					"%s: failed to evaluate object, got <%s> %v",
+					strings.Join(fieldPaths, ""),
+					kind,
+					anyValue,
+				)
 			}
 
 			for key, fieldInfo := range objectInfo.Fields {
 				fieldVal := object[key]
 
-				output, err := c.EncodeParameterValues(&fieldInfo, reflect.ValueOf(fieldVal), append(fieldPaths, "."+key))
+				output, err := c.EncodeParameterValues(
+					&fieldInfo,
+					reflect.ValueOf(fieldVal),
+					append(fieldPaths, "."+key),
+				)
 				if err != nil {
 					return nil, err
 				}
@@ -219,17 +233,28 @@ func (c *URLParameterEncoder) EncodeParameterValues(
 					continue
 				}
 
-				output, err := c.EncodeParameterValues(&fieldInfo, fieldVal, append(fieldPaths, "."+fieldType.Name))
+				output, err := c.EncodeParameterValues(
+					&fieldInfo,
+					fieldVal,
+					append(fieldPaths, "."+fieldType.Name),
+				)
 				if err != nil {
 					return nil, err
 				}
 
 				for _, pair := range output {
-					results.Add(append([]Key{NewKey(fieldType.Name)}, pair.Keys()...), pair.Values())
+					results.Add(
+						append([]Key{NewKey(fieldType.Name)}, pair.Keys()...),
+						pair.Values(),
+					)
 				}
 			}
 		default:
-			return nil, fmt.Errorf("%s: failed to evaluate object, got %s", strings.Join(fieldPaths, ""), kind)
+			return nil, fmt.Errorf(
+				"%s: failed to evaluate object, got %s",
+				strings.Join(fieldPaths, ""),
+				kind,
+			)
 		}
 
 		return results, nil
@@ -260,7 +285,11 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(
 		}
 
 		return []ParameterItem{NewParameterItem([]Key{}, []string{value})}, nil
-	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64, *schema.TypeRepresentationBigInteger:
+	case *schema.TypeRepresentationInt8,
+		*schema.TypeRepresentationInt16,
+		*schema.TypeRepresentationInt32,
+		*schema.TypeRepresentationInt64,
+		*schema.TypeRepresentationBigInteger:
 		value, err := utils.DecodeIntReflection[int64](reflectValue)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), err)
@@ -269,7 +298,9 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(
 		return []ParameterItem{
 			NewParameterItem([]Key{}, []string{strconv.FormatInt(value, 10)}),
 		}, nil
-	case *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64, *schema.TypeRepresentationBigDecimal:
+	case *schema.TypeRepresentationFloat32,
+		*schema.TypeRepresentationFloat64,
+		*schema.TypeRepresentationBigDecimal:
 		value, err := utils.DecodeFloatReflection[float64](reflectValue)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, ""), err)
@@ -285,7 +316,12 @@ func (c *URLParameterEncoder) encodeScalarParameterReflectionValues(
 		}
 
 		if !slices.Contains(sl.OneOf, value) {
-			return nil, fmt.Errorf("%s: the value must be one of %v, got %s", strings.Join(fieldPaths, ""), sl.OneOf, value)
+			return nil, fmt.Errorf(
+				"%s: the value must be one of %v, got %s",
+				strings.Join(fieldPaths, ""),
+				sl.OneOf,
+				value,
+			)
 		}
 
 		return []ParameterItem{NewParameterItem([]Key{}, []string{value})}, nil

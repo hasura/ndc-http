@@ -114,7 +114,13 @@ func (mfb *MultipartFormEncoder) evalMultipartForm(
 					}
 				}
 
-				if err := mfb.evalMultipartFieldValueRecursive(w, key, reflect.ValueOf(fieldValue), &fieldInfo, enc); err != nil {
+				if err := mfb.evalMultipartFieldValueRecursive(
+					w,
+					key,
+					reflect.ValueOf(fieldValue),
+					&fieldInfo,
+					enc,
+				); err != nil {
 					return err
 				}
 			}
@@ -141,7 +147,13 @@ func (mfb *MultipartFormEncoder) evalMultipartForm(
 					}
 				}
 
-				if err := mfb.evalMultipartFieldValueRecursive(w, fieldType.Name, fieldValue, &fieldInfo, enc); err != nil {
+				if err := mfb.evalMultipartFieldValueRecursive(
+					w,
+					fieldType.Name,
+					fieldValue,
+					&fieldInfo,
+					enc,
+				); err != nil {
 					return err
 				}
 			}

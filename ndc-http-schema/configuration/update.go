@@ -49,7 +49,10 @@ func UpdateHTTPConfiguration(
 			schemas[i] = s
 		}
 
-		if err := utils.WriteSchemaFile(filepath.Join(configurationDir, config.Output), schemas); err != nil {
+		if err := utils.WriteSchemaFile(
+			filepath.Join(configurationDir, config.Output),
+			schemas,
+		); err != nil {
 			return nil, nil, nil, err
 		}
 	}

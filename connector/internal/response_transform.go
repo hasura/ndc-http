@@ -64,7 +64,32 @@ func (rt *ResponseTransformer) evalResultType(
 	fieldPaths []string,
 ) (any, error) {
 	switch value := transformValue.(type) {
-	case bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, *bool, *int, *int8, *int16, *int32, *int64, *uint, *uint8, *uint16, *uint32, *uint64, *float32, *float64:
+	case bool,
+		int,
+		int8,
+		int16,
+		int32,
+		int64,
+		uint,
+		uint8,
+		uint16,
+		uint32,
+		uint64,
+		float32,
+		float64,
+		*bool,
+		*int,
+		*int8,
+		*int16,
+		*int32,
+		*int64,
+		*uint,
+		*uint8,
+		*uint16,
+		*uint32,
+		*uint64,
+		*float32,
+		*float64:
 		return value, nil
 	case string:
 		return rt.evalStringValue(value, responseBody, fieldPaths)
@@ -82,7 +107,11 @@ func (rt *ResponseTransformer) evalResultType(
 		result := make([]any, len(value))
 
 		for i, elem := range value {
-			elemValue, err := rt.evalResultType(elem, responseBody, append(fieldPaths, fmt.Sprintf("[%d]", i)))
+			elemValue, err := rt.evalResultType(
+				elem,
+				responseBody,
+				append(fieldPaths, fmt.Sprintf("[%d]", i)),
+			)
 			if err != nil {
 				return nil, err
 			}
@@ -109,7 +138,11 @@ func (rt *ResponseTransformer) evalResultType(
 
 		return result, nil
 	default:
-		return nil, fmt.Errorf("%s: failed to transform value: %v", strings.Join(fieldPaths, "."), transformValue)
+		return nil, fmt.Errorf(
+			"%s: failed to transform value: %v",
+			strings.Join(fieldPaths, "."),
+			transformValue,
+		)
 	}
 }
 

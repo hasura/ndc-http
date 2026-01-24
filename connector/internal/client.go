@@ -195,7 +195,6 @@ func (client *HTTPClient) sendSingle(
 
 	resp, cancel, err := client.manager.ExecuteRequest(
 		ctx,
-		span,
 		request,
 		namespace,
 		client.requestArguments,
@@ -387,7 +386,8 @@ func (client *HTTPClient) evalHTTPResponse(
 		} else {
 			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema, contenttype.JSONDecodeOptions{
 				StringifyJSON: client.manager.RuntimeSettings.StringifyJSON,
-			}).Decode(resp.Body, resultType)
+			}).
+				Decode(resp.Body, resultType)
 		}
 
 		if err != nil {

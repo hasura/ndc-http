@@ -9,8 +9,8 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
-	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/invopop/jsonschema"
 	"github.com/theory/jsonpath"
 	"github.com/theory/jsonpath/spec"
@@ -19,14 +19,14 @@ import (
 
 // NDCHttpSettings represent global settings of the HTTP API, including base URL, headers, etc...
 type NDCHttpSettings struct {
-	Servers            []ServerConfig             `json:"servers"                      mapstructure:"servers"            yaml:"servers"`
-	Headers            map[string]utils.EnvString `json:"headers,omitempty"            mapstructure:"headers"            yaml:"headers,omitempty"`
-	ArgumentPresets    []ArgumentPresetConfig     `json:"argumentPresets,omitempty"    mapstructure:"argumentPresets"    yaml:"argumentPresets,omitempty"`
-	SecuritySchemes    map[string]SecurityScheme  `json:"securitySchemes,omitempty"    mapstructure:"securitySchemes"    yaml:"securitySchemes,omitempty"`
-	Security           AuthSecurities             `json:"security,omitempty"           mapstructure:"security"           yaml:"security,omitempty"`
-	Version            string                     `json:"version,omitempty"            mapstructure:"version"            yaml:"version,omitempty"`
-	TLS                *exhttp.TLSConfig          `json:"tls,omitempty"                mapstructure:"tls"                yaml:"tls,omitempty"`
-	ResponseTransforms []ResponseTransformSetting `json:"responseTransforms,omitempty" mapstructure:"responseTransforms" yaml:"responseTransforms,omitempty"`
+	Servers            []ServerConfig                 `json:"servers"                      mapstructure:"servers"            yaml:"servers"`
+	Headers            map[string]goenvconf.EnvString `json:"headers,omitempty"            mapstructure:"headers"            yaml:"headers,omitempty"`
+	ArgumentPresets    []ArgumentPresetConfig         `json:"argumentPresets,omitempty"    mapstructure:"argumentPresets"    yaml:"argumentPresets,omitempty"`
+	SecuritySchemes    map[string]SecurityScheme      `json:"securitySchemes,omitempty"    mapstructure:"securitySchemes"    yaml:"securitySchemes,omitempty"`
+	Security           AuthSecurities                 `json:"security,omitempty"           mapstructure:"security"           yaml:"security,omitempty"`
+	Version            string                         `json:"version,omitempty"            mapstructure:"version"            yaml:"version,omitempty"`
+	TLS                *exhttp.TLSConfig              `json:"tls,omitempty"                mapstructure:"tls"                yaml:"tls,omitempty"`
+	ResponseTransforms []ResponseTransformSetting     `json:"responseTransforms,omitempty" mapstructure:"responseTransforms" yaml:"responseTransforms,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -60,13 +60,13 @@ func (rs *NDCHttpSettings) Validate() error {
 
 // ServerConfig contains server configurations.
 type ServerConfig struct {
-	URL             utils.EnvString            `json:"url"                       mapstructure:"url"             yaml:"url"`
-	ID              string                     `json:"id,omitempty"              mapstructure:"id"              yaml:"id,omitempty"`
-	ArgumentPresets []ArgumentPresetConfig     `json:"argumentPresets,omitempty" mapstructure:"argumentPresets" yaml:"argumentPresets,omitempty"`
-	Headers         map[string]utils.EnvString `json:"headers,omitempty"         mapstructure:"headers"         yaml:"headers,omitempty"`
-	SecuritySchemes map[string]SecurityScheme  `json:"securitySchemes,omitempty" mapstructure:"securitySchemes" yaml:"securitySchemes,omitempty"`
-	Security        AuthSecurities             `json:"security,omitempty"        mapstructure:"security"        yaml:"security,omitempty"`
-	TLS             *exhttp.TLSConfig          `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
+	URL             goenvconf.EnvString            `json:"url"                       mapstructure:"url"             yaml:"url"`
+	ID              string                         `json:"id,omitempty"              mapstructure:"id"              yaml:"id,omitempty"`
+	ArgumentPresets []ArgumentPresetConfig         `json:"argumentPresets,omitempty" mapstructure:"argumentPresets" yaml:"argumentPresets,omitempty"`
+	Headers         map[string]goenvconf.EnvString `json:"headers,omitempty"         mapstructure:"headers"         yaml:"headers,omitempty"`
+	SecuritySchemes map[string]SecurityScheme      `json:"securitySchemes,omitempty" mapstructure:"securitySchemes" yaml:"securitySchemes,omitempty"`
+	Security        AuthSecurities                 `json:"security,omitempty"        mapstructure:"security"        yaml:"security,omitempty"`
+	TLS             *exhttp.TLSConfig              `json:"tls,omitempty"             mapstructure:"tls"             yaml:"tls,omitempty"`
 }
 
 // Validate if the current instance is valid.
@@ -112,9 +112,9 @@ func (ss ServerConfig) GetURL() (*url.URL, error) {
 // ArgumentPresetConfig represents an argument preset configuration.
 type ArgumentPresetConfig struct {
 	// The JSON path of the argument field.
-	Path string `json:"path"    mapstructure:"path"    yaml:"path"`
+	Path string `json:"path" mapstructure:"path" yaml:"path"`
 	// The value to be set.
-	Value ArgumentPresetValue `json:"value"   mapstructure:"value"   yaml:"value"`
+	Value ArgumentPresetValue `json:"value" mapstructure:"value" yaml:"value"`
 	// Target operations to be applied.
 	Targets []string `json:"targets" mapstructure:"targets" yaml:"targets"`
 }
@@ -402,7 +402,7 @@ func (apv ArgumentPresetValueForwardHeader) GetType() ArgumentPresetValueType {
 // ResponseTransformSetting represents a response transformation setting.
 type ResponseTransformSetting struct {
 	// The body template.
-	Body any `json:"body"    mapstructure:"body"    yaml:"body"`
+	Body any `json:"body" mapstructure:"body" yaml:"body"`
 	// Target operations to be applied.
 	Targets []string `json:"targets" mapstructure:"targets" yaml:"targets"`
 }

@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hasura/ndc-sdk-go/v2/utils"
+	"github.com/hasura/goenvconf"
 )
 
 var systemCertPool = x509.SystemCertPool
@@ -55,33 +55,33 @@ func NewTLSTransport(
 // TLSConfig represents the transport layer security (LTS) configuration for the mutualTLS authentication.
 type TLSConfig struct {
 	// Path to the TLS cert to use for TLS required connections.
-	CertFile *utils.EnvString `json:"certFile,omitempty"                 mapstructure:"certFile"                 yaml:"certFile,omitempty"`
+	CertFile *goenvconf.EnvString `json:"certFile,omitempty" mapstructure:"certFile" yaml:"certFile,omitempty"`
 	// Alternative to cert_file. Provide the certificate contents as a base64-encoded string instead of a filepath.
-	CertPem *utils.EnvString `json:"certPem,omitempty"                  mapstructure:"certPem"                  yaml:"certPem,omitempty"`
+	CertPem *goenvconf.EnvString `json:"certPem,omitempty" mapstructure:"certPem" yaml:"certPem,omitempty"`
 	// Path to the TLS key to use for TLS required connections.
-	KeyFile *utils.EnvString `json:"keyFile,omitempty"                  mapstructure:"keyFile"                  yaml:"keyFile,omitempty"`
+	KeyFile *goenvconf.EnvString `json:"keyFile,omitempty" mapstructure:"keyFile" yaml:"keyFile,omitempty"`
 	// Alternative to key_file. Provide the key contents as a base64-encoded string instead of a filepath.
-	KeyPem *utils.EnvString `json:"keyPem,omitempty"                   mapstructure:"keyPem"                   yaml:"keyPem,omitempty"`
+	KeyPem *goenvconf.EnvString `json:"keyPem,omitempty" mapstructure:"keyPem" yaml:"keyPem,omitempty"`
 	// Path to the CA cert. For a client this verifies the server certificate. For a server this verifies client certificates.
 	// If empty uses system root CA.
-	CAFile *utils.EnvString `json:"caFile,omitempty"                   mapstructure:"caFile"                   yaml:"caFile,omitempty"`
+	CAFile *goenvconf.EnvString `json:"caFile,omitempty" mapstructure:"caFile" yaml:"caFile,omitempty"`
 	// Alternative to ca_file. Provide the CA cert contents as a base64-encoded string instead of a filepath.
-	CAPem *utils.EnvString `json:"caPem,omitempty"                    mapstructure:"caPem"                    yaml:"caPem,omitempty"`
+	CAPem *goenvconf.EnvString `json:"caPem,omitempty" mapstructure:"caPem" yaml:"caPem,omitempty"`
 	// Additionally you can configure TLS to be enabled but skip verifying the server's certificate chain.
-	InsecureSkipVerify *utils.EnvBool `json:"insecureSkipVerify,omitempty"       mapstructure:"insecureSkipVerify"       yaml:"insecureSkipVerify,omitempty"`
+	InsecureSkipVerify *goenvconf.EnvBool `json:"insecureSkipVerify,omitempty" mapstructure:"insecureSkipVerify" yaml:"insecureSkipVerify,omitempty"`
 	// Whether to load the system certificate authorities pool alongside the certificate authority.
-	IncludeSystemCACertsPool *utils.EnvBool `json:"includeSystemCACertsPool,omitempty" mapstructure:"includeSystemCACertsPool" yaml:"includeSystemCACertsPool,omitempty"`
+	IncludeSystemCACertsPool *goenvconf.EnvBool `json:"includeSystemCACertsPool,omitempty" mapstructure:"includeSystemCACertsPool" yaml:"includeSystemCACertsPool,omitempty"`
 	// Minimum acceptable TLS version.
-	MinVersion string `json:"minVersion,omitempty"               mapstructure:"minVersion"               yaml:"minVersion,omitempty"`
+	MinVersion string `json:"minVersion,omitempty" mapstructure:"minVersion" yaml:"minVersion,omitempty"`
 	// Maximum acceptable TLS version.
-	MaxVersion string `json:"maxVersion,omitempty"               mapstructure:"maxVersion"               yaml:"maxVersion,omitempty"`
+	MaxVersion string `json:"maxVersion,omitempty" mapstructure:"maxVersion" yaml:"maxVersion,omitempty"`
 	// Explicit cipher suites can be set. If left blank, a safe default list is used.
 	// See https://go.dev/src/crypto/tls/cipher_suites.go for a list of supported cipher suites.
-	CipherSuites []string `json:"cipherSuites,omitempty"             mapstructure:"cipherSuites"             yaml:"cipherSuites,omitempty"`
+	CipherSuites []string `json:"cipherSuites,omitempty" mapstructure:"cipherSuites" yaml:"cipherSuites,omitempty"`
 	// ServerName requested by client for virtual hosting.
 	// This sets the ServerName in the TLSConfig. Please refer to
 	// https://godoc.org/crypto/tls#Config for more information. (optional)
-	ServerName *utils.EnvString `json:"serverName,omitempty"               mapstructure:"serverName"               yaml:"serverName,omitempty"`
+	ServerName *goenvconf.EnvString `json:"serverName,omitempty" mapstructure:"serverName" yaml:"serverName,omitempty"`
 }
 
 // Validate if the current instance is valid.

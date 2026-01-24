@@ -26,7 +26,10 @@ func main() {
 
 func jsonSchemaConvertConfig() error {
 	r := new(jsonschema.Reflector)
-	if err := r.AddGoComments("github.com/hasura/ndc-http/ndc-http-schema/configuration", "../configuration"); err != nil {
+	if err := r.AddGoComments(
+		"github.com/hasura/ndc-http/ndc-http-schema/configuration",
+		"../configuration",
+	); err != nil {
 		return err
 	}
 
@@ -47,7 +50,10 @@ func jsonSchemaConvertConfig() error {
 func jsonSchemaConnectorConfiguration() error {
 	r := new(jsonschema.Reflector)
 
-	if err := r.AddGoComments("github.com/hasura/ndc-http/ndc-http-schema/configuration", "../configuration"); err != nil {
+	if err := r.AddGoComments(
+		"github.com/hasura/ndc-http/ndc-http-schema/configuration",
+		"../configuration",
+	); err != nil {
 		return err
 	}
 
@@ -67,7 +73,10 @@ func jsonSchemaConnectorConfiguration() error {
 
 func jsonSchemaNDCHttpSchema() error {
 	r := new(jsonschema.Reflector)
-	if err := r.AddGoComments("github.com/hasura/ndc-http/ndc-http-schema/schema", "../schema"); err != nil {
+	if err := r.AddGoComments(
+		"github.com/hasura/ndc-http/ndc-http-schema/schema",
+		"../schema",
+	); err != nil {
 		return err
 	}
 

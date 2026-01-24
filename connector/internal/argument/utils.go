@@ -19,7 +19,10 @@ func convertTypePresentationFromString(
 	switch t := typeRep.Interface().(type) {
 	case *schema.TypeRepresentationBoolean:
 		return strconv.ParseBool(input)
-	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64:
+	case *schema.TypeRepresentationInt8,
+		*schema.TypeRepresentationInt16,
+		*schema.TypeRepresentationInt32,
+		*schema.TypeRepresentationInt64:
 		return strconv.ParseInt(input, 10, 64)
 	case *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64:
 		return strconv.ParseFloat(input, 64)
@@ -35,7 +38,11 @@ func convertTypePresentationFromString(
 		return input, nil
 	case *schema.TypeRepresentationEnum:
 		if !slices.Contains(t.OneOf, input) {
-			return nil, fmt.Errorf("invalid enum value, expected one of %v, got: %s", t.OneOf, input)
+			return nil, fmt.Errorf(
+				"invalid enum value, expected one of %v, got: %s",
+				t.OneOf,
+				input,
+			)
 		}
 
 		return input, nil
@@ -54,7 +61,9 @@ func convertTypePresentationFromString(
 		}
 
 		return result.Format(time.RFC3339), err
-	case *schema.TypeRepresentationJSON, *schema.TypeRepresentationGeography, *schema.TypeRepresentationGeometry:
+	case *schema.TypeRepresentationJSON,
+		*schema.TypeRepresentationGeography,
+		*schema.TypeRepresentationGeometry:
 		var result any
 
 		return result, json.Unmarshal([]byte(input), &result)
