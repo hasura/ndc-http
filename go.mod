@@ -5,6 +5,7 @@ go 1.24.12
 require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/google/uuid v1.6.0
+	github.com/hasura/goenvconf v0.6.1
 	github.com/hasura/ndc-http/exhttp v0.0.1
 	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20251031024158-ca7c6d6957ec
 	github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260124011343-f658e14823b0
@@ -29,7 +30,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.5 // indirect
-	github.com/hasura/goenvconf v0.6.1 // indirect
 	github.com/invopop/jsonschema v0.13.0 // indirect
 	github.com/klauspost/compress v1.18.3 // indirect
 	github.com/mailru/easyjson v0.9.1 // indirect
