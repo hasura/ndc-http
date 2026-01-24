@@ -9,7 +9,6 @@ import (
 	"reflect"
 	"slices"
 	"strconv"
-	"strings"
 
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -27,8 +26,6 @@ func BuildSchemaFromConfig(
 	errors := make(map[string][]string)
 	existedFileIDs := []string{}
 
-	basePath, wdErr := os.Getwd()
-
 	for i, file := range config.Files {
 		schemaOutput, err := buildSchemaFile(config, configDir, &file, logger)
 		if err != nil {
@@ -39,11 +36,7 @@ func BuildSchemaFromConfig(
 			continue
 		}
 
-		fileID := file.File
-
-		if wdErr == nil && !strings.HasPrefix(fileID, "http") {
-			fileID = tryRelPath(fileID, basePath)
-		}
+		fileID := tryRelPath(file.File, configDir)
 
 		if slices.Contains(existedFileIDs, fileID) {
 			logger.Warn(
