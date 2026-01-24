@@ -15,7 +15,7 @@ runtime:
   # JSON scalars will be encoded to string.
   # Enable this option if you need to make commands compatible with PromptQL
   stringifyJson:
-    value: true
+    value: false
 concurrency:
   query: 1
   mutation: 1

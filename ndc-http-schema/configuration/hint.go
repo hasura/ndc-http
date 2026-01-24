@@ -48,7 +48,13 @@ func (cv *ConfigValidator) Render(w io.Writer) {
 			)
 		}
 
+		basePath, wdErr := os.Getwd()
+
 		for ns, errs := range cv.warnings {
+			if wdErr == nil {
+				ns = tryRelPath(ns, basePath)
+			}
+
 			_, _ = w.Write([]byte("\n\n  "))
 			_, _ = w.Write([]byte(ns))
 			_, _ = w.Write([]byte("\n"))
@@ -107,7 +113,7 @@ func (cv *ConfigValidator) renderReadme(w io.Writer) error {
 	data := map[string]any{
 		"ContextPath":       cv.relativeContextPath,
 		"SubgraphName":      cv.subgraphName,
-		"SubgraphPath":      filepath.Dir(filepath.Dir(cv.contextPath)),
+		"SubgraphPath":      filepath.Dir(filepath.Dir(cv.relativeContextPath)),
 		"ConnectorName":     cv.connectorName,
 		"ServiceName":       strings.ToUpper(cv.getServiceName()),
 		"ForwardingHeaders": forwardingHeaders,

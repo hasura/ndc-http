@@ -57,20 +57,9 @@ func ValidateConfiguration(
 		forwardedHeaderNames:      make(map[string]bool),
 		requiredHeadersForwarding: map[schema.SecuritySchemeType]bool{},
 		contextPath:               contextPath,
-		relativeContextPath:       contextPath,
+		relativeContextPath:       tryRelPath(contextPath, ""),
 		errors:                    map[string][]string{},
 		warnings:                  map[string][]string{},
-	}
-
-	// extract the relative context path for templates.
-	if contextPath != "" && contextPath[0] == '/' {
-		currentDir, err := os.Getwd()
-		if err == nil {
-			relativeContextPath, err := filepath.Rel(currentDir, contextPath)
-			if err == nil {
-				cv.relativeContextPath = relativeContextPath
-			}
-		}
 	}
 
 	cv.subgraphName = cv.findSubgraphName()
