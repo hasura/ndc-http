@@ -5,12 +5,12 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/ndc"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
-	sdkUtils "github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/pb33f/libopenapi"
 	"github.com/pb33f/libopenapi/datamodel/high/base"
 	v3 "github.com/pb33f/libopenapi/datamodel/high/v3"
@@ -48,7 +48,7 @@ func (oc *OAS3Builder) BuildDocumentModel(
 	if len(oc.schema.Settings.Servers) == 0 {
 		oc.schema.Settings.Servers = []rest.ServerConfig{
 			{
-				URL: sdkUtils.NewEnvStringVariable(
+				URL: goenvconf.NewEnvStringVariable(
 					utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"}),
 				),
 			},
@@ -92,7 +92,7 @@ func (oc *OAS3Builder) BuildDocumentModel(
 }
 
 func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig {
-	var results []rest.ServerConfig //nolint:prealloc
+	var results []rest.ServerConfig
 
 	for _, server := range servers {
 		if server.URL == "" {
@@ -136,7 +136,7 @@ func (oc *OAS3Builder) convertServers(servers []*v3.Server) []rest.ServerConfig 
 
 		conf := rest.ServerConfig{
 			ID:  serverID,
-			URL: sdkUtils.NewEnvString(envName, strings.TrimRight(serverURL, "/")),
+			URL: goenvconf.NewEnvString(envName, strings.TrimRight(serverURL, "/")),
 		}
 		results = append(results, conf)
 	}
@@ -171,21 +171,23 @@ func (oc *OAS3Builder) convertSecuritySchemes(
 		if inLocation == rest.APIKeyInCookie {
 			result.SecuritySchemer = rest.NewCookieAuthConfig()
 		} else {
-			valueEnv := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key}))
+			valueEnv := goenvconf.NewEnvStringVariable(
+				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key}),
+			)
 			result.SecuritySchemer = rest.NewAPIKeyAuthConfig(security.Name, inLocation, valueEnv)
 		}
 	case rest.HTTPAuthScheme:
 		switch security.Scheme {
 		case string(rest.BasicAuthScheme):
-			user := sdkUtils.NewEnvStringVariable(
+			user := goenvconf.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "USERNAME"}),
 			)
-			password := sdkUtils.NewEnvStringVariable(
+			password := goenvconf.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "PASSWORD"}),
 			)
 			result.SecuritySchemer = rest.NewBasicAuthConfig(user, password)
 		default:
-			valueEnv := sdkUtils.NewEnvStringVariable(
+			valueEnv := goenvconf.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN"}),
 			)
 			result.SecuritySchemer = rest.NewHTTPAuthConfig(
@@ -212,10 +214,10 @@ func (oc *OAS3Builder) convertSecuritySchemes(
 		}
 
 		if security.Flows.ClientCredentials != nil {
-			clientID := sdkUtils.NewEnvStringVariable(
+			clientID := goenvconf.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_ID"}),
 			)
-			clientSecret := sdkUtils.NewEnvStringVariable(
+			clientSecret := goenvconf.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_SECRET"}),
 			)
 			flow := oc.convertV3OAuthFLow(key, security.Flows.ClientCredentials)
@@ -478,7 +480,7 @@ func (oc *OAS3Builder) convertV3OAuthFLow(key string, input *v3.OAuthFlow) rest.
 		RefreshURL:       input.RefreshUrl,
 	}
 
-	tokenURL := sdkUtils.NewEnvStringVariable(
+	tokenURL := goenvconf.NewEnvStringVariable(
 		utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN_URL"}),
 	)
 	if input.TokenUrl != "" {

@@ -95,7 +95,7 @@ func (c *HTTPConnector) explainQuery(
 		return nil, err
 	}
 
-	rawArgs, err := utils.ResolveArgumentVariables(request.Arguments, variables)
+	rawArgs, err := utils.ResolveArguments(request.Arguments, variables)
 	if err != nil {
 		return nil, schema.UnprocessableContentError(
 			"failed to resolve argument variables",

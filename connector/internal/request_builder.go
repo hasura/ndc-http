@@ -294,7 +294,13 @@ func (c *RequestBuilder) evalURLAndHeaderParameters() (*url.URL, http.Header, er
 			continue
 		}
 
-		if err := c.evalURLAndHeaderParameterBySchema(endpoint, &headers, argumentKey, &argumentInfo, c.Arguments[argumentKey]); err != nil {
+		if err := c.evalURLAndHeaderParameterBySchema(
+			endpoint,
+			&headers,
+			argumentKey,
+			&argumentInfo,
+			c.Arguments[argumentKey],
+		); err != nil {
 			return nil, nil, fmt.Errorf("%s: %w", argumentKey, err)
 		}
 	}

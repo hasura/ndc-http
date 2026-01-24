@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
@@ -179,7 +180,7 @@ func parseSchemaDocVariableInfo(value any) schemaDocVariableInfo {
 	var defaultValue string
 
 	switch t := value.(type) {
-	case utils.EnvString:
+	case goenvconf.EnvString:
 		if t.Value != nil {
 			defaultValue = *t.Value
 		}
@@ -189,7 +190,7 @@ func parseSchemaDocVariableInfo(value any) schemaDocVariableInfo {
 			Type:    "string",
 			Default: defaultValue,
 		}
-	case utils.EnvBool:
+	case goenvconf.EnvBool:
 		if t.Value != nil {
 			defaultValue = strconv.FormatBool(*t.Value)
 		}
@@ -199,7 +200,7 @@ func parseSchemaDocVariableInfo(value any) schemaDocVariableInfo {
 			Type:    "boolean",
 			Default: defaultValue,
 		}
-	case utils.EnvFloat:
+	case goenvconf.EnvFloat:
 		if t.Value != nil {
 			defaultValue = fmt.Sprint(*t.Value)
 		}
@@ -209,7 +210,7 @@ func parseSchemaDocVariableInfo(value any) schemaDocVariableInfo {
 			Type:    "float",
 			Default: defaultValue,
 		}
-	case utils.EnvInt:
+	case goenvconf.EnvInt:
 		if t.Value != nil {
 			defaultValue = strconv.FormatInt(*t.Value, 10)
 		}

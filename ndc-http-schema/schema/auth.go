@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/hasura/ndc-sdk-go/v2/utils"
+	"github.com/hasura/goenvconf"
 	"github.com/invopop/jsonschema"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
@@ -329,16 +329,20 @@ func (ss *SecurityScheme) Validate() error {
 //
 // [apiKey authentication]: https://swagger.io/docs/specification/authentication/api-keys/
 type APIKeyAuthConfig struct {
-	Type  SecuritySchemeType `json:"type"  mapstructure:"type"  yaml:"type"`
-	In    APIKeyLocation     `json:"in"    mapstructure:"in"    yaml:"in"`
-	Name  string             `json:"name"  mapstructure:"name"  yaml:"name"`
-	Value utils.EnvString    `json:"value" mapstructure:"value" yaml:"value"`
+	Type  SecuritySchemeType  `json:"type"  mapstructure:"type"  yaml:"type"`
+	In    APIKeyLocation      `json:"in"    mapstructure:"in"    yaml:"in"`
+	Name  string              `json:"name"  mapstructure:"name"  yaml:"name"`
+	Value goenvconf.EnvString `json:"value" mapstructure:"value" yaml:"value"`
 }
 
 var _ SecuritySchemer = (*APIKeyAuthConfig)(nil)
 
 // NewAPIKeyAuthConfig creates a new APIKeyAuthConfig instance.
-func NewAPIKeyAuthConfig(name string, in APIKeyLocation, value utils.EnvString) *APIKeyAuthConfig {
+func NewAPIKeyAuthConfig(
+	name string,
+	in APIKeyLocation,
+	value goenvconf.EnvString,
+) *APIKeyAuthConfig {
 	return &APIKeyAuthConfig{
 		Type:  APIKeyScheme,
 		Name:  name,
@@ -386,16 +390,16 @@ func (ss APIKeyAuthConfig) GetType() SecuritySchemeType {
 //
 // [bearer]: https://swagger.io/docs/specification/authentication/bearer-authentication
 type HTTPAuthConfig struct {
-	Type   SecuritySchemeType `json:"type"   mapstructure:"type"   yaml:"type"`
-	Header string             `json:"header" mapstructure:"header" yaml:"header"`
-	Scheme string             `json:"scheme" mapstructure:"scheme" yaml:"scheme"`
-	Value  utils.EnvString    `json:"value"  mapstructure:"value"  yaml:"value"`
+	Type   SecuritySchemeType  `json:"type"   mapstructure:"type"   yaml:"type"`
+	Header string              `json:"header" mapstructure:"header" yaml:"header"`
+	Scheme string              `json:"scheme" mapstructure:"scheme" yaml:"scheme"`
+	Value  goenvconf.EnvString `json:"value"  mapstructure:"value"  yaml:"value"`
 }
 
 var _ SecuritySchemer = (*HTTPAuthConfig)(nil)
 
 // NewHTTPAuthConfig creates a new HTTPAuthConfig instance.
-func NewHTTPAuthConfig(scheme string, header string, value utils.EnvString) *HTTPAuthConfig {
+func NewHTTPAuthConfig(scheme string, header string, value goenvconf.EnvString) *HTTPAuthConfig {
 	return &HTTPAuthConfig{
 		Type:   HTTPAuthScheme,
 		Header: header,
@@ -422,14 +426,14 @@ func (ss HTTPAuthConfig) GetType() SecuritySchemeType {
 //
 // [basic]: https://swagger.io/docs/specification/authentication/basic-authentication
 type BasicAuthConfig struct {
-	Type     SecuritySchemeType `json:"type"     mapstructure:"type"     yaml:"type"`
-	Header   string             `json:"header"   mapstructure:"header"   yaml:"header"`
-	Username utils.EnvString    `json:"username" mapstructure:"username" yaml:"username"`
-	Password utils.EnvString    `json:"password" mapstructure:"password" yaml:"password"`
+	Type     SecuritySchemeType  `json:"type"     mapstructure:"type"     yaml:"type"`
+	Header   string              `json:"header"   mapstructure:"header"   yaml:"header"`
+	Username goenvconf.EnvString `json:"username" mapstructure:"username" yaml:"username"`
+	Password goenvconf.EnvString `json:"password" mapstructure:"password" yaml:"password"`
 }
 
 // NewBasicAuthConfig creates a new BasicAuthConfig instance.
-func NewBasicAuthConfig(username, password utils.EnvString) *BasicAuthConfig {
+func NewBasicAuthConfig(username, password goenvconf.EnvString) *BasicAuthConfig {
 	return &BasicAuthConfig{
 		Type:     BasicAuthScheme,
 		Username: username,
@@ -499,13 +503,13 @@ func ParseOAuthFlowType(value string) (OAuthFlowType, error) {
 //
 // [OAuth 2.0]: https://swagger.io/docs/specification/authentication/oauth2
 type OAuthFlow struct {
-	AuthorizationURL string                     `json:"authorizationUrl,omitempty" mapstructure:"authorizationUrl" yaml:"authorizationUrl,omitempty"`
-	TokenURL         *utils.EnvString           `json:"tokenUrl,omitempty"         mapstructure:"tokenUrl"         yaml:"tokenUrl,omitempty"`
-	RefreshURL       string                     `json:"refreshUrl,omitempty"       mapstructure:"refreshUrl"       yaml:"refreshUrl,omitempty"`
-	Scopes           map[string]string          `json:"scopes,omitempty"           mapstructure:"scopes"           yaml:"scopes,omitempty"`
-	ClientID         *utils.EnvString           `json:"clientId,omitempty"         mapstructure:"clientId"         yaml:"clientId,omitempty"`
-	ClientSecret     *utils.EnvString           `json:"clientSecret,omitempty"     mapstructure:"clientSecret"     yaml:"clientSecret,omitempty"`
-	EndpointParams   map[string]utils.EnvString `json:"endpointParams,omitempty"   mapstructure:"endpointParams"   yaml:"endpointParams,omitempty"`
+	AuthorizationURL string                         `json:"authorizationUrl,omitempty" mapstructure:"authorizationUrl" yaml:"authorizationUrl,omitempty"`
+	TokenURL         *goenvconf.EnvString           `json:"tokenUrl,omitempty"         mapstructure:"tokenUrl"         yaml:"tokenUrl,omitempty"`
+	RefreshURL       string                         `json:"refreshUrl,omitempty"       mapstructure:"refreshUrl"       yaml:"refreshUrl,omitempty"`
+	Scopes           map[string]string              `json:"scopes,omitempty"           mapstructure:"scopes"           yaml:"scopes,omitempty"`
+	ClientID         *goenvconf.EnvString           `json:"clientId,omitempty"         mapstructure:"clientId"         yaml:"clientId,omitempty"`
+	ClientSecret     *goenvconf.EnvString           `json:"clientSecret,omitempty"     mapstructure:"clientSecret"     yaml:"clientSecret,omitempty"`
+	EndpointParams   map[string]goenvconf.EnvString `json:"endpointParams,omitempty"   mapstructure:"endpointParams"   yaml:"endpointParams,omitempty"`
 }
 
 // Validate if the current instance is valid.

@@ -387,7 +387,8 @@ func (client *HTTPClient) evalHTTPResponse(
 		} else {
 			result, err = contenttype.NewJSONDecoder(client.requests.Schema.NDCHttpSchema, contenttype.JSONDecodeOptions{
 				StringifyJSON: client.manager.RuntimeSettings.StringifyJSON,
-			}).Decode(resp.Body, resultType)
+			}).
+				Decode(resp.Body, resultType)
 		}
 
 		if err != nil {

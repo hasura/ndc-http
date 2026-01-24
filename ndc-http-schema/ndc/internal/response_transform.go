@@ -292,7 +292,11 @@ func (rt *ResponseTransformer) evalResultType(
 			}
 
 			for key, v := range mapValue {
-				newFieldType, err := rt.evalResultType(schemaType, reflect.ValueOf(v), append(fieldPaths, key))
+				newFieldType, err := rt.evalResultType(
+					schemaType,
+					reflect.ValueOf(v),
+					append(fieldPaths, key),
+				)
 				if err != nil {
 					return nil, err
 				}
@@ -304,12 +308,18 @@ func (rt *ResponseTransformer) evalResultType(
 				}
 			}
 
-			newObjectTypeName := restUtils.StringSliceToPascalCase(append(fieldPaths, "TransformedResult"))
+			newObjectTypeName := restUtils.StringSliceToPascalCase(
+				append(fieldPaths, "TransformedResult"),
+			)
 			rt.schema.ObjectTypes[newObjectTypeName] = newObjectType
 
 			resultType = schema.NewNamedType(newObjectTypeName)
 		} else {
-			return nil, fmt.Errorf("unsupported reflection kind %v: %v", fieldKind, field.Interface())
+			return nil, fmt.Errorf(
+				"unsupported reflection kind %v: %v",
+				fieldKind,
+				field.Interface(),
+			)
 		}
 
 	default:
@@ -382,13 +392,20 @@ func (rt *ResponseTransformer) evalJSONPath(
 
 			return schema.NewNullableType(newType), nil
 		default:
-			return nil, fmt.Errorf("invalid json path at %s. Expected array, got: %v", strings.Join(fieldPaths, "."), selector)
+			return nil, fmt.Errorf(
+				"invalid json path at %s. Expected array, got: %v",
+				strings.Join(fieldPaths, "."),
+				selector,
+			)
 		}
 	case *schema.NamedType:
 		if scalarType, ok := rt.schema.ScalarTypes[t.Name]; ok {
 			if len(segments[0].Selectors()) > 0 {
 				if _, err := scalarType.Representation.AsJSON(); err != nil {
-					return nil, fmt.Errorf("invalid json path at %s. Cannot select nested fields from primitive scalars", strings.Join(fieldPaths, "."))
+					return nil, fmt.Errorf(
+						"invalid json path at %s. Cannot select nested fields from primitive scalars",
+						strings.Join(fieldPaths, "."),
+					)
 				}
 			}
 
@@ -397,24 +414,40 @@ func (rt *ResponseTransformer) evalJSONPath(
 
 		selectorName, isNameSelector := selector.(spec.Name)
 		if !isNameSelector {
-			return nil, fmt.Errorf("invalid json path at %s. Expected object field name, got: %v", strings.Join(fieldPaths, "."), selector)
+			return nil, fmt.Errorf(
+				"invalid json path at %s. Expected object field name, got: %v",
+				strings.Join(fieldPaths, "."),
+				selector,
+			)
 		}
 
 		objectType, ok := rt.schema.ObjectTypes[t.Name]
 		if !ok {
-			return nil, fmt.Errorf("%s: type name %s does not exist", strings.Join(fieldPaths, "."), t.Name)
+			return nil, fmt.Errorf(
+				"%s: type name %s does not exist",
+				strings.Join(fieldPaths, "."),
+				t.Name,
+			)
 		}
 
 		objectField, ok := objectType.Fields[string(selectorName)]
 		if !ok {
-			return nil, fmt.Errorf("invalid json path at %s. Object field name `%s` does not exist", strings.Join(fieldPaths, "."), string(selectorName))
+			return nil, fmt.Errorf(
+				"invalid json path at %s. Object field name `%s` does not exist",
+				strings.Join(fieldPaths, "."),
+				string(selectorName),
+			)
 		}
 
 		if len(segments) == 1 {
 			return objectField.Type.Interface(), nil
 		}
 
-		return rt.evalJSONPath(objectField.Type, segments[1:], append(fieldPaths, string(selectorName)))
+		return rt.evalJSONPath(
+			objectField.Type,
+			segments[1:],
+			append(fieldPaths, string(selectorName)),
+		)
 	default:
 		return nil, fmt.Errorf("%s: invalid type %v", strings.Join(fieldPaths, "."), rawType)
 	}

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"gotest.tools/v3/assert"
@@ -192,41 +193,41 @@ func TestNDCHttpSettings(t *testing.T) {
 			expected: NDCHttpSettings{
 				Servers: []ServerConfig{
 					{
-						URL: utils.NewEnvString(
+						URL: goenvconf.NewEnvString(
 							"PET_STORE_SERVER_URL",
 							"https://petstore3.swagger.io/api/v3",
 						),
 					},
 					{
-						URL: utils.NewEnvStringValue("https://petstore3.swagger.io/api/v3.1"),
+						URL: goenvconf.NewEnvStringValue("https://petstore3.swagger.io/api/v3.1"),
 						TLS: &exhttp.TLSConfig{
-							CertFile: &utils.EnvString{
+							CertFile: &goenvconf.EnvString{
 								Variable: utils.ToPtr("PET_STORE_CERT_FILE"),
 							},
-							CertPem: &utils.EnvString{
+							CertPem: &goenvconf.EnvString{
 								Variable: utils.ToPtr("PET_STORE_CERT_PEM"),
 							},
-							KeyFile: &utils.EnvString{
+							KeyFile: &goenvconf.EnvString{
 								Variable: utils.ToPtr("PET_STORE_KEY_FILE"),
 							},
-							KeyPem: &utils.EnvString{
+							KeyPem: &goenvconf.EnvString{
 								Variable: utils.ToPtr("PET_STORE_KEY_PEM"),
 							},
-							CAFile: &utils.EnvString{
+							CAFile: &goenvconf.EnvString{
 								Variable: utils.ToPtr("PET_STORE_CA_FILE"),
 							},
-							CAPem: &utils.EnvString{
+							CAPem: &goenvconf.EnvString{
 								Variable: utils.ToPtr("PET_STORE_CA_PEM"),
 							},
-							InsecureSkipVerify: &utils.EnvBool{
+							InsecureSkipVerify: &goenvconf.EnvBool{
 								Variable: utils.ToPtr("PET_STORE_INSECURE_SKIP_VERIFY"),
 								Value:    utils.ToPtr(true),
 							},
-							IncludeSystemCACertsPool: &utils.EnvBool{
+							IncludeSystemCACertsPool: &goenvconf.EnvBool{
 								Variable: utils.ToPtr("PET_STORE_INCLUDE_SYSTEM_CA_CERT_POOL"),
 								Value:    utils.ToPtr(true),
 							},
-							ServerName: &utils.EnvString{
+							ServerName: &goenvconf.EnvString{
 								Variable: utils.ToPtr("PET_STORE_SERVER_NAME"),
 							},
 							MinVersion:   "1.0",
@@ -241,14 +242,14 @@ func TestNDCHttpSettings(t *testing.T) {
 							Type:  APIKeyScheme,
 							In:    APIKeyInHeader,
 							Name:  "api_key",
-							Value: utils.NewEnvStringVariable("PET_STORE_API_KEY"),
+							Value: goenvconf.NewEnvStringVariable("PET_STORE_API_KEY"),
 						},
 					},
 					"basic": {
 						SecuritySchemer: &BasicAuthConfig{
 							Type:     BasicAuthScheme,
-							Username: utils.NewEnvStringValue("user"),
-							Password: utils.NewEnvStringValue("password"),
+							Username: goenvconf.NewEnvStringValue("user"),
+							Password: goenvconf.NewEnvStringValue("password"),
 						},
 					},
 					"http": {
@@ -256,7 +257,7 @@ func TestNDCHttpSettings(t *testing.T) {
 							Type:   HTTPAuthScheme,
 							Header: "Authorization",
 							Scheme: "bearer",
-							Value:  utils.NewEnvStringVariable("PET_STORE_API_KEY"),
+							Value:  goenvconf.NewEnvStringVariable("PET_STORE_API_KEY"),
 						},
 					},
 					"cookie": {
@@ -277,7 +278,7 @@ func TestNDCHttpSettings(t *testing.T) {
 								ImplicitFlow: {
 									AuthorizationURL: "https://petstore3.swagger.io/oauth/authorize",
 									TokenURL: utils.ToPtr(
-										utils.NewEnvStringValue(
+										goenvconf.NewEnvStringValue(
 											"https://petstore3.swagger.io/oauth/token",
 										),
 									),
@@ -297,33 +298,33 @@ func TestNDCHttpSettings(t *testing.T) {
 				},
 				Version: "1.0.19",
 				TLS: &exhttp.TLSConfig{
-					CertFile: &utils.EnvString{
+					CertFile: &goenvconf.EnvString{
 						Variable: utils.ToPtr("PET_STORE_CERT_FILE"),
 					},
-					CertPem: &utils.EnvString{
+					CertPem: &goenvconf.EnvString{
 						Variable: utils.ToPtr("PET_STORE_CERT_PEM"),
 					},
-					KeyFile: &utils.EnvString{
+					KeyFile: &goenvconf.EnvString{
 						Variable: utils.ToPtr("PET_STORE_KEY_FILE"),
 					},
-					KeyPem: &utils.EnvString{
+					KeyPem: &goenvconf.EnvString{
 						Variable: utils.ToPtr("PET_STORE_KEY_PEM"),
 					},
-					CAFile: &utils.EnvString{
+					CAFile: &goenvconf.EnvString{
 						Variable: utils.ToPtr("PET_STORE_CA_FILE"),
 					},
-					CAPem: &utils.EnvString{
+					CAPem: &goenvconf.EnvString{
 						Variable: utils.ToPtr("PET_STORE_CA_PEM"),
 					},
-					InsecureSkipVerify: &utils.EnvBool{
+					InsecureSkipVerify: &goenvconf.EnvBool{
 						Variable: utils.ToPtr("PET_STORE_INSECURE_SKIP_VERIFY"),
 						Value:    utils.ToPtr(true),
 					},
-					IncludeSystemCACertsPool: &utils.EnvBool{
+					IncludeSystemCACertsPool: &goenvconf.EnvBool{
 						Variable: utils.ToPtr("PET_STORE_INCLUDE_SYSTEM_CA_CERT_POOL"),
 						Value:    utils.ToPtr(true),
 					},
-					ServerName: &utils.EnvString{
+					ServerName: &goenvconf.EnvString{
 						Variable: utils.ToPtr("PET_STORE_SERVER_NAME"),
 					},
 					MinVersion:   "1.0",

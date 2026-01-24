@@ -194,7 +194,10 @@ func (c *JSONEncoder) evalScalarType(
 		}
 
 		c.writeStringValue(strconv.FormatFloat(value, 'f', -1, 64))
-	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64:
+	case *schema.TypeRepresentationInt8,
+		*schema.TypeRepresentationInt16,
+		*schema.TypeRepresentationInt32,
+		*schema.TypeRepresentationInt64:
 		value, err := utils.DecodeIntReflection[int64](reflectValue)
 		if err != nil {
 			return err

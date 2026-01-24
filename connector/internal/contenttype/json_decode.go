@@ -179,7 +179,10 @@ func (c *JSONDecoder) evalScalarType(value any, scalarType schema.ScalarType) (a
 		return utils.DecodeBoolean(value)
 	case *schema.TypeRepresentationFloat32, *schema.TypeRepresentationFloat64:
 		return utils.DecodeFloat[float64](value)
-	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64:
+	case *schema.TypeRepresentationInt8,
+		*schema.TypeRepresentationInt16,
+		*schema.TypeRepresentationInt32,
+		*schema.TypeRepresentationInt64:
 		return utils.DecodeInt[int64](value)
 	case *schema.TypeRepresentationString:
 		if s, ok := value.(string); ok {

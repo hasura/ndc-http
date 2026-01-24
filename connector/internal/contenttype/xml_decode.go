@@ -357,7 +357,11 @@ func (c *XMLDecoder) evalAttribute(
 	case *schema.ArrayType:
 		var result any
 		if err := json.Unmarshal([]byte(attr.Value), &result); err != nil {
-			return nil, fmt.Errorf("%s: failed to decode xml attribute, %w", strings.Join(fieldPaths, ","), err)
+			return nil, fmt.Errorf(
+				"%s: failed to decode xml attribute, %w",
+				strings.Join(fieldPaths, ","),
+				err,
+			)
 		}
 
 		return result, nil
@@ -370,7 +374,11 @@ func (c *XMLDecoder) evalAttribute(
 
 		var result any
 		if err := json.Unmarshal([]byte(attr.Value), &result); err != nil {
-			return nil, fmt.Errorf("%s: failed to decode xml attribute, %w", strings.Join(fieldPaths, ","), err)
+			return nil, fmt.Errorf(
+				"%s: failed to decode xml attribute, %w",
+				strings.Join(fieldPaths, ","),
+				err,
+			)
 		}
 
 		return result, nil
@@ -391,7 +399,11 @@ func (c *XMLDecoder) decodeSimpleScalarValue(
 	switch respType.(type) {
 	case *schema.TypeRepresentationString:
 		result = block.Data
-	case *schema.TypeRepresentationDate, *schema.TypeRepresentationTimestamp, *schema.TypeRepresentationTimestampTZ, *schema.TypeRepresentationUUID, *schema.TypeRepresentationEnum:
+	case *schema.TypeRepresentationDate,
+		*schema.TypeRepresentationTimestamp,
+		*schema.TypeRepresentationTimestampTZ,
+		*schema.TypeRepresentationUUID,
+		*schema.TypeRepresentationEnum:
 		if len(block.Data) > 0 {
 			result = block.Data
 		}
@@ -409,7 +421,10 @@ func (c *XMLDecoder) decodeSimpleScalarValue(
 		}
 
 		result = block.Data
-	case *schema.TypeRepresentationInt8, *schema.TypeRepresentationInt16, *schema.TypeRepresentationInt32, *schema.TypeRepresentationInt64:
+	case *schema.TypeRepresentationInt8,
+		*schema.TypeRepresentationInt16,
+		*schema.TypeRepresentationInt32,
+		*schema.TypeRepresentationInt64:
 		if len(block.Data) == 0 {
 			break
 		}
@@ -421,7 +436,9 @@ func (c *XMLDecoder) decodeSimpleScalarValue(
 		}
 
 		result, err = strconv.ParseFloat(block.Data, 64)
-	case *schema.TypeRepresentationGeography, *schema.TypeRepresentationGeometry, *schema.TypeRepresentationJSON:
+	case *schema.TypeRepresentationGeography,
+		*schema.TypeRepresentationGeometry,
+		*schema.TypeRepresentationJSON:
 		result = decodeArbitraryXMLBlock(block)
 	}
 

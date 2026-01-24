@@ -41,6 +41,8 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3 h1:NmZ1PKzSTQbuGHw9DGPFomqkkLW
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3/go.mod h1:zQrxl1YP88HQlA6i9c63DSVPFklWpGX4OWAc9bFuaH4=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.5 h1:jP1RStw811EvUDzsUQ9oESqw2e4RqCjSAD9qIL8eMns=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.5/go.mod h1:WXNBZ64q3+ZUemCMXD9kYnr56H7CgZxDBHCVwstfl3s=
+github.com/hasura/goenvconf v0.6.1 h1:A3L9jXTzwddAb9fgHfCDQvYv4rHp89B91R1tKdpNT5o=
+github.com/hasura/goenvconf v0.6.1/go.mod h1:mj6eef7yeb8K79e8nI4iCY7ImEydpkSCIiNsU3H5iBA=
 github.com/hasura/ndc-sdk-go/v2 v2.2.0 h1:FMEZGvOIB6j0E4Im+Wp715pZeAURmxKLoLzS+rxq9u4=
 github.com/hasura/ndc-sdk-go/v2 v2.2.0/go.mod h1:Q7DMZo6P7nyp9Kw6sbcGFJqWACCJb45FMi89bOBAMIY=
 github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260124011343-f658e14823b0 h1:+GdMq8ds1RO5D1BaArr7B7sWDpAw6XyCCi6XUjWpRaw=

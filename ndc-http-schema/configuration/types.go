@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	restUtils "github.com/hasura/ndc-http/ndc-http-schema/utils"
@@ -23,7 +24,7 @@ var fieldNameRegex = regexp.MustCompile(`^[a-zA-Z_]\w+$`)
 
 // Configuration contains required settings for the connector.
 type Configuration struct {
-	Output string `json:"output,omitempty"         yaml:"output,omitempty"`
+	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 	// Require strict validation
 	Strict         bool                   `json:"strict"                   yaml:"strict"`
 	Runtime        RawRuntimeSettings     `json:"runtime,omitempty"        yaml:"runtime,omitempty"`
@@ -35,19 +36,19 @@ type Configuration struct {
 // ConcurrencySettings represent settings for concurrent webhook executions to remote servers.
 type ConcurrencySettings struct {
 	// Maximum number of concurrent executions if there are many query variables.
-	Query uint `json:"query"    yaml:"query"`
+	Query uint `json:"query" yaml:"query"`
 	// Maximum number of concurrent executions if there are many mutation operations.
 	Mutation uint `json:"mutation" yaml:"mutation"`
 	// Maximum number of concurrent requests to remote servers (distribution mode).
-	HTTP uint `json:"http"     yaml:"http"`
+	HTTP uint `json:"http" yaml:"http"`
 }
 
 // ForwardHeadersSettings hold settings of header forwarding from and to Hasura engine.
 type ForwardHeadersSettings struct {
 	// Enable headers forwarding.
-	Enabled bool `json:"enabled"         yaml:"enabled"`
+	Enabled bool `json:"enabled" yaml:"enabled"`
 	// The argument field name to be added for headers forwarding.
-	ArgumentField *string `json:"argumentField"   yaml:"argumentField"   jsonschema:"oneof_type=string;null,pattern=^[a-zA-Z_][a-zA-Z0-9_]+$"`
+	ArgumentField *string `json:"argumentField" yaml:"argumentField" jsonschema:"oneof_type=string;null,pattern=^[a-zA-Z_][a-zA-Z0-9_]+$"`
 	// HTTP response headers to be forwarded from a data connector to the client.
 	ResponseHeaders *ForwardResponseHeadersSettings `json:"responseHeaders" yaml:"responseHeaders" jsonschema:"nullable"`
 }
@@ -88,11 +89,11 @@ func (j *ForwardHeadersSettings) UnmarshalJSON(b []byte) error {
 // ForwardResponseHeadersSettings hold settings of header forwarding from http response to Hasura engine.
 type ForwardResponseHeadersSettings struct {
 	// Name of the field in the NDC function/procedure's result which contains the response headers.
-	HeadersField string `json:"headersField"   jsonschema:"pattern=^[a-zA-Z_][a-zA-Z0-9_]+$" yaml:"headersField"`
+	HeadersField string `json:"headersField" jsonschema:"pattern=^[a-zA-Z_][a-zA-Z0-9_]+$" yaml:"headersField"`
 	// Name of the field in the NDC function/procedure's result which contains the result.
-	ResultField string `json:"resultField"    jsonschema:"pattern=^[a-zA-Z_][a-zA-Z0-9_]+$" yaml:"resultField"`
+	ResultField string `json:"resultField" jsonschema:"pattern=^[a-zA-Z_][a-zA-Z0-9_]+$" yaml:"resultField"`
 	// List of actual HTTP response headers from the data connector to be set as response headers. Returns all headers if empty.
-	ForwardHeaders []string `json:"forwardHeaders"                                               yaml:"forwardHeaders"`
+	ForwardHeaders []string `json:"forwardHeaders" yaml:"forwardHeaders"`
 }
 
 // Validate checks if the setting is valid.
@@ -115,8 +116,8 @@ type ConfigItem struct {
 	// Distributed enables distributed schema
 	Distributed *bool `json:"distributed,omitempty" yaml:"distributed,omitempty"`
 	// configure the request timeout in seconds.
-	Timeout *utils.EnvInt              `json:"timeout,omitempty"     yaml:"timeout,omitempty"     mapstructure:"timeout"`
-	Retry   *exhttp.RetryPolicySetting `json:"retry,omitempty"       yaml:"retry,omitempty"       mapstructure:"retry"`
+	Timeout *goenvconf.EnvInt          `json:"timeout,omitempty" yaml:"timeout,omitempty" mapstructure:"timeout"`
+	Retry   *exhttp.RetryPolicySetting `json:"retry,omitempty"   yaml:"retry,omitempty"   mapstructure:"retry"`
 }
 
 // IsDistributed checks if the distributed option is enabled.
@@ -171,29 +172,29 @@ func (ci ConfigItem) GetRuntimeSettings() (*rest.RuntimeSettings, error) {
 // ConvertConfig represents the content of convert config file.
 type ConvertConfig struct {
 	// File path needs to be converted
-	File string `json:"file"                          jsonschema:"required"     yaml:"file"`
+	File string `json:"file" jsonschema:"required" yaml:"file"`
 	// The API specification of the file, is one of oas3 (openapi3), oas2 (openapi2)
-	Spec rest.SchemaSpecType `json:"spec,omitempty"                jsonschema:"default=oas3" yaml:"spec"`
+	Spec rest.SchemaSpecType `json:"spec,omitempty" jsonschema:"default=oas3" yaml:"spec"`
 	// Alias names for HTTP method. Used for prefix renaming, e.g. getUsers, postUser
-	MethodAlias map[string]string `json:"methodAlias,omitempty"                                   yaml:"methodAlias"`
+	MethodAlias map[string]string `json:"methodAlias,omitempty" yaml:"methodAlias"`
 	// Add a prefix to the function and procedure names
-	Prefix string `json:"prefix,omitempty"                                        yaml:"prefix"`
+	Prefix string `json:"prefix,omitempty" yaml:"prefix"`
 	// Trim the prefix in URL, e.g. /v1
-	TrimPrefix string `json:"trimPrefix,omitempty"                                    yaml:"trimPrefix"`
+	TrimPrefix string `json:"trimPrefix,omitempty" yaml:"trimPrefix"`
 	// The environment variable prefix for security values, e.g. PET_STORE
-	EnvPrefix string `json:"envPrefix,omitempty"                                     yaml:"envPrefix"`
+	EnvPrefix string `json:"envPrefix,omitempty" yaml:"envPrefix"`
 	// Return the pure NDC schema only
-	Pure bool `json:"pure,omitempty"                                          yaml:"pure"`
+	Pure bool `json:"pure,omitempty" yaml:"pure"`
 	// Ignore deprecated fields.
-	NoDeprecation bool `json:"noDeprecation,omitempty"                                 yaml:"noDeprecation"`
+	NoDeprecation bool `json:"noDeprecation,omitempty" yaml:"noDeprecation"`
 	// Patch files to be applied into the input file before converting
-	PatchBefore []restUtils.PatchConfig `json:"patchBefore,omitempty"                                   yaml:"patchBefore"`
+	PatchBefore []restUtils.PatchConfig `json:"patchBefore,omitempty" yaml:"patchBefore"`
 	// Patch files to be applied into the input file after converting
-	PatchAfter []restUtils.PatchConfig `json:"patchAfter,omitempty"                                    yaml:"patchAfter"`
+	PatchAfter []restUtils.PatchConfig `json:"patchAfter,omitempty" yaml:"patchAfter"`
 	// Allowed content types. All content types are allowed by default
-	AllowedContentTypes []string `json:"allowedContentTypes,omitempty"                           yaml:"allowedContentTypes"`
+	AllowedContentTypes []string `json:"allowedContentTypes,omitempty" yaml:"allowedContentTypes"`
 	// The location where the ndc schema file will be generated. Print to stdout if not set
-	Output string `json:"output,omitempty"                                        yaml:"output,omitempty"`
+	Output string `json:"output,omitempty" yaml:"output,omitempty"`
 }
 
 // NDCHttpRuntimeSchema wraps NDCHttpSchema with runtime settings.
@@ -271,7 +272,7 @@ type RawRuntimeSettings struct {
 	// Enable the sendHttpRequest operation.
 	EnableRawRequest *bool `json:"enableRawRequest,omitempty" yaml:"enableRawRequest,omitempty"`
 	// Treat the JSON scalar as a json string
-	StringifyJSON *utils.EnvBool `json:"stringifyJson,omitempty"    yaml:"stringifyJson,omitempty"`
+	StringifyJSON *goenvconf.EnvBool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
 }
 
 // RuntimeSettings hold optional runtime settings.
@@ -279,7 +280,7 @@ type RuntimeSettings struct {
 	// Enable the sendHttpRequest operation.
 	EnableRawRequest bool `json:"enableRawRequest,omitempty" yaml:"enableRawRequest,omitempty"`
 	// Treat the JSON scalar as a json string
-	StringifyJSON bool `json:"stringifyJson,omitempty"    yaml:"stringifyJson,omitempty"`
+	StringifyJSON bool `json:"stringifyJson,omitempty" yaml:"stringifyJson,omitempty"`
 }
 
 // Validate validates and returns validated settings.

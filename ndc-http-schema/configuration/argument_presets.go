@@ -138,7 +138,12 @@ func evalArgumentFromJSONPath(
 
 	switch t := rawType.(type) {
 	case *schema.NullableType:
-		underlyingType, typeRep, err := evalArgumentFromJSONPath(httpSchema, t.UnderlyingType, segments, fieldPaths)
+		underlyingType, typeRep, err := evalArgumentFromJSONPath(
+			httpSchema,
+			t.UnderlyingType,
+			segments,
+			fieldPaths,
+		)
 		if err != nil {
 			return nil, nil, fmt.Errorf("%s: %w", strings.Join(fieldPaths, "."), err)
 		}
@@ -155,9 +160,19 @@ func evalArgumentFromJSONPath(
 
 		switch s := segments[0].Selectors()[0].(type) {
 		case spec.WildcardSelector, spec.Index, spec.SliceSelector:
-			newType, typeRep, err := evalArgumentFromJSONPath(httpSchema, t.ElementType, segments[1:], append(fieldPaths, s.String()))
+			newType, typeRep, err := evalArgumentFromJSONPath(
+				httpSchema,
+				t.ElementType,
+				segments[1:],
+				append(fieldPaths, s.String()),
+			)
 			if err != nil {
-				return nil, nil, fmt.Errorf("%s%s: %w", strings.Join(fieldPaths, "."), s.String(), err)
+				return nil, nil, fmt.Errorf(
+					"%s%s: %w",
+					strings.Join(fieldPaths, "."),
+					s.String(),
+					err,
+				)
 			}
 
 			return schema.NewArrayType(newType), typeRep, nil
@@ -184,7 +199,11 @@ func evalArgumentFromJSONPath(
 		}
 
 		if selectorName == "" {
-			return nil, nil, fmt.Errorf("invalid json path %s, empty selector name: %s", strings.Join(fieldPaths, "."), segments[0].String())
+			return nil, nil, fmt.Errorf(
+				"invalid json path %s, empty selector name: %s",
+				strings.Join(fieldPaths, "."),
+				segments[0].String(),
+			)
 		}
 
 		selector := string(selectorName)
@@ -194,7 +213,12 @@ func evalArgumentFromJSONPath(
 			return nil, nil, nil
 		}
 
-		newFieldType, typeRep, err := evalArgumentFromJSONPath(httpSchema, field.Type, segments[1:], append(fieldPaths, selector))
+		newFieldType, typeRep, err := evalArgumentFromJSONPath(
+			httpSchema,
+			field.Type,
+			segments[1:],
+			append(fieldPaths, selector),
+		)
 		if err != nil {
 			return nil, nil, err
 		}

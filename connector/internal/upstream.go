@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/connector/internal/argument"
 	"github.com/hasura/ndc-http/connector/internal/security"
 	"github.com/hasura/ndc-http/exhttp"
@@ -17,7 +18,6 @@ import (
 	"github.com/hasura/ndc-http/ndc-http-schema/version"
 	"github.com/hasura/ndc-sdk-go/v2/connector"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
-	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/hasura/ndc-sdk-go/v2/utils/compression"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -400,7 +400,7 @@ func (um *UpstreamManager) InjectMockRequestSettings(
 func (um *UpstreamManager) getHeadersFromEnv(
 	logger *slog.Logger,
 	namespace string,
-	headers map[string]utils.EnvString,
+	headers map[string]goenvconf.EnvString,
 ) map[string]string {
 	results := make(map[string]string)
 

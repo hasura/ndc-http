@@ -8,11 +8,11 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
-	sdkUtils "github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/pb33f/libopenapi/datamodel/high/base"
 )
 
@@ -181,7 +181,13 @@ func mergeUnionTypeSchemasRecursive(
 
 	switch tr := inputs[0].TypeRead.(type) {
 	case *schema.NullableType:
-		result, ok = mergeUnionTypeSchemasRecursive(httpSchema, baseSchema, newInputs, unionType, fieldPaths)
+		result, ok = mergeUnionTypeSchemasRecursive(
+			httpSchema,
+			baseSchema,
+			newInputs,
+			unionType,
+			fieldPaths,
+		)
 	case *schema.ArrayType:
 		elemInputs := make([]SchemaInfoCache, len(inputs))
 
@@ -201,7 +207,13 @@ func mergeUnionTypeSchemasRecursive(
 			elemInputs[i] = item
 		}
 
-		result, ok = mergeUnionTypeSchemasRecursive(httpSchema, baseSchema, elemInputs, unionType, fieldPaths)
+		result, ok = mergeUnionTypeSchemasRecursive(
+			httpSchema,
+			baseSchema,
+			elemInputs,
+			unionType,
+			fieldPaths,
+		)
 		if !ok {
 			return nil, false
 		}
@@ -222,12 +234,22 @@ func mergeUnionTypeSchemasRecursive(
 					continue
 				}
 
-				rt, isMatched := mergeUnionTypes(httpSchema, result.TypeRead.Encode(), item.TypeRead.Encode(), fieldPaths)
+				rt, isMatched := mergeUnionTypes(
+					httpSchema,
+					result.TypeRead.Encode(),
+					item.TypeRead.Encode(),
+					fieldPaths,
+				)
 				if !isMatched {
 					return nil, false
 				}
 
-				wt, isMatched := mergeUnionTypes(httpSchema, result.TypeWrite.Encode(), item.TypeWrite.Encode(), fieldPaths)
+				wt, isMatched := mergeUnionTypes(
+					httpSchema,
+					result.TypeWrite.Encode(),
+					item.TypeWrite.Encode(),
+					fieldPaths,
+				)
 				if !isMatched {
 					return nil, false
 				}
@@ -533,30 +555,30 @@ func isXMLLeafObject(objectType rest.ObjectType) bool {
 }
 
 func createTLSConfig(keys []string) *exhttp.TLSConfig {
-	caPem := sdkUtils.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CA_PEM")))
-	caFile := sdkUtils.NewEnvStringVariable(
+	caPem := goenvconf.NewEnvStringVariable(utils.StringSliceToConstantCase(append(keys, "CA_PEM")))
+	caFile := goenvconf.NewEnvStringVariable(
 		utils.StringSliceToConstantCase(append(keys, "CA_FILE")),
 	)
-	certPem := sdkUtils.NewEnvStringVariable(
+	certPem := goenvconf.NewEnvStringVariable(
 		utils.StringSliceToConstantCase(append(keys, "CERT_PEM")),
 	)
-	certFile := sdkUtils.NewEnvStringVariable(
+	certFile := goenvconf.NewEnvStringVariable(
 		utils.StringSliceToConstantCase(append(keys, "CERT_FILE")),
 	)
-	keyPem := sdkUtils.NewEnvStringVariable(
+	keyPem := goenvconf.NewEnvStringVariable(
 		utils.StringSliceToConstantCase(append(keys, "KEY_PEM")),
 	)
-	keyFile := sdkUtils.NewEnvStringVariable(
+	keyFile := goenvconf.NewEnvStringVariable(
 		utils.StringSliceToConstantCase(append(keys, "KEY_FILE")),
 	)
-	serverName := sdkUtils.NewEnvStringVariable(
+	serverName := goenvconf.NewEnvStringVariable(
 		utils.StringSliceToConstantCase(append(keys, "SERVER_NAME")),
 	)
-	insecureSkipVerify := sdkUtils.NewEnvBool(
+	insecureSkipVerify := goenvconf.NewEnvBool(
 		utils.StringSliceToConstantCase(append(keys, "INSECURE_SKIP_VERIFY")),
 		false,
 	)
-	includeSystemCACertsPool := sdkUtils.NewEnvBool(
+	includeSystemCACertsPool := goenvconf.NewEnvBool(
 		utils.StringSliceToConstantCase(append(keys, "INCLUDE_SYSTEM_CA_CERTS_POOL")),
 		false,
 	)

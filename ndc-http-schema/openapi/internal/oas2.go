@@ -5,12 +5,12 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/ndc"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-http/ndc-http-schema/utils"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
-	sdkUtils "github.com/hasura/ndc-sdk-go/v2/utils"
 	"github.com/pb33f/libopenapi"
 	"github.com/pb33f/libopenapi/datamodel/high/base"
 	v2 "github.com/pb33f/libopenapi/datamodel/high/v2"
@@ -37,7 +37,7 @@ func (oc *OAS2Builder) BuildDocumentModel(
 	}
 
 	envName := utils.StringSliceToConstantCase([]string{oc.EnvPrefix, "SERVER_URL"})
-	urlEnv := sdkUtils.NewEnvStringVariable(envName)
+	urlEnv := goenvconf.NewEnvStringVariable(envName)
 
 	if docModel.Model.Host != "" {
 		scheme := "https"
@@ -56,7 +56,7 @@ func (oc *OAS2Builder) BuildDocumentModel(
 		)
 
 		if _, err := exhttp.ParseHttpURL(serverURL); err == nil {
-			urlEnv = sdkUtils.NewEnvString(envName, serverURL)
+			urlEnv = goenvconf.NewEnvString(envName, serverURL)
 		}
 	}
 
@@ -116,15 +116,15 @@ func (oc *OAS2Builder) convertSecuritySchemes(
 			return err
 		}
 
-		valueEnv := sdkUtils.NewEnvStringVariable(
+		valueEnv := goenvconf.NewEnvStringVariable(
 			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key}),
 		)
 		result.SecuritySchemer = rest.NewAPIKeyAuthConfig(security.Name, inLocation, valueEnv)
 	case string(rest.BasicAuthScheme):
-		user := sdkUtils.NewEnvStringVariable(
+		user := goenvconf.NewEnvStringVariable(
 			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "USERNAME"}),
 		)
-		password := sdkUtils.NewEnvStringVariable(
+		password := goenvconf.NewEnvStringVariable(
 			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "PASSWORD"}),
 		)
 		result.SecuritySchemer = rest.NewBasicAuthConfig(user, password)
@@ -146,7 +146,7 @@ func (oc *OAS2Builder) convertSecuritySchemes(
 			AuthorizationURL: security.AuthorizationUrl,
 		}
 
-		tokenURL := sdkUtils.NewEnvStringVariable(
+		tokenURL := goenvconf.NewEnvStringVariable(
 			utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "TOKEN_URL"}),
 		)
 		if security.TokenUrl != "" {
@@ -165,10 +165,10 @@ func (oc *OAS2Builder) convertSecuritySchemes(
 		}
 
 		if flowType == rest.ClientCredentialsFlow {
-			clientID := sdkUtils.NewEnvStringVariable(
+			clientID := goenvconf.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_ID"}),
 			)
-			clientSecret := sdkUtils.NewEnvStringVariable(
+			clientSecret := goenvconf.NewEnvStringVariable(
 				utils.StringSliceToConstantCase([]string{oc.EnvPrefix, key, "CLIENT_SECRET"}),
 			)
 			flow.ClientID = &clientID
@@ -328,7 +328,13 @@ func (oc *OAS2Builder) getSchemaTypeFromParameter(
 		if param.Items == nil || param.Items.Type == "" {
 			typeEncoder = schema.NewArrayType(schema.NewNamedType(string(rest.ScalarJSON)))
 		} else {
-			itemName := getScalarFromType(oc.schema, []string{param.Items.Type}, param.Format, param.Enum, fieldPaths)
+			itemName := getScalarFromType(
+				oc.schema,
+				[]string{param.Items.Type},
+				param.Format,
+				param.Enum,
+				fieldPaths,
+			)
 			typeEncoder = schema.NewArrayType(schema.NewNamedType(itemName))
 		}
 	default:

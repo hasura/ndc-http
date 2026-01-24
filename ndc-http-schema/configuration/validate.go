@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"github.com/hasura/ndc-sdk-go/v2/utils"
 	"go.yaml.in/yaml/v4"
 )
 
@@ -202,7 +202,13 @@ func (cv *ConfigValidator) validateArgumentPresets(
 			}
 		case *schema.ArgumentPresetValueForwardHeader:
 			cv.forwardedHeaderNames[t.Name] = true
-			cv.addWarning(namespace, fmt.Sprintf("Make sure that the %s header is added to the header forwarding list.", t.Name))
+			cv.addWarning(
+				namespace,
+				fmt.Sprintf(
+					"Make sure that the %s header is added to the header forwarding list.",
+					t.Name,
+				),
+			)
 		}
 	}
 }
@@ -472,7 +478,7 @@ func (cv *ConfigValidator) addError(namespace string, value string) {
 
 func (cv *ConfigValidator) validateEnvString(
 	schemaDoc *schemaDocInfo,
-	value *utils.EnvString,
+	value *goenvconf.EnvString,
 ) bool {
 	if value == nil {
 		return false
