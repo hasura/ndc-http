@@ -195,7 +195,6 @@ func (client *HTTPClient) sendSingle(
 
 	resp, cancel, err := client.manager.ExecuteRequest(
 		ctx,
-		span,
 		request,
 		namespace,
 		client.requestArguments,

@@ -20,7 +20,6 @@ import (
 	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"github.com/hasura/ndc-sdk-go/v2/utils/compression"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -198,7 +197,6 @@ func (um *UpstreamManager) CreateHTTPClient(
 // ExecuteRequest executes a request to the upstream server.
 func (um *UpstreamManager) ExecuteRequest(
 	ctx context.Context,
-	span trace.Span,
 	request *RetryableRequest,
 	namespace string,
 	requestArguments HTTPRequestArguments,
@@ -213,9 +211,6 @@ func (um *UpstreamManager) ExecuteRequest(
 			bytes.NewReader(request.Body),
 		)
 		if err != nil {
-			span.SetStatus(codes.Error, "failed to execute the request")
-			span.RecordError(err)
-
 			return nil, nil, schema.NewConnectorError(
 				http.StatusInternalServerError,
 				err.Error(),
@@ -284,9 +279,7 @@ func (um *UpstreamManager) evalRequestSettings(
 	}
 
 	logger := connector.GetLogger(ctx)
-	securityOptional := securities.IsOptional()
-
-	var err error
+	span := trace.SpanFromContext(ctx)
 
 	server, ok := settings.servers[request.ServerID]
 	if ok {
@@ -300,10 +293,8 @@ func (um *UpstreamManager) evalRequestSettings(
 			}
 		}
 
-		if !securityOptional && len(server.Credentials) > 0 {
-			var hc *http.Client
-
-			hc, err = um.evalSecuritySchemes(req, securities, server.Credentials)
+		if len(server.Credentials) > 0 {
+			hc, securityName, err := um.evalSecuritySchemes(req, securities, server.Credentials)
 			if err != nil {
 				logger.Error(
 					fmt.Sprintf("failed to evaluate the authentication: %s", err),
@@ -313,13 +304,15 @@ func (um *UpstreamManager) evalRequestSettings(
 			}
 
 			if hc != nil {
+				span.SetAttributes(attribute.String("security.key", securityName))
+
 				return hc, nil
 			}
 		}
 	}
 
-	if !securityOptional && len(settings.credentials) > 0 {
-		hc, err := um.evalSecuritySchemes(req, securities, settings.credentials)
+	if len(settings.credentials) > 0 {
+		hc, securityName, err := um.evalSecuritySchemes(req, securities, settings.credentials)
 		if err != nil {
 			logger.Error(
 				fmt.Sprintf("failed to evaluate the authentication: %s", err),
@@ -330,6 +323,8 @@ func (um *UpstreamManager) evalRequestSettings(
 		}
 
 		if hc != nil {
+			span.SetAttributes(attribute.String("security.key", securityName))
+
 			return hc, nil
 		}
 	}
@@ -341,24 +336,39 @@ func (um *UpstreamManager) evalSecuritySchemes(
 	req *http.Request,
 	securities rest.AuthSecurities,
 	credentials map[string]security.Credential,
-) (*http.Client, error) {
+) (*http.Client, string, error) {
+	// find the security that is required in the operation.
 	for _, security := range securities {
-		sc, ok := credentials[security.Name()]
+		securityName := security.Name()
+
+		sc, ok := credentials[securityName]
 		if !ok {
 			continue
 		}
 
 		hasAuth, err := sc.Inject(req)
 		if err != nil {
-			return nil, err
+			return nil, securityName, err
 		}
 
 		if hasAuth {
-			return sc.GetClient(), nil
+			return sc.GetClient(), securityName, nil
 		}
 	}
 
-	return nil, nil
+	// fallback to the first working credential.
+	for name, cred := range credentials {
+		hasAuth, err := cred.Inject(req)
+		if err != nil {
+			continue
+		}
+
+		if hasAuth {
+			return cred.GetClient(), name, nil
+		}
+	}
+
+	return nil, "", nil
 }
 
 // InjectMockRequestSettings injects mock credential into the request for explain APIs.
@@ -380,10 +390,11 @@ func (um *UpstreamManager) InjectMockRequestSettings(
 		securities = settings.security
 	}
 
-	if securities.IsOptional() || len(settings.credentials) == 0 {
+	if len(settings.credentials) == 0 {
 		return
 	}
 
+	// find the security that is required in the operation.
 	for _, security := range securities {
 		sc, ok := settings.credentials[security.Name()]
 		if !ok {
@@ -391,6 +402,18 @@ func (um *UpstreamManager) InjectMockRequestSettings(
 		}
 
 		hasAuth := sc.InjectMock(req)
+		if hasAuth {
+			return
+		}
+	}
+
+	// fallback to the first working credential.
+	for _, cred := range settings.credentials {
+		hasAuth, err := cred.Inject(req)
+		if err != nil {
+			continue
+		}
+
 		if hasAuth {
 			return
 		}
