@@ -110,6 +110,10 @@ func (j SchemaFileFormat) IsValid() bool {
 
 // ParseSchemaFileFormat parses SchemaFileFormat from file extension.
 func ParseSchemaFileFormat(extension string) (SchemaFileFormat, error) {
+	if extension == "yml" {
+		extension = "yaml"
+	}
+
 	result := SchemaFileFormat(extension)
 	if !result.IsValid() {
 		return result, fmt.Errorf(
