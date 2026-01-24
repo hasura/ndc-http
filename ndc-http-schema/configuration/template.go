@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -69,7 +70,8 @@ func writeWarningIf(w io.Writer, text string, noColor bool) {
 
 // extract the relative context path for templates.
 func tryRelPath(maybeAbsPath string, basePath string) string {
-	if !filepath.IsAbs(maybeAbsPath) {
+	if strings.HasPrefix(maybeAbsPath, "http://") || strings.HasPrefix(maybeAbsPath, "https://") ||
+		!filepath.IsAbs(maybeAbsPath) {
 		return maybeAbsPath
 	}
 

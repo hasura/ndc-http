@@ -4,6 +4,10 @@ on:
   workflow_call:
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   test-go:
     name: Run unit tests

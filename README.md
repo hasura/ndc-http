@@ -84,6 +84,16 @@ Most of web frameworks support plugins or middlewares for OpenAPI generation the
 
 Otherwise, if you are using [Postman](https://www.postman.com/) to manage your API documentation, many tools, such as [postman2openapi] (https://kevinswiber.github.io/postman2openapi/), will help you convert Postman collections to OpenAPI documents.
 
+## AI Assistance Disclosure
+
+This project has been developed with assistance from AI coding tools, including:
+
+- Test case development.
+- Documentation improvements.
+- Code review and optimization suggestions.
+
+All AI-generated code has been reviewed, tested, and validated by human developers to ensure quality, security, and correctness. The AI tools serve as development accelerators while maintaining human oversight and decision-making.
+
 ## License
 
 HTTP Connector is available under the [Apache License 2.0](./LICENSE).

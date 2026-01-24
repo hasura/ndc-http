@@ -35,8 +35,6 @@ func TestConfigValidator(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Dir, func(t *testing.T) {
 			connectorDir := filepath.Join(absDir, tc.Dir, "connector", "http")
-			expectedBytes, expectedErr := os.ReadFile(filepath.Join(tc.Dir, "expected.tpl"))
-			assert.NilError(t, expectedErr)
 			config, schemas, mergedSchema, err := UpdateHTTPConfiguration(
 				connectorDir,
 				slog.Default(),
@@ -48,6 +46,9 @@ func TestConfigValidator(t *testing.T) {
 			}
 
 			assert.NilError(t, err)
+
+			expectedBytes, expectedErr := os.ReadFile(filepath.Join(tc.Dir, "expected.tpl"))
+			assert.NilError(t, expectedErr)
 
 			validStatus, err := ValidateConfiguration(
 				config,
