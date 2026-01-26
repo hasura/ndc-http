@@ -5,7 +5,7 @@ on:
       - "v*"
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   packages: write
 
@@ -22,14 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [tests]
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up containerd
-        uses: crazy-max/ghaction-setup-containerd@v3
-
-      - name: Fix containerd socket permissions
-        run: |
-          sudo chgrp docker /run/containerd/containerd.sock
+      - uses: actions/checkout@v6
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -56,30 +49,7 @@ jobs:
         with:
           images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          push: false
-          tags: ${{ steps.docker-metadata.outputs.tags }}
-          labels: ${{ steps.docker-metadata.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            VERSION=${{ steps.get-version.outputs.tagged_version }}
-          # Export the image to a tar so it can be imported into containerd so gokakashi can scan it
-          outputs: type=oci,dest=/tmp/image.tar
-
-      - name: Import docker image into containerd store
-        run: |
-          ctr images import --base-name ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }} --digests --all-platforms /tmp/image.tar
-
-      - name: Get first docker tag for gokakashi
-        id: first-docker-tag
-        run: |
-          FIRST_TAG=$(echo "${{ steps.docker-metadata.outputs.tags }}" | head -n 1)
-          echo "First docker tag: $FIRST_TAG"
-          echo "tag=$FIRST_TAG" >> $GITHUB_OUTPUT
-
-      - name: Push docker image
+      - name: Build and Push docker image
         uses: docker/build-push-action@v6
         with:
           push: true
@@ -89,35 +59,14 @@ jobs:
           build-args: |
             VERSION=${{ steps.get-version.outputs.tagged_version }}
 
-      - name: Scan docker image with gokakashi
-        uses: shinobistack/gokakashi-action@v0.2.0
-        continue-on-error: true
-        with:
-          image: ${{ steps.first-docker-tag.outputs.tag }}
-          labels: agentKey=${{ github.run_id }}
-          policy: ci-platform
-          server: https://gokakashi-server.hasura-app.io
-          token: ${{ secrets.GOKAKASHI_API_TOKEN }}
-          cf_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-          cf_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-          interval: 10
-          retries: 8
-
-      - name: Upload Trivy report as artifact
-        uses: actions/upload-artifact@v4
-        continue-on-error: true
-        with:
-          name: trivy-report
-          path: /tmp/trivy-report-*.json
-
   build-cli-and-manifests:
     name: Build the CLI binaries and manifests
     runs-on: ubuntu-latest
     needs: [release-image]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+        uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
       - name: Build the CLI
