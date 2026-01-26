@@ -15,12 +15,13 @@ import (
 
 // ConfigValidator manages the validation and status of upstreams.
 type ConfigValidator struct {
-	config       *Configuration
-	templates    *template.Template
-	mergedSchema *schema.NDCHttpSchema
-	logger       *slog.Logger
-	contextPath  string
-	noColor      bool
+	config              *Configuration
+	templates           *template.Template
+	mergedSchema        *schema.NDCHttpSchema
+	logger              *slog.Logger
+	contextPath         string
+	relativeContextPath string
+	noColor             bool
 
 	subgraphName              string
 	connectorName             string
@@ -56,6 +57,7 @@ func ValidateConfiguration(
 		forwardedHeaderNames:      make(map[string]bool),
 		requiredHeadersForwarding: map[schema.SecuritySchemeType]bool{},
 		contextPath:               contextPath,
+		relativeContextPath:       tryRelPath(contextPath, ""),
 		errors:                    map[string][]string{},
 		warnings:                  map[string][]string{},
 	}
@@ -95,7 +97,7 @@ func (cv *ConfigValidator) evaluateSchema(ndcSchema *NDCHttpRuntimeSchema) error
 
 	if ndcSchema.Settings == nil || len(ndcSchema.Settings.Servers) == 0 {
 		errorMsg, err := cv.renderTemplate(templateEmptySettings, map[string]any{
-			"ContextPath": cv.contextPath,
+			"ContextPath": cv.relativeContextPath,
 			"Namespace":   ndcSchema.Name,
 		})
 		if err != nil {

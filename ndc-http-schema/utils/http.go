@@ -36,17 +36,7 @@ func IsContentTypeMultipartForm(contentType string) bool {
 
 // CloneURL clones the input URL to a new instance.
 func CloneURL(input *url.URL) *url.URL {
-	return &url.URL{
-		Scheme:      input.Scheme,
-		Opaque:      input.Opaque,
-		User:        input.User,
-		Host:        input.Host,
-		Path:        input.Path,
-		RawPath:     input.RawPath,
-		OmitHost:    input.OmitHost,
-		ForceQuery:  input.ForceQuery,
-		RawQuery:    input.RawQuery,
-		Fragment:    input.Fragment,
-		RawFragment: input.RawFragment,
-	}
+	result := *input
+
+	return &result
 }

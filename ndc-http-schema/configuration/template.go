@@ -3,6 +3,9 @@ package configuration
 import (
 	"embed"
 	"io"
+	"os"
+	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -17,13 +20,9 @@ const (
 )
 
 const (
-	ansiReset          = "\033[0m"
-	ansiFaint          = "\033[2m"
-	ansiResetFaint     = "\033[22m"
-	ansiBrightRed      = "\033[91m"
-	ansiBrightGreen    = "\033[92m"
-	ansiBrightYellow   = "\033[93m"
-	ansiBrightRedFaint = "\033[91;2m"
+	ansiReset        = "\033[0m"
+	ansiBrightRed    = "\033[91m"
+	ansiBrightYellow = "\033[93m"
 )
 
 func getTemplates() (*template.Template, error) {
@@ -67,4 +66,28 @@ func writeWarningIf(w io.Writer, text string, noColor bool) {
 	if text != "" {
 		_, _ = w.Write([]byte(text))
 	}
+}
+
+// extract the relative context path for templates.
+func tryRelPath(maybeAbsPath string, basePath string) string {
+	if strings.HasPrefix(maybeAbsPath, "http://") || strings.HasPrefix(maybeAbsPath, "https://") ||
+		!filepath.IsAbs(maybeAbsPath) {
+		return maybeAbsPath
+	}
+
+	if basePath == "" {
+		currentDir, err := os.Getwd()
+		if err != nil {
+			return maybeAbsPath
+		}
+
+		basePath = currentDir
+	}
+
+	relativePath, err := filepath.Rel(basePath, maybeAbsPath)
+	if err != nil {
+		return maybeAbsPath
+	}
+
+	return relativePath
 }

@@ -29,11 +29,12 @@ func TestConfigValidator(t *testing.T) {
 	}
 
 	spacesRegex := regexp.MustCompile(`\n(\s|\t)*\n`)
+	absDir, err := os.Getwd()
+	assert.NilError(t, err)
 
 	for _, tc := range testCases {
 		t.Run(tc.Dir, func(t *testing.T) {
-			connectorDir := filepath.Join(tc.Dir, "connector", "http")
-			expectedBytes, err := os.ReadFile(filepath.Join(tc.Dir, "expected.tpl"))
+			connectorDir := filepath.Join(absDir, tc.Dir, "connector", "http")
 			config, schemas, mergedSchema, err := UpdateHTTPConfiguration(
 				connectorDir,
 				slog.Default(),
@@ -45,6 +46,9 @@ func TestConfigValidator(t *testing.T) {
 			}
 
 			assert.NilError(t, err)
+
+			expectedBytes, expectedErr := os.ReadFile(filepath.Join(tc.Dir, "expected.tpl"))
+			assert.NilError(t, expectedErr)
 
 			validStatus, err := ValidateConfiguration(
 				config,

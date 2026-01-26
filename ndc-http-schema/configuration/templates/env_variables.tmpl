@@ -2,6 +2,8 @@
 
     {{range $index, $variable := .Variables }}- {{ $variable }}
     {{end}}
+
+  If these variables are optional, for example, authentication tokens are forwarded from the client and the forwardHeaders option is enabled, then skip this warning.
   
   Use the DDN CLI to add environment variables if you haven't added them yet:
   

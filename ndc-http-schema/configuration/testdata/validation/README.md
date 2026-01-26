@@ -8,7 +8,7 @@ The connector plugin can't automatically add environment variables. Therefore, y
 ddn connector env add --connector testdata/validation/connector/http/connector.yaml --ENV_NAME=value
 ```
 
-### testdata/validation/connector/http/schema.yaml
+### schema.yaml
 
 | Name | Type | Default |
 | ---- | ---- | ------- |
@@ -28,7 +28,7 @@ ddn connector env add --connector testdata/validation/connector/http/connector.y
 | PET_STORE_URL | string |  |
 
 
-### testdata/validation/connector/http/schema2.yaml
+### schema2.yaml
 
 | Name | Type | Default |
 | ---- | ---- | ------- |

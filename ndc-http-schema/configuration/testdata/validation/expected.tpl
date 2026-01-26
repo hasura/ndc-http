@@ -3,7 +3,7 @@ WARNING:
   * Authorization header must be forwarded for the following authentication schemes: [cookie openIdConnect]
     See https://github.com/hasura/ndc-http/blob/main/docs/authentication.md#headers-forwarding for more information.
 
-  testdata/validation/connector/http/schema.yaml
+  schema.yaml
   
     * Make sure that the X-Pet-Status header is added to the header forwarding list.
 
@@ -25,6 +25,8 @@ Environment Variables:
     - PET_STORE_KEY_PEM
     - PET_STORE_TEST_HEADER
     - PET_STORE_URL
+
+  If these variables are optional, for example, authentication tokens are forwarded from the client and the forwardHeaders option is enabled, then skip this warning.
 
   Use the DDN CLI to add environment variables if you haven't added them yet:
 

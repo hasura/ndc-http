@@ -36,7 +36,7 @@ func BuildSchemaFromConfig(
 			continue
 		}
 
-		fileID := file.File
+		fileID := tryRelPath(file.File, configDir)
 
 		if slices.Contains(existedFileIDs, fileID) {
 			logger.Warn(
@@ -220,8 +220,10 @@ func buildSchemaFile(
 			return nil, err
 		}
 
+		relDir := tryRelPath(configDir, "")
+
 		if err := templates.ExecuteTemplate(os.Stderr, templateEmptySettings, map[string]any{
-			"ContextPath": configDir,
+			"ContextPath": relDir,
 			"Namespace":   configItem.File,
 		}); err != nil {
 			logger.Warn(err.Error())
