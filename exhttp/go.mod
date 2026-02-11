@@ -4,6 +4,7 @@ go 1.24.13
 
 require (
 	github.com/cenkalti/backoff/v5 v5.0.3
+	github.com/hasura/goenvconf v0.6.1
 	github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260124011343-f658e14823b0
 	github.com/prometheus/common v0.67.5
 	go.opentelemetry.io/otel v1.39.0

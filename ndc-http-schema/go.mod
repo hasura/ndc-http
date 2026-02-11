@@ -6,6 +6,7 @@ require (
 	github.com/alecthomas/kong v1.13.0
 	github.com/evanphx/json-patch v0.5.2
 	github.com/google/go-cmp v0.7.0
+	github.com/hasura/goenvconf v0.6.1
 	github.com/hasura/ndc-http/exhttp v0.0.1
 	github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260124011343-f658e14823b0
 	github.com/invopop/jsonschema v0.13.0
