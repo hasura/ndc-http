@@ -198,7 +198,7 @@ Production-ready HTTP client with:
 
 ### Prerequisites
 
-- **Go 1.24+** (as specified in [go.mod](go.mod:3))
+- **Go 1.26.1+** (as specified in [go.work](go.work:1))
 - **golangci-lint** for linting
 - **Docker** (optional, for integration tests)
 
@@ -226,11 +226,20 @@ make go-tidy
 # Generate JSON schema
 make build-jsonschema
 
+# Generate test configuration from OpenAPI specs
+make generate-test-config
+
+# Remove build output directory
+make clean
+
 # Start DDN environment
 make start-ddn
 
 # Stop DDN environment
 make stop-ddn
+
+# Build and test full supergraph integration
+make build-supergraph-test
 ```
 
 ### Testing
@@ -248,9 +257,21 @@ go test -v ./connector/internal/contenttype/
 ```
 
 Test fixtures are in:
-- [connector/testdata/](connector/testdata/) - Connector test configurations
+- [connector/testdata/](connector/testdata/) - Connector test configurations:
+  - `petstore3/` - Petstore API OpenAPI 3.0 example with query/mutation snapshots
+  - `jsonplaceholder/` - JSONPlaceholder API integration example
+  - `auth/` - Authentication scheme examples
+  - `patch/` - JSON Patch before/after examples
+  - `compression/` - Compression handling tests
+  - `presets/` - Argument preset examples
+  - `tls/` - TLS/mTLS certificate tests with `certs/` and `certs_s1/` subdirectories
+  - `multi-schemas/` - Multi-API composition (cat.yaml, dog.yaml)
+  - `raw/` - Raw/schemaless request examples
+  - `stripe/` - Stripe API example
 - [ndc-http-schema/command/testdata/](ndc-http-schema/command/testdata/) - CLI test data
-- [tests/](tests/) - Integration tests
+- [tests/](tests/) - Integration tests and DDN engine configurations
+
+The CI test script ([scripts/test.sh](scripts/test.sh)) runs coverage collection per module, starts a Hydra OAuth server for auth integration tests, and uses `ndc-test` for NDC specification compliance validation.
 
 ### Building
 
@@ -387,10 +408,12 @@ Combine multiple API specifications into a single connector:
 - **Retry with Backoff** - Configurable retry strategy with exponential backoff
 - **Timeout Management** - Per-request and global timeouts
 - **Header Forwarding** - Forward headers from Hasura engine
-- **Argument Presets** - Set default argument values
-- **Response Transforms** - Transform API responses before returning
-- **Distributed Execution** - Send requests to multiple servers
+- **Argument Presets** - Set default argument values using JSONPath for nested field navigation
+- **Response Transforms** - Transform API responses before returning via JSONPath/templates
+- **Distributed Execution** - Fan-out requests to multiple upstream servers; controlled via `HTTPOptions` (fields: `servers`, `parallel`, `concurrency`)
 - **Schemaless Requests** - GraphQL-to-REST proxy without schema
+- **Compression** - Automatic gzip/deflate request encoding and response decompression via `Accept-Encoding`
+- **JSON Patch** - Modify OpenAPI specs at conversion time without editing source files
 
 ### 4. Observability
 
@@ -435,6 +458,22 @@ The project uses Go workspaces ([go.work](go.work:1)):
 - Main module: `github.com/hasura/ndc-http`
 - Local modules: `./ndc-http-schema`, `./exhttp`
 - Run `make go-tidy` after dependency changes
+
+### Linter Configuration
+
+The project uses golangci-lint v2 (see [.golangci.yml](.golangci.yml)):
+
+**Formatters:** `gci`, `gofmt`, `gofumpt`, `goimports`, `golines`
+
+**Complexity thresholds:**
+- Function length: 200 lines / 90 statements
+- Cyclomatic complexity: 40 (`gocyclo`), 30 (`cyclop`)
+- Cognitive complexity: 60 (`gocognit`)
+- Nesting complexity: 15 (`nestif`)
+
+**Per-directory exclusions:**
+- `ndc-http-schema`: `goconst` disabled (many repeated schema strings)
+- `ndc-http-schema/openapi`: `dupl` disabled (similar OpenAPI parsing patterns)
 
 ## Important Files
 
@@ -502,6 +541,33 @@ The project uses Go workspaces ([go.work](go.work:1)):
 2. Update conversion logic in [ndc-http-schema/configuration/](ndc-http-schema/configuration/)
 3. Regenerate JSON schema: `make build-jsonschema`
 
+### Using the Patch System
+
+The connector supports JSON Patch (RFC 6902) to modify OpenAPI specs without editing source files. Patches are applied before schema conversion.
+
+**Patch file format:**
+```yaml
+# patch-after.yaml - applied to the converted NDC schema
+- op: remove
+  path: /settings/securitySchemes/petstore_auth
+- op: replace
+  path: /settings/servers/0/url/value
+  value: https://api.example.com
+```
+
+**Register patches in config:**
+```yaml
+files:
+  - file: openapi.yaml
+    spec: openapi3
+    patchBefore:
+      - path: patch-before.yaml  # applied before conversion
+    patchAfter:
+      - path: patch-after.yaml   # applied after conversion
+```
+
+Patch examples: [connector/testdata/patch/](connector/testdata/patch/), [ndc-http-schema/command/testdata/patch/](ndc-http-schema/command/testdata/patch/)
+
 ## Testing with Hasura DDN
 
 ### Local Development
@@ -549,6 +615,18 @@ ndc-http-schema convert --log-level=debug -f openapi.yaml
 # Server
 HASURA_LOG_LEVEL=debug ./server/main.go serve
 ```
+
+## CI/CD Pipelines
+
+Located in [.github/workflows/](.github/workflows/):
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `test.yaml` | Push/PR | Runs unit tests, NDC compliance tests (`ndc-test`), coverage reports posted to PRs |
+| `lint.yaml` | Push/PR | Detects all workspace modules, runs `golangci-lint` per module, checks `gofmt` |
+| `release.yaml` | Tag `v*` | Builds multi-platform Docker images (`linux/amd64`, `linux/arm64`), cross-compiles CLI binaries via `gox`, creates draft GitHub release, generates plugin manifests |
+
+**Platforms for CLI release:** `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`
 
 ## Contributing
 

@@ -72,7 +72,7 @@ func (ssp ParameterItems) find(keys []Key) (*ParameterItem, int) {
 		isEqual := false
 
 		for j, value := range item.keys {
-			isEqual = value == keys[j]
+			isEqual = len(keys) > j && value == keys[j] //nolint:gosec
 			if !isEqual {
 				return nil, -1
 			}

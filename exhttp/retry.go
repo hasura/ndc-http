@@ -12,7 +12,6 @@ import (
 	"github.com/cenkalti/backoff/v5"
 	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
-	"github.com/hasura/ndc-sdk-go/v2/utils"
 )
 
 var defaultRetryHTTPStatus = []int{408, 429, 500, 502, 503}
@@ -181,37 +180,37 @@ func (rp RetryPolicy) GetExponentialBackoff() *backoff.ExponentialBackOff {
 // Schema returns the object type schema of this type.
 func (rp RetryPolicy) Schema() schema.ObjectType {
 	return schema.ObjectType{
-		Description: utils.ToPtr("Retry policy of request"),
+		Description: new("Retry policy of request"),
 		Fields: schema.ObjectTypeFields{
 			"times": {
-				Description: utils.ToPtr("Number of retry times"),
+				Description: new("Number of retry times"),
 				Type:        schema.NewNamedType("Int32").Encode(),
 			},
 			"delay": {
-				Description: utils.ToPtr(
+				Description: new(
 					"The initial wait time in milliseconds before a retry is attempted.",
 				),
 				Type: schema.NewNullableType(schema.NewNamedType("Int32")).Encode(),
 			},
 			"httpStatus": {
-				Description: utils.ToPtr("List of HTTP status the connector will retry on"),
+				Description: new("List of HTTP status the connector will retry on"),
 				Type: schema.NewNullableType(schema.NewArrayType(schema.NewNamedType("Int32"))).
 					Encode(),
 			},
 			"jitter": {
-				Description: utils.ToPtr(
+				Description: new(
 					"How much does the reconnection time vary relative to the base value. Must be in range (0, 1)",
 				),
 				Type: schema.NewNullableType(schema.NewNamedType("Float64")).Encode(),
 			},
 			"multiplier": {
-				Description: utils.ToPtr(
+				Description: new(
 					"How much should the reconnection time grow on subsequent attempts. Must be >=1; 1 = constant interval",
 				),
 				Type: schema.NewNullableType(schema.NewNamedType("Float64")).Encode(),
 			},
 			"maxIntervalSeconds": {
-				Description: utils.ToPtr("How much can the wait time grow. Defaults to 60 seconds"),
+				Description: new("How much can the wait time grow. Defaults to 60 seconds"),
 				Type:        schema.NewNullableType(schema.NewNamedType("Float64")).Encode(),
 			},
 		},

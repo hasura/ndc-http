@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/hasura/gotel/otelutils"
 	"github.com/hasura/ndc-sdk-go/v2/connector"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -89,7 +90,7 @@ func (tt TelemetryConfig) do(
 	requestLogAttrs := map[string]any{
 		"url":     req.URL.String(),
 		"method":  req.Method,
-		"headers": connector.NewTelemetryHeaders(req.Header),
+		"headers": otelutils.NewTelemetryHeaders(req.Header),
 	}
 
 	if isDebug && req.Body != nil && req.ContentLength > 0 && req.ContentLength <= 100*1024 {

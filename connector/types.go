@@ -4,14 +4,14 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/hasura/ndc-sdk-go/v2/connector"
+	"github.com/hasura/gotel"
 )
 
 var errBuildSchemaFailed = errors.New("failed to build NDC HTTP schema")
 
 // State is the global state which is shared for every connector request.
 type State struct {
-	Tracer *connector.Tracer
+	Tracer *gotel.Tracer
 }
 
 type options struct {
