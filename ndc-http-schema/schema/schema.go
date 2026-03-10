@@ -159,7 +159,7 @@ type TypeSchema struct {
 	Format      string      `json:"format,omitempty"    mapstructure:"format"    yaml:"format,omitempty"`
 	Pattern     string      `json:"pattern,omitempty"   mapstructure:"pattern"   yaml:"pattern,omitempty"`
 	Maximum     *float64    `json:"maximum,omitempty"   mapstructure:"maximum"   yaml:"maximum,omitempty"`
-	Minimum     *float64    `json:"minimum,omitempty,"  mapstructure:"minimum"   yaml:"minimum,omitempty"`
+	Minimum     *float64    `json:"minimum,omitempty"   mapstructure:"minimum"   yaml:"minimum,omitempty"`
 	MaxLength   *int64      `json:"maxLength,omitempty" mapstructure:"maxLength" yaml:"maxLength,omitempty"`
 	MinLength   *int64      `json:"minLength,omitempty" mapstructure:"minLength" yaml:"minLength,omitempty"`
 	Items       *TypeSchema `json:"items,omitempty"     mapstructure:"items"     yaml:"items,omitempty"`

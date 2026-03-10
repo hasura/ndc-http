@@ -132,7 +132,9 @@ func (ks Keys) String() string {
 
 	for i, k := range ks {
 		if k.index != nil {
-			sb.WriteString(fmt.Sprintf("[%d]", *k.index))
+			sb.WriteByte('[')
+			sb.WriteString(strconv.Itoa(*k.index))
+			sb.WriteByte(']')
 
 			continue
 		}
