@@ -72,7 +72,7 @@ func (ssp ParameterItems) find(keys []Key) (*ParameterItem, int) {
 		isEqual := false
 
 		for j, value := range item.keys {
-			isEqual = value == keys[j]
+			isEqual = len(keys) > j && value == keys[j] //nolint:gosec
 			if !isEqual {
 				return nil, -1
 			}
@@ -132,7 +132,9 @@ func (ks Keys) String() string {
 
 	for i, k := range ks {
 		if k.index != nil {
-			sb.WriteString(fmt.Sprintf("[%d]", *k.index))
+			sb.WriteByte('[')
+			sb.WriteString(strconv.Itoa(*k.index))
+			sb.WriteByte(']')
 
 			continue
 		}

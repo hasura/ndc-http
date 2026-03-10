@@ -13,6 +13,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/hasura/gotel"
 	"github.com/hasura/ndc-http/connector/internal/contenttype"
 	"github.com/hasura/ndc-http/exhttp"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
@@ -26,7 +27,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-var tracer = connector.NewTracer("HTTPClient")
+var tracer = gotel.NewTracer("HTTPClient")
 
 // HTTPClient represents a http client wrapper with advanced methods.
 type HTTPClient struct {
