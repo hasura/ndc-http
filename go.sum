@@ -39,8 +39,8 @@ github.com/hasura/goenvconf v0.6.2 h1:+473Aw5Isi4AMG0BhxUKMwkmbWAda0nXRPPkvzTxrE
 github.com/hasura/goenvconf v0.6.2/go.mod h1:mj6eef7yeb8K79e8nI4iCY7ImEydpkSCIiNsU3H5iBA=
 github.com/hasura/gotel v0.6.2 h1:alo4Vj4O2DJAp2FAWStjz7gQEGal8ruKKznaeV1IEv4=
 github.com/hasura/gotel v0.6.2/go.mod h1:g3hlHSH8v18FE6spGpjYErVbOvERyGZ9OTD1KIufnzk=
-github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260307095527-fb83196bf54d h1:QkIGLPQB4FN4sysXIh8vy2dO3balWi8XiX3ZYXrss7k=
-github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260307095527-fb83196bf54d/go.mod h1:SwOnHGEhUjd3JbnPLKIrndDijSouWEmmOdL/W16WapI=
+github.com/hasura/ndc-sdk-go/v2 v2.3.0 h1:a1se1xFcRjcf7TMGH+9ZZPObaOw6L8blVzMnco5qdic=
+github.com/hasura/ndc-sdk-go/v2 v2.3.0/go.mod h1:SwOnHGEhUjd3JbnPLKIrndDijSouWEmmOdL/W16WapI=
 github.com/hexops/gotextdiff v1.0.3 h1:gitA9+qJrrTCsiCl7+kh75nPqQt1cx4ZkudSTLoUqJM=
 github.com/hexops/gotextdiff v1.0.3/go.mod h1:pSWU5MAI3yDq+fZBTazCSJysOMbxWL1BSow5/V2vxeg=
 github.com/invopop/jsonschema v0.13.0 h1:KvpoAJWEjR3uD9Kbm2HWJmqsEaHt8lBUpd0qHcIi21E=

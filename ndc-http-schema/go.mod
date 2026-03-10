@@ -8,7 +8,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/hasura/goenvconf v0.6.2
 	github.com/hasura/ndc-http/exhttp v0.0.1
-	github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260124011343-f658e14823b0
+	github.com/hasura/ndc-sdk-go/v2 v2.3.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/pb33f/libopenapi v0.34.2

@@ -9,7 +9,7 @@ require (
 	github.com/hasura/gotel v0.6.2
 	github.com/hasura/ndc-http/exhttp v0.0.1
 	github.com/hasura/ndc-http/ndc-http-schema v0.0.0-20260211224901-8ad2f13a16c8
-	github.com/hasura/ndc-sdk-go/v2 v2.2.1-0.20260307095527-fb83196bf54d
+	github.com/hasura/ndc-sdk-go/v2 v2.3.0
 	github.com/theory/jsonpath v0.11.0
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/trace v1.42.0
