@@ -687,7 +687,7 @@ func SetHeaderParameters(
 	}
 
 	explode := param.GetExplode(rest.InHeader)
-	headerValues := transformParameterItemStrings(queryParams, explode)
+	headerValues := transformParameterItemStrings(queryParams, explode, false)
 	header.Set(param.Name, strings.Join(headerValues, ","))
 }
 
@@ -714,7 +714,12 @@ func encodePathParameterValue(
 	defaultParam := queryParams.FindDefault()
 	// the param is an array or a primitive value
 	if defaultParam != nil {
-		values := defaultParam.Values()
+		// Percent-encode each individual value before joining so that style
+		// separators (",", ";", ".") are preserved while reserved characters
+		// such as "/" and ".." inside a value are escaped. This prevents
+		// path-traversal (CWE-22) where a crafted string path parameter could
+		// otherwise redirect the upstream request to an arbitrary path.
+		values := escapePathParameterValues(defaultParam.Values())
 
 		if len(values) == 0 || (len(values) == 1 && values[0] == "") {
 			switch style {
@@ -758,7 +763,7 @@ func encodePathParameterValue(
 		}
 	}
 
-	keyValues := transformParameterItemStrings(queryParams, explode)
+	keyValues := transformParameterItemStrings(queryParams, explode, true)
 
 	switch style {
 	case rest.EncodingStyleMatrix:
@@ -782,13 +787,41 @@ func encodePathParameterValue(
 	}
 }
 
-func transformParameterItemStrings(queryParams ParameterItems, explode bool) []string {
+// escapePathParameterValues percent-encodes each value individually so that it
+// is safe to substitute into a URL path. Escaping per element (rather than the
+// joined string) preserves the style separators while neutralizing reserved
+// characters such as "/" and ".." that would otherwise enable path traversal.
+func escapePathParameterValues(values []string) []string {
+	escaped := make([]string, len(values))
+	for i, v := range values {
+		escaped[i] = url.PathEscape(v)
+	}
+
+	return escaped
+}
+
+// transformParameterItemStrings flattens parameter items into key/value strings.
+// When escape is true (path parameters), each key and value is percent-encoded
+// individually to prevent path traversal; header parameters pass escape=false
+// to keep their existing raw behavior.
+func transformParameterItemStrings(
+	queryParams ParameterItems,
+	explode bool,
+	escape bool,
+) []string {
 	var headerValues []string
 
 	for _, pair := range queryParams {
 		key := pair.Keys().Format(false)
+		if escape {
+			key = url.PathEscape(key)
+		}
 
 		for _, value := range pair.Values() {
+			if escape {
+				value = url.PathEscape(value)
+			}
+
 			if explode {
 				// R=100,G=200,B=150
 				headerValues = append(headerValues, key+"="+value)

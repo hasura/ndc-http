@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"path"
 	"slices"
 	"strings"
 	"testing"
@@ -1440,6 +1441,90 @@ func TestEncodePathParameters(t *testing.T) {
 				tc.param.EncodingObject,
 			)
 			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+// TestEncodePathParameters_PathTraversal is a regression test for CWE-22.
+//
+// A string path parameter value such as "../../../admin/secret" must NOT be
+// substituted into the path verbatim. Otherwise, after the connector joins the
+// rendered path onto the upstream base URL with path.Join (which calls
+// path.Clean), the "/" and ".." segments would collapse and redirect the
+// credentialed upstream request to an arbitrary path (e.g. /admin/secret).
+//
+// Reported by Alwin Persson (Intigriti).
+func TestEncodePathParameters_PathTraversal(t *testing.T) {
+	const (
+		operationPath = "/item/{name}"
+		paramName     = "name"
+		maliciousVal  = "../../../admin/secret"
+	)
+
+	testCases := []struct {
+		name  string
+		enc   rest.EncodingObject
+		value string
+	}{
+		{
+			name:  "simple",
+			value: maliciousVal,
+		},
+		{
+			name:  "matrix",
+			enc:   rest.EncodingObject{Style: rest.EncodingStyleMatrix},
+			value: maliciousVal,
+		},
+		{
+			name:  "label",
+			enc:   rest.EncodingObject{Style: rest.EncodingStyleLabel},
+			value: maliciousVal,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			inputs := ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{tc.value},
+				},
+			}
+
+			rendered := EncodePathParameters(operationPath, paramName, inputs, tc.enc)
+
+			// The encoded value must not reintroduce raw path separators or
+			// traversal segments into the rendered path.
+			assert.Assert(
+				t,
+				!strings.Contains(rendered, "../"),
+				"rendered path must not contain raw traversal segments, got %q",
+				rendered,
+			)
+			assert.Assert(
+				t,
+				strings.Contains(rendered, url.PathEscape(tc.value)) ||
+					strings.Contains(rendered, "%2F"),
+				"the malicious value should be percent-encoded, got %q",
+				rendered,
+			)
+
+			// Mirror upstream_setting.go: req.URL.Path = path.Join(base, rendered).
+			// Because the "/" and ".." are percent-encoded, path.Clean cannot
+			// collapse the segments, so the request stays within /item/...
+			joined := path.Join("/v1", rendered)
+			assert.Assert(
+				t,
+				strings.HasPrefix(joined, "/v1/item/"),
+				"path must stay within the intended prefix, got %q",
+				joined,
+			)
+			assert.Assert(
+				t,
+				joined != "/admin/secret" && !strings.HasSuffix(joined, "/admin/secret"),
+				"path traversal must not reach /admin/secret, got %q",
+				joined,
+			)
 		})
 	}
 }

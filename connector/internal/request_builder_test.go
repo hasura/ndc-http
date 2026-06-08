@@ -158,11 +158,15 @@ func TestEvalURLAndHeaderParametersOAS2(t *testing.T) {
 		headers      map[string]string
 	}{
 		{
+			// CWE-22: "/" inside a single string path parameter is now
+			// percent-encoded (%2F) so it cannot traverse to a different
+			// upstream path. The value below decodes once to %2F (the raw URL
+			// holds %252F) instead of a literal slash.
 			name: "get_subject",
 			rawArguments: `{
 				"identifier": "thesauri/material/AAT.11914"
 			}`,
-			expectedURL: "/id/thesauri/material/AAT.11914",
+			expectedURL: "/id/thesauri%2Fmaterial%2FAAT.11914",
 		},
 	}
 
