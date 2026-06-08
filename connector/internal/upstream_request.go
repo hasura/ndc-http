@@ -31,7 +31,7 @@ func (um *UpstreamManager) BuildRequests(
 	httpOptions, err := um.parseHTTPOptionsFromArguments(operation.Arguments, rawArgs)
 	if err != nil {
 		return nil, schema.UnprocessableContentError("invalid http options", map[string]any{
-			"cause": err.Error(),
+			errorKeyCause: err.Error(),
 		})
 	}
 

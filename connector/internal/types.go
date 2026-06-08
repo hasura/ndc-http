@@ -15,6 +15,10 @@ const (
 	acceptHeader               = "Accept"
 	defaultTimeoutSeconds uint = 30
 	defaultRetryDelays    uint = 1000
+
+	// keys used in structured error/response detail maps.
+	errorKeyCause   = "cause"
+	responseKeyData = "data"
 )
 
 var errRequestBodyRequired = errors.New("request body is required")
@@ -102,8 +106,8 @@ func (dr DistributedResponse[T]) ToMap() map[string]any {
 	results := make([]map[string]any, len(dr.Results))
 	for i, result := range dr.Results {
 		results[i] = map[string]any{
-			"server": result.Server,
-			"data":   result.Data,
+			"server":        result.Server,
+			responseKeyData: result.Data,
 		}
 	}
 

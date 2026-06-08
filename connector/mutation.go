@@ -27,7 +27,7 @@ func (c *HTTPConnector) Mutation(
 			return nil, schema.UnprocessableContentError(
 				"invalid request_arguments in request body",
 				map[string]any{
-					"cause": err.Error(),
+					errorKeyCause: err.Error(),
 				},
 			)
 		}
@@ -71,7 +71,7 @@ func (c *HTTPConnector) MutationExplain(
 				return nil, schema.UnprocessableContentError(
 					"invalid request_arguments in request body",
 					map[string]any{
-						"cause": err.Error(),
+						errorKeyCause: err.Error(),
 					},
 				)
 			}
@@ -97,7 +97,7 @@ func (c *HTTPConnector) explainProcedure(
 	var rawArgs map[string]any
 	if err := json.Unmarshal(operation.Arguments, &rawArgs); err != nil {
 		return nil, schema.BadRequestError("failed to decode arguments", map[string]any{
-			"cause": err.Error(),
+			errorKeyCause: err.Error(),
 		})
 	}
 
