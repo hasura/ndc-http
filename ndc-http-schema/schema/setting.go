@@ -12,9 +12,9 @@ import (
 	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	"github.com/invopop/jsonschema"
+	orderedmap "github.com/pb33f/ordered-map/v2"
 	"github.com/theory/jsonpath"
 	"github.com/theory/jsonpath/spec"
-	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
 // NDCHttpSettings represent global settings of the HTTP API, including base URL, headers, etc...

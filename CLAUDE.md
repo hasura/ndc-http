@@ -198,7 +198,7 @@ Production-ready HTTP client with:
 
 ### Prerequisites
 
-- **Go 1.26.1+** (as specified in [go.work](go.work:1))
+- **Go 1.26++** (as specified in [go.work](go.work:1))
 - **golangci-lint** for linting
 - **Docker** (optional, for integration tests)
 
@@ -620,10 +620,10 @@ HASURA_LOG_LEVEL=debug ./server/main.go serve
 
 Located in [.github/workflows/](.github/workflows/):
 
-| Workflow | Trigger | What it does |
-|---|---|---|
-| `test.yaml` | Push/PR | Runs unit tests, NDC compliance tests (`ndc-test`), coverage reports posted to PRs |
-| `lint.yaml` | Push/PR | Detects all workspace modules, runs `golangci-lint` per module, checks `gofmt` |
+| Workflow       | Trigger  | What it does                                                                                                                                                        |
+| -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test.yaml`    | Push/PR  | Runs unit tests, NDC compliance tests (`ndc-test`), coverage reports posted to PRs                                                                                  |
+| `lint.yaml`    | Push/PR  | Detects all workspace modules, runs `golangci-lint` per module, checks `gofmt`                                                                                      |
 | `release.yaml` | Tag `v*` | Builds multi-platform Docker images (`linux/amd64`, `linux/arm64`), cross-compiles CLI binaries via `gox`, creates draft GitHub release, generates plugin manifests |
 
 **Platforms for CLI release:** `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`
