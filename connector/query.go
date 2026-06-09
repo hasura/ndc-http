@@ -39,7 +39,7 @@ func (c *HTTPConnector) Query(
 			return nil, schema.UnprocessableContentError(
 				"invalid request_arguments in request body",
 				map[string]any{
-					"cause": err.Error(),
+					errorKeyCause: err.Error(),
 				},
 			)
 		}
@@ -77,7 +77,7 @@ func (c *HTTPConnector) QueryExplain(
 			return nil, schema.UnprocessableContentError(
 				"invalid request_arguments in request body",
 				map[string]any{
-					"cause": err.Error(),
+					errorKeyCause: err.Error(),
 				},
 			)
 		}
@@ -100,7 +100,7 @@ func (c *HTTPConnector) explainQuery(
 		return nil, schema.UnprocessableContentError(
 			"failed to resolve argument variables",
 			map[string]any{
-				"cause": err.Error(),
+				errorKeyCause: err.Error(),
 			},
 		)
 	}
@@ -128,7 +128,7 @@ func (c *HTTPConnector) execQuerySync(
 			Aggregates: schema.RowSetAggregates{},
 			Rows: []map[string]any{
 				{
-					"__value": result,
+					valueFieldKey: result,
 				},
 			},
 		}
@@ -170,7 +170,7 @@ func (c *HTTPConnector) execQueryAsync(
 					Aggregates: schema.RowSetAggregates{},
 					Rows: []map[string]any{
 						{
-							"__value": result,
+							valueFieldKey: result,
 						},
 					},
 				}
@@ -270,7 +270,7 @@ func (c *HTTPConnector) serializeExplainResponse(
 	rawHeaders, err := json.Marshal(req.Header)
 	if err != nil {
 		return nil, schema.InternalServerError("failed to encode headers", map[string]any{
-			"cause": err.Error(),
+			errorKeyCause: err.Error(),
 		})
 	}
 

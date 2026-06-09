@@ -50,7 +50,7 @@ func (c *RequestBuilder) Build() (*RetryableRequest, error) {
 		return nil, schema.UnprocessableContentError(
 			"failed to evaluate URL and Headers from parameters",
 			map[string]any{
-				"cause": err.Error(),
+				errorKeyCause: err.Error(),
 			},
 		)
 	}

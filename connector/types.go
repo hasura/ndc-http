@@ -7,6 +7,13 @@ import (
 	"github.com/hasura/gotel"
 )
 
+const (
+	// valueFieldKey is the NDC field key holding a function's scalar result.
+	valueFieldKey = "__value"
+	// errorKeyCause is the key used in structured error detail maps.
+	errorKeyCause = "cause"
+)
+
 var errBuildSchemaFailed = errors.New("failed to build NDC HTTP schema")
 
 // State is the global state which is shared for every connector request.

@@ -60,7 +60,7 @@ func (rqe *RawRequestBuilder) Explain() (*schema.ExplainResponse, error) {
 	rawHeaders, err := json.Marshal(httpRequest.Headers)
 	if err != nil {
 		return nil, schema.InternalServerError("failed to encode headers", map[string]any{
-			"cause": err.Error(),
+			errorKeyCause: err.Error(),
 		})
 	}
 

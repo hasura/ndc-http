@@ -428,7 +428,7 @@ func (client *HTTPClient) evalHTTPResponse(
 			http.StatusInternalServerError,
 			"failed to evaluate response",
 			map[string]any{
-				"cause": "unsupported content type " + contentType,
+				errorKeyCause: "unsupported content type " + contentType,
 			},
 		)
 	}
