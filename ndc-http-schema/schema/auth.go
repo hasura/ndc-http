@@ -8,7 +8,7 @@ import (
 
 	"github.com/hasura/goenvconf"
 	"github.com/invopop/jsonschema"
-	orderedmap "github.com/wk8/go-ordered-map/v2"
+	orderedmap "github.com/pb33f/ordered-map/v2"
 )
 
 const (

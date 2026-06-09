@@ -90,7 +90,7 @@ func (tt TelemetryConfig) do(
 	requestLogAttrs := map[string]any{
 		"url":     req.URL.String(),
 		"method":  req.Method,
-		"headers": otelutils.NewTelemetryHeaders(req.Header),
+		"headers": otelutils.ExtractTelemetryHeaders(req.Header, nil),
 	}
 
 	if isDebug && req.Body != nil && req.ContentLength > 0 && req.ContentLength <= 100*1024 {
