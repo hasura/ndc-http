@@ -727,6 +727,13 @@ func encodePathParameterValue(
 			}
 		}
 
+		// Percent-encode each value as a single path segment before joining so
+		// that reserved characters (notably "/" and ".") inside a client-supplied
+		// value cannot act as path separators and traverse the upstream request
+		// path. Escaping per element keeps the legitimate style separators
+		// (",", ";", ".") intact. See CWE-22 (path traversal).
+		values = escapePathSegments(values)
+
 		switch style {
 		case rest.EncodingStyleMatrix:
 			if !explode {
@@ -758,7 +765,7 @@ func encodePathParameterValue(
 		}
 	}
 
-	keyValues := transformParameterItemStrings(queryParams, explode)
+	keyValues := transformParameterItemStringsForPath(queryParams, explode)
 
 	switch style {
 	case rest.EncodingStyleMatrix:
@@ -802,4 +809,45 @@ func transformParameterItemStrings(queryParams ParameterItems, explode bool) []s
 	}
 
 	return headerValues
+}
+
+// transformParameterItemStringsForPath is the path-parameter counterpart of
+// transformParameterItemStrings. It percent-encodes every key and value as a
+// single path segment so that reserved characters (notably "/" and ".") in a
+// client-supplied value cannot act as path separators and traverse the upstream
+// request path. See CWE-22 (path traversal).
+func transformParameterItemStringsForPath(queryParams ParameterItems, explode bool) []string {
+	var pathValues []string
+
+	for _, pair := range queryParams {
+		key := url.PathEscape(pair.Keys().Format(false))
+
+		for _, value := range pair.Values() {
+			value = url.PathEscape(value)
+
+			if explode {
+				// R=100,G=200,B=150
+				pathValues = append(pathValues, key+"="+value)
+
+				continue
+			}
+
+			// R,100,G,200,B,150
+			pathValues = append(pathValues, key, value)
+		}
+	}
+
+	return pathValues
+}
+
+// escapePathSegments percent-encodes each value as a single path segment,
+// preventing path traversal (CWE-22) when the values are joined into the
+// upstream request path.
+func escapePathSegments(values []string) []string {
+	escaped := make([]string, len(values))
+	for i, value := range values {
+		escaped[i] = url.PathEscape(value)
+	}
+
+	return escaped
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"path"
 	"slices"
 	"strings"
 	"testing"
@@ -1429,6 +1430,77 @@ func TestEncodePathParameters(t *testing.T) {
 			},
 			expected: ";R=100;G=200;B=150",
 		},
+		{
+			// CWE-22: a string value containing "/" and ".." must be
+			// percent-encoded as a single segment so it cannot traverse the
+			// upstream path.
+			name: "traversal_simple",
+			param: &rest.RequestParameter{
+				Name: "name",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleSimple,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"../../../admin/secret"},
+				},
+			},
+			expected: "..%2F..%2F..%2Fadmin%2Fsecret",
+		},
+		{
+			name: "traversal_label",
+			param: &rest.RequestParameter{
+				Name: "name",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleLabel,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"../secret"},
+				},
+			},
+			expected: "...%2Fsecret",
+		},
+		{
+			name: "traversal_matrix",
+			param: &rest.RequestParameter{
+				Name: "name",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleMatrix,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{},
+					values: []string{"../secret"},
+				},
+			},
+			expected: ";name=..%2Fsecret",
+		},
+		{
+			name: "traversal_object_explode",
+			param: &rest.RequestParameter{
+				Name: "filter",
+				EncodingObject: rest.EncodingObject{
+					Explode: utils.ToPtr(true),
+					Style:   rest.EncodingStyleSimple,
+				},
+			},
+			inputs: ParameterItems{
+				{
+					keys:   []Key{NewKey("path")},
+					values: []string{"../../etc/passwd"},
+				},
+			},
+			expected: "path=..%2F..%2Fetc%2Fpasswd",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -1440,6 +1512,105 @@ func TestEncodePathParameters(t *testing.T) {
 				tc.param.EncodingObject,
 			)
 			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+// TestEncodePathParameters_NoUpstreamTraversal is a regression test for CWE-22.
+// A malicious string path-parameter value such as "../../../admin/secret"
+// applied to an operation path like "/item/{name}" must NOT be able to escape
+// the intended segment and redirect the upstream request to "/admin/secret".
+//
+// It mirrors the real request flow:
+//  1. EncodePathParameters substitutes the value into the operation path
+//     (connector/internal/request_builder.go InPath branch), then
+//  2. path.Join(baseURL.Path, endpoint.Path) joins it with the server base path
+//     (connector/internal/upstream_setting.go), which runs path.Clean.
+func TestEncodePathParameters_NoUpstreamTraversal(t *testing.T) {
+	testCases := []struct {
+		name        string
+		basePath    string
+		rawPath     string
+		paramName   string
+		value       string
+		notExpected string // a traversal target that must NOT be reached
+	}{
+		{
+			name:        "dot_dot_with_slashes",
+			basePath:    "/v1",
+			rawPath:     "/item/{name}",
+			paramName:   "name",
+			value:       "../../../admin/secret",
+			notExpected: "/admin/secret",
+		},
+		{
+			name:        "leading_slash_injection",
+			basePath:    "/v1",
+			rawPath:     "/item/{name}",
+			paramName:   "name",
+			value:       "/admin/secret",
+			notExpected: "/admin/secret",
+		},
+		{
+			name:        "empty_base_path",
+			basePath:    "",
+			rawPath:     "/item/{name}",
+			paramName:   "name",
+			value:       "../../../admin/secret",
+			notExpected: "/admin/secret",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			encodedPath := EncodePathParameters(
+				tc.rawPath,
+				tc.paramName,
+				ParameterItems{
+					{
+						keys:   []Key{},
+						values: []string{tc.value},
+					},
+				},
+				rest.EncodingObject{
+					Explode: utils.ToPtr(false),
+					Style:   rest.EncodingStyleSimple,
+				},
+			)
+
+			// The "/" separators inside the value must be percent-encoded so
+			// the value stays a single path segment.
+			assert.Assert(
+				t,
+				!strings.Contains(encodedPath, "/admin/secret"),
+				"raw slashes leaked into the encoded path: %q",
+				encodedPath,
+			)
+			assert.Assert(
+				t,
+				strings.Contains(encodedPath, "%2F"),
+				"expected slashes in the value to be percent-encoded, got %q",
+				encodedPath,
+			)
+
+			// path.Join runs path.Clean; with the slashes encoded there are no
+			// extra segments for it to collapse, so the request cannot traverse
+			// to the attacker-chosen absolute path.
+			finalPath := path.Join(tc.basePath, encodedPath)
+			assert.Assert(
+				t,
+				finalPath != tc.notExpected,
+				"path traversal succeeded: final path resolved to %q",
+				finalPath,
+			)
+			// The encoded value must still be carried within the intended
+			// "/item/" segment.
+			assert.Assert(
+				t,
+				strings.Contains(finalPath, "/item/"),
+				"expected the value to stay under /item/, got %q",
+				finalPath,
+			)
 		})
 	}
 }

@@ -158,11 +158,19 @@ func TestEvalURLAndHeaderParametersOAS2(t *testing.T) {
 		headers      map[string]string
 	}{
 		{
+			// Security (CWE-22): a string path parameter is untrusted client
+			// input, so "/" inside the value is now percent-encoded (%2F) and
+			// kept within a single path segment instead of being substituted
+			// raw. This prevents path traversal / endpoint redirection on the
+			// upstream. NOTE: this is a deliberate behavior change for APIs that
+			// used a single string path parameter to carry a multi-segment
+			// identifier (e.g. the Getty AAT style "/id/{identifier}"); such
+			// values are now escaped.
 			name: "get_subject",
 			rawArguments: `{
 				"identifier": "thesauri/material/AAT.11914"
 			}`,
-			expectedURL: "/id/thesauri/material/AAT.11914",
+			expectedURL: "/id/thesauri%2Fmaterial%2FAAT.11914",
 		},
 	}
 
