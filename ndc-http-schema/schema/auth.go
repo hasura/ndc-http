@@ -155,7 +155,7 @@ func (j SecurityScheme) JSONSchema() *jsonschema.Schema {
 		Enum: []any{APIKeyScheme},
 	})
 	apiKeySchema.Set("value", envStringRef)
-	apiKeySchema.Set("in", (APIKeyLocation("")).JSONSchema())
+	apiKeySchema.Set("in", APIKeyLocation("").JSONSchema())
 	apiKeySchema.Set("name", &jsonschema.Schema{
 		Type: "string",
 	})

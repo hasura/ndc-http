@@ -5,8 +5,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"maps"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 
 	"github.com/hasura/goenvconf"
@@ -357,7 +359,10 @@ func (um *UpstreamManager) evalSecuritySchemes(
 	}
 
 	// fallback to the first working credential.
-	for name, cred := range credentials {
+	// Iterate in sorted key order so the selection is deterministic.
+	for _, name := range slices.Sorted(maps.Keys(credentials)) {
+		cred := credentials[name]
+
 		hasAuth, err := cred.Inject(req)
 		if err != nil {
 			continue
@@ -408,7 +413,10 @@ func (um *UpstreamManager) InjectMockRequestSettings(
 	}
 
 	// fallback to the first working credential.
-	for _, cred := range settings.credentials {
+	// Iterate in sorted key order so the selection is deterministic.
+	for _, name := range slices.Sorted(maps.Keys(settings.credentials)) {
+		cred := settings.credentials[name]
+
 		hasAuth, err := cred.Inject(req)
 		if err != nil {
 			continue

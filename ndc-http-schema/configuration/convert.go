@@ -40,7 +40,7 @@ func ConvertToNDCSchema(config *ConvertConfig, logger *slog.Logger) (*schema.NDC
 	switch config.Spec {
 	case schema.OpenAPIv3Spec, schema.OAS3Spec:
 		result, errs = openapi.OpenAPIv3ToNDCSchema(rawContent, options)
-	case schema.OpenAPIv2Spec, (schema.OAS2Spec):
+	case schema.OpenAPIv2Spec, schema.OAS2Spec:
 		result, errs = openapi.OpenAPIv2ToNDCSchema(rawContent, options)
 	case schema.NDCSpec:
 		result, err = ndc.BuildNDCSchema(rawContent, ndc.ConvertOptions{

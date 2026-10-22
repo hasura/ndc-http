@@ -1546,7 +1546,14 @@ func TestConnectorOAuth(t *testing.T) {
 				}
 			}
 		},
-		"arguments": {},
+		"arguments": {
+			"httpOptions": {
+				"type": "literal",
+				"value": {
+					"servers": ["0"]
+				}
+			}
+		},
 		"collection_relationships": {}
 	}`)
 
