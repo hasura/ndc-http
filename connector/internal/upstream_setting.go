@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"maps"
 	"math/rand/v2"
 	"net/http"
 	"net/url"
@@ -84,12 +85,13 @@ func (us *UpstreamSetting) getBaseURLFromServers(
 	results := []*url.URL{}
 	selectedServerIDs := []string{}
 
-	for key, server := range us.servers {
+	// Iterate in sorted key order so the index-to-server mapping is stable.
+	for _, key := range slices.Sorted(maps.Keys(us.servers)) {
 		if len(serverIDs) > 0 && !slices.Contains(serverIDs, key) {
 			continue
 		}
 
-		hostPtr := server.URL
+		hostPtr := us.servers[key].URL
 		results = append(results, hostPtr)
 		selectedServerIDs = append(selectedServerIDs, key)
 	}
@@ -106,7 +108,7 @@ func (us *UpstreamSetting) getBaseURLFromServers(
 
 		return result, selectedServerIDs[0], nil
 	default:
-		index := rand.IntN(len(results) - 1)
+		index := rand.IntN(len(results))
 		host := results[index]
 
 		return host, selectedServerIDs[index], nil
