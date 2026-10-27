@@ -1,0 +1,33 @@
+name: Vulnerability Scan
+
+# Same gate ndc-hub applies to new connector versions (registry-automation trivy scan):
+# image scan, CRITICAL/HIGH, fail on any finding. Running it here catches issues before tagging.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * 1" # weekly, catches CVEs published after merge
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trivy-scan:
+    name: Trivy image scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Build image
+        run: docker build -f Dockerfile -t ndc-http:scan .
+      - name: Scan image (CRITICAL,HIGH)
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --scanners vuln \
+            --severity CRITICAL,HIGH \
+            --exit-code 1 \
+            ndc-http:scan
