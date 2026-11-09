@@ -1729,78 +1729,55 @@ func TestConnectorTLS(t *testing.T) {
 	testServer := connServer.BuildTestServer()
 	defer testServer.Close()
 
-	func() {
-		findPetsBody := []byte(`{
-			"collection": "findPets",
-			"query": {
-				"fields": {
-					"__value": {
-						"type": "column",
-						"column": "__value"
+	// Select each server explicitly: unfiltered requests randomly choose a server
+	// and cannot guarantee coverage of both TLS configurations.
+	for _, tc := range []struct {
+		name     string
+		serverID string
+	}{
+		{name: "global_tls_from_files", serverID: "0"},
+		{name: "server_tls_from_pem", serverID: "1"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			findPetsBody := []byte(fmt.Sprintf(`{
+				"collection": "findPets",
+				"query": {
+					"fields": {
+						"__value": {
+							"type": "column",
+							"column": "__value"
+						}
 					}
-				}
-			},
-			"arguments": {},
-			"collection_relationships": {}
-		}`)
+				},
+				"arguments": {
+					"httpOptions": {
+						"type": "literal",
+						"value": {
+							"servers": [%q]
+						}
+					}
+				},
+				"collection_relationships": {}
+			}`, tc.serverID))
 
-		res, err := http.Post(
-			fmt.Sprintf("%s/query", testServer.URL),
-			"application/json",
-			bytes.NewBuffer(findPetsBody),
-		)
-		assert.NilError(t, err)
-		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
-			{
-				Rows: []map[string]any{
-					{
-						"__value": []any{},
+			res, err := http.Post(
+				fmt.Sprintf("%s/query", testServer.URL),
+				"application/json",
+				bytes.NewBuffer(findPetsBody),
+			)
+			assert.NilError(t, err)
+			assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
+				{
+					Rows: []map[string]any{
+						{
+							"__value": []any{},
+						},
 					},
 				},
-			},
+			})
 		})
-	}()
+	}
 
-	func() {
-		findPetsBody := []byte(`{
-			"collection": "findPets",
-			"query": {
-				"fields": {
-					"__value": {
-						"type": "column",
-						"column": "__value"
-					}
-				}
-			},
-			"arguments": {
-				"httpOptions": {
-					"type": "literal",
-					"value": {
-						"servers": ["1"]
-					}
-				}
-			},
-			"collection_relationships": {}
-		}`)
-
-		res, err := http.Post(
-			fmt.Sprintf("%s/query", testServer.URL),
-			"application/json",
-			bytes.NewBuffer(findPetsBody),
-		)
-		assert.NilError(t, err)
-		assertHTTPResponse(t, res, http.StatusOK, schema.QueryResponse{
-			{
-				Rows: []map[string]any{
-					{
-						"__value": []any{},
-					},
-				},
-			},
-		})
-	}()
-
-	time.Sleep(time.Second)
 	assert.Equal(t, 1, mockServer.Count())
 	assert.Equal(t, 1, mockServer1.Count())
 }
@@ -1821,6 +1798,7 @@ func TestConnectorTLSInsecure(t *testing.T) {
 	testServer := connServer.BuildTestServer()
 	defer testServer.Close()
 
+	// Server 0 uses the global insecure TLS setting; server 1 has its own TLS override.
 	func() {
 		findPetsBody := []byte(`{
 			"collection": "findPets",
@@ -1832,7 +1810,14 @@ func TestConnectorTLSInsecure(t *testing.T) {
 					}
 				}
 			},
-			"arguments": {},
+			"arguments": {
+				"httpOptions": {
+					"type": "literal",
+					"value": {
+						"servers": ["0"]
+					}
+				}
+			},
 			"collection_relationships": {}
 		}`)
 

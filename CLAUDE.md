@@ -198,7 +198,7 @@ Production-ready HTTP client with:
 
 ### Prerequisites
 
-- **Go 1.26++** (as specified in [go.work](go.work:1))
+- **Go 1.27++** (as specified in [go.work](go.work:1))
 - **golangci-lint** for linting
 - **Docker** (optional, for integration tests)
 

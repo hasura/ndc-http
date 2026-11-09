@@ -6,8 +6,8 @@ import (
 	"slices"
 	"strconv"
 	"time"
+	"uuid"
 
-	"github.com/google/uuid"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"github.com/hasura/ndc-sdk-go/v2/utils"
 )

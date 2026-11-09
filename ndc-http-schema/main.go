@@ -60,11 +60,12 @@ func initLogger(logLevel string, noColor bool) (*slog.Logger, error) {
 		return nil, err
 	}
 
-	logger := slog.New(tint.NewHandler(os.Stderr, &tint.Options{
-		Level:      level,
-		TimeFormat: "15:04",
-		NoColor:    noColor,
-	}))
+	logger := slog.New(
+		tint.NewTextHandler(
+			os.Stderr,
+			&tint.Options{Level: level, TimeFormat: "15:04", NoColor: noColor},
+		),
+	)
 	slog.SetDefault(logger)
 
 	return logger, nil

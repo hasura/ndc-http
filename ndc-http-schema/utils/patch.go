@@ -8,7 +8,7 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"go.yaml.in/yaml/v4"
+	"github.com/pb33f/go-yaml"
 )
 
 var (

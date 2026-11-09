@@ -24,6 +24,7 @@ linters:
     - noinlineerr
     - noctx
     - modernize
+    - gomodguard
   settings:
     nestif:
       # Minimal complexity of if statements to report.
