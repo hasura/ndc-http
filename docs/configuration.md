@@ -74,6 +74,11 @@ files:
       
 ```
 
+Omitting `retry` or setting `retry.times.value` to `0` disables retries, not error handling.
+Upstream responses with status codes of 400 or higher are returned as connector errors
+with the upstream response body in `details.error`. Upstream 4xx responses map to
+connector HTTP 422; upstream 5xx status codes are preserved.
+
 ## JSON Patch
 
 You can add JSON patches to extend API documentation files. HTTP connector supports `merge` and `json6902` strategies. JSON patches can be applied before or after the conversion from OpenAPI to HTTP schema configuration. It will be useful if you need to extend or fix some fields in the API documentation such as server URL.

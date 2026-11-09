@@ -250,6 +250,11 @@ func (um *UpstreamManager) ExecuteRequest(
 	clientWrapper := exhttp.NewClient(httpClient, middlewares...)
 
 	resp, err := clientWrapper.Do(req)
+	// Status validation must also run when retries are disabled. Retry middleware
+	// already converts error responses, so do not read their bodies again.
+	if err == nil && resp.StatusCode >= http.StatusBadRequest {
+		err = exhttp.HTTPErrorFromResponse(resp)
+	}
 
 	return resp, cancel, err
 }
