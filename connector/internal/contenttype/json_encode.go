@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"uuid"
 
-	"github.com/google/uuid"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"github.com/hasura/ndc-sdk-go/v2/utils"
@@ -224,7 +224,8 @@ func (c *JSONEncoder) evalScalarType(
 			return err
 		}
 
-		if err := uuid.Validate(str); err != nil {
+		_, err = uuid.Parse(str)
+		if err != nil {
 			return err
 		}
 

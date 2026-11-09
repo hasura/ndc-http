@@ -10,7 +10,7 @@ import (
 	"github.com/hasura/goenvconf"
 	"github.com/hasura/ndc-http/exhttp"
 	"github.com/hasura/ndc-http/ndc-http-schema/schema"
-	"go.yaml.in/yaml/v4"
+	"github.com/pb33f/go-yaml"
 )
 
 // ConfigValidator manages the validation and status of upstreams.

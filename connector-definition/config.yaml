@@ -2,7 +2,7 @@
 # The generated schema output will be generated to this file location.
 # The schema is an array of API documentation files that were converted to ndc-http-schema configuration specs.
 # You can find out more about that specs and advanced configurations in https://github.com/hasura/ndc-http/tree/main/ndc-http-schema#ndc-http-configuration
-output: schema.output.json
+# output: schema.output.json
 strict: false
 forwardHeaders:
   enabled: false

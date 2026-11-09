@@ -1,6 +1,5 @@
 # build context at repo root: docker build -f Dockerfile .
-FROM golang:1.26.10 AS builder
-ENV GOTOOLCHAIN=go1.26.10
+FROM golang:1.27.3 AS builder
 
 WORKDIR /app
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"go.yaml.in/yaml/v4"
+	"github.com/pb33f/go-yaml"
 	"gotest.tools/v3/assert"
 )
 

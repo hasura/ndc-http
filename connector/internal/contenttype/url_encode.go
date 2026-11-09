@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"uuid"
 
-	"github.com/google/uuid"
 	rest "github.com/hasura/ndc-http/ndc-http-schema/schema"
 	"github.com/hasura/ndc-sdk-go/v2/schema"
 	"github.com/hasura/ndc-sdk-go/v2/utils"
