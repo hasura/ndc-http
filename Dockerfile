@@ -1,5 +1,5 @@
 # build context at repo root: docker build -f Dockerfile .
-FROM golang:1.27.3 AS builder
+FROM golang:1.27.4 AS builder
 
 WORKDIR /app
 
